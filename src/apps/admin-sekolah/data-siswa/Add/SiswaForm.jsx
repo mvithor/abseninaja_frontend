@@ -212,7 +212,6 @@ const TambahSiswaForm = ({ setSuccess, setError }) => {
                                 textField: {
                                 fullWidth: true,
                                 size: 'medium',
-                                required: true,
                                 InputProps: {
                                     sx: {
                                     height: '46px', // Atur tinggi agar sama seperti input lain
