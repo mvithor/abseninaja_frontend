@@ -29,8 +29,8 @@ const TambahSiswaForm = ({ setSuccess, setError }) => {
         email: '',
         password: '',
         kelas_id: '',
-        nis: '',
-        tanggal_lahir: '',
+        nis: null,
+        tanggal_lahir: null,
     });
 
     // fetch kelas
@@ -82,11 +82,17 @@ const TambahSiswaForm = ({ setSuccess, setError }) => {
     };
 
     const handleDateChange = (date) => {
-        setFormState((prevState) => ({
-            ...prevState,
-            tanggal_lahir: date
-        }));
-    };
+        setFormState((prevState) => {
+          const updated = { ...prevState };
+          if (date) {
+            updated.tanggal_lahir = date;
+          } else {
+            delete updated.tanggal_lahir;
+          }
+          return updated;
+        });
+      };
+      
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -198,7 +204,6 @@ const TambahSiswaForm = ({ setSuccess, setError }) => {
                             onChange={handleChange}
                             startAdornment={<InputAdornment position="start"><IconIdBadge2 /></InputAdornment>}
                             fullWidth
-                            required
                         />
                 </Grid>
                 <Grid size={{ xs: 12, md: 6 }}>
