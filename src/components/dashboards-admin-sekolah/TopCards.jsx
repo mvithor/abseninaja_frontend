@@ -67,11 +67,11 @@ const TopCards = () => {
   });
 
   const cards = [
-    { href: '/jumlah-siswa', title: 'Siswa', digits: jumlahSiswa || '0' },
-    { href: '/jumlah-kelas', title: 'Kelas', digits: jumlahKelas || '0' },
-    { href: '/jumlah-guru', title: 'Guru', digits: jumlahGuru || '0' },
-    { href: '/jumlah-staf', title: 'Staf', digits: jumlahStaf || '0' },
-    { href: '/jumlah-ekskul', title: 'Ekskul', digits: jumlahEkskul || '0' },
+    { href: '/dashboard/admin-sekolah/siswa', title: 'Siswa', digits: jumlahSiswa || '0' },
+    { href: '/dashboard/admin-sekolah/kelas', title: 'Kelas', digits: jumlahKelas || '0' },
+    { href: '/dashboard/admin-sekolah/pegawai/guru', title: 'Guru', digits: jumlahGuru || '0' },
+    { href: '/dashboard/admin-sekolajh/pegawai/staf', title: 'Staf', digits: jumlahStaf || '0' },
+    { href: '/dashboard/admin-sekolah/ekskul', title: 'Ekskul', digits: jumlahEkskul || '0' },
   ];
 
   const isLoading = isLoadingSiswa || isLoadingKelas || isLoadingGuru || isLoadingStaf || isLoadingEkskul;

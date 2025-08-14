@@ -49,6 +49,9 @@ const KategoriPegawaiAdd = Loadable(lazy(() => import('../views/apps/admin-sekol
 const KategoriPegawaiDetailList = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-pegawai/KategoriPegawaiDetailList')));
 const KategoriPegawaiDetailAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-pegawai/KategoriPegawaiDetailAdd')));
 const KategoriPegawaiDetailEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-pegawai/KategoriPegawaiDetailEdit')));
+// Perizinan Pegawai
+const PerizinanPegawaiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-pegawai/PerizinanPegawaiList')));
+const PerizinanPegawaiEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-pegawai/PerizinanPegawaiEdit')));
 // Generate QR-Code
 const QrCodeGenerateList = Loadable(lazy(() => import('../views/apps/admin-sekolah/qr-code/QrCodeGenerateList')));
 // Ekskul Sekolah
@@ -93,6 +96,9 @@ const WaTemplateEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/w
 const KategoriTemplateList = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-template/KategoriTemplateList')));
 const KategoriTemplateAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-template/KategoriTemplateAdd')));
 const KategoriTemplateEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kategori-template/KategoriTemplateEdit')));
+// Notifikasi Template Mobile
+const NotifikasiTemplateList = Loadable(lazy(() => import('../views/apps/admin-sekolah/notifikasi-template/NotifikasiTemplateList')));
+const NotifikasiTemplateAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/notifikasi-template/NotifikasiTemplateAdd')));
 // Pengaturan Jam
 const PengaturanJamList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pengaturan-jam/PengaturanJamList')));
 const PengaturanJamEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/pengaturan-jam/PengaturanJamEdit')));
@@ -119,6 +125,8 @@ const SemesterAjaranEdit = Loadable(lazy(() => import('../views/apps/admin-sekol
 // User Admin
 const UserAdminList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-admin/UserAdminList')));
 const UserAdminAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-admin/UserAdminAdd')));
+// User Staf
+const UserStafList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-staf/UserStafList')));
 // User Siswa
 const UserSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-siswa/UserSiswaList')));
 // User Guru List
@@ -139,9 +147,9 @@ const Router = [
         element: <BlankLayout />, 
         children: [
           { path: '/', element: <Login /> },
-          { path: '/auth/404', element: <Error /> },
-          { path: '/auth/forbidden', element: <Forbidden /> },
-          { path: '*', element: <Navigate to="/auth/404" /> },
+          { path: '/404', element: <Error /> },
+          { path: '/forbidden', element: <Forbidden /> },
+          { path: '*', element: <Navigate to="/404" /> },
         ],
     },
     {
@@ -188,6 +196,9 @@ const Router = [
                     { path: 'kategori-pegawai/detail/:id', element: <KategoriPegawaiDetailList/> },
                     { path: 'kategori-pegawai/:id/tambah-sub-kategori', element: <KategoriPegawaiDetailAdd/> },
                     { path: 'kategori-pegawai/:id/edit-sub-kategori/:subKategoriId', element: <KategoriPegawaiDetailEdit/> },
+                    // Perizinan Pegawai
+                    { path: 'perizinan-pegawai', element: <PerizinanPegawaiList /> }, 
+                    { path: 'perizinan-pegawai/edit/:id', element: <PerizinanPegawaiEdit /> }, 
                     // WhatsApp
                     { path: 'whatsapp', element: <WhatsAppList/> },
                     // Template WhatsApp
@@ -198,6 +209,9 @@ const Router = [
                     { path: 'kategori-template', element: <KategoriTemplateList/> },
                     { path: 'kategori-template/tambah-template', element: <KategoriTemplateAdd/> },
                     { path: 'kategori-template/edit/:id', element: <KategoriTemplateEdit/> },
+                    // Notifikasi Template Mobile
+                    { path: 'notifikasi-template', element: <NotifikasiTemplateList/> },
+                    { path: 'notifikasi-template/tambah', element: <NotifikasiTemplateAdd/> },
                     // Kelas
                     { path: 'kelas', element: <KelasList/> }, 
                     { path: 'kelas/detail/:id', element: <KelasDetail/> },
@@ -250,6 +264,7 @@ const Router = [
                     // User Admiin
                     { path: 'user-admin', element: <UserAdminList/> },
                     { path: 'user-admin/tambah', element: <UserAdminAdd/> },
+                    { path: 'user-staf', element: <UserStafList/> },
                     // User Siswa
                     { path: 'user-siswa', element: <UserSiswaList/> },
                     // User Guru

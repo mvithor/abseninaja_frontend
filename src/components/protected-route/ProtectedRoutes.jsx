@@ -12,7 +12,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
   if (!allowedRoles.includes(role)) {
     // Jika role tidak diizinkan, arahkan ke halaman forbidden
-    return <Navigate to="/auth/forbidden" />;
+    return <Navigate to="/forbidden" />;
   }
 
   // Jika akses diizinkan, render komponen yang dimasukkan ke dalam <Outlet />

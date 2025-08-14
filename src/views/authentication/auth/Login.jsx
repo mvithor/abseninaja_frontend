@@ -13,13 +13,13 @@ const Login = () => (
         position: 'relative',
         '&:before': {
           content: '""',
-          background: 'radial-gradient(#d2f1df, #d3d7fa, #bad8f4)',
+          background: 'radial-gradient(#E3E3E3, #5E5CE6, #38A1FF)',
           backgroundSize: '400% 400%',
           animation: 'gradient 15s ease infinite',
           position: 'absolute',
           height: '100%',
           width: '100%',
-          opacity: 0.3,
+          opacity: 0.5,
         },
       }}>
         <Box position="relative">

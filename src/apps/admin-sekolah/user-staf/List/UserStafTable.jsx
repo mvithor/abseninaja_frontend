@@ -15,25 +15,22 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import { IconEdit, IconBell } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconBell } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
-const UserWaliSiswaTable = ({
-    userWaliSiswa,
+const UserStafTable = ({
+    userStaf,
     page,
     rowsPerPage,
     handleChangePage,
     handleChangeRowsPerPage,
     handleEdit,
+    handleDelete,
     handleOpenPrefs,
     isLoading,
     isError,
     errorMessage
 }) => {
-    const total = Array.isArray(userWaliSiswa) ? userWaliSiswa.length : 0;
-    const paged = rowsPerPage > 0
-      ? (userWaliSiswa || []).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-      : (userWaliSiswa || []);
 
     return (
         <Paper variant='outlined'>
@@ -62,12 +59,12 @@ const UserWaliSiswaTable = ({
                     {isLoading ? (
                         <TableRow>
                         <TableCell colSpan={5}>
-                            <Box
+                            <Box 
                             sx={{
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                minHeight: '100px'
+                                minHeight: '100px' 
                             }}
                             >
                             <CircularProgress />
@@ -91,7 +88,7 @@ const UserWaliSiswaTable = ({
                             </Box>
                         </TableCell>
                         </TableRow>
-                    ) : total === 0 ? (
+                    ) : userStaf.length === 0 ? (  
                         <TableRow>
                         <TableCell colSpan={5}>
                         <Box
@@ -99,42 +96,50 @@ const UserWaliSiswaTable = ({
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
-                                height: '100%',
-                                minHeight: '100px',
-                                textAlign: 'center'
+                                height: '100%', 
+                                minHeight: '100px', 
+                                textAlign: 'center' 
                             }}
                             >
                             <Typography variant="h6">
-                                Tidak ada pengguna wali siswa ditemukan
+                                Tidak ada pengguna staf ditemukan
                             </Typography>
                             </Box>
                         </TableCell>
                         </TableRow>
                     ) : (
-                        paged.map((waliSiswaUser, index) => (
-                        <TableRow key={waliSiswaUser.user_id || waliSiswaUser.id || index}>
+                        (rowsPerPage > 0
+                        ? userStaf.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        : userStaf
+                        ).map((stafUser, index) => (
+                        <TableRow key={stafUser.User.id || index}>
                             <TableCell>
                                 <Typography sx={{ fontSize: '1rem' }}>{page * rowsPerPage + index + 1}</Typography>
                             </TableCell>
                             <TableCell align='center'>
-                                <Typography sx={{ fontSize: '1rem' }}>{waliSiswaUser.name}</Typography>
+                                <Typography sx={{ fontSize: '1rem' }}>{stafUser.User.name}</Typography>
                             </TableCell>
                             <TableCell align='center'>
-                                <Typography sx={{ fontSize: '1rem' }}>{waliSiswaUser.email}</Typography>
+                                <Typography sx={{ fontSize: '1rem' }}>{stafUser.User.email}</Typography>
                             </TableCell>
                             <TableCell align='center'>
-                                <Typography sx={{ fontSize: '1rem' }}>{waliSiswaUser.updated_at || 'Tidak Ada'}</Typography>
+                                <Typography sx={{ fontSize: '1rem' }}>{stafUser.User.updated_at || 'Tidak Ada'}</Typography>
                             </TableCell>
                             <TableCell>
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 1, height: '100%' }}>
                                 <Tooltip title="Preferensi Notifikasi" placement="bottom">
-                                  <IconButton onClick={() => handleOpenPrefs?.(waliSiswaUser.user_id, waliSiswaUser.name)}>
+                                <IconButton onClick={() => handleOpenPrefs?.(stafUser.User.id, stafUser.User.name)}>
                                     <IconBell width={18} />
-                                  </IconButton>
+                                </IconButton>
                                 </Tooltip>
                                 <Tooltip title="Edit" placement="bottom">
-                                <IconButton onClick={() => handleEdit(waliSiswaUser.user_id)}>
+                                <IconButton onClick={() => handleEdit(stafUser.User.id)}>
                                     <IconEdit width={18} />
+                                </IconButton>
+                                </Tooltip>
+                                <Tooltip title="Hapus" placement="bottom">
+                                <IconButton onClick={() => handleDelete(stafUser.User.id)}>
+                                    <IconTrash width={18} />
                                 </IconButton>
                                 </Tooltip>
                             </Box>
@@ -148,7 +153,7 @@ const UserWaliSiswaTable = ({
                         <TablePagination
                             rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                             colSpan={5}
-                            count={total}
+                            count={userStaf.length}
                             rowsPerPage={rowsPerPage}
                             page={page}
                             onPageChange={handleChangePage}
@@ -158,23 +163,25 @@ const UserWaliSiswaTable = ({
                         />
                         </TableRow>
                     </TableFooter>
+                    
                 </Table>
             </TableContainer>
         </Paper>
     );
 };
 
-UserWaliSiswaTable.propTypes = {
-    userWaliSiswa: PropTypes.array.isRequired,
+UserStafTable.propTypes = {
+    userStaf: PropTypes.array.isRequired,
     page: PropTypes.number.isRequired,
     rowsPerPage: PropTypes.number.isRequired,
     handleChangePage: PropTypes.func.isRequired,
     handleChangeRowsPerPage: PropTypes.func.isRequired,
     handleEdit: PropTypes.func.isRequired,
-    handleOpenPrefs: PropTypes.func,          
-    isLoading: PropTypes.bool.isRequired,
-    isError: PropTypes.bool.isRequired,
-    errorMessage: PropTypes.string
-}
+    handleDelete: PropTypes.func.isRequired,
+    handleOpenPrefs: PropTypes.func,
+    isLoading: PropTypes.bool.isRequired, 
+    isError: PropTypes.bool.isRequired, 
+    errorMessage: PropTypes.string 
+};
 
-export default UserWaliSiswaTable;
+export default UserStafTable;

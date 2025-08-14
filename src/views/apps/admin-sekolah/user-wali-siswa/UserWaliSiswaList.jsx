@@ -7,6 +7,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import UserWaliSiswaTable from "src/apps/admin-sekolah/user-wali-siswa/list/UserWaliSiswaTable";
+import NotificationPrefsDrawer from "src/apps/admin-sekolah/user-wali-siswa/prefs/NotificationPrefsDrawer";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 
@@ -27,6 +28,9 @@ const UserWaliSiswaList = () => {
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const [prefsOpen, setPrefsOpen] = useState(false);
+    const [prefsUser, setPrefsUser] = useState({ id: null, name: '' });
     const navigate = useNavigate();
 
     const { data: userWaliSiswa = [], isLoading, isError, error: queryError } = useQuery({
@@ -47,11 +51,9 @@ const UserWaliSiswaList = () => {
         setPage(0);
     };
     
-    const filteredUserWaliSiswa = userWaliSiswa
-        .filter((userWaliSiswa) => 
-          userWaliSiswa.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .sort((a, b) => a.name.localeCompare(b.name));
+    const filteredUserWaliSiswa = (userWaliSiswa || [])
+        .filter((item) => (item?.name || '').toLowerCase().includes((searchQuery || '').toLowerCase()))
+        .sort((a, b) => (a?.name || '').localeCompare(b?.name || ''));
     
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -61,10 +63,19 @@ const UserWaliSiswaList = () => {
         navigate(`#`);
     };
 
+    const handleOpenPrefs = (userId, name) => {
+        setPrefsUser({ id: userId, name: name || '' });
+        setPrefsOpen(true);
+    };
+
+    const handleClosePrefs = () => {
+        setPrefsOpen(false);
+    };
+
     return (
         <PageContainer title="Pengguna Wali Siswa" description="Pengguna Wali Siswa">
             <ParentCard title="Pengguna Wali Siswa">
-                <Alerts error={error}/>
+                <Alerts error={error} success={success}/>
                 <Box
                     sx={{
                         display: 'flex',
@@ -89,11 +100,23 @@ const UserWaliSiswaList = () => {
                     handleChangePage={handleChangePage}
                     handleChangeRowsPerPage={handleRowsPerPageChange}
                     handleEdit={handleEdit}
+                    handleOpenPrefs={handleOpenPrefs}
                     isLoading={isLoading}
                     isError={isError}
                     errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"}
                 />
             </ParentCard>
+
+            <NotificationPrefsDrawer
+                open={prefsOpen}
+                onClose={handleClosePrefs}
+                userId={prefsUser.id}
+                userName={prefsUser.name}
+                onSaved={() => {
+                    setSuccess('Preferensi notifikasi disimpan');
+                    setTimeout(() => setSuccess(''), 2500);
+                }}
+            />
         </PageContainer>
     );
 };

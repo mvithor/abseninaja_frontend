@@ -54,7 +54,7 @@ import {
         id: uniqueId(),
         title: 'Pesan',
         icon: IconMessage,
-        href: '/dashboard/admin-sekolah/pesan'
+        href: '#'
     },
     {
         id: uniqueId(),
@@ -242,7 +242,7 @@ import {
                 id: uniqueId(),
                 title: 'Jadwal Kelas',
                 icon: IconCalendarEvent,
-                href: '/dashboard/admin-sekolah/jadwal-Kelas',
+                href: '#',
             },
             {
                 id: uniqueId(),
@@ -293,39 +293,91 @@ import {
         children: [
             {
                 id: uniqueId(),
-                title: 'Login WhatsApp',
-                icon: IconKey,
-                href: '/dashboard/admin-sekolah/whatsapp',
+                title: 'Notifikasi WhatsApp',
+                icon: IconSettings,
+                href: '',
+                children: [
+                    {
+                        id: uniqueId(),
+                        title: 'Login WhatsApp',
+                        icon: IconKey,
+                        href: '/dashboard/admin-sekolah/whatsapp',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Template Pesan',
+                        icon: IconTemplate,
+                        href: '/dashboard/admin-sekolah/wa-template',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Kategori Template',
+                        icon: IconCategory,
+                        href: '/dashboard/admin-sekolah/kategori-template',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Broadcast Manual',
+                        icon: IconBroadcast,
+                        href: '#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Broadcast Terjadwal',
+                        icon: IconClock2,
+                        href: '#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Riwayat Pesan',
+                        icon: IconClipboardText,
+                        href: '#',
+                    },
+                ],
             },
             {
                 id: uniqueId(),
-                title: 'Template Pesan',
-                icon: IconTemplate,
-                href: '/dashboard/admin-sekolah/wa-template',
-            },
-            {
-                id: uniqueId(),
-                title: 'Kategori Template',
-                icon: IconCategory,
-                href: '/dashboard/admin-sekolah/kategori-template',
-            },
-            {
-                id: uniqueId(),
-                title: 'Broadcast Manual',
-                icon: IconBroadcast,
-                href: '#',
-            },
-            {
-                id: uniqueId(),
-                title: 'Broadcast Terjadwal',
-                icon: IconClock2,
-                href: '#',
-            },
-            {
-                id: uniqueId(),
-                title: 'Riwayat Pesan',
-                icon: IconClipboardText,
-                href: '#',
+                title: 'Notifikasi Aplikasi',
+                icon: IconSettings,
+                href: '',
+                children: [
+                    {
+                        id: uniqueId(),
+                        title: 'Template Notifikasi',
+                        icon: IconCategory2,
+                        href: '/dashboard/admin-sekolah/notifikasi-template',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Target Penerima',
+                        icon: IconCategory2,
+                        href: '#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'User Preferensi',
+                        icon: IconCategory2,
+                        href: '#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Broadcast Manual',
+                        icon: IconCalendarEvent,
+                        href: '/#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Broadcast Terjadwal',
+                        icon: IconClock,
+                        href: '#',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Log Pengiriman',
+                        icon: IconCategory2,
+                        href: '#',
+                    },
+                ],
             },
         ],
     },
