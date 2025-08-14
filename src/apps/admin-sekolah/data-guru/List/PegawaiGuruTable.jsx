@@ -47,7 +47,7 @@ const PegawaiGuruTable = ({
                             <Typography variant="h6" sx={{ fontSize: '1rem' }}>NIP</Typography>
                         </TableCell>
                         <TableCell align="center">
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Jabatan</Typography>
+                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Mata Pelajaran</Typography>
                         </TableCell>
                         <TableCell align="center">
                             <Typography variant="h6" sx={{ fontSize: '1rem' }}>Telepon</Typography>
