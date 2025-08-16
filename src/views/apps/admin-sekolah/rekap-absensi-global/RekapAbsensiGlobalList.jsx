@@ -46,6 +46,13 @@ const getEndOfMonth = () => {
   return new Date(now.getFullYear(), now.getMonth() + 1, 0);
 };
 
+const statusColor = (v) => {
+  if (v === '✔') return 'green';     // Hadir
+  if (v === 'T')  return '#1976d2';  // Terlambat
+  if (v === 'I')  return 'orange';   // Izin
+  if (v === 'S')  return 'red';      // Sakit
+  return 'gray';                     // Tanpa Keterangan / kosong
+};
 
 const RekapAbsensiList = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -68,27 +75,18 @@ const RekapAbsensiList = () => {
     queryKey: ['kelasOptions'],
     queryFn: async () => {
       const response = await axiosInstance.get('/api/v1/admin-sekolah/wali-kelas/by-kelas');
-  
-      console.log("Data sebelum sorting:", response.data.data);
-  
       const sortedData = response.data.data.sort((a, b) => {
         const extractLevel = (kelas) => {
           if (kelas.startsWith("VII")) return 7;
           if (kelas.startsWith("VIII")) return 8;
           if (kelas.startsWith("IX")) return 9;
-          return 99; // Jika tidak sesuai, masukkan ke akhir
+          return 99;
         };
-  
         const levelA = extractLevel(a.nama_kelas);
         const levelB = extractLevel(b.nama_kelas);
-  
         if (levelA !== levelB) return levelA - levelB;
-  
-        // Jika level sama, urutkan berdasarkan huruf setelah angka
         return a.nama_kelas.localeCompare(b.nama_kelas);
       });
-  
-      console.log("Data setelah sorting:", sortedData);
       return sortedData;
     },
     onError: (error) => {
@@ -96,32 +94,21 @@ const RekapAbsensiList = () => {
       setTimeout(() => setError(''), 3000);
     },
   });
-  
-
 
   // Fetch laporan saat modal dibuka
   const fetchLaporan = async (kelasId, startDate, endDate) => {
-    if (!kelasId || !startDate || !endDate) return; // Cegah pemanggilan jika nilai kosong
-  
+    if (!kelasId || !startDate || !endDate) return;
     setIsFetching(true);
-    
     try {
       const params = { 
         kelasId, 
         startDate: startDate instanceof Date ? format(startDate, 'yyyy-MM-dd') : '', 
         endDate: endDate instanceof Date ? format(endDate, 'yyyy-MM-dd') : '' 
       };
-  
-      console.log("Mengambil data dengan params:", params); // Debugging
-  
       const response = await axiosInstance.get('/api/v1/admin-sekolah/rekap/laporan', { params });
-  
-      console.log("Data diterima:", response.data);
-  
       setSiswaData(response.data.data || []);
       setNamaSekolah(response.data.namaSekolah || "Nama Sekolah Tidak Diketahui");
     } catch (error) {
-      console.error("Gagal mengambil data laporan:", error);
       setError('Gagal mengambil data laporan.');
       setTimeout(() => setError(''), 3000);
     } finally {
@@ -129,39 +116,27 @@ const RekapAbsensiList = () => {
     }
   };
   
-    // Fetch absensi per tanggal (tanpa filter jika tanggal tidak dipilih)
-    const fetchAbsensiPerTanggal = async (kelasId, startDate = '', endDate = '') => {
-      if (!kelasId || !startDate || !endDate) return;
-  
-      setIsFetching(true);
-      try {
-        const params = { 
-          kelasId, 
-          startDate: startDate instanceof Date ? format(startDate, 'yyyy-MM-dd') : '', 
-          endDate: endDate instanceof Date ? format(endDate, 'yyyy-MM-dd') : '' 
-        };
-  
-        const response = await axiosInstance.get('/api/v1/admin-sekolah/rekap/generate-absensi-tanggal', { params });
-  
-        // Periksa apakah response memiliki data yang sesuai
-        const tanggalArray = response.data?.tanggalArray || [];
-        const rekap = response.data?.rekap || [];
-  
-        console.log("Data absensi diterima:", response.data);
-  
-        setTanggalArray(tanggalArray);
-        setSiswaData(rekap);
-        
-      } catch (error) {
-        console.error("Gagal mengambil data absensi:", error);
-        setError('Gagal mengambil data absensi.');
-        setTimeout(() => setError(''), 3000);
-      } finally {
-        setIsFetching(false);
-      }
+  // Fetch absensi per tanggal
+  const fetchAbsensiPerTanggal = async (kelasId, startDate = '', endDate = '') => {
+    if (!kelasId || !startDate || !endDate) return;
+    setIsFetching(true);
+    try {
+      const params = { 
+        kelasId, 
+        startDate: startDate instanceof Date ? format(startDate, 'yyyy-MM-dd') : '', 
+        endDate: endDate instanceof Date ? format(endDate, 'yyyy-MM-dd') : '' 
+      };
+      const response = await axiosInstance.get('/api/v1/admin-sekolah/rekap/generate-absensi-tanggal', { params });
+      setTanggalArray(response.data?.tanggalArray || []);
+      setSiswaData(response.data?.rekap || []);
+    } catch (error) {
+      setError('Gagal mengambil data absensi.');
+      setTimeout(() => setError(''), 3000);
+    } finally {
+      setIsFetching(false);
+    }
   };
 
-  // Fetch laporan saat kelas dipilih, atau tanggal berubah (default bulan ini)
   useEffect(() => {
     if (kelasId) {
       fetchLaporan(kelasId, startDate, endDate);
@@ -174,7 +149,6 @@ const RekapAbsensiList = () => {
     setModalType(type);
     setKelasId(id);
     setModalOpen(true);
-
     if (type === 'laporan') {
       fetchLaporan(id, startDate, endDate);
     } else if (type === 'absensi') {
@@ -192,37 +166,34 @@ const RekapAbsensiList = () => {
     fetchAbsensiPerTanggal(kelasId, startDate, endDate);
   };
 
-   // Fungsi untuk mengunduh laporan berdasarkan format yang dipilih
-   const handleDownload = () => {
+  // Unduh laporan
+  const handleDownload = () => {
     if (siswaData.length === 0) {
       setError('Tidak ada data untuk diunduh');
       setTimeout(() => setError(''), 3000);
       return;
     }
-
-    if (downloadFormat === 'csv') {
-      downloadCSV();
-    } else if (downloadFormat === 'pdf') {
-      downloadPDF();
-    } else if (downloadFormat === 'print') {
-      printReport();
-    }
+    if (downloadFormat === 'csv') downloadCSV();
+    else if (downloadFormat === 'pdf') downloadPDF();
+    else if (downloadFormat === 'print') printReport();
   };
 
   const formatDate = (date) => date ? new Date(date).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" }) : "";
 
-  // Fungsi unduh CSV
+  // CSV
   const downloadCSV = () => {
-    let fileName = `Laporan_Absensi_${formatDate(startDate)}_sampai_${formatDate(endDate)}.csv`;
-
-    const header = `No, Nama Siswa, Total Hadir, Total Sakit, Total Izin, Total Alpa\n`;
-    const rows = siswaData.map((siswa, index) => 
-      `${index + 1},${siswa.nama_siswa},${siswa.kehadiran},${siswa.sakit},${siswa.izin},${siswa.alpa}`
-    );
-
+    const fileName = `Laporan_Absensi_${formatDate(startDate)}_sampai_${formatDate(endDate)}.csv`;
+    const header = `No, Nama Siswa, Total Hadir, Total Terlambat, Total Sakit, Total Izin, Total Tanpa Keterangan\n`;
+    const rows = siswaData.map((siswa, index) => {
+      const hadir = siswa.hadir ?? siswa.kehadiran ?? 0;
+      const terlambat = siswa.terlambat ?? 0;
+      const sakit = siswa.sakit ?? 0;
+      const izin = siswa.izin ?? 0;
+      const tk = siswa.tanpa_keterangan ?? siswa.alpa ?? 0;
+      return `${index + 1},${siswa.nama_siswa},${hadir},${terlambat},${sakit},${izin},${tk}`;
+    });
     const csvContent = "data:text/csv;charset=utf-8," + header + rows.join("\n");
     const encodedUri = encodeURI(csvContent);
-    
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
     link.setAttribute("download", fileName);
@@ -231,12 +202,12 @@ const RekapAbsensiList = () => {
     document.body.removeChild(link);
   };
 
-  // Fungsi unduh PDF
+  // PDF
   const downloadPDF = () => {
     if (siswaData.length === 0) {
-        setError("Tidak ada data untuk diunduh");
-        setTimeout(() => setError(""), 3000);
-        return;
+      setError("Tidak ada data untuk diunduh");
+      setTimeout(() => setError(""), 3000);
+      return;
     }
 
     const doc = new jsPDF();
@@ -244,7 +215,6 @@ const RekapAbsensiList = () => {
     const tanggalRekap = `${format(startDate, "dd MMMM yyyy")} - ${format(endDate, "dd MMMM yyyy")}`;
     const currentDate = format(new Date(), "dd MMMM yyyy HH:mm");
 
-    // Header (Hanya di halaman pertama)
     doc.setFontSize(16);
     doc.text("Laporan Absensi", 105, 15, { align: "center" });
 
@@ -253,72 +223,73 @@ const RekapAbsensiList = () => {
     doc.text(`Admin: ${adminName}`, 15, 32);
     doc.text(`Periode Rekap: ${tanggalRekap}`, 15, 39);
 
-    // Buat Tabel Data Absensi
-    const tableColumn = ["No", "Nama Siswa", "Total Hadir", "Total Sakit", "Total Izin", "Total Alpa"];
-    const tableRows = siswaData.map((siswa, index) => [
-        index + 1,
-        siswa.nama_siswa,
-        siswa.kehadiran || 0,
-        siswa.sakit || 0,
-        siswa.izin || 0,
-        siswa.alpa || 0,
-    ]);
+    const tableColumn = ["No", "Nama Siswa", "Total Hadir", "Total Terlambat", "Total Sakit", "Total Izin", "Total Tanpa Keterangan"];
+    const tableRows = siswaData.map((siswa, index) => {
+      const hadir = siswa.hadir ?? siswa.kehadiran ?? 0;
+      const terlambat = siswa.terlambat ?? 0;
+      const sakit = siswa.sakit ?? 0;
+      const izin = siswa.izin ?? 0;
+      const tk = siswa.tanpa_keterangan ?? siswa.alpa ?? 0;
+      return [index + 1, siswa.nama_siswa, hadir, terlambat, sakit, izin, tk];
+    });
 
-    // Fungsi untuk menambahkan footer di setiap halaman
     const addFooter = (doc) => {
-        doc.setFontSize(10);
-        doc.text(`Diunduh pada: ${currentDate}`, 15, doc.internal.pageSize.height - 10);
+      doc.setFontSize(10);
+      doc.text(`Diunduh pada: ${currentDate}`, 15, doc.internal.pageSize.height - 10);
     };
 
     let isFirstPage = true;
 
     autoTable(doc, {
-        head: [tableColumn],
-        body: tableRows,
-        startY: isFirstPage ? 45 : 20, 
-        theme: "striped",
-        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255], halign: "center" },
-        alternateRowStyles: { fillColor: [240, 240, 240] },
-        margin: { top: 15 },
-        didDrawPage: function (data) {
-            if (!isFirstPage) {
-                data.settings.startY = 15;
-            }
-            isFirstPage = false;
-            addFooter(doc); 
-        },
-        columnStyles: {
-          0: { halign: "center" }, // No (Nomor)
-          2: { halign: "center" }, // Total Hadir
-          3: { halign: "center" }, // Total Sakit
-          4: { halign: "center" }, // Total Izin
-          5: { halign: "center" }, // Total Alpa
+      head: [tableColumn],
+      body: tableRows,
+      startY: isFirstPage ? 45 : 20, 
+      theme: "striped",
+      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255], halign: "center" },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      margin: { top: 15 },
+      didDrawPage: function (data) {
+        if (!isFirstPage) data.settings.startY = 15;
+        isFirstPage = false;
+        addFooter(doc); 
+      },
+      columnStyles: {
+        0: { halign: "center" }, // No
+        2: { halign: "center" }, // Hadir
+        3: { halign: "center" }, // Terlambat
+        4: { halign: "center" }, // Sakit
+        5: { halign: "center" }, // Izin
+        6: { halign: "center" }, // TK
       },
     });
 
-    // Tambahkan footer di halaman pertama
     addFooter(doc);
-
-    let fileName = `Laporan_Absensi_${tanggalRekap.replace(/\s/g, "_")}.pdf`;
+    const fileName = `Laporan_Absensi_${tanggalRekap.replace(/\s/g, "_")}.pdf`;
     doc.save(fileName);
-};
+  };
 
-  // Fungsi untuk mencetak laporan langsung
+  // Print
   const printReport = () => {
     const printWindow = window.open('', '', 'width=800,height=600');
     printWindow.document.write('<html><head><title>Laporan Absensi</title></head><body>');
     printWindow.document.write('<h2>Laporan Absensi</h2>');
     printWindow.document.write('<table border="1" cellspacing="0" cellpadding="5">');
-    printWindow.document.write('<tr><th>No</th><th>Nama Siswa</th><th>Total Hadir</th><th>Total Sakit</th><th>Total Izin</th><th>Total Alpa</th></tr>');
+    printWindow.document.write('<tr><th>No</th><th>Nama Siswa</th><th>Total Hadir</th><th>Total Terlambat</th><th>Total Sakit</th><th>Total Izin</th><th>Total Tanpa Keterangan</th></tr>');
 
     siswaData.forEach((siswa, index) => {
+      const hadir = siswa.hadir ?? siswa.kehadiran ?? 0;
+      const terlambat = siswa.terlambat ?? 0;
+      const sakit = siswa.sakit ?? 0;
+      const izin = siswa.izin ?? 0;
+      const tk = siswa.tanpa_keterangan ?? siswa.alpa ?? 0;
       printWindow.document.write(`<tr>
         <td>${index + 1}</td>
         <td>${siswa.nama_siswa}</td>
-        <td>${siswa.kehadiran}</td>
-        <td>${siswa.sakit}</td>
-        <td>${siswa.izin}</td>
-        <td>${siswa.alpa}</td>
+        <td>${hadir}</td>
+        <td>${terlambat}</td>
+        <td>${sakit}</td>
+        <td>${izin}</td>
+        <td>${tk}</td>
       </tr>`);
     });
 
@@ -327,7 +298,7 @@ const RekapAbsensiList = () => {
     printWindow.print();
   };
 
-  // Fungsi untuk menutup modal
+  // Tutup modal
   const handleCloseModal = () => {
     setModalOpen(false);
     setSiswaData([]);
@@ -336,7 +307,6 @@ const RekapAbsensiList = () => {
     setEndDate(getEndOfMonth()); 
   };
   
-
   const closeModal = () => {
     setModalOpen(false);
     setSiswaData([]);
@@ -360,6 +330,7 @@ const RekapAbsensiList = () => {
           isLoading={isLoading}
           isError={isError}
         />
+
         {/* Modal */}
         <Dialog open={modalOpen} onClose={closeModal} maxWidth="xl" fullWidth>
           <DialogTitle align="center">
@@ -368,10 +339,8 @@ const RekapAbsensiList = () => {
           <DialogContent>
           {modalType === 'laporan' ? (
             <>
-           
-              {/* Form Filter untuk Laporan */}
-                <Grid container spacing={2} alignItems="center" mb={4} mt={2}>
-                {/* Input Tanggal Mulai */}
+              {/* Filter */}
+              <Grid container spacing={2} alignItems="center" mb={4} mt={2}>
                 <Grid size={{ xs: 12, sm: 3 , md: 3 }}>
                   <CustomFormLabel sx={{ mt: 1 }}>Tanggal Mulai</CustomFormLabel>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -382,8 +351,6 @@ const RekapAbsensiList = () => {
                     />
                   </LocalizationProvider>
                 </Grid>
-
-                {/* Input Tanggal Akhir */}
                 <Grid size={{ xs: 12, sm: 3 , md: 3 }}>
                   <CustomFormLabel sx={{ mt: 1 }}>Tanggal Akhir</CustomFormLabel>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -394,34 +361,27 @@ const RekapAbsensiList = () => {
                     />
                   </LocalizationProvider>
                 </Grid>
-
-                {/* Pilih Format */}
                 <Grid size={{ xs: 12, sm: 2 , md: 2 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <CustomFormLabel sx={{ mt: 1 }}>Pilih Format</CustomFormLabel>
                   <CustomSelect
                     value={downloadFormat}
                     onChange={(e) => setDownloadFormat(e.target.value)}
                     fullWidth
-                    sx={{
-                      backgroundColor: '#fff',
-                      '& select': {
-                        padding: '8px', 
-                      }
-                    }}
+                    sx={{ backgroundColor: '#fff', '& select': { padding: '8px' } }}
                   >
                     <MenuItem value="csv">CSV</MenuItem>
                     <MenuItem value="pdf">PDF</MenuItem>
                     <MenuItem value="print">Print</MenuItem>
                   </CustomSelect>
                 </Grid>
-                {/* Tombol Unduh Laporan */}
                 <Grid size={{ xs: 12, sm: 2 , md: 2 }} mt={4} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Button variant="contained" color="primary" onClick={handleDownload} fullWidth>
                     Unduh Laporan
                   </Button>
                 </Grid>
               </Grid>
-              {/* Konten Laporan */}
+
+              {/* Tabel Laporan */}
               {isFetching ? (
                 <CircularProgress />
               ) : (
@@ -430,60 +390,40 @@ const RekapAbsensiList = () => {
                     <Table>
                       <TableHead>
                         <TableRow>
-                          <TableCell>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>No</Typography>
-                          </TableCell>
-                          <TableCell>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Siswa</Typography>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Hadir</Typography>  
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Sakit</Typography>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Izin</Typography>
-                          </TableCell>
-                          <TableCell align='center'>
-                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Alpa</Typography>
-                          </TableCell>
+                          <TableCell><Typography variant="h6" sx={{ fontSize: '1rem' }}>No</Typography></TableCell>
+                          <TableCell><Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Siswa</Typography></TableCell>
+                          <TableCell align='center'><Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Hadir</Typography></TableCell>
+                          <TableCell align='center'><Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Terlambat</Typography></TableCell>
+                          <TableCell align='center'><Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Sakit</Typography></TableCell>
+                          <TableCell align='center'><Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Izin</Typography></TableCell>
+                          <TableCell align='center'><Typography variant="h6" sx={{ fontSize: '1rem' }}>Total Tanpa Keterangan</Typography></TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {siswaData.map((siswa, index) => (
-                          <TableRow key={`laporan-${index}`}>
-                            <TableCell>
-                              <Typography sx={{ fontSize: '1rem' }}>{index + 1}</Typography>
-                            </TableCell>
-                            <TableCell>
-                              <Typography sx={{ fontSize: '1rem' }}>{siswa.nama_siswa || '-'}</Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography sx={{ fontSize: '1rem' }}>{siswa.kehadiran || '0'}</Typography>  
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography sx={{ fontSize: '1rem' }}>{siswa.sakit || '0'}</Typography>   
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography sx={{ fontSize: '1rem' }}>{siswa.izin || '0'}</Typography>
-                            </TableCell>
-                            <TableCell align='center'>
-                              <Typography sx={{ fontSize: '1rem' }}>{siswa.alpa || '0'}</Typography>
-                            </TableCell>
-                          </TableRow>
-                        ))}
+                        {siswaData.map((siswa, index) => {
+                          const hadir = siswa.hadir ?? siswa.kehadiran ?? 0;
+                          const terlambat = siswa.terlambat ?? 0;
+                          const sakit = siswa.sakit ?? 0;
+                          const izin = siswa.izin ?? 0;
+                          const tk = siswa.tanpa_keterangan ?? siswa.alpa ?? 0;
+                          return (
+                            <TableRow key={`laporan-${index}`}>
+                              <TableCell><Typography sx={{ fontSize: '1rem' }}>{index + 1}</Typography></TableCell>
+                              <TableCell><Typography sx={{ fontSize: '1rem' }}>{siswa.nama_siswa || '-'}</Typography></TableCell>
+                              <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{hadir}</Typography></TableCell>
+                              <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{terlambat}</Typography></TableCell>
+                              <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{sakit}</Typography></TableCell>
+                              <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{izin}</Typography></TableCell>
+                              <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{tk}</Typography></TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </TableContainer>
 
-                  {/* Tombol Unduh & Kembali */}
                   <Stack direction="row" spacing={2} justifyContent="flex-start" mt={3}>
-                    <Button 
-                      variant="contained" 
-                      color="primary" 
-                      onClick={handleCloseModal}
-                    >
+                    <Button variant="contained" color="primary" onClick={handleCloseModal}>
                       Kembali
                     </Button>
                   </Stack>
@@ -492,116 +432,118 @@ const RekapAbsensiList = () => {
             </>
           ) : (
             <>
-              {/* Konten Absensi dengan DataGrid */}
+              {/* Legenda */}
+              <Grid container spacing={2} mb={1}>
+                <Grid size={{ xs: 12 }}>
+                  <Typography variant="body2" sx={{ mb: 1 }}>
+                    <strong>Legenda:</strong> ✔ = Hadir, T = Terlambat, I = Izin, S = Sakit, - = Tanpa Keterangan
+                  </Typography>
+                </Grid>
+              </Grid>
+
+              {/* Filter tanggal */}
               <Grid container spacing={2} mb={2}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <CustomFormLabel>Tanggal Mulai</CustomFormLabel>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker
-                            renderInput={(props) => <CustomTextField {...props} fullWidth />}
-                            value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
-                        />
-                    </LocalizationProvider>
+                  <CustomFormLabel>Tanggal Mulai</CustomFormLabel>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      renderInput={(props) => <CustomTextField {...props} fullWidth />}
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                    />
+                  </LocalizationProvider>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <CustomFormLabel>Tanggal Akhir</CustomFormLabel>
-                    <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker
-                            renderInput={(props) => <CustomTextField {...props} fullWidth />}
-                            value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
-                        />
-                    </LocalizationProvider>
+                  <CustomFormLabel>Tanggal Akhir</CustomFormLabel>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      renderInput={(props) => <CustomTextField {...props} fullWidth />}
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
+                    />
+                  </LocalizationProvider>
                 </Grid>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        onClick={handleFilter}
-                        disabled={!startDate || !endDate}
-                    >
-                        Terapkan
-                    </Button>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleFilter}
+                    disabled={!startDate || !endDate}
+                    sx={{ mt: { xs: 3.5, md: 4.5 } }}
+                  >
+                    Terapkan
+                  </Button>
                 </Grid>
-            </Grid>
+              </Grid>
 
-            {isFetching ? (
+              {isFetching ? (
                 <CircularProgress />
-            ) : (
+              ) : (
                 <div style={{ height: 500, width: '100%' }}>
-                <DataGrid
+                  <DataGrid
                     rows={(siswaData || []).map((siswa, idx) => {
-                    console.log(`Data siswa ${idx}:`, siswa); // Debugging log
-                    const row = { id: idx, nama_siswa: siswa.nama_siswa };
-
-                    // Pastikan absensi berupa array, jika undefined berikan array kosong
-                    const absensi = Array.isArray(siswa.absensi) ? siswa.absensi : [];
-
-                    // Loop semua tanggal dan pastikan data absensi selalu ada
-                    (tanggalArray || []).forEach((tanggal, i) => {
+                      const row = { id: idx, nama_siswa: siswa.nama_siswa };
+                      const absensi = Array.isArray(siswa.absensi) ? siswa.absensi : [];
+                      (tanggalArray || []).forEach((tanggal, i) => {
                         row[`tanggal_${i}`] = absensi[i] || "-";
-                    });
-
-                    return row;
+                      });
+                      return row;
                     })}
                     columns={[
-                    {
+                      {
                         field: 'nama_siswa',
                         headerName: 'Nama Siswa',
                         width: 200,
                         renderHeader: () => (
-                        <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', textAlign: 'left' }}>
+                          <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', textAlign: 'left' }}>
                             Nama Siswa
-                        </Typography>
+                          </Typography>
                         ),
-                    },
-                    ...(tanggalArray || []).map((tanggal, idx) => ({
+                      },
+                      ...(tanggalArray || []).map((tanggal, idx) => ({
                         field: `tanggal_${idx}`,
                         headerName: tanggal,
                         width: 100,
                         align: "center",
                         headerAlign: "center",
                         renderHeader: () => (
-                        <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', textAlign: 'center' }}>
+                          <Typography sx={{ fontWeight: 'bold', fontSize: '1rem', textAlign: 'center' }}>
                             {tanggal}
-                        </Typography>
+                          </Typography>
                         ),
                         renderCell: (params) => (
-                        <Typography
+                          <Typography
                             sx={{
-                            fontWeight: 'bold',
-                            color:
-                                params.value === '✔' ? 'green' :
-                                params.value === 'I' ? 'orange' :
-                                params.value === 'S' ? 'red' : 'gray',
-                            textAlign: 'center',
+                              fontWeight: 'bold',
+                              color: statusColor(params.value),
+                              textAlign: 'center',
+                              width: '100%',
                             }}
-                        >
+                          >
                             {params.value}
-                        </Typography>
+                          </Typography>
                         ),
-                    })),
+                      })),
                     ]}
                     pageSize={10}
                     rowsPerPageOptions={[10, 20, 50]}
                     disableSelectionOnClick
                     autoHeight
                     sx={{
-                    '& .MuiDataGrid-columnHeaders': {
+                      '& .MuiDataGrid-columnHeaders': {
                         backgroundColor: '#f5f5f5',
                         fontWeight: 'bold',
-                    },
-                    '& .MuiDataGrid-cell': {
+                      },
+                      '& .MuiDataGrid-cell': {
                         borderBottom: '1px solid #ddd',
-                    },
-                    '& .MuiDataGrid-row:nth-of-type(odd)': {
+                      },
+                      '& .MuiDataGrid-row:nth-of-type(odd)': {
                         backgroundColor: '#f9f9f9',
-                    },
+                      },
                     }}
-                />
+                  />
                 </div>
-                )}
+              )}
             </>
           )}
         </DialogContent>

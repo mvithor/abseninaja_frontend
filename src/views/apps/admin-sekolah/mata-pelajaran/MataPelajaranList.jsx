@@ -138,7 +138,6 @@ const MataPelajaranList = () => {
                         gap: 2, 
                         width: '100%',
                         mb: 2,
-                        mt: -2
                     }}
                     >
                 <SearchButton

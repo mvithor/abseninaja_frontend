@@ -95,8 +95,8 @@ const UserStafList = () => {
         setPage(newPage);
     };
 
-    const handleEdit = (id) => {
-        navigate(`/dashboard/admin-sekolah/user/staf/edit/${id}`);
+    const handleEdit = () => {
+        navigate(`#`);
     };
 
     const handleDelete = (user_id, type = 'pegawai') => {

@@ -44,38 +44,54 @@ const WhatsAppList = () => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleQr = ({ qr }) => {
+    const handleQr = ({ sekolah_id, qr }) => {
+      if (String(currentSessionId) === String(sekolah_id)) {
         setQrCode(qr);
         setOpenQrDialog(true);
-      };
-      
-
-      const handleConnected = async ({ sekolah_id }) => {
-        if (currentSessionId === sekolah_id) {
-          setSuccess('Berhasil terhubung ke WhatsApp');
-          setOpenQrDialog(false);
-          setQrCode('');
-          await queryClient.invalidateQueries(['whatsApp']);
-          setCurrentSessionId(null);
-        }
-        setLoadingConnect(false);
-      };
-      
-
-    const handleDisconnected = async ({ sekolah_id }) => {
-      if (currentSessionId === sekolah_id) {
-        setError('Koneksi WhatsApp terputus, silakan scan ulang QR');
       }
-      await queryClient.invalidateQueries(['whatsApp']);
     };
 
-    
+    const handleConnected = async ({ sekolah_id }) => {
+      // 🔄 Update cache React Query agar status langsung berubah tanpa reload
+      queryClient.setQueryData(['whatsApp'], (prev) => {
+        if (!prev) return prev;
+        return prev.map((item) =>
+          String(item.sekolah_id) === String(sekolah_id)
+            ? { ...item, status: 'connected' }
+            : item
+        );
+      });
+
+      if (String(currentSessionId) === String(sekolah_id)) {
+        setSuccess('Berhasil terhubung ke WhatsApp');
+        setOpenQrDialog(false);
+        setQrCode('');
+        setCurrentSessionId(null);
+        setLoadingConnect(false);
+      }
+    };
+
+    const handleDisconnected = async ({ sekolah_id }) => {
+      // 🔄 Update cache agar status langsung "disconnected"
+      queryClient.setQueryData(['whatsApp'], (prev) => {
+        if (!prev) return prev;
+        return prev.map((item) =>
+          String(item.sekolah_id) === String(sekolah_id)
+            ? { ...item, status: 'disconnected' }
+            : item
+        );
+      });
+
+      if (String(currentSessionId) === String(sekolah_id)) {
+        setError('Koneksi WhatsApp terputus, silakan scan ulang QR');
+      }
+    };
 
     const handleSessionError = ({ sekolah_id, message }) => {
-      if (currentSessionId === sekolah_id) {
+      if (String(currentSessionId) === String(sekolah_id)) {
         setError(message || 'Terjadi kesalahan pada sesi WhatsApp.');
+        setLoadingConnect(false);
       }
-      setLoadingConnect(false);
     };
 
     socket.on('qr', handleQr);
@@ -103,13 +119,16 @@ const WhatsAppList = () => {
 
   const handleConnect = async (sekolahId) => {
     try {
-      setCurrentSessionId(sekolahId);
+      setCurrentSessionId(String(sekolahId));
       setLoadingConnect(true);
+      setOpenQrDialog(true);
+      setQrCode('');
       await axiosInstance.get(`/api/v1/admin-sekolah/wa/${sekolahId}/qr`);
     } catch (error) {
-      console.error('Gagal memulai koneksi:',error);
+      console.error('Gagal memulai koneksi:', error);
       setError("Gagal memulai koneksi");
       setLoadingConnect(false);
+      setOpenQrDialog(false);
     }
   };
 
@@ -117,8 +136,16 @@ const WhatsAppList = () => {
     try {
       setLoadingLogout(true);
       await axiosInstance.delete(`/api/v1/admin-sekolah/wa/${sekolahId}/logout`);
+      // 🔄 Patch cache agar langsung "disconnected" tanpa nunggu refetch
+      queryClient.setQueryData(['whatsApp'], (prev) => {
+        if (!prev) return prev;
+        return prev.map((item) =>
+          String(item.sekolah_id) === String(sekolahId)
+            ? { ...item, status: 'disconnected' }
+            : item
+        );
+      });
       setSuccess("Berhasil logout dari WhatsApp");
-      await queryClient.invalidateQueries(['whatsApp']);
       setCurrentSessionId(null);
     } catch (error) {
       console.error(error);
@@ -130,7 +157,7 @@ const WhatsAppList = () => {
 
   const handleShowQR = async (sekolahId) => {
     try {
-      setCurrentSessionId(sekolahId);
+      setCurrentSessionId(String(sekolahId));
       const response = await axiosInstance.get(`/api/v1/admin-sekolah/wa/${sekolahId}/qr`);
       if (response.data?.qr) {
         setQrCode(response.data.qr);
