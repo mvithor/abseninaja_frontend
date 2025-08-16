@@ -22,7 +22,7 @@ import CustomTextField from "src/components/forms/theme-elements/CustomTextField
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
 import SubmitButton from "src/components/button-group/SubmitButton";
 import CancelButton from "src/components/button-group/CancelButton";
-import { IconMessageChatbot, IconLanguageHiragana, IconEye } from "@tabler/icons-react";
+import { IconMessageChatbot, IconEye } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 
@@ -231,7 +231,7 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
           {/* TITLE */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="title" sx={{ mt: 1.85 }}>
-              Judul (title)
+              Judul
             </CustomFormLabel>
             <CustomOutlinedInput
               id="title"
@@ -252,7 +252,7 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
           {/* BODY SHORT */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="body_short" sx={{ mt: 1.85 }}>
-              Body Pendek (body_short)
+              Body Pendek
             </CustomFormLabel>
             <CustomTextField
               id="body_short"
@@ -270,7 +270,7 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
           {/* BODY LONG */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="body_long" sx={{ mt: 1.85 }}>
-              Body Panjang (body_long) — opsional
+              Body Panjang opsional
             </CustomFormLabel>
             <CustomTextField
               id="body_long"

@@ -26,7 +26,7 @@ const AdminSekolahForm = ({ setSuccess, setError, nama_admin, email, sekolah_id,
     const mutation = useMutation({
         mutationKey: ['adminSekolah'],
         mutationFn: async (newAdmin) => {
-            const response = await axiosInstance.post(`/api/v1/super-admin/pendaftaran/admin-sekolah`, newAdmin);
+            const response = await axiosInstance.post(`/api/v1/super-admin/approved/admin-sekolah`, newAdmin);
             return response.data;
         },
         onSuccess: (data) => {
@@ -35,11 +35,10 @@ const AdminSekolahForm = ({ setSuccess, setError, nama_admin, email, sekolah_id,
             setFormState({
                 password: '',
             });
-            setTimeout(() => navigate('/dashboard/admin/manajemen-sekolah/admin-sekolah'), 3000);
+            setTimeout(() => navigate('/dashboard/super-admin/manajemen-sekolah/admin-sekolah'), 3000);
         },
         onError: (error) => {
             const errorMsg = error.response?.data.message || 'Terjadi kesalahan saat menambahkan admin sekolah';
-            console.error('Terjadi kesalahan:', errorMsg);
             setError(errorMsg);
             setSuccess('');
         },
@@ -65,7 +64,6 @@ const AdminSekolahForm = ({ setSuccess, setError, nama_admin, email, sekolah_id,
             password: formState.password,
             sekolah_id: sekolah_id,  
         };
-        console.log('Data yang dikirim:', newAdminData);
         mutation.mutate(newAdminData);
     };
     
