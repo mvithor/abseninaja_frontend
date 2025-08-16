@@ -3,14 +3,14 @@ import {
     IconScan, IconCalendarTime, IconPhotoDown,
     IconFiles, IconSchool, IconWallet,
     IconDashboard, IconSettings, IconDownload, IconUsers,
-    IconClock, IconMapPin, IconClipboard, IconCategory, 
+    IconClock, IconMapPin, IconCategory, 
     IconCalendarEvent, IconChartBar, IconUser, IconBuildingArch,
     IconBooks, IconCategory2, IconCalendar, IconBell, IconCoin,
     IconCreditCard, IconPoint, IconClipboardText,
     IconMessage,IconKey, IconTemplate, IconBroadcast,
-    IconClock2, IconTrophy,
+    IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, IconLicense,
+    IconUsersGroup, IconDatabase, IconActivity, IconFileDownload
   } from '@tabler/icons-react';
-  
   
   import { uniqueId } from 'lodash';
   
@@ -85,19 +85,19 @@ import {
     {
         id: uniqueId(),
         title: 'Manajemen Perizinan',
-        icon: IconQrcode,
+        icon: IconLicense,
         href: '',
         children: [
             {
                 id: uniqueId(),
                 title: 'Pegawai',
-                icon: IconPhotoDown,
+                icon: IconUsers,
                 href: '/dashboard/admin-sekolah/perizinan-pegawai',
             },
             {
                 id: uniqueId(),
                 title: 'Siswa',
-                icon: IconCalendar,
+                icon: IconUsers,
                 href: '#',
             },
         ],
@@ -111,13 +111,13 @@ import {
             {
                 id: uniqueId(),
                 title: 'Data Guru',
-                icon: IconClipboard,
+                icon: IconDatabase,
                 href: '/dashboard/admin-sekolah/pegawai/guru',
             },
             {
                 id: uniqueId(),
                 title: 'Data Staff',
-                icon: IconClipboard,
+                icon: IconDatabase,
                 href: '/dashboard/admin-sekolah/pegawai/staf',
             },
             {
@@ -137,13 +137,13 @@ import {
             {
                 id: uniqueId(),
                 title: 'Prestasi Madrasah',
-                icon: IconClipboard,
+                icon: IconBuilding,
                 href: '#',
             },
             {
                 id: uniqueId(),
                 title: 'Prestasi Kelompok',
-                icon: IconClipboard,
+                icon: IconUsersGroup,
                 href: '#',
             },
             {
@@ -157,19 +157,19 @@ import {
     {
         id: uniqueId(),
         title: 'Manajemen Ekskul',
-        icon: IconTrophy,
+        icon: IconBriefcase,
         href: '',
         children: [
             {
                 id: uniqueId(),
                 title: 'Daftar Ekstrakurikuler',
-                icon: IconClipboard,
+                icon: IconActivity,
                 href: '/dashboard/admin-sekolah/ekskul',
             },
             {
                 id: uniqueId(),
                 title: 'Anggota Ekstrakurikuler',
-                icon: IconCategory,
+                icon: IconUsersGroup,
                 href: '#',
             },
         ],
@@ -294,7 +294,7 @@ import {
             {
                 id: uniqueId(),
                 title: 'Notifikasi WhatsApp',
-                icon: IconSettings,
+                icon: IconBrandWhatsapp,
                 href: '',
                 children: [
                     {
@@ -338,19 +338,19 @@ import {
             {
                 id: uniqueId(),
                 title: 'Notifikasi Aplikasi',
-                icon: IconSettings,
+                icon: IconPhone,
                 href: '',
                 children: [
                     {
                         id: uniqueId(),
                         title: 'Template Notifikasi',
-                        icon: IconCategory2,
+                        icon: IconTemplate,
                         href: '/dashboard/admin-sekolah/notifikasi-template',
                     },
                     {
                         id: uniqueId(),
                         title: 'Target Penerima',
-                        icon: IconCategory2,
+                        icon: IconUser,
                         href: '#',
                     },
                     {
@@ -488,14 +488,14 @@ import {
             {
                 id: uniqueId(),
                 title: 'Rekap Absensi Harian',
-                icon: IconBuildingArch,
+                icon: IconFileDownload,
                 href: '/dashboard/admin-sekolah/rekap-absensi',
             },
             {
                 id: uniqueId(),
                 title: 'Rekap Absensi Ekskul',
-                icon: IconUser,
-                href: '/dashboard/admin-sekolah/wali-kelas',
+                icon: IconFileDownload,
+                href: '#',
             },
         ],
     },
@@ -536,12 +536,6 @@ import {
                 href: '/dashboard/admin-sekolah/user-wali-siswa',
             },
         ],
-    },
-    {
-        id: uniqueId(),
-        title: 'Tentang Aplikasi',
-        icon: IconClipboardText,
-        href: '/dashboard/admin-sekolah/#'
     },
   ];
   

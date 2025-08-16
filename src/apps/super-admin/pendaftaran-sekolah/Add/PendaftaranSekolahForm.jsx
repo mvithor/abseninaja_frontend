@@ -41,8 +41,6 @@ const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
     onSuccess: (data) => {
         setSuccess(data.msg);
         setError("");
-      
-        // ✅ Refresh redux data agar daftar langsung update
         dispatch(fetchAllPendaftaranSekolah());
       
         setTimeout(() => navigate('/dashboard/super-admin/pendaftaran-sekolah'), 3000);

@@ -46,7 +46,8 @@ const pendaftaranSekolahSlice = createSlice({
     fetchPendaftaranSekolahByIdFailure: (state, action) => {
       state.loading = false;
       state.error = action.payload;
-    },
+      state.selectedPendaftaran = null;
+    },    
     setSelectedPendaftaran: (state, action) => {
       state.selectedPendaftaran = action.payload;
     },

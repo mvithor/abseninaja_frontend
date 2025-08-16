@@ -1,37 +1,37 @@
+// pendaftaranThunks.jsx
 import axiosInstance from "src/utils/axiosInstance";
 import { 
-    getPendaftaranSekolah, 
-    fetchPendaftaranSekolahByIdFailure,
-    fetchPendaftaranSekolahByIdRequest,
-    fetchPendaftaranSekolahByIdSuccess, 
+  getPendaftaranSekolah, 
+  fetchPendaftaranSekolahByIdFailure,
+  fetchPendaftaranSekolahByIdRequest,
+  fetchPendaftaranSekolahByIdSuccess, 
 } from "./pendaftaranSekolahSlice";
 
-const API_URL = "/api/v1/super-admin/pendaftaran/form";
+// Konsisten dengan router backend
+const API_BASE = "/api/v1/super-admin/pendaftaran";
+const FORM_URL = `${API_BASE}/form`;
 
 export const fetchAllPendaftaranSekolah = (sekolahId = null) => async (dispatch) => {
   try {
-    const response = sekolahId
-      ? await axiosInstance.get(`${API_URL}/${sekolahId}`)
-      : await axiosInstance.get(API_URL);
-    
-    const data = response.data;
-
-    // 🔧 Normalisasi: pastikan selalu array
-    const normalizedData = Array.isArray(data) ? data : [data];
-
-    dispatch(getPendaftaranSekolah(normalizedData));
+    const url = sekolahId ? `${FORM_URL}?sekolah_id=${sekolahId}` : FORM_URL;
+    const { data } = await axiosInstance.get(url);
+    const normalized = Array.isArray(data) ? data : (data ? [data] : []);
+    dispatch(getPendaftaranSekolah(normalized));
   } catch (error) {
     console.error("❌ Gagal fetch pendaftaran:", error);
   }
 };
 
-
 export const fetchPendaftaranSekolahById = (id) => async (dispatch) => {
   dispatch(fetchPendaftaranSekolahByIdRequest());
   try {
-    const response = await axiosInstance.get(`${API_URL}/${id}`);
-    dispatch(fetchPendaftaranSekolahByIdSuccess(response.data));
+    const { data } = await axiosInstance.get(`${API_BASE}/${id}`); // ⬅️ BUKAN /form/:id
+    dispatch(fetchPendaftaranSekolahByIdSuccess(data));
   } catch (error) {
-    dispatch(fetchPendaftaranSekolahByIdFailure(error.message));
+    const msg = error?.response?.status === 404
+      ? "Data pendaftaran tidak ditemukan."
+      : (error?.message || "Terjadi kesalahan mengambil data pendaftaran.");
+    dispatch(fetchPendaftaranSekolahByIdFailure(msg));
+    console.error("❌ fetchPendaftaranSekolahById:", error);
   }
 };

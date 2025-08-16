@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axiosInstance from 'src/utils/axiosInstance';
@@ -27,15 +27,15 @@ const PendaftaranEdit = () => {
         queryFn: fetchStatusPendaftaran
     });
 
-    useEffect (() => {
+    useEffect(() => {
         if (id) {
-            dispatch(fetchPendaftaranSekolahById(id))
-            .catch((error) => {
-                console.error('Error fetching data:', error);
-                setError("Gagal memuat data")
-            });
+          // opsional: kosongkan dulu agar form tak bawa data sebelumnya
+          // dispatch(setSelectedPendaftaran(null));
+          dispatch(fetchPendaftaranSekolahById(id))
+            .catch(() => setError("Gagal memuat data"));
         }
-    }, [dispatch, id])
+      }, [dispatch, id]);
+      
 
     useEffect(() => {
         if (selectedPendaftaran) {
