@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, MenuItem } from "@mui/material";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -21,7 +21,7 @@ const AbsensiForm = ({ setSuccess, setError }) => {
   const [formState, setFormState] = useState({
     siswa_id: '',
     kelas_id: '',
-    nama_kelas: '', 
+    nama_kelas: '',
     tanggal: '',
     jam_masuk: null,
     jam_pulang: null,
@@ -41,7 +41,7 @@ const AbsensiForm = ({ setSuccess, setError }) => {
     queryKey: ["statusOptions"],
     queryFn: async () => {
       const response = await axiosInstance.get('/api/v1/admin-sekolah/dropdown/status-kehadiran');
-      return response.data.data;
+      return response.data.data; // { id, nama_status, is_global }
     }
   });
 
@@ -64,7 +64,7 @@ const AbsensiForm = ({ setSuccess, setError }) => {
       } else {
         setError(errorMsg);
       }
-      setSuccess(""); 
+      setSuccess("");
     },
     onSettled: () => {
       setTimeout(() => {
@@ -74,6 +74,51 @@ const AbsensiForm = ({ setSuccess, setError }) => {
       }, 3000);
     },
   });
+
+  const normalizeStatusName = (name = '') => {
+    const s = String(name).trim().toLowerCase();
+    if (s === 'masuk' || s === 'hadir') return 'hadir';
+    if (s === 'terlambat') return 'terlambat';
+    if (s === 'izin') return 'izin';
+    if (s === 'sakit') return 'sakit';
+    if (s === 'alpa' || s === 'tanpa keterangan') return 'tanpa_keterangan';
+    if (s === 'pulang') return 'pulang';
+    return s;
+  };
+
+  const selectedStatus = useMemo(
+    () => statusOptions.find((item) => item.id === formState.status_kehadiran_id),
+    [statusOptions, formState.status_kehadiran_id]
+  );
+
+  // 🔧 Tentukan aturan per status
+  const rules = useMemo(() => {
+    const key = normalizeStatusName(selectedStatus?.nama_status || '');
+    const isGlobal = !!selectedStatus?.is_global;
+
+    // default: tidak boleh & tidak wajib
+    let allowJamMasuk = false, allowJamPulang = false;
+    let requireJamMasuk = false, requireJamPulang = false;
+
+    if (!isGlobal) {
+      // Izin / Sakit (custom) → tidak pakai jam
+      return { allowJamMasuk, allowJamPulang, requireJamMasuk, requireJamPulang };
+    }
+
+    if (key === 'hadir' || key === 'terlambat' || key === 'masuk') {
+      allowJamMasuk = true;   requireJamMasuk = true;   // WAJIB jam_masuk
+      allowJamPulang = true;  requireJamPulang = false; // jam_pulang opsional
+    } else if (key === 'pulang') {
+      allowJamMasuk = false;  requireJamMasuk = false;
+      allowJamPulang = true;  requireJamPulang = true;  // WAJIB jam_pulang
+    } else if (key === 'tanpa_keterangan') {
+      // Alpa / TK → tidak pakai jam
+      allowJamMasuk = false;  requireJamMasuk = false;
+      allowJamPulang = false; requireJamPulang = false;
+    }
+
+    return { allowJamMasuk, allowJamPulang, requireJamMasuk, requireJamPulang };
+  }, [selectedStatus]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -85,27 +130,48 @@ const AbsensiForm = ({ setSuccess, setError }) => {
         kelas_id: selectedSiswa?.kelas_id || '',
         nama_kelas: selectedSiswa?.Kelas.nama_kelas || 'Tidak Diketahui',
       }));
+    } else if (name === "status_kehadiran_id") {
+      const nextSelected = statusOptions.find((s) => s.id === value);
+      const key = normalizeStatusName(nextSelected?.nama_status || '');
+      const isGlobal = !!nextSelected?.is_global;
+
+      setFormState((prev) => {
+        let jam_masuk = prev.jam_masuk;
+        let jam_pulang = prev.jam_pulang;
+
+        if (!isGlobal || key === 'izin' || key === 'sakit' || key === 'tanpa_keterangan') {
+          // Kosongkan jam untuk Izin/Sakit/TK atau status custom
+          jam_masuk = null;
+          jam_pulang = null;
+        } else if (key === 'pulang') {
+          // Pulang → wajib jam_pulang, reset agar admin isi
+          jam_pulang = null;
+        }
+        // Hadir/Terlambat: biarkan apa adanya (jam_pulang opsional)
+
+        return {
+          ...prev,
+          status_kehadiran_id: value,
+          jam_masuk,
+          jam_pulang,
+        };
+      });
     } else {
       setFormState((prevState) => ({ ...prevState, [name]: value }));
-      if (name === "status_kehadiran_id") {
-        const selected = statusOptions.find((item) => item.id === value);
-        const isCustom = selected && !selected.is_global;
-        setFormState((prevState) => ({
-          ...prevState,
-          jam_masuk: isCustom ? null : prevState.jam_masuk,
-          jam_pulang: isCustom ? null : prevState.jam_pulang,
-        }));
-      }
     }
   };
 
-  const handleDateChange = (date) => setFormState((prevState) => ({ ...prevState, tanggal: date }));
+  const handleDateChange = (date) =>
+    setFormState((prevState) => ({ ...prevState, tanggal: date }));
 
   const handleTimeChange = (field, value) => {
-    if (value) {
-      const formattedTime = `${value.getHours().toString().padStart(2, '0')}.${value.getMinutes().toString().padStart(2, '0')}`;
-      setFormState((prevState) => ({ ...prevState, [field]: formattedTime }));
+    if (!value) {
+      setFormState((prev) => ({ ...prev, [field]: null }));
+      return;
     }
+    const hh = value.getHours().toString().padStart(2, '0');
+    const mm = value.getMinutes().toString().padStart(2, '0');
+    setFormState((prevState) => ({ ...prevState, [field]: `${hh}.${mm}` }));
   };
 
   const handleSubmit = (event) => {
@@ -114,6 +180,18 @@ const AbsensiForm = ({ setSuccess, setError }) => {
       setError("Tanggal dan status kehadiran harus diisi");
       return;
     }
+
+    // ✅ Validasi sesuai rules
+    if (rules.requireJamMasuk && !formState.jam_masuk) {
+      setError("Jam masuk wajib diisi untuk status ini");
+      return;
+    }
+    if (rules.requireJamPulang && !formState.jam_pulang) {
+      setError("Jam pulang wajib diisi untuk status ini");
+      return;
+    }
+
+    setLoading(true);
     mutation.mutate(formState);
   };
 
@@ -121,8 +199,8 @@ const AbsensiForm = ({ setSuccess, setError }) => {
 
   if (siswaError || statusError) return <div>Error Loading Data...</div>;
 
-  const selectedStatus = statusOptions.find((item) => item.id === formState.status_kehadiran_id);
-  const isCustomStatus = selectedStatus && !selectedStatus.is_global;
+  const timeToDate = (val) =>
+    val ? new Date(`1970-01-01T${String(val).replace('.', ':')}:00`) : null;
 
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
@@ -144,7 +222,13 @@ const AbsensiForm = ({ setSuccess, setError }) => {
                 });
               }}
               renderInput={(params) => (
-                <CustomTextField {...params} fullWidth placeholder="Cari / Pilih nama siswa" aria-label="Pilih nama siswa" InputProps={{ ...params.InputProps, style: { height: 45 } }} />
+                <CustomTextField
+                  {...params}
+                  fullWidth
+                  placeholder="Cari / Pilih nama siswa"
+                  aria-label="Pilih nama siswa"
+                  InputProps={{ ...params.InputProps, style: { height: 45 } }}
+                />
               )}
             />
           </Grid>
@@ -156,57 +240,65 @@ const AbsensiForm = ({ setSuccess, setError }) => {
 
           <Grid size={{ xs: 12, md: 6 }}>
             <CustomFormLabel htmlFor="tanggal" sx={{ mt: 1.85 }}>Tanggal</CustomFormLabel>
-            <DatePicker value={formState.tanggal || null} onChange={handleDateChange} placeholder="Masukkan Tanggal" slotProps={{ textField: { fullWidth: true, size: 'medium', required: true, InputProps: { sx: { height: '46px' } } } }} />
+            <DatePicker
+              value={formState.tanggal || null}
+              onChange={handleDateChange}
+              placeholder="Masukkan Tanggal"
+              enableAccessibleFieldDOMStructure={false}
+              slotProps={{ textField: { fullWidth: true, size: 'medium', required: true, InputProps: { sx: { height: '46px' } } } }}
+            />
           </Grid>
 
-          {!isCustomStatus && (
-            <Grid size={{ xs: 12, md: 6 }}>
-              <CustomFormLabel htmlFor="jam_masuk" sx={{ mt: 1.85 }}>Jam Masuk</CustomFormLabel>
-              <TimePicker ampm={false} disableMaskedInput value={formState.jam_masuk ? new Date(`1970-01-01T${formState.jam_masuk.replace('.', ':')}:00`) : null} onChange={(value) => handleTimeChange("jam_masuk", value)} desktopModeMediaQuery="@media (min-width:9999px)" enableAccessibleFieldDOMStructure={false} slotProps={{ textField: { fullWidth: true, size: "medium", required: true } }} />
-            </Grid>
-          )}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <CustomFormLabel htmlFor="jam_masuk" sx={{ mt: 1.85 }}>Jam Masuk</CustomFormLabel>
+            <TimePicker
+              ampm={false}
+              disableMaskedInput
+              value={timeToDate(formState.jam_masuk)}
+              onChange={(value) => handleTimeChange("jam_masuk", value)}
+              disabled={!rules.allowJamMasuk}
+              desktopModeMediaQuery="@media (min-width:9999px)"
+              enableAccessibleFieldDOMStructure={false}
+              slotProps={{ textField: { fullWidth: true, size: "medium", required: rules.requireJamMasuk } }}
+            />
+          </Grid>
 
-          {!isCustomStatus && (
-            <Grid size={{ xs: 12, md: 6 }}>
-              <CustomFormLabel htmlFor="jam_pulang" sx={{ mt: 1.85 }}>Jam Pulang</CustomFormLabel>
-              <TimePicker ampm={false} disableMaskedInput value={formState.jam_pulang ? new Date(`1970-01-01T${formState.jam_pulang.replace('.', ':')}:00`) : null} onChange={(value) => handleTimeChange("jam_pulang", value)} desktopModeMediaQuery="@media (min-width:9999px)" enableAccessibleFieldDOMStructure={false} slotProps={{ textField: { fullWidth: true, size: "medium", required: true } }} />
-            </Grid>
-          )}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <CustomFormLabel htmlFor="jam_pulang" sx={{ mt: 1.85 }}>Jam Pulang</CustomFormLabel>
+            <TimePicker
+              ampm={false}
+              disableMaskedInput
+              value={timeToDate(formState.jam_pulang)}
+              onChange={(value) => handleTimeChange("jam_pulang", value)}
+              disabled={!rules.allowJamPulang}
+              desktopModeMediaQuery="@media (min-width:9999px)"
+              enableAccessibleFieldDOMStructure={false}
+              slotProps={{ textField: { fullWidth: true, size: "medium", required: rules.requireJamPulang } }}
+            />
+          </Grid>
 
-         {/* Status Kehadiran (Gabungan Global & Custom) */}
-<Grid size={{ xs: 12, md: 6 }}>
-  <CustomFormLabel htmlFor="status_kehadiran_id" sx={{ mt: 1.85 }}>
-    Status Kehadiran
-  </CustomFormLabel>
-  <CustomSelect
-    id="status_kehadiran_id"
-    name="status_kehadiran_id"
-    value={formState.status_kehadiran_id}
-    onChange={(e) => {
-      const selectedId = e.target.value;
-      const selectedStatus = statusOptions.find((s) => s.id === selectedId);
-
-      setFormState((prevState) => ({
-        ...prevState,
-        status_kehadiran_id: selectedId,
-        status_kehadiran: selectedStatus?.nama_status || "",
-        jam_masuk: selectedStatus?.is_global ? prevState.jam_masuk : null,
-        jam_pulang: selectedStatus?.is_global ? prevState.jam_pulang : null,
-      }));
-    }}
-    fullWidth
-    displayEmpty
-    required
-  >
-    <MenuItem value="" disabled>Pilih Status Kehadiran</MenuItem>
-    {statusOptions.map((statusOption) => (
-      <MenuItem key={statusOption.id} value={statusOption.id}>
-        {statusOption.nama_status}
-      </MenuItem>
-    ))}
-  </CustomSelect>
-</Grid>
-
+          {/* Status Kehadiran (Gabungan Global & Custom) */}
+          <Grid size={{ xs: 12, md: 6 }}>
+            <CustomFormLabel htmlFor="status_kehadiran_id" sx={{ mt: 1.85 }}>
+              Status Kehadiran
+            </CustomFormLabel>
+            <CustomSelect
+              id="status_kehadiran_id"
+              name="status_kehadiran_id"
+              value={formState.status_kehadiran_id}
+              onChange={handleChange}
+              fullWidth
+              displayEmpty
+              required
+            >
+              <MenuItem value="" disabled>Pilih Status Kehadiran</MenuItem>
+              {statusOptions.map((statusOption) => (
+                <MenuItem key={statusOption.id} value={statusOption.id}>
+                  {statusOption.nama_status}
+                </MenuItem>
+              ))}
+            </CustomSelect>
+          </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
             <CustomFormLabel htmlFor="keterangan" sx={{ mt: 1.85 }}>Deskripsi</CustomFormLabel>

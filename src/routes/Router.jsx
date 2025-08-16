@@ -26,6 +26,7 @@ const DashboardAdminSekolah = Loadable(lazy(() => import('../views/dashboard/Adm
 const AbsensiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/absensi/AbsensiList')));
 const QrCodeScanView = Loadable(lazy(() => import('../views/apps/admin-sekolah/absensi/QrCodeScanView')));
 const AbsensiAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/absensi/AbsensiAdd')));
+const AbsensiEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/absensi/AbsensiEdit')));
 // Data Siswa
 const SiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-siswa/SiswaList')));
 const SiswaAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-siswa/SiswaAdd')));
@@ -165,6 +166,7 @@ const Router = [
                     { path: 'absensi-siswa', element: <AbsensiList/> },
                     { path: 'absensi', element: <QrCodeScanView/> },
                     { path: 'absensi-siswa/tambah', element: <AbsensiAdd/> },
+                    { path: 'absensi-siswa/edit/:id', element: <AbsensiEdit/> },
                     // Data Siswa
                     { path: 'siswa', element: <SiswaList/> },
                     { path: 'siswa/edit/:id', element: <SiswaEdit/> },
