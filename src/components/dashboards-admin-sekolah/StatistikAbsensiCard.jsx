@@ -16,17 +16,19 @@ import {
   TableRow,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import Grid from "@mui/material/Grid";
+import Grid from "@mui/material/Grid"; 
 import axiosInstance from "src/utils/axiosInstance";
 
-
 const fetchIzinData = async () => {
-  const response = await axiosInstance.get("/api/v1/admin-sekolah/izin/absensi");
+  const response = await axiosInstance.get("/api/v1/admin-sekolah/absensi/izin");
   return response.data.data;
 };
 
+// ⛳ BYPASS REDIS CACHE DI SINI
 const fetchStats = async () => {
-  const response = await axiosInstance.get("/api/v1/admin-sekolah/absensi/statistik");
+  const response = await axiosInstance.get("/api/v1/admin-sekolah/absensi/statistik", {
+    params: { noCache: 1 },
+  });
   return response.data.data;
 };
 
@@ -50,22 +52,11 @@ const StatistikAbsensiCard = () => {
   }, []);
 
   const data = [
-    {
-      title: "Siswa Masuk",
-      value: stats.Hadir || 0,
-    },
-    {
-      title: "Siswa Tanpa Keterangan",
-      value: stats["Tanpa Keterangan"] || 0
-    },
-    {
-      title: "Siswa Izin",
-      value: stats.Izin || 0,
-    },
-    {
-      title: "Siswa Terlambat",
-      value: stats.Terlambat || 0,
-    },
+    { title: "Siswa Masuk",           value: Number(stats.Hadir || 0) },
+    { title: "Siswa Tanpa Keterangan",value: Number(stats["Tanpa Keterangan"] || 0) },
+    { title: "Siswa Izin",            value: Number(stats.Izin || 0) },
+    { title: "Siswa Terlambat",       value: Number(stats.Terlambat || 0) },
+    { title: "Siswa Sakit",           value: Number(stats.Sakit || 0) }, // 🆕 card Sakit
   ];
 
   const handleOpenModal = () => setOpenModal(true);
@@ -73,13 +64,15 @@ const StatistikAbsensiCard = () => {
 
   return (
     <Box sx={{ mb: 4 }}>
-      <Grid container spacing={2}>
+      {/* columns: lg=20 agar 5 card per baris (tiap item lg=4) */}
+      <Grid container spacing={2} columns={{ xs: 12, sm: 12, md: 12, lg: 20 }}>
         {data.map((item, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+          <Grid size={{ xs: 12, sm: 6, md: 4, lg: 4 }} key={index}>
             <Paper
               elevation={3}
               sx={{
                 p: 2,
+                height: "100%",
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
@@ -122,7 +115,10 @@ const StatistikAbsensiCard = () => {
                       color: theme.palette.primary.contrastText,
                     },
                   }}
-                  onClick={item.title === "Siswa Izin" ? handleOpenModal : undefined}
+                  // Modal "Lihat" tetap khusus untuk Izin (bisa ditambah endpoint Sakit nanti)
+                  onClick={
+                    item.title === "Siswa Izin" ? handleOpenModal : undefined
+                  }
                 >
                   Lihat
                 </Button>
