@@ -4,12 +4,11 @@ import { setUser, clearUser } from '../store/apps/user/userSlice';
 import {jwtDecode} from 'jwt-decode';
 
 const axiosInstance = axios.create({
-  baseURL: 'https://dev.abseninaja.com',
+  baseURL: import.meta.env.VITE_API_URL,
   timeout: 60000,
-  withCredentials: true, // Kirim cookie untuk autentikasi
+  withCredentials: true,
 });
 
-// Interceptor untuk menambahkan access token ke header
 axiosInstance.interceptors.request.use(
   (config) => {
     const state = store.getState();
@@ -23,11 +22,10 @@ axiosInstance.interceptors.request.use(
         // Periksa apakah token sudah kadaluarsa
         if (decodedToken.exp < currentTime) {
           store.dispatch(clearUser());
-          window.location.href = '/auth/login';
-          return Promise.reject(new Error('Token expired.'));
+          window.location.href = '/';
+          return Promise.reject(new Error('Token expired'));
         }
 
-        // Tambahkan token ke header
         config.headers['Authorization'] = `Bearer ${token}`;
         config.headers['x-user-id'] = decodedToken.userId; 
       } catch (error) {
@@ -46,15 +44,12 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Interceptor untuk menangani respon dan memperbarui token
 axiosInstance.interceptors.response.use(
   (response) => {
-    // Jika backend mengirimkan token baru melalui header `x-access-token`
     const newToken = response.headers['x-access-token'];
     if (newToken) {
       try {
-        const decodedToken = jwtDecode(newToken); // Decode token baru
-        // Perbarui token di Redux state
+        const decodedToken = jwtDecode(newToken);
         store.dispatch(
           setUser({
             name: decodedToken.name, 
