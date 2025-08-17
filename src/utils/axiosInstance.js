@@ -9,6 +9,8 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
+console.log(import.meta.env.VITE_API_URL)
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const state = store.getState();
