@@ -128,14 +128,14 @@ const KelasTableDetail = ({
                       <Checkbox
                         checked={checked}
                         onChange={() => onToggleOne(row.id)}
-                        inputProps={{ 'aria-label': `select ${row.nama_siswa || '-'}` }}
+                        inputProps={{ 'aria-label': `select ${row.name || '-'}` }}
                       />
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontSize: '1rem' }}>{page * rowsPerPage + index + 1}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{row.nama_siswa || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{row.User.name || '-'}</Typography>
                     </TableCell>
                     <TableCell align='center'>
                       <Typography sx={{ fontSize: '1rem' }}>{row.nis || '-'}</Typography>
