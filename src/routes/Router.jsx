@@ -139,6 +139,7 @@ const RekapAbsensiGlobalList = Loadable(lazy(() => import('../views/apps/admin-s
 
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
+const PrivacyPolicy = Loadable(lazy(() => import('../views/privacy-policy/PrivacyPolicy')));
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Forbidden = Loadable(lazy(() => import('../views/authentication/Forbidden')));
 
@@ -149,6 +150,7 @@ const Router = [
         children: [
           { path: '/', element: <Login /> },
           { path: '/404', element: <Error /> },
+          { path: '/privacy-policy', element: <PrivacyPolicy/> },
           { path: '/forbidden', element: <Forbidden /> },
           { path: '*', element: <Navigate to="/404" /> },
         ],

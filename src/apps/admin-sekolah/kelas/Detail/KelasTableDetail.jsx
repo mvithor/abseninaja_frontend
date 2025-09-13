@@ -29,13 +29,28 @@ const KelasTableDetail = ({
   onToggleOne,
   onToggleAllCurrentPage
 }) => {
+  const safeData = Array.isArray(dataKelasDetail) ? dataKelasDetail : [];
   const visibleRows = rowsPerPage > 0
-    ? dataKelasDetail.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    : dataKelasDetail;
+    ? safeData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    : safeData;
 
   const currentPageIds = visibleRows.map((r) => r.id);
   const allCurrentSelected = currentPageIds.length > 0 && currentPageIds.every(id => selectedIds.includes(id));
   const someCurrentSelected = currentPageIds.some(id => selectedIds.includes(id));
+
+  const fmtDate = (d) => {
+    if (!d) return '-';
+    try {
+      const date = new Date(d);
+      if (Number.isNaN(date.getTime())) return d; // jika bukan ISO, tampilkan apa adanya
+      return date.toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' });
+    } catch {
+      return d;
+    }
+  };
+
+  const getNamaWali = (row) => row?.wali_utama_nama || row?.wali_utama?.nama || '-';
+  const getTelpWali = (row) => row?.wali_utama?.nomor_telepon || row?.nomor_telepon_wali_legacy || '-';
 
   return (
     <Paper variant='outlined'>
@@ -58,7 +73,7 @@ const KelasTableDetail = ({
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama</Typography>
               </TableCell>
               <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NISN</Typography>
+                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NIS/NISN</Typography>
               </TableCell>
               <TableCell align='center'>
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Tanggal Lahir</Typography>
@@ -70,7 +85,7 @@ const KelasTableDetail = ({
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nomor Telepon Siswa</Typography>
               </TableCell>
               <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Wali</Typography>
+                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Wali Utama</Typography>
               </TableCell>
               <TableCell align='center'>
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nomor Telepon Wali</Typography>
@@ -96,7 +111,7 @@ const KelasTableDetail = ({
                   </Box>
                 </TableCell>
               </TableRow>
-            ) : dataKelasDetail.length === 0 ? (
+            ) : safeData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={9}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100px', textAlign: 'center' }}>
@@ -105,40 +120,40 @@ const KelasTableDetail = ({
                 </TableCell>
               </TableRow>
             ) : (
-              visibleRows.map((kelasDetail, index) => {
-                const checked = selectedIds.includes(kelasDetail.id);
+              visibleRows.map((row, index) => {
+                const checked = selectedIds.includes(row.id);
                 return (
-                  <TableRow key={kelasDetail.id} hover>
+                  <TableRow key={row.id} hover>
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={checked}
-                        onChange={() => onToggleOne(kelasDetail.id)}
-                        inputProps={{ 'aria-label': `select ${kelasDetail.User?.name || '-'}` }}
+                        onChange={() => onToggleOne(row.id)}
+                        inputProps={{ 'aria-label': `select ${row.name || '-'}` }}
                       />
                     </TableCell>
                     <TableCell>
                       <Typography sx={{ fontSize: '1rem' }}>{page * rowsPerPage + index + 1}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.User?.name}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{row.User.name || '-'}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.nis}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{row.nis || '-'}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.tanggal_lahir || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{fmtDate(row.tanggal_lahir)}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.jenis_kelamin || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{row.jenis_kelamin || '-'}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.nomor_telepon_siswa || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{row.nomor_telepon_siswa || '-'}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.nama_wali || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{getNamaWali(row)}</Typography>
                     </TableCell>
                     <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{kelasDetail.nomor_telepon_wali || '-'}</Typography>
+                      <Typography sx={{ fontSize: '1rem' }}>{getTelpWali(row)}</Typography>
                     </TableCell>
                   </TableRow>
                 );
@@ -150,7 +165,7 @@ const KelasTableDetail = ({
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={9}
-                count={dataKelasDetail.length}
+                count={safeData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={(_, newPage) => handleChangePage(newPage)}

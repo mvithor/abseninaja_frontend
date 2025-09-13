@@ -14,8 +14,8 @@ import TransferSiswaModal from "src/apps/admin-sekolah/kelas/Detail/TransferSisw
 const fetchKelasBySiswa = async (id) => {
   const response = await axiosInstance.get(`/api/v2/admin-sekolah/siswa/${id}`);
   return {
-    nama_kelas: response.data.nama_kelas,
-    siswa: response.data.data
+    nama_kelas: response.data?.nama_kelas,
+    siswa: Array.isArray(response.data?.data) ? response.data.data : [],
   };
 };
 
@@ -33,23 +33,43 @@ const KelasDetail = () => {
   const [openTransfer, setOpenTransfer] = useState(false);
 
   const { data, isError, error: queryError, isLoading } = useQuery({
-    queryKey: ['dataKelasDetail', String(id)],
+    queryKey: ["dataKelasDetail", String(id)],
     queryFn: () => fetchKelasBySiswa(id),
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
+    onError: (err) => {
+      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
       setError(errorMessage);
       setTimeout(() => setError(""), 3000);
-    }
+    },
   });
 
   const namaKelas = data?.nama_kelas || "Tidak Diketahui";
   const dataKelasDetail = data?.siswa || [];
 
-  // filter + sort
+  // ---- SEARCH & SORT disesuaikan dengan API baru ----
   const filteredKelasBySiswa = useMemo(() => {
-    return (dataKelasDetail || [])
-      .filter((row) => row.User?.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-      .sort((a, b) => (a.User?.name || "").localeCompare(b.User?.name || ""));
+    const q = (searchQuery || "").toLowerCase().trim();
+
+    const byQuery = (row) => {
+      if (!q) return true;
+
+      const namaSiswa = (row.nama_siswa || "").toLowerCase();
+      const nis = (row.nis || "").toLowerCase();
+      const namaWali = (row.wali_utama_nama || row.wali_utama?.nama || "").toLowerCase();
+      const telpWali = (row.wali_utama?.nomor_telepon || row.nomor_telepon_wali_legacy || "").toLowerCase();
+
+      return (
+        namaSiswa.includes(q) ||
+        nis.includes(q) ||
+        namaWali.includes(q) ||
+        telpWali.includes(q)
+      );
+    };
+
+    const sorted = [...(dataKelasDetail || [])]
+      .filter(byQuery)
+      .sort((a, b) => (a.nama_siswa || "").localeCompare(b.nama_siswa || "", "id"));
+
+    return sorted;
   }, [dataKelasDetail, searchQuery]);
 
   const handleSearchChange = (event) => setSearchQuery(event.target.value);
@@ -85,17 +105,22 @@ const KelasDetail = () => {
   return (
     <PageContainer title="Detail Kelas" description="Detail Kelas">
       <ParentCard title={`Detail Kelas: ${namaKelas}`}>
-        <Alerts error={error || (isError && queryError?.message)} success={success} />
+        <Alerts error={error || (isError && (queryError?.response?.data?.msg || queryError?.message))} success={success} />
+
         <Box
           sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, mt: -2 }}
         >
-          <SearchButton value={searchQuery} onChange={handleSearchChange} placeholder="Cari Siswa" />
+          <SearchButton
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Cari nama siswa / NIS / nama wali / telp wali"
+          />
           <Stack direction="row" spacing={1} alignItems="center">
             {selectedIds.length > 0 && (
               <Chip label={`${selectedIds.length} terpilih`} color="primary" variant="outlined" />
             )}
             <Button
-              sx={{ backgroundColor: "#2F327D", '&:hover': { backgroundColor: "#280274" } }}
+              sx={{ backgroundColor: "#2F327D", "&:hover": { backgroundColor: "#280274" } }}
               variant="contained"
               color="secondary"
               type="button"
@@ -116,15 +141,15 @@ const KelasDetail = () => {
           handleChangeRowsPerPage={handleRowsPerPageChange}
           isError={isError}
           isLoading={isLoading}
-          errorMessage={queryError?.message}
+          errorMessage={queryError?.response?.data?.msg || queryError?.message}
           selectedIds={selectedIds}
           onToggleOne={handleToggleOne}
           onToggleAllCurrentPage={handleToggleAllCurrentPage}
         />
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-start', pt: 3, gap: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-start", pt: 3, gap: 1 }}>
           <Button
-            sx={{ backgroundColor: "#2F327D", '&:hover': { backgroundColor: "#280274" } }}
+            sx={{ backgroundColor: "#2F327D", "&:hover": { backgroundColor: "#280274" } }}
             variant="contained"
             color="secondary"
             type="button"
@@ -133,7 +158,9 @@ const KelasDetail = () => {
             Kembali
           </Button>
           {selectedIds.length > 0 && (
-            <Button variant="outlined" onClick={() => setSelectedIds([])}>Bersihkan Pilihan</Button>
+            <Button variant="outlined" onClick={() => setSelectedIds([])}>
+              Bersihkan Pilihan
+            </Button>
           )}
         </Box>
       </ParentCard>
@@ -144,9 +171,9 @@ const KelasDetail = () => {
         fromKelasId={id}
         selectedIds={selectedIds}
         onSuccess={(msg) => {
-          setSuccess(msg || 'Transfer berhasil');
+          setSuccess(msg || "Transfer berhasil");
           setSelectedIds([]);
-          setTimeout(() => setSuccess(''), 3000);
+          setTimeout(() => setSuccess(""), 3000);
         }}
       />
     </PageContainer>
