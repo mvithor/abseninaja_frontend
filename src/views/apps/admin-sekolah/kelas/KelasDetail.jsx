@@ -45,29 +45,19 @@ const KelasDetail = () => {
   const namaKelas = data?.nama_kelas || "Tidak Diketahui";
   const dataKelasDetail = data?.siswa || [];
 
-  // ---- SEARCH & SORT disesuaikan dengan API baru ----
+  // ---- SEARCH & SORT: hanya filter nama siswa (User.name) ----
   const filteredKelasBySiswa = useMemo(() => {
     const q = (searchQuery || "").toLowerCase().trim();
 
     const byQuery = (row) => {
       if (!q) return true;
-
-      const namaSiswa = (row.nama_siswa || "").toLowerCase();
-      const nis = (row.nis || "").toLowerCase();
-      const namaWali = (row.wali_utama_nama || row.wali_utama?.nama || "").toLowerCase();
-      const telpWali = (row.wali_utama?.nomor_telepon || row.nomor_telepon_wali_legacy || "").toLowerCase();
-
-      return (
-        namaSiswa.includes(q) ||
-        nis.includes(q) ||
-        namaWali.includes(q) ||
-        telpWali.includes(q)
-      );
+      const nama = (row?.User?.name || "").toLowerCase();
+      return nama.includes(q);
     };
 
     const sorted = [...(dataKelasDetail || [])]
       .filter(byQuery)
-      .sort((a, b) => (a.nama_siswa || "").localeCompare(b.nama_siswa || "", "id"));
+      .sort((a, b) => (a?.User?.name || "").localeCompare(b?.User?.name || "", "id"));
 
     return sorted;
   }, [dataKelasDetail, searchQuery]);
@@ -108,12 +98,12 @@ const KelasDetail = () => {
         <Alerts error={error || (isError && (queryError?.response?.data?.msg || queryError?.message))} success={success} />
 
         <Box
-          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, mt: -2 }}
+          sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, mt: 2 }}
         >
           <SearchButton
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Cari nama siswa / NIS / nama wali / telp wali"
+            placeholder="Cari nama siswa"
           />
           <Stack direction="row" spacing={1} alignItems="center">
             {selectedIds.length > 0 && (
@@ -147,19 +137,18 @@ const KelasDetail = () => {
           onToggleAllCurrentPage={handleToggleAllCurrentPage}
         />
 
-        <Box sx={{ display: "flex", justifyContent: "flex-start", pt: 3, gap: 1 }}>
+        <Box sx={{ display: "flex", justifyContent: "flex-start", mt: 3 }}>
           <Button
-            sx={{ backgroundColor: "#2F327D", "&:hover": { backgroundColor: "#280274" } }}
             variant="contained"
             color="secondary"
-            type="button"
             onClick={handleBack}
+            sx={{ px: 3 }}
           >
             Kembali
           </Button>
           {selectedIds.length > 0 && (
             <Button variant="outlined" onClick={() => setSelectedIds([])}>
-              Bersihkan Pilihan
+              Hapus Pilihan
             </Button>
           )}
         </Box>

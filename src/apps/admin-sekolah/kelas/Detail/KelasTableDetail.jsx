@@ -38,32 +38,18 @@ const KelasTableDetail = ({
   const allCurrentSelected = currentPageIds.length > 0 && currentPageIds.every(id => selectedIds.includes(id));
   const someCurrentSelected = currentPageIds.some(id => selectedIds.includes(id));
 
-  const fmtDate = (d) => {
-    if (!d) return '-';
-    try {
-      const date = new Date(d);
-      if (Number.isNaN(date.getTime())) return d; // jika bukan ISO, tampilkan apa adanya
-      return date.toLocaleDateString('id-ID', { year: 'numeric', month: '2-digit', day: '2-digit' });
-    } catch {
-      return d;
-    }
-  };
-
-  const getNamaWali = (row) => row?.wali_utama_nama || row?.wali_utama?.nama || '-';
-  const getTelpWali = (row) => row?.wali_utama?.nomor_telepon || row?.nomor_telepon_wali_legacy || '-';
-
   return (
     <Paper variant='outlined'>
       <TableContainer>
         <Table aria-label="custom pagination table" sx={{ whiteSpace: 'nowrap' }}>
           <TableHead>
             <TableRow>
-              <TableCell padding="checkbox">
+            <TableCell padding="checkbox">
                 <Checkbox
                   indeterminate={!allCurrentSelected && someCurrentSelected}
                   checked={allCurrentSelected}
                   onChange={(e) => onToggleAllCurrentPage(currentPageIds, e.target.checked)}
-                  inputProps={{ 'aria-label': 'select all on page' }}
+                  slotProps={{ input: { 'aria-label': 'select all on page' } }}
                 />
               </TableCell>
               <TableCell>
@@ -73,22 +59,7 @@ const KelasTableDetail = ({
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama</Typography>
               </TableCell>
               <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NIS/NISN</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Tanggal Lahir</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Jenis Kelamin</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nomor Telepon Siswa</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Wali Utama</Typography>
-              </TableCell>
-              <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nomor Telepon Wali</Typography>
+                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NISN</Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -128,7 +99,7 @@ const KelasTableDetail = ({
                       <Checkbox
                         checked={checked}
                         onChange={() => onToggleOne(row.id)}
-                        inputProps={{ 'aria-label': `select ${row.name || '-'}` }}
+                        slotProps={{ input: { 'aria-label': `select ${row.name || '-'}` } }}
                       />
                     </TableCell>
                     <TableCell>
@@ -139,21 +110,6 @@ const KelasTableDetail = ({
                     </TableCell>
                     <TableCell align='center'>
                       <Typography sx={{ fontSize: '1rem' }}>{row.nis || '-'}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{fmtDate(row.tanggal_lahir)}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{row.jenis_kelamin || '-'}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{row.nomor_telepon_siswa || '-'}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{getNamaWali(row)}</Typography>
-                    </TableCell>
-                    <TableCell align='center'>
-                      <Typography sx={{ fontSize: '1rem' }}>{getTelpWali(row)}</Typography>
                     </TableCell>
                   </TableRow>
                 );

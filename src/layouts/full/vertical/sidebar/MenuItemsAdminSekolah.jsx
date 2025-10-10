@@ -170,7 +170,7 @@ import {
                 id: uniqueId(),
                 title: 'Anggota Ekstrakurikuler',
                 icon: IconUsersGroup,
-                href: '#',
+                href: '/dashboard/admin-sekolah/anggota-ekskul',
             },
         ],
     },
