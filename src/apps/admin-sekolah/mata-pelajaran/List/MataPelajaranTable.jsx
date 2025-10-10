@@ -15,7 +15,7 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconEye } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
 const MataPelajaranTable = ({
@@ -25,7 +25,7 @@ const MataPelajaranTable = ({
     handleChangePage,
     handleChangeRowsPerPage,
     handleEdit,
-    handleDelete,
+    handleDetail,
     isLoading,
     isError,
     errorMessage
@@ -46,6 +46,9 @@ const MataPelajaranTable = ({
                             <TableCell align='center'>
                                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Mata Pelajaran</Typography>
                             </TableCell>
+                            <TableCell align='center'>
+                                <Typography variant="h6" sx={{ fontSize: '1rem' }}>Jumlah Kelas</Typography>
+                            </TableCell>
                             <TableCell align="center">
                                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Aksi</Typography>
                             </TableCell>
@@ -54,7 +57,7 @@ const MataPelajaranTable = ({
                         <TableBody>
                             {isLoading ? (
                             <TableRow>
-                            <TableCell colSpan={4}>
+                            <TableCell colSpan={5}>
                                 <Box 
                                 sx={{
                                     display: 'flex',
@@ -69,7 +72,7 @@ const MataPelajaranTable = ({
                             </TableRow>
                         ) : isError ? (
                             <TableRow>
-                            <TableCell colSpan={4}>
+                            <TableCell colSpan={5}>
                                 <Box
                                 sx={{
                                     display: 'flex',
@@ -86,7 +89,7 @@ const MataPelajaranTable = ({
                             </TableRow>
                         ) : mapel.length === 0 ? (  
                             <TableRow>
-                            <TableCell colSpan={4}>
+                            <TableCell colSpan={5}>
                             <Box
                                 sx={{
                                     display: 'flex',
@@ -118,16 +121,19 @@ const MataPelajaranTable = ({
                                 <TableCell align='center'>
                                     <Typography sx={{ fontSize: '1rem' }}>{mataPelajaran.nama_mapel}</Typography>
                                 </TableCell>
+                                <TableCell align='center'>
+                                    <Typography sx={{ fontSize: '1rem' }}>{mataPelajaran.jumlah_kelas}</Typography>
+                                </TableCell>
                                 <TableCell>
                                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <Tooltip title="Lihat Detail" placement="bottom">
+                                    <IconButton onClick={() => handleDetail(mataPelajaran.id)}>
+                                        <IconEye width={18} />
+                                    </IconButton>
+                                    </Tooltip>
                                     <Tooltip title="Edit" placement="bottom">
                                     <IconButton onClick={() => handleEdit(mataPelajaran.id)}>
                                         <IconEdit width={18} />
-                                    </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Hapus" placement="bottom">
-                                    <IconButton onClick={() => handleDelete(mataPelajaran.id)}>
-                                        <IconTrash width={18} />
                                     </IconButton>
                                     </Tooltip>
                                 </Box>
@@ -139,7 +145,7 @@ const MataPelajaranTable = ({
                         <TableFooter>
                             <TableRow>
                                 <TablePagination
-                                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]} // Tetap digunakan untuk opsi jumlah baris
+                                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                                 colSpan={4}
                                 count={mapel.length}
                                 rowsPerPage={rowsPerPage}
@@ -164,7 +170,7 @@ MataPelajaranTable.propTypes = {
     handleChangePage: PropTypes.func.isRequired,
     handleChangeRowsPerPage: PropTypes.func.isRequired,
     handleEdit: PropTypes.func.isRequired,
-    handleDelete: PropTypes.func.isRequired,
+    handleDetail: PropTypes.func.isRequired,
     isLoading: PropTypes.bool.isRequired, 
     isError: PropTypes.bool.isRequired, 
     errorMessage: PropTypes.string 
