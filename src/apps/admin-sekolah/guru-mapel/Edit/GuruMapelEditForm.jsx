@@ -22,15 +22,15 @@ const GuruMapelEditForm = ({
         }
     });
 
-    const { data: mapelOptions = [], isLoading: isMapelLoading } = useQuery({
-        queryKey: ["mapelOptions"],
+    const { data: offeringOptions = [], isLoading: isOfferingLoading } = useQuery({
+        queryKey: ["offeringOptions"],
         queryFn: async () => {
-            const response = await axiosInstance.get('/api/v1/admin-sekolah/mata-pelajaran');
+            const response = await axiosInstance.get('/api/v1/admin-sekolah/dropdown/mapel');
             return response.data.data;
         }
     });
 
-    if (isLoading || isPegawaiLoading || isMapelLoading) {
+    if (isLoading || isPegawaiLoading || isOfferingLoading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" height="40px">
                 <CircularProgress />
@@ -39,7 +39,7 @@ const GuruMapelEditForm = ({
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4.5 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
             <Grid container spacing={2} rowSpacing={1}>
                 <Grid size={{ xs: 12, md: 6 }}>
                     <CustomFormLabel htmlFor="pegawai_id" sx={{ mt: 1.85 }}>
@@ -54,22 +54,11 @@ const GuruMapelEditForm = ({
                         displayEmpty
                         inputProps={{ "aria-label": "Pilih Pegawai" }}
                         MenuProps={{
-                            anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "left",
-                            },
-                            transformOrigin: {
-                            vertical: "top",
-                            horizontal: "left",
-                            },
-                            PaperProps: {
-                            style: {
-                                maxHeight: 300,
-                                overflowY: 'auto',
-                            },
-                            },
+                            anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                            transformOrigin: { vertical: "top", horizontal: "left" },
+                            PaperProps: { style: { maxHeight: 300, overflowY: 'auto' } },
                         }}
-                        >
+                    >
                         <MenuItem value="" disabled>
                             Pilih Pegawai
                         </MenuItem>
@@ -77,57 +66,48 @@ const GuruMapelEditForm = ({
                             <MenuItem value="" disabled>Memuat...</MenuItem>
                         ) : (
                             pegawaiOptions.map((option) => (
-                            <MenuItem key={option.id} value={option.id}>
-                                {option.nama}
-                            </MenuItem>
+                                <MenuItem key={option.id} value={option.id}>
+                                    {option.nama}
+                                </MenuItem>
                             ))
                         )}
                     </CustomSelect>
                 </Grid>
+
                 <Grid size={{ xs: 12, md: 6 }}>
-                    <CustomFormLabel htmlFor="mata_pelajaran_id" sx={{ mt: 1.85 }}>
-                        Kelas
+                    <CustomFormLabel htmlFor="offering_id" sx={{ mt: 1.85 }}>
+                        Offering
                     </CustomFormLabel>
                     <CustomSelect
-                        id="mata_pelajaran_id"
-                        name="mata_pelajaran_id"
-                        value={guruMapelData.mata_pelajaran_id || ""}
+                        id="offering_id"
+                        name="offering_id"
+                        value={guruMapelData.offering_id || ""}
                         onChange={handleChange}
                         fullWidth
                         displayEmpty
-                        inputProps={{ "aria-label": "Pilih Mata Pelajaran" }}
+                        inputProps={{ "aria-label": "Pilih Offering" }}
                         MenuProps={{
-                            anchorOrigin: {
-                            vertical: "bottom",
-                            horizontal: "left",
-                            },
-                            transformOrigin: {
-                            vertical: "top",
-                            horizontal: "left",
-                            },
-                            PaperProps: {
-                            style: {
-                                maxHeight: 300,
-                                overflowY: 'auto',
-                            },
-                            },
+                            anchorOrigin: { vertical: "bottom", horizontal: "left" },
+                            transformOrigin: { vertical: "top", horizontal: "left" },
+                            PaperProps: { style: { maxHeight: 300, overflowY: 'auto' } },
                         }}
-                        >
+                    >
                         <MenuItem value="" disabled>
-                            Pilih Mata Pelajaran
+                            Pilih Offering
                         </MenuItem>
-                        {isMapelLoading ? (
+                        {isOfferingLoading ? (
                             <MenuItem value="" disabled>Memuat...</MenuItem>
                         ) : (
-                            mapelOptions.map((option) => (
-                            <MenuItem key={option.id} value={option.id}>
-                                {option.nama_mapel}
-                            </MenuItem>
+                            offeringOptions.map((opt) => (
+                                <MenuItem key={opt.id} value={opt.id}>
+                                    {opt.label}
+                                </MenuItem>
                             ))
                         )}
                     </CustomSelect>
                 </Grid>
             </Grid>
+
             <Box sx={{display: 'flex', justifyContent: 'flex-start', gap: 2, mt: 4 }} >
                 <SubmitButton type="submit">Simpan</SubmitButton>
                 <CancelButton onClick={handleCancel}>Batal</CancelButton>

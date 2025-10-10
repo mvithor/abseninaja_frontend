@@ -48,12 +48,17 @@ const GuruMapelTable = ({
                         </TableCell>
                         <TableCell align="center">
                             <Typography variant="h6" sx={{ fontSize: '1rem' }}>
-                                Kode
+                                Kode Mapel
                             </Typography>
                         </TableCell>
                         <TableCell align="center">
                             <Typography variant="h6" sx={{ fontSize: '1rem' }}>
                                 Mata Pelajaran
+                            </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                            <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                                Kelas
                             </Typography>
                         </TableCell>
                         <TableCell align="center">
@@ -66,7 +71,7 @@ const GuruMapelTable = ({
                     <TableBody>
                         {isLoading ? (
                             <TableRow>
-                                <TableCell colSpan={5}>
+                                <TableCell colSpan={6}>
                                     <Box
                                         sx={{
                                             display: 'flex',
@@ -81,7 +86,7 @@ const GuruMapelTable = ({
                             </TableRow>
                         ) : isError ? (
                             <TableRow>
-                                <TableCell colSpan={5}>
+                                <TableCell colSpan={6}>
                                     <Box
                                         sx={{
                                             display: 'flex',
@@ -98,7 +103,7 @@ const GuruMapelTable = ({
                             </TableRow>
                         ) : guruMapel.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5}>
+                                <TableCell colSpan={6}>
                                     <Box
                                         sx={{
                                             display: 'flex',
@@ -133,12 +138,17 @@ const GuruMapelTable = ({
                                     </TableCell>
                                     <TableCell align="center">
                                         <Typography sx={{ fontSize: '1rem' }}>
-                                            {guruMataPelajaran.kode_mapel || 'Tidak ditemukan'}
+                                            {guruMataPelajaran.kode_offering || 'Tidak tersedia'}
                                         </Typography>
                                     </TableCell>
                                     <TableCell align="center">
                                         <Typography sx={{ fontSize: '1rem' }}>
                                             {guruMataPelajaran.nama_mapel || 'Tidak tersedia'}
+                                        </Typography>
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <Typography sx={{ fontSize: '1rem' }}>
+                                            {guruMataPelajaran.nama_kelas || 'Tidak tersedia'}
                                         </Typography>
                                     </TableCell>
                                     <TableCell>
@@ -170,7 +180,7 @@ const GuruMapelTable = ({
                         <TableRow>
                             <TablePagination
                                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                                colSpan={5}
+                                colSpan={6}
                                 count={guruMapel.length}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
