@@ -73,7 +73,6 @@ const MataPelajaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah
 // Jadwal Mapel
 const JadwalMapelList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelList')));
 const JadwalMapelAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelAdd')));
-const JadwalMapelEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelEdit')));
 // Jadwal Ekskul
 const JadwalEkskulList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulList')));
 const JadwalEkskulAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulAdd')));
