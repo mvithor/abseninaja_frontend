@@ -226,12 +226,10 @@ const Router = [
                     // Mata Pelajaran
                     { path: 'mata-pelajaran', element: <MataPelajaranList/> },
                     { path: 'mata-pelajaran/tambah-mapel', element: <MataPelajaranAdd/> },
-                    { path: 'mata-pelajaran/edit/:id', element: <MataPelajaranEdit/> },
                     { path: 'mata-pelajaran/detail/:id', element: <MataPelajaranDetail/> },
                     // Jadwal Mapel
                     { path: 'jadwal-mapel', element: <JadwalMapelList/> },
                     { path: 'jadwal-mapel/tambah-jadwal', element: <JadwalMapelAdd/> },
-                    { path: 'jadwal-mapel/edit/:id', element: <JadwalMapelEdit/> },
                     // Jadwal Ekskul
                     { path: 'jadwal-ekskul', element: <JadwalEkskulList/> },
                     { path: 'jadwal-ekskul/tambah-jadwal', element: <JadwalEkskulAdd/> },
