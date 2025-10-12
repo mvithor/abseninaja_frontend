@@ -94,7 +94,7 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm" keepMounted>
+    <Dialog open={open} onClose={mutation.isLoading ? undefined : onClose} fullWidth maxWidth="sm" keepMounted>
       <DialogTitle>Transfer Siswa</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2}>
@@ -114,6 +114,7 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
               loading={isKelasLoading}
               value={kelasTujuan}
               onChange={(_, val) => setKelasTujuan(val)}
+              disabled={mutation.isLoading}
               renderOption={(props, option) => (
                 <li {...props} key={option.id}>
                   {option.nama_kelas}
@@ -147,12 +148,13 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="outlined">Batal</Button>
+        <Button onClick={onClose} variant="outlined" disabled={mutation.isLoading}>Batal</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
           disabled={!kelasTujuan?.id || !selectedIds?.length || mutation.isLoading || isKelasLoading}
           sx={{ backgroundColor: '#2F327D', '&:hover': { backgroundColor: '#280274' } }}
+          startIcon={mutation.isLoading ? <CircularProgress size={16} /> : null}
         >
           {mutation.isLoading ? 'Memproses…' : 'Transfer'}
         </Button>
