@@ -99,7 +99,7 @@ const UserAdminList = () => {
     }
 
     const handleEdit = (id) => {
-        navigate(`/dashboard/admin-sekolah/user-admin/edit/${id}`)
+        navigate(`#`)
     }
 
     const handleDelete = (user_id, type = 'admin sekolah') => {

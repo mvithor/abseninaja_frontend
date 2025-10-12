@@ -79,7 +79,8 @@ const UserSiswaList = () => {
   const handleChangePage = (_e, newPage) => setPage(newPage);
   const handleRowsPerPageChange = (e) => { setRowsPerPage(parseInt(e.target.value, 10)); setPage(0); };
 
-  const handleEdit = (userId) => navigate(`/dashboard/admin-sekolah/users/${userId}/edit`);
+  const handleEdit = (userId) => navigate(`#`);
+  // const handleEdit = (userId) => navigate(`/dashboard/admin-sekolah/users/${userId}/edit`);
 
   const handleOpenPrefs = (userId, userName) => {
     setPrefsUser({ id: userId, name: userName || "" });
@@ -87,7 +88,6 @@ const UserSiswaList = () => {
   };
   const handleClosePrefs = () => setPrefsOpen(false);
 
-  // delete flow
   const handleOpenConfirmDialog = (userId) => { setDeleteUserSiswa(userId); setConfirmDialogOpen(true); };
   const handleCloseConfirmDialog = () => { setConfirmDialogOpen(false); setDeleteUserSiswa(null); };
   const handleDelete = () => {
