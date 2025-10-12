@@ -226,7 +226,6 @@ const Router = [
                     // Mata Pelajaran
                     { path: 'mata-pelajaran', element: <MataPelajaranList/> },
                     { path: 'mata-pelajaran/tambah-mapel', element: <MataPelajaranAdd/> },
-                    { path: 'mata-pelajaran/detail/:id', element: <MataPelajaranDetail/> },
                     // Jadwal Mapel
                     { path: 'jadwal-mapel', element: <JadwalMapelList/> },
                     { path: 'jadwal-mapel/tambah-jadwal', element: <JadwalMapelAdd/> },
