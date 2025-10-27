@@ -44,8 +44,6 @@ const WaktuEdit = () => {
 
     useEffect(() => {
         if (data) {
-            console.log("Kategori Waktu ID:", data.kategori_waktu_id);
-            console.log("Hari ID:", data.hari_id);
             setWaktuData({
                 jam_mulai: data.jam_mulai || "",
                 jam_selesai: data.jam_selesai || "",
