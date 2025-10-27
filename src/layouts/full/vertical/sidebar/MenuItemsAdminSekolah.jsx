@@ -98,7 +98,7 @@ import {
                 id: uniqueId(),
                 title: 'Siswa',
                 icon: IconUsers,
-                href: '#',
+                href: '/dashboard/admin-sekolah/perizinan-siswa',
             },
         ],
     },

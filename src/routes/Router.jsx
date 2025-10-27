@@ -53,6 +53,9 @@ const KategoriPegawaiDetailEdit = Loadable(lazy(() => import('../views/apps/admi
 // Perizinan Pegawai
 const PerizinanPegawaiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-pegawai/PerizinanPegawaiList')));
 const PerizinanPegawaiEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-pegawai/PerizinanPegawaiEdit')));
+// Perizinan Siswa
+const PerizinanSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-siswa/PerizinanSiswaList')));
+const PerizinanSiswaEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/perizinan-siswa/PerizinanSiswaEdit')));
 // Generate QR-Code
 const QrCodeGenerateList = Loadable(lazy(() => import('../views/apps/admin-sekolah/qr-code/QrCodeGenerateList')));
 // Ekskul Sekolah
@@ -102,6 +105,7 @@ const KategoriTemplateEdit = Loadable(lazy(() => import('../views/apps/admin-sek
 // Notifikasi Template Mobile
 const NotifikasiTemplateList = Loadable(lazy(() => import('../views/apps/admin-sekolah/notifikasi-template/NotifikasiTemplateList')));
 const NotifikasiTemplateAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/notifikasi-template/NotifikasiTemplateAdd')));
+const NotifikasiTemplateEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/notifikasi-template/NotifikasiTemplateEdit')));
 // Pengaturan Jam
 const PengaturanJamList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pengaturan-jam/PengaturanJamList')));
 const PengaturanJamEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/pengaturan-jam/PengaturanJamEdit')));
@@ -205,6 +209,9 @@ const Router = [
                     // Perizinan Pegawai
                     { path: 'perizinan-pegawai', element: <PerizinanPegawaiList /> }, 
                     { path: 'perizinan-pegawai/edit/:id', element: <PerizinanPegawaiEdit /> }, 
+                    // Perizinan Siswa
+                    { path: 'perizinan-siswa', element: <PerizinanSiswaList /> }, 
+                    { path: 'perizinan-siswa/edit/:id', element: <PerizinanSiswaEdit /> }, 
                     // WhatsApp
                     { path: 'whatsapp', element: <WhatsAppList/> },
                     // Template WhatsApp
@@ -218,6 +225,7 @@ const Router = [
                     // Notifikasi Template Mobile
                     { path: 'notifikasi-template', element: <NotifikasiTemplateList/> },
                     { path: 'notifikasi-template/tambah', element: <NotifikasiTemplateAdd/> },
+                    { path: 'notifikasi-template/edit/:id', element: <NotifikasiTemplateEdit/> },
                     // Kelas
                     { path: 'kelas', element: <KelasList/> }, 
                     { path: 'kelas/detail/:id', element: <KelasDetail/> },
