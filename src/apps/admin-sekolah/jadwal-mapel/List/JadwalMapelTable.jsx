@@ -14,7 +14,6 @@ import {
   Box,
   Paper,
   CircularProgress,
-  Chip, // ✅ tambah Chip untuk badge kategori
 } from '@mui/material';
 import { IconEdit, IconTrash } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
@@ -23,6 +22,7 @@ const JadwalMapelTable = ({
   jadwalMapel,
   page,
   rowsPerPage,
+  totalCount,                 // ← pakai total dari server
   handleChangePage,
   handleChangeRowsPerPage,
   handleEdit,
@@ -31,9 +31,7 @@ const JadwalMapelTable = ({
   isError,
   errorMessage,
 }) => {
-  const sliceData = rowsPerPage > 0
-    ? jadwalMapel.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    : jadwalMapel;
+  const baseIndex = rowsPerPage === -1 ? 0 : page * rowsPerPage;
 
   return (
     <Paper variant='outlined'>
@@ -53,7 +51,6 @@ const JadwalMapelTable = ({
               <TableCell align="center">
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Waktu/Jam</Typography>
               </TableCell>
-              {/* ✅ kolom baru: Kategori */}
               <TableCell align="center">
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Kategori</Typography>
               </TableCell>
@@ -88,7 +85,7 @@ const JadwalMapelTable = ({
                   </Box>
                 </TableCell>
               </TableRow>
-            ) : jadwalMapel.length === 0 ? (
+            ) : (jadwalMapel?.length || 0) === 0 ? (
               <TableRow>
                 <TableCell colSpan={8}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', minHeight: '100px', textAlign: 'center' }}>
@@ -99,17 +96,17 @@ const JadwalMapelTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              sliceData.map((row, index) => {
+              jadwalMapel.map((row, index) => {
                 const isKBM = row.kategori === 'KBM';
                 const kelasDisp = isKBM ? (row.kelas || '-') : 'ALL';
                 const mapelDisp = isKBM ? (row.mata_pelajaran || '-') : '–';
                 const guruDisp  = isKBM ? (row.nama_guru || '-') : '–';
 
                 return (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id || index}>
                     <TableCell>
                       <Typography sx={{ fontSize: '1rem' }}>
-                        {page * rowsPerPage + index + 1}
+                        {baseIndex + index + 1}
                       </Typography>
                     </TableCell>
 
@@ -124,16 +121,19 @@ const JadwalMapelTable = ({
                         {row.hari || '-'}
                       </Typography>
                     </TableCell>
+
                     <TableCell align="center">
                       <Typography sx={{ fontSize: '1rem' }}>
                         {row.waktu || '-'}
                       </Typography>
                     </TableCell>
+
                     <TableCell align="center">
-                        <Typography sx={{ fontSize: '1rem', fontStyle: row.kategori && row.kategori !== 'KBM' ? 'italic' : 'normal' }}>
-                            {row.kategori ? (row.kategori === 'KBM' ? 'KBM' : `${row.kategori}`) : '-'}
-                        </Typography>
+                      <Typography sx={{ fontSize: '1rem', fontStyle: row.kategori && row.kategori !== 'KBM' ? 'italic' : 'normal' }}>
+                        {row.kategori || '-'}
+                      </Typography>
                     </TableCell>
+
                     <TableCell align="center">
                       <Typography sx={{ fontSize: '1rem' }}>
                         {mapelDisp}
@@ -148,15 +148,25 @@ const JadwalMapelTable = ({
 
                     <TableCell>
                       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                        <Tooltip title="Edit" placement="bottom">
-                          <IconButton onClick={() => handleEdit(row.id)}>
-                            <IconEdit width={18} />
-                          </IconButton>
+                        <Tooltip title={isKBM ? "Edit" : "Tidak tersedia untuk Non-KBM, ubah melalui menu waktu"} placement="bottom">
+                          <span>
+                            <IconButton
+                              onClick={() => isKBM && handleEdit(row.id)}
+                              disabled={!isKBM}
+                            >
+                              <IconEdit width={18} />
+                            </IconButton>
+                          </span>
                         </Tooltip>
-                        <Tooltip title="Hapus" placement="bottom">
-                          <IconButton onClick={() => handleDelete(row.id)}>
-                            <IconTrash width={18} />
-                          </IconButton>
+                        <Tooltip title={isKBM ? "Hapus" : "Tidak tersedia untuk Non-KBM, ubah melalui menu waktu"} placement="bottom">
+                          <span>
+                            <IconButton
+                              onClick={() => isKBM && handleDelete(row.id)}
+                              disabled={!isKBM}
+                            >
+                              <IconTrash width={18} />
+                            </IconButton>
+                          </span>
                         </Tooltip>
                       </Box>
                     </TableCell>
@@ -169,9 +179,9 @@ const JadwalMapelTable = ({
           <TableFooter>
             <TableRow>
               <TablePagination
-                rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
-                colSpan={8} 
-                count={jadwalMapel.length}
+                rowsPerPageOptions={[5, 10, 20, 25, { label: 'All', value: -1 }]}
+                colSpan={8}
+                count={totalCount}                 // ← penting: total dari server
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -191,9 +201,9 @@ JadwalMapelTable.propTypes = {
   jadwalMapel: PropTypes.array.isRequired,
   page: PropTypes.number.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
+  totalCount: PropTypes.number.isRequired,
   handleChangePage: PropTypes.func.isRequired,
   handleChangeRowsPerPage: PropTypes.func.isRequired,
-  handleDetail: PropTypes.func.isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,

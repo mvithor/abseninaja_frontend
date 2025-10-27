@@ -4,7 +4,7 @@ import {
   InputAdornment,
   MenuItem,
   CircularProgress,
-  Chip,
+  Chip, // (boleh tetap ada meski tidak dipakai lagi)
 } from "@mui/material";
 import { IconBuilding } from "@tabler/icons-react";
 import SubmitButton from "src/components/button-group/SubmitButton";
@@ -20,10 +20,33 @@ const fetcher = async (url) => (await axiosInstance.get(url)).data.data;
 const strEq = (a, b) => String(a ?? "") === String(b ?? "");
 const hasOption = (options, id) => options?.some((o) => strEq(o.id, id));
 
+/* ➕ Helper untuk parent: mapping error BE → FE (tetap diexport agar View bisa pakai) */
+export const buildUpdateErrorMessage = (err) => {
+  const d = err?.response?.data || {};
+  const msg = d.msg || "Terjadi kesalahan saat menyimpan perubahan.";
+  let detail = Array.isArray(d.detail) ? d.detail.slice() : [];
+  if (!detail.length && Array.isArray(d.errors)) detail = d.errors.slice();
+  if (!detail.length && Array.isArray(d.conflicts)) {
+    const toHHMM = (t) => {
+      if (!t) return "-";
+      const [h, m] = String(t).split(":");
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    };
+    detail = d.conflicts.map((c) => {
+      const jam = `${toHHMM(c.jam_mulai)}-${toHHMM(c.jam_selesai)}`;
+      const kat = c.kategori || "-";
+      return c.kelas
+        ? `Konflik: ${jam} (${kat}) sudah terisi untuk ${c.kelas}.`
+        : `Konflik: ${jam} (${kat}) adalah Non-KBM (global).`;
+    });
+  }
+  return { msg, detail };
+};
+
 const JadwalMapelEditForm = ({
-  jadwalData,          
+  jadwalData,
   setJadwalData,
-  handleChange,        
+  handleChange,
   handleSubmit,
   handleCancel,
   isLoading,
@@ -41,6 +64,7 @@ const JadwalMapelEditForm = ({
   const { data: offeringOptions = [], isLoading: isOfferingLoading } = useQuery({
     queryKey: ["offeringOptions", jadwalData?.kelas_id || ""],
     enabled: !!jadwalData?.kelas_id,
+    keepPreviousData: true,
     queryFn: () =>
       fetcher(
         `/api/v1/admin-sekolah/dropdown/offering?kelas_id=${jadwalData.kelas_id}`
@@ -50,7 +74,27 @@ const JadwalMapelEditForm = ({
   const { data: guruOptions = [], isLoading: isGuruLoading } = useQuery({
     queryKey: ["guruOptions"],
     queryFn: () => fetcher("/api/v1/admin-sekolah/dropdown/guru-mapel"),
+    keepPreviousData: true,
   });
+
+  // 🔎 Filter waktu berdasarkan hari yang sedang diedit (jadwalData.hari_id)
+  const waktuOptionsFiltered = useMemo(() => {
+    const hid = jadwalData?.hari_id;
+    if (!hid) return waktuOptions;
+    return (waktuOptions || []).filter((w) => strEq(w.hari_id, hid));
+  }, [waktuOptions, jadwalData?.hari_id]);
+
+  // Jika waktu_id terpilih tidak termasuk waktu hari ini, kosongkan agar valid
+  useEffect(() => {
+    if (!jadwalData?.waktu_id) return;
+    if (!hasOption(waktuOptionsFiltered, jadwalData.waktu_id)) {
+      setJadwalData((prev) => ({
+        ...prev,
+        waktu_id: "",
+        kategori: "",
+      }));
+    }
+  }, [waktuOptionsFiltered, jadwalData?.waktu_id, setJadwalData]);
 
   // derive kategori dari waktu_id bila ada (fallback ke yang sudah ada di state)
   const selectedWaktu = useMemo(
@@ -70,7 +114,7 @@ const JadwalMapelEditForm = ({
     }
   }, [jadwalData?.kelas_id, jadwalData?.nama_kelas, kelasOptions, setJadwalData]);
 
-  // Jika Non-KBM → pastikan offering_id & guru_id kosong (hindari out-of-range)
+  // Jika Non-KBM → kosongkan offering_id & guru_id
   useEffect(() => {
     if (!isKBM) {
       if (jadwalData?.offering_id || jadwalData?.guru_id) {
@@ -79,27 +123,7 @@ const JadwalMapelEditForm = ({
     }
   }, [isKBM, jadwalData?.offering_id, jadwalData?.guru_id, setJadwalData]);
 
-  // Validasi saat opsi offering berubah: value harus ada di options
-  useEffect(() => {
-    if (!isKBM) return;
-    if (!jadwalData?.kelas_id) {
-      if (jadwalData?.offering_id || jadwalData?.guru_id) {
-        setJadwalData((prev) => ({ ...prev, offering_id: "", guru_id: "" }));
-      }
-      return;
-    }
-    if (jadwalData?.offering_id && !hasOption(offeringOptions, jadwalData.offering_id)) {
-      setJadwalData((prev) => ({ ...prev, offering_id: "", guru_id: "" }));
-    }
-  }, [
-    isKBM,
-    jadwalData?.kelas_id,
-    jadwalData?.offering_id,
-    offeringOptions,
-    setJadwalData,
-  ]);
-
-  // Validasi guru saat opsi berubah
+  // Validasi guru saat opsi berubah (jangan reset offering di sini; biarkan prefill tampil)
   const guruByOffering = useMemo(
     () => guruOptions.filter((g) => strEq(g.offering_id, jadwalData?.offering_id)),
     [guruOptions, jadwalData?.offering_id]
@@ -138,36 +162,30 @@ const JadwalMapelEditForm = ({
   const anyLoading =
     isLoading || isKelasLoading || isWaktuLoading || (isKBM && isOfferingLoading);
 
+  const hasCurrentOffering = hasOption(offeringOptions, jadwalData?.offering_id);
+  const hasCurrentGuru =
+    jadwalData?.guru_id && guruByOffering.some((g) => strEq(g.id, jadwalData?.guru_id));
+
   return (
     <Box component="form" onSubmit={(e) => handleSubmit(e, isKBM)} sx={{ mt: -4 }}>
+      {/* ❌ Tidak ada lagi blok error di sini; semua error ke Alerts (view) */}
       <Grid container spacing={2} rowSpacing={1}>
-        {/* Kelas */}
+        {/* Kelas (read-only) */}
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel sx={{ mt: 1.85 }}>Kelas</CustomFormLabel>
-          <CustomSelect
-            name="kelas_id"
-            value={jadwalData?.kelas_id || ""}
-            onChange={handleChange}
+          <CustomOutlinedInput
+            value={
+              jadwalData?.nama_kelas ||
+              (jadwalData?.kelas_id ? `Kelas #${jadwalData.kelas_id}` : "")
+            }
+            readOnly
             fullWidth
-            required
-            displayEmpty
-            disabled={anyLoading}
-            MenuProps={{ disablePortal: true, PaperProps: { style: { maxHeight: 300 } } }}
             startAdornment={
               <InputAdornment position="start">
                 <IconBuilding size={18} />
               </InputAdornment>
             }
-          >
-            <MenuItem value="" disabled>
-              {isKelasLoading ? "Memuat..." : "Pilih Kelas"}
-            </MenuItem>
-            {kelasOptions.map((k) => (
-              <MenuItem key={k.id} value={k.id}>
-                {k.nama_kelas}
-              </MenuItem>
-            ))}
-          </CustomSelect>
+          />
         </Grid>
 
         {/* Hari (display-only) */}
@@ -176,38 +194,18 @@ const JadwalMapelEditForm = ({
           <CustomOutlinedInput value={jadwalData?.hari || ""} readOnly fullWidth />
         </Grid>
 
-        {/* Waktu */}
+        {/* Waktu (hanya hari yang sedang diedit) */}
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel sx={{ mt: 1.85 }}>Waktu</CustomFormLabel>
-          <CustomSelect
-            name="waktu_id"
-            value={jadwalData?.waktu_id || ""}
-            onChange={(e) => onChangeWaktu(e.target.value)}
+          <CustomOutlinedInput
+            readOnly
             fullWidth
-            required
-            displayEmpty
-            disabled={isWaktuLoading}
-            MenuProps={{ disablePortal: true, PaperProps: { style: { maxHeight: 300 } } }}
-          >
-            <MenuItem value="" disabled>
-              {isWaktuLoading ? "Memuat..." : "Pilih Waktu"}
-            </MenuItem>
-            {waktuOptions.map((w) => (
-              <MenuItem key={w.id} value={w.id}>
-                {`${w.jam_mulai} - ${w.jam_selesai} • ${w.kategori_waktu}`}
-              </MenuItem>
-            ))}
-          </CustomSelect>
-
-          {kategori && (
-            <Box mt={1}>
-              <Chip
-                size="small"
-                variant="outlined"
-                label={isKBM ? "KBM" : `Non-KBM: ${kategori}`}
-              />
-            </Box>
-          )}
+            value={
+              jadwalData?.waktu
+                ? `${jadwalData.waktu} • ${jadwalData?.kategori || ''}`
+                : ''
+            }
+          />
         </Grid>
 
         {/* Offering (KBM only) */}
@@ -218,11 +216,7 @@ const JadwalMapelEditForm = ({
             </CustomFormLabel>
             <CustomSelect
               name="offering_id"
-              value={
-                jadwalData?.kelas_id && hasOption(offeringOptions, jadwalData?.offering_id)
-                  ? jadwalData.offering_id
-                  : ""
-              }
+              value={jadwalData?.offering_id || ""}
               onChange={(e) => onChangeOffering(e.target.value)}
               fullWidth
               required
@@ -237,6 +231,17 @@ const JadwalMapelEditForm = ({
                   ? "Pilih Kelas terlebih dahulu"
                   : "Pilih Offering"}
               </MenuItem>
+
+              {!isOfferingLoading && jadwalData?.offering_id && !hasCurrentOffering && (
+                <MenuItem value={jadwalData.offering_id}>
+                  {(jadwalData?.nama_mapel || "-") +
+                    " • " +
+                    (jadwalData?.nama_kelas || "-") +
+                    " • " +
+                    (jadwalData?.kode_offering || "-")}
+                </MenuItem>
+              )}
+
               {offeringOptions.map((o) => (
                 <MenuItem key={o.id} value={o.id}>
                   {o.label}
@@ -252,12 +257,7 @@ const JadwalMapelEditForm = ({
             <CustomFormLabel sx={{ mt: 1.85 }}>Guru Pengampu</CustomFormLabel>
             <CustomSelect
               name="guru_id"
-              value={
-                jadwalData?.offering_id &&
-                guruByOffering.some((g) => strEq(g.id, jadwalData?.guru_id))
-                  ? jadwalData.guru_id
-                  : ""
-              }
+              value={jadwalData?.guru_id || ""}
               onChange={handleChange}
               fullWidth
               displayEmpty
@@ -269,6 +269,13 @@ const JadwalMapelEditForm = ({
                   ? "Tanpa Guru"
                   : "Pilih Offering terlebih dahulu"}
               </MenuItem>
+
+              {!isGuruLoading && jadwalData?.guru_id && !hasCurrentGuru && (
+                <MenuItem value={jadwalData.guru_id}>
+                  {jadwalData?.nama_guru || "Guru terpilih"}
+                </MenuItem>
+              )}
+
               {guruByOffering.map((g) => (
                 <MenuItem key={g.id} value={g.id}>
                   {g.nama_guru}

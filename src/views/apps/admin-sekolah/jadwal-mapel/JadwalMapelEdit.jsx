@@ -5,7 +5,9 @@ import axiosInstance from "src/utils/axiosInstance";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import Alerts from "src/components/alerts/Alerts";
-import JadwalMapelEditForm from "src/apps/admin-sekolah/jadwal-mapel/Edit/JadwalMapelEditForm";
+import JadwalMapelEditForm, {
+  buildUpdateErrorMessage,
+} from "src/apps/admin-sekolah/jadwal-mapel/Edit/JadwalMapelEditForm";
 
 const fetchJadwalById = async (id) => {
   const res = await axiosInstance.get(`/api/v1/admin-sekolah/jadwal-mapel/${id}`);
@@ -20,7 +22,6 @@ const JadwalMapelEdit = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  // single state object: submit + display (biar konsisten style FE kamu)
   const [jadwalData, setJadwalData] = useState({
     id: "",
     hari_id: "",
@@ -29,7 +30,6 @@ const JadwalMapelEdit = () => {
     kelas_id: "",
     offering_id: "",
     guru_id: "",
-    // display-only
     hari: "",
     waktu: "",
     nama_kelas: "",
@@ -42,13 +42,12 @@ const JadwalMapelEdit = () => {
     queryKey: ["jadwal-mapel", id],
     queryFn: () => fetchJadwalById(id),
     onError: (err) => {
-      const msg = err.response?.data?.msg || "Terjadi kesalahan saat memuat data";
+      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
       setError(msg);
-      setTimeout(() => setError(""), 3000);
+      setTimeout(() => setError(""), 4000);
     },
   });
 
-  // Prefill dari API
   useEffect(() => {
     if (!data) return;
     setJadwalData((prev) => ({
@@ -57,10 +56,9 @@ const JadwalMapelEdit = () => {
       hari_id: data.hari_id ?? "",
       waktu_id: data.waktu_id ?? "",
       kategori: data.kategori || "",
-      // kelas_id di-prefill via form (matching nama_kelas → id) setelah options ready
+      // kelas_id di-prefill via form (matching nama_kelas → id)
       offering_id: data.offering_id ?? "",
       guru_id: data.guru_id ?? "",
-      // display
       hari: data.hari || "",
       waktu: data.waktu || "",
       nama_kelas: data.nama_kelas || "",
@@ -72,6 +70,9 @@ const JadwalMapelEdit = () => {
 
   const mutation = useMutation({
     mutationFn: async ({ isKBM, body }) => {
+      // reset alert sebelum submit
+      setError("");
+      setSuccess("");
       const res = await axiosInstance.put(
         `/api/v1/admin-sekolah/jadwal-mapel/${id}`,
         body
@@ -79,16 +80,21 @@ const JadwalMapelEdit = () => {
       return res.data;
     },
     onSuccess: (response) => {
-      setSuccess(response.msg || "Jadwal berhasil diperbarui");
+      setSuccess(response?.msg || "Jadwal berhasil diperbarui");
       queryClient.invalidateQueries(["jadwal-mapel", id]);
       queryClient.invalidateQueries(["jadwalMapel"]);
       setTimeout(() => navigate("/dashboard/admin-sekolah/jadwal-mapel"), 3000);
     },
     onError: (err) => {
-      const msg = err.response?.data?.msg || "Terjadi kesalahan saat memperbarui jadwal";
-      const details = err.response?.data?.errors || [];
-      setError(details.length ? details.join(", ") : msg);
-      setTimeout(() => setError(""), 3000);
+      const { msg, detail } = buildUpdateErrorMessage(err);
+      // Gabungkan msg + detail menjadi satu string untuk Alerts
+      const fullMsg =
+        Array.isArray(detail) && detail.length
+          ? [msg, ...detail.map((d) => `• ${d}`)].join("\n")
+          : msg;
+
+      setError(fullMsg);
+      setTimeout(() => setError(""), 6000);
     },
   });
 
@@ -113,7 +119,10 @@ const JadwalMapelEdit = () => {
   return (
     <PageContainer title="Edit Jadwal" description="Edit Jadwal Mata Pelajaran">
       <ParentCard title="Form Edit Jadwal">
-        <Alerts error={error || (isError && queryError?.message)} success={success} />
+        <Alerts
+          error={error || (isError && queryError?.message)}
+          success={success}
+        />
         <JadwalMapelEditForm
           jadwalData={jadwalData}
           setJadwalData={setJadwalData}
