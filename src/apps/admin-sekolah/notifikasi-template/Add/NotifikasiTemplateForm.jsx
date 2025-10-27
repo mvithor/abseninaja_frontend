@@ -4,17 +4,9 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   InputAdornment,
-  Switch,
-  FormControlLabel,
   Chip,
   Stack,
   MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Button,
-  Typography
 } from "@mui/material";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomOutlinedInput from "src/components/forms/theme-elements/CustomOutlinedInput";
@@ -22,7 +14,7 @@ import CustomTextField from "src/components/forms/theme-elements/CustomTextField
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
 import SubmitButton from "src/components/button-group/SubmitButton";
 import CancelButton from "src/components/button-group/CancelButton";
-import { IconMessageChatbot, IconEye } from "@tabler/icons-react";
+import { IconMessageChatbot } from "@tabler/icons-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 
@@ -35,15 +27,9 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
     title: "",
     body_short: "",
     body_long: "",
-    enabled: true,
+    enabled: true,      
     locale: "id",
   });
-
-  // Preview dialog state
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewData, setPreviewData] = useState(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [previewError, setPreviewError] = useState("");
 
   const { data: catalog = [], isError: catalogError } = useQuery({
     queryKey: ["templateCatalog"],
@@ -55,16 +41,16 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
 
   // Dropdown options
   const keyOptions = useMemo(
-       () =>
-         catalog.map((c) => ({
-           value: c.key,
-           label: `${c.key} • ${c.business_category || '-' } (${c.type})`,
-           type: c.type,
-           business_category: c.business_category || null,
-           placeholders: c.placeholders || [],
-         })),
-       [catalog]
-     );
+    () =>
+      catalog.map((c) => ({
+        value: c.key,
+        label: `${c.key} • ${c.business_category || '-' } (${c.type})`,
+        type: c.type,
+        business_category: c.business_category || null,
+        placeholders: c.placeholders || [],
+      })),
+    [catalog]
+  );
   const localeOptions = [
     { value: "id", label: "Indonesia (id)" },
     { value: "en", label: "English (en)" },
@@ -101,19 +87,13 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
     setFormState((s) => ({ ...s, [name]: value }));
   };
 
-  const handleToggleEnabled = (e) => {
-    setFormState((s) => ({ ...s, enabled: e.target.checked }));
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Minimal FE validation
     if (!formState.key) return setError("Pilih Key template terlebih dahulu");
     if (!formState.title?.trim()) return setError("Judul (title) wajib diisi");
     if (!formState.body_short?.trim()) return setError("Body Pendek (body_short) wajib diisi");
 
-    // Payload sesuai controller (tanpa type/deeplink/min_app_version)
     const payload = {
       key: formState.key,
       title: formState.title,
@@ -128,39 +108,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
 
   const handleCancel = () => navigate(-1);
 
-  // === Preview ===
-  const openPreview = async () => {
-    setPreviewOpen(true);
-    setPreviewLoading(true);
-    setPreviewError("");
-    setPreviewData(null);
-
-    if (!formState.key) {
-      setPreviewLoading(false);
-      setPreviewError("Pilih Key template terlebih dahulu");
-      return;
-    }
-
-    try {
-      // Auto-generate dummy variables dari daftar placeholder
-      const variables = Object.fromEntries(
-        (selectedPlaceholders || []).map((p) => [p, `{${p}}`])
-      );
-
-      const res = await axiosInstance.post(
-        "/api/v1/admin-sekolah/notification-template/preview",
-        { templateKey: formState.key, variables }
-      );
-
-      setPreviewData(res.data);
-    } catch (err) {
-      const msg = err.response?.data?.msg || "Gagal melakukan preview template";
-      setPreviewError(msg);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
   useEffect(() => {
     if (catalogError) setError("Gagal memuat katalog template");
   }, [catalogError, setError]);
@@ -169,7 +116,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
     <>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
         <Grid container spacing={2} rowSpacing={1}>
-          {/* KEY (Select dari katalog) */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomFormLabel htmlFor="key" sx={{ mt: 1.85 }}>
               Pilih Key Template
@@ -189,8 +135,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
                 </MenuItem>
               ))}
             </CustomSelect>
-
-            {/* Helper placeholder */}
             {formState.key && (
               <Box sx={{ mt: 1 }}>
                 <CustomFormLabel sx={{ mt: 0 }}>Placeholder tersedia</CustomFormLabel>
@@ -206,8 +150,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
               </Box>
             )}
           </Grid>
-
-          {/* LOCALE */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomFormLabel htmlFor="locale" sx={{ mt: 1.85 }}>
               Locale (opsional)
@@ -227,8 +169,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
               ))}
             </CustomSelect>
           </Grid>
-
-          {/* TITLE */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="title" sx={{ mt: 1.85 }}>
               Judul
@@ -248,8 +188,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
               required
             />
           </Grid>
-
-          {/* BODY SHORT */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="body_short" sx={{ mt: 1.85 }}>
               Body Pendek
@@ -266,8 +204,6 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
               required
             />
           </Grid>
-
-          {/* BODY LONG */}
           <Grid size={{ xs: 12 }}>
             <CustomFormLabel htmlFor="body_long" sx={{ mt: 1.85 }}>
               Body Panjang opsional
@@ -283,63 +219,13 @@ const TambahTemplateNotifikasiForm = ({ setSuccess, setError }) => {
               fullWidth
             />
           </Grid>
-
-          {/* ENABLED */}
-          <Grid size={{ xs: 12 }}>
-            <FormControlLabel
-              control={<Switch checked={formState.enabled} onChange={handleToggleEnabled} />}
-              label="Aktifkan template"
-            />
-          </Grid>
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 2 }}>
-          <Button
-            type="button"
-            variant="outlined"
-            startIcon={<IconEye size={18} />}
-            onClick={openPreview}
-          >
-            Preview
-          </Button>
           <SubmitButton isLoading={loading}>Simpan</SubmitButton>
           <CancelButton onClick={handleCancel}>Batal</CancelButton>
         </Box>
       </Box>
-
-      {/* Preview Dialog */}
-      <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>Preview Template</DialogTitle>
-        <DialogContent dividers>
-          {previewLoading ? (
-            <Typography>Memuat preview…</Typography>
-          ) : previewError ? (
-            <Typography color="error">{previewError}</Typography>
-          ) : previewData ? (
-            <Box sx={{ display: 'grid', gap: 1 }}>
-              <Typography variant="subtitle2">Title</Typography>
-              <Typography sx={{ mb: 1 }}>{previewData.payload?.notification?.title || '-'}</Typography>
-              <Typography variant="subtitle2">Body</Typography>
-              <Typography sx={{ whiteSpace: 'pre-wrap' }}>{previewData.payload?.notification?.body || '-'}</Typography>
-              {Array.isArray(previewData.missingVariables) && previewData.missingVariables.length > 0 && (
-                <Box sx={{ mt: 2 }}>
-                  <Typography variant="subtitle2" color="warning.main">Variabel belum terisi:</Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mt: 1 }}>
-                    {previewData.missingVariables.map((v) => (
-                      <Chip key={v} size="small" label={v} color="warning" variant="outlined" />
-                    ))}
-                  </Stack>
-                </Box>
-              )}
-            </Box>
-          ) : (
-            <Typography>Tidak ada data preview.</Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setPreviewOpen(false)}>Tutup</Button>
-        </DialogActions>
-      </Dialog>
     </>
   );
 };
