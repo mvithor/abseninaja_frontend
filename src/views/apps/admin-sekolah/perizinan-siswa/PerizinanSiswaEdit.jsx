@@ -5,45 +5,45 @@ import axiosInstance from "src/utils/axiosInstance";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import Alerts from "src/components/alerts/Alerts";
-import PerizinanPegawaiEditForm from "src/apps/admin-sekolah/perizinan-pegawai/Edit/PerizinanPegawaiEditForm";
+import PerizinanSiswaEditForm from "src/apps/admin-sekolah/perizinan-siswa/Edit/PerizinanSiswaEditForm";
 
-const fetchPerizinanPegawaiById = async (id) => {
-  try {
-    const response = await axiosInstance.get(`/api/v1/admin-sekolah/perizinan-pegawai/${id}`);
-    return response.data.data;
-  } catch (error) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.error('Error fetching perizinan pegawai:', error);
+const fetchPerizinanSiswaById = async (id) => {
+    try {
+        const response = await axiosInstance.get(`/api/v1/admin-sekolah/perizinan-siswa/${id}`);
+        return response.data.data;
+    } catch (error) {
+        if (process.env.NODE_ENV !== 'production') {
+            console.error('Error fetching perizinan pegawai:', error);
+          }
+        throw new Error('Terjadi kesalahan saat mengambil data perizinan. Silakan coba lagi');
     }
-    throw new Error('Terjadi kesalahan saat mengambil data perizinan. Silakan coba lagi');
-  }
 };
 
-const PerizinanPegawaiEdit = () => {
+const PerizinanSiswaEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const queryClient = useQueryClient();
   const [perizinanData, setPerizinanData] = useState({
-    nama_pegawai: '',
-    email_pegawai: '',
-    kategori: '',
-    sub_kategori: '',
+    nama_siswa: '',
+    nama_wali_utama: '',
+    nomor_telepon_wali: '',
+    kelas: '',
     jenis_izin: '',
+    kategori_izin: '',
     tanggal_izin: '',
+    diajukan: '',
     alasan: '',
-    lampiran: '',
-    disetujui_oleh: '',
     status: '',
+    lampiran: '',
     catatan_admin: '',
+    disetujui_oleh: ''
   });
 
-  const queryClient = useQueryClient();
-
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
-    queryKey: ['perizinanPegawai', id],
-    queryFn: () => fetchPerizinanPegawaiById(id),
+    queryKey: ['perizinanSiswa', id],
+    queryFn: () => fetchPerizinanSiswaById(id),
     onError: (err) => {
       const errorMessage = err.response?.data?.msg || err.message || 'Terjadi kesalahan saat memuat data';
       setError(errorMessage);
@@ -55,31 +55,33 @@ const PerizinanPegawaiEdit = () => {
     if (data) {
       setPerizinanData((prev) => ({
         ...prev,
-        nama_pegawai: data.nama_pegawai || '',
-        email_pegawai: data.email_pegawai || '',
-        kategori: data.kategori || '',
-        sub_kategori: data.sub_kategori || '',
+        nama_siswa: data.nama_siswa || '',
+        nama_wali_utama: data.nama_wali_utama || '',
+        nomor_telepon_wali: data.nomor_telepon_wali || '',
+        kelas: data.kelas || '',
         jenis_izin: data.jenis_izin || '',
+        kategori_izin: data.kategori_izin || '',
         tanggal_izin: data.tanggal_izin || '',
+        diajukan: data.diajukan || '',
         alasan: data.alasan || '',
-        lampiran: data.lampiran || '',
-        disetujui_oleh: data.disetujui_oleh || '',
         status: data.status || 'Menunggu',
+        lampiran: data.lampiran || '',
         catatan_admin: data.catatan_admin || '',
+        disetujui_oleh: data.disetujui_oleh || '',
       }));
     }
   }, [data]);
 
   const mutation = useMutation({
     mutationFn: async (payload) => {
-      return await axiosInstance.put(`/api/v1/admin-sekolah/perizinan-pegawai/${id}`, payload);
+      return await axiosInstance.put(`/api/v1/admin-sekolah/perizinan-siswa/${id}`, payload);
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg || 'Perizinan berhasil diperbarui');
-      queryClient.invalidateQueries(['perizinanPegawai']);
-      queryClient.invalidateQueries(['perizinanPegawai', id]);
+      queryClient.invalidateQueries(['perizinanSiswa']);
+      queryClient.invalidateQueries(['perizinanSiswa', id]);
       setTimeout(() => {
-        navigate('/dashboard/admin-sekolah/perizinan-pegawai');
+        navigate('/dashboard/admin-sekolah/perizinan-siswa');
       }, 3000);
     },
     onError: (err) => {
@@ -116,19 +118,20 @@ const PerizinanPegawaiEdit = () => {
   };
 
   return (
-    <PageContainer title="Edit Perizinan Pegawai" description="Edit Perizinan Pegawai">
-      <ParentCard title="Edit Perizinan Pegawai">
-        <Alerts error={error || (isError && queryError?.message)} success={success} />
-        <PerizinanPegawaiEditForm
-          perizinanData={perizinanData}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-          handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
-        />
-      </ParentCard>
+    <PageContainer title="Edit Perizinan Siswa" description="Edit Perizinan Siswa">
+        <ParentCard title="Edit Perizinan Siswa">
+            <Alerts error={error || (isError && queryError?.message)} success={success} />
+            <PerizinanSiswaEditForm
+                perizinanData={perizinanData}
+                handleChange={handleChange}
+                handleSubmit={handleSubmit}
+                handleCancel={handleCancel}
+                isLoading={isFetching || mutation.isLoading}
+                perizinanId={id} 
+            />
+        </ParentCard>
     </PageContainer>
   );
 };
 
-export default PerizinanPegawaiEdit;
+export default PerizinanSiswaEdit;

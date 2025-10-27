@@ -25,7 +25,6 @@ const toCloudinaryThumb = (
   opts = 'c_thumb,w_56,h_56,f_auto,q_auto'
 ) => (isCloudinaryImage(url) ? url.replace('/upload/', `/upload/${opts}/`) : url);
 
-// ===== Hardcode Status dari ENUM (model) =====
 const STATUS_PERIZINAN_OPTIONS = [
   { value: 'Menunggu', label: 'Menunggu' },
   { value: 'Disetujui', label: 'Disetujui' },
@@ -219,18 +218,6 @@ const PerizinanPegawaiEditForm = ({
             fullWidth
             multiline
             minRows={2}
-          />
-        </Grid>
-
-        {/* Disetujui Oleh (read-only; diisi backend saat approve) */}
-        <Grid size={{ xs: 12, md: 6 }}>
-          <CustomFormLabel htmlFor="disetujui_oleh" sx={{ mt: 1.85 }}>Disetujui Oleh</CustomFormLabel>
-          <CustomOutlinedInput
-            id="disetujui_oleh"
-            name="disetujui_oleh"
-            value={perizinanData.disetujui_oleh || ''}
-            fullWidth
-            readOnly
           />
         </Grid>
       </Grid>

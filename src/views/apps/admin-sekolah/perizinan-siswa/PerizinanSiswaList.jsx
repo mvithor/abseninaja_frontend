@@ -6,23 +6,23 @@ import FilterButton from "src/components/button-group/FilterButton";
 import SearchButton from "src/components/button-group/SearchButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
-import PerizinanPegawaiTable from "src/apps/admin-sekolah/perizinan-pegawai/List/PerizinanPegawaiTable";
+import PerizinanSiswaTable from "src/apps/admin-sekolah/perizinan-siswa/List/PerizinanSiswaTable";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 
-const fetchPerizinanPegawai = async () => {
+const fetchPerizinanSiswa = async () => {
     try {
-        const response = await axiosInstance.get('/api/v1/admin-sekolah/perizinan-pegawai');
+        const response = await axiosInstance.get('/api/v1/admin-sekolah/perizinan-siswa');
         return response.data.data;
     } catch (error) {
         if (process.env.NODE_ENV !== 'production') {
-            console.error('Error fetching perizinan pegawai:', error);
+            console.error('Error fetching perizinan siswa:', error);
         }
-        throw new Error('Terjadi kesalahan saat mengambil data perizinan pegawai. Silakan coba lagi'); 
+        throw new Error('Terjadi kesalahan saat mengambil data perizinan siswa. Silakan coba lagi'); 
     }
 };
 
-const PerizinanPegawaiList = () => {
+const PerizinanSiswaList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
@@ -30,8 +30,8 @@ const PerizinanPegawaiList = () => {
     const navigate = useNavigate();
 
     const { data: perizinan = [], isLoading, isError, error: queryError } = useQuery({
-        queryKey: ['perizinanPegawai'],
-        queryFn: fetchPerizinanPegawai,
+        queryKey: ['perizinanSiswa'],
+        queryFn: fetchPerizinanSiswa,
         onError: (error) => {
             const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
             setError(errorMessage);
@@ -43,16 +43,16 @@ const PerizinanPegawaiList = () => {
         setSearchQuery(event.target.value);
     };
 
-    const filteredPerizinanPegawai = (perizinan || [])
-    .filter((perizinan) => perizinan.nama_pegawai?.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => a.nama_pegawai?.localeCompare(b.nama_pegawai));
+    const filteredPerizinanSiswa = (perizinan || [])
+    .filter((perizinan) => perizinan.nama_siswa?.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.nama_siswa?.localeCompare(b.nama_siswa));
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
 
     const handleEdit = (id) => {
-        navigate(`/dashboard/admin-sekolah/perizinan-pegawai/edit/${id}`)
+        navigate(`/dashboard/admin-sekolah/perizinan-siswa/edit/${id}`)
     };
 
     const handleRowsPerPageChange = (event) => {
@@ -61,8 +61,8 @@ const PerizinanPegawaiList = () => {
     };
 
     return (
-        <PageContainer title="Perizinan Pegawai" description="Perizinan Pegawai">
-            <ParentCard title="Perizinan Pegawai">
+        <PageContainer title="Perizinan Siswa" description="Perizinan Siswa">
+            <ParentCard title="Perizinan Siswa">
                 <Alerts error={error}/>
                 <Box
                     sx={{
@@ -77,12 +77,12 @@ const PerizinanPegawaiList = () => {
                 <SearchButton
                     value={searchQuery}
                     onChange={handleSearchChange}
-                    placeholder="Cari Pegawai"
+                    placeholder="Cari Siswa"
                 />
                 <FilterButton/>
                 </Box>
-                <PerizinanPegawaiTable
-                    perizinan={filteredPerizinanPegawai}
+                <PerizinanSiswaTable
+                    perizinan={filteredPerizinanSiswa}
                     page={page}
                     rowsPerPage={rowsPerPage}
                     handleChangePage={handleChangePage}
@@ -97,4 +97,4 @@ const PerizinanPegawaiList = () => {
     );
 };
 
-export default PerizinanPegawaiList;
+export default PerizinanSiswaList

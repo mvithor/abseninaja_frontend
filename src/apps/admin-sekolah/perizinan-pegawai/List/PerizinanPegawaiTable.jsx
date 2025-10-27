@@ -91,7 +91,6 @@ const PerizinanPegawaiTable = ({
               </TableCell>
             </TableRow>
           </TableHead>
-
           <TableBody>
             {isLoading ? (
               <TableRow>
