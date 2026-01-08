@@ -129,6 +129,18 @@ const StatusKehadiranEdit = Loadable(lazy(() => import('../views/apps/admin-seko
 const SemesterAjaranList = Loadable(lazy(() => import('../views/apps/admin-sekolah/semester-ajaran/SemesterAjaranList')));
 const SemesterAjaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/semester-ajaran/SemesterAjaranAdd')));
 const SemesterAjaranEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/semester-ajaran/SemesterAjaranEdit')));
+// Tahun Ajaran
+const TahunAjaranList = Loadable(lazy(() => import('../views/apps/admin-sekolah/tahun-ajaran/TahunAjaranList')));
+const TahunAjaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/tahun-ajaran/TahunAjaranAdd')));
+const TahunAjaranEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/tahun-ajaran/TahunAjaranEdit')));
+// Prestasi Siswa
+const PrestasiSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-siswa/PrestasiSiswaList')));
+const PrestasiSiswaAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-siswa/PrestasiSiswaAdd')));
+const PrestasiSiswaEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-siswa/PrestasiSiswaEdit')));
+// Prestasi Institusi
+const PrestasiMadrasahList = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-madrasah/PrestasiMadrasahList')));
+const PrestasiMadrasahAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-madrasah/PrestasiMadrasahAdd')));
+const PrestasiMadrasahEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/prestasi-madrasah/PrestasiMadrasahEdit')));
 // User Admin
 const UserAdminList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-admin/UserAdminList')));
 const UserAdminAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-admin/UserAdminAdd')));
@@ -140,6 +152,9 @@ const UserSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/us
 const UserGuruList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-guru/UserGuruList')));
 // User Wali Siswa
 const UserWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-wali-siswa/UserWaliSiswaList')));
+// Download Data Siswa
+const DownloadDataSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-siswa/DownloadDataSiswaList')));
+const DownloadDataWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-wali-siswa/DownloadDataWaliSiswaList')));
 // Rekap Absensi 
 const RekapAbsensiGlobalList = Loadable(lazy(() => import('../views/apps/admin-sekolah/rekap-absensi-global/RekapAbsensiGlobalList')));
 
@@ -269,10 +284,22 @@ const Router = [
                     { path: 'status-kehadiran', element: <StatusKehadiranList/> }, 
                     { path: 'status-kehadiran/tambah', element: <StatusKehadiranAdd/> }, 
                     { path: 'status-kehadiran/edit/:id', element: <StatusKehadiranEdit/> }, 
-                    // Semester Ajaran dan Tahun Ajaran
+                    // Tahun Ajaran
+                    { path: 'tahun-ajaran', element: <TahunAjaranList/> },
+                    { path: 'tahun-ajaran/tambah', element: <TahunAjaranAdd/> },
+                    { path: 'tahun-ajaran/edit/:id', element: <TahunAjaranEdit/> },
+                    // Semester Ajaran 
                     { path: 'semester-ajaran', element: <SemesterAjaranList/> },
                     { path: 'semester-ajaran/tambah', element: <SemesterAjaranAdd/> },
                     { path: 'semester-ajaran/edit/:id', element: <SemesterAjaranEdit/> },
+                    // Prestasi Siswa
+                    { path: 'prestasi-siswa', element: <PrestasiSiswaList/> },
+                    { path: 'prestasi-siswa/tambah-prestasi', element: <PrestasiSiswaAdd/> },
+                    { path: 'prestasi-siswa/edit/:id', element: <PrestasiSiswaEdit/> },
+                    // Prestasi Institusi
+                    { path: 'prestasi-Institusi', element: <PrestasiMadrasahList/> },
+                    { path: 'prestasi-Institusi/tambah-prestasi', element: <PrestasiMadrasahAdd/> },
+                    { path: 'prestasi-Institusi/edit/:id', element: <PrestasiMadrasahEdit/> },
                     // Hari
                     { path: 'hari', element: <HariList/> },
                     { path: 'hari/tambah-hari', element: <HariAdd/> },
@@ -287,7 +314,10 @@ const Router = [
                     { path: 'user-guru', element: <UserGuruList/> },
                     // User Wali Siswa
                     { path: 'user-wali-siswa', element: <UserWaliSiswaList/> },
-                     // Rekap Absensi
+                     // Download
+                     { path: 'download/data-siswa-kelas', element: <DownloadDataSiswaList/> },
+                     { path: 'download/data-wali-siswa', element: <DownloadDataWaliSiswaList/> },
+                    // Rekap Absensi
                     { path: 'rekap-absensi', element: <RekapAbsensiGlobalList/> }, 
                 ]
             },

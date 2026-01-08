@@ -62,8 +62,6 @@ const EkskulEdit = () => {
       }));
     }
   }, [data, pegawaiOptions]);
-  
-  
 
   const mutation = useMutation({
     mutationFn: async (payload) => {
@@ -115,18 +113,41 @@ const EkskulEdit = () => {
     navigate(-1);
   };
 
+  const handlePembinaChange = (newValue) => {
+    setEkskulData((prev) => ({
+      ...prev,
+      pembinaTerpilih: newValue,
+    }));
+  };
+
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.size > 1 * 1024 * 1024) {
+      setError("Ukuran file maksimal 1MB");
+      setTimeout(() => setError(""), 3000);
+      setEkskulData((prev) => ({ ...prev, logo_file: null }));
+      return;
+    }
+    setEkskulData((prev) => ({
+      ...prev,
+      logo_file: file,
+    }));
+  };
+
   return (
     <PageContainer title="Edit Ekstrakurikuler" description="Edit Ekstrakurikuler">
       <ParentCard title=" Form Edit Ekstrakurikuler">
         <Alerts error={error || (isError && queryError?.message)} success={success} />
         <EkskulEditForm
           ekskulData={ekskulData}
+          pegawaiOptions={pegawaiOptions}
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || isPegawaiLoading || mutation.isLoading}
-          setEkskulData={setEkskulData}
-          setError={setError}
+          isLoading={isFetching || mutation.isLoading}
+          isPegawaiLoading={isPegawaiLoading}
+          onPembinaChange={handlePembinaChange}
+          onLogoChange={handleLogoChange}
         />
       </ParentCard>
     </PageContainer>

@@ -249,7 +249,7 @@ const JadwalMapelList = () => {
             gap: 2,
             width: "100%",
             mb: 3,
-            mt: -2,
+
           }}
         >
           <SearchButton

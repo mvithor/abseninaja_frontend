@@ -9,7 +9,8 @@ import {
     IconCreditCard, IconPoint, IconClipboardText,
     IconMessage,IconKey, IconTemplate, IconBroadcast,
     IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, IconLicense,
-    IconUsersGroup, IconDatabase, IconActivity, IconFileDownload
+    IconUsersGroup, IconDatabase, IconActivity, IconFileDownload,
+    IconCalendarClock
   } from '@tabler/icons-react';
   
   import { uniqueId } from 'lodash';
@@ -136,21 +137,15 @@ import {
         children: [
             {
                 id: uniqueId(),
-                title: 'Prestasi Madrasah',
+                title: 'Prestasi Institusi',
                 icon: IconBuilding,
-                href: '#',
+                href: '/dashboard/admin-sekolah/prestasi-institusi',
             },
             {
                 id: uniqueId(),
-                title: 'Prestasi Kelompok',
+                title: 'Prestasi Siswa',
                 icon: IconUsersGroup,
-                href: '#',
-            },
-            {
-                id: uniqueId(),
-                title: 'Prestasi Individu',
-                icon: IconCategory,
-                href: '#',
+                href: '/dashboard/admin-sekolah/prestasi-siswa',
             },
         ],
     },
@@ -256,12 +251,6 @@ import {
                 icon: IconSettings,
                 href: '',
                 children: [
-                    {
-                        id: uniqueId(),
-                        title: 'Tahun Ajaran',
-                        icon: IconCategory2,
-                        href: '/dashboard/admin-sekolah/semester-ajaran',
-                    },
                     {
                         id: uniqueId(),
                         title: 'Hari',
@@ -481,26 +470,6 @@ import {
     },
     {
         id: uniqueId(),
-        title: 'Download',
-        icon: IconDownload,
-        href: '',
-        children: [
-            {
-                id: uniqueId(),
-                title: 'Rekap Absensi Harian',
-                icon: IconFileDownload,
-                href: '/dashboard/admin-sekolah/rekap-absensi',
-            },
-            {
-                id: uniqueId(),
-                title: 'Rekap Absensi Ekskul',
-                icon: IconFileDownload,
-                href: '#',
-            },
-        ],
-    },
-    {
-        id: uniqueId(),
         title: 'Manajemen Pengguna',
         icon: IconUsers,
         href: '',
@@ -537,6 +506,68 @@ import {
             },
         ],
     },
+    {
+        id: uniqueId(),
+        title: 'Download',
+        icon: IconDownload,
+        href: '',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Data Siswa',
+                icon: IconFileDownload,
+                href: '/dashboard/admin-sekolah/download/data-siswa-kelas',
+            },
+            {
+                id: uniqueId(),
+                title: 'Data Wali Siswa',
+                icon: IconFileDownload,
+                href: '/dashboard/admin-sekolah/download/data-wali-siswa',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rekapitulasi Absensi',
+                icon: IconFileDownload,
+                href: '#',
+                children: [
+                    {
+                        id: uniqueId(),
+                        title: 'Rekap Absensi Harian',
+                        icon: IconFileDownload,
+                        href: '/dashboard/admin-sekolah/rekap-absensi',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Rekap Absensi Ekskul',
+                        icon: IconFileDownload,
+                        href: '#',
+                    },
+                ],
+            },
+            
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Periode Akademik',
+        icon: IconCalendarClock,
+        href: '',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Tahun Ajaran',
+                icon: IconCategory2,
+                href: '/dashboard/admin-sekolah/tahun-ajaran',
+            },
+            {
+                id: uniqueId(),
+                title: 'Semester Ajaran',
+                icon: IconCategory2,
+                href: '/dashboard/admin-sekolah/semester-ajaran',
+            },
+        ],
+    },
+    
   ];
   
   export default MenuitemsAdminSekolah;

@@ -69,6 +69,7 @@ const SemesterAjaranTable = ({
               </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
             {isLoading ? (
               <TableRow>
@@ -125,68 +126,79 @@ const SemesterAjaranTable = ({
               (rowsPerPage > 0
                 ? semester.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 : semester
-              ).map((item, index) => (
-                <TableRow key={item.id} sx={(item)}>
-                  <TableCell>
-                    <Typography sx={{ fontSize: '1rem' }}>
-                      {page * rowsPerPage + index + 1}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography sx={{ fontSize: '1rem' }}>
-                      {item.semester || 'Tidak ditemukan'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography sx={{ fontSize: '1rem' }}>
-                      {item.tahun_ajaran || 'Tidak ditemukan'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Chip
-                        label={item.is_aktif ? "Aktif" : "Nonaktif"}
-                        size="medium"
-                        sx={{
-                        borderRadius: '8px',
-                        backgroundColor: item.is_aktif ? '#34C759' : '#E0E0E0',
-                        color: item.is_aktif ? '#fff' : '#424242',
-                        fontWeight: 600
-                        }}
-                    />
+              ).map((item, index) => {
+                const tahunAjaranLabel = item?.TahunAjaran?.tahun_ajaran || 'Tidak ditemukan';
+                const tahunAjaranAktif = item?.TahunAjaran?.is_aktif === true; // AUTO sync dari semester aktif
+                const semesterLocked = item?.is_locked === true;
+
+                return (
+                  <TableRow key={item.id} sx={(item)}>
+                    <TableCell>
+                      <Typography sx={{ fontSize: '1rem' }}>
+                        {page * rowsPerPage + index + 1}
+                      </Typography>
                     </TableCell>
 
                     <TableCell align="center">
-                    <Chip
-                        label={item.is_locked ? "Terkunci" : "Terbuka"}
+                      <Typography sx={{ fontSize: '1rem' }}>
+                        {item?.semester || 'Tidak ditemukan'}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Typography sx={{ fontSize: '1rem' }}>
+                        {tahunAjaranLabel}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Chip
+                        label={tahunAjaranAktif ? "Aktif" : "Nonaktif"}
                         size="medium"
                         sx={{
-                        borderRadius: '8px',
-                        backgroundColor: item.is_locked ? '#FF3B30' : '#007AFF',
-                        color: '#fff',
-                        fontWeight: 600
+                          borderRadius: '8px',
+                          backgroundColor: tahunAjaranAktif ? '#34C759' : '#E0E0E0',
+                          color: tahunAjaranAktif ? '#fff' : '#424242',
+                          fontWeight: 600
                         }}
-                    />
+                      />
                     </TableCell>
-                  <TableCell align="center">
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        height: '100%',
-                      }}
-                    >
-                      <Tooltip title="Edit" placement="bottom">
-                        <IconButton onClick={() => handleEdit(item.id)}>
-                          <IconEdit width={18} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
+
+                    <TableCell align="center">
+                      <Chip
+                        label={semesterLocked ? "Terkunci" : "Terbuka"}
+                        size="medium"
+                        sx={{
+                          borderRadius: '8px',
+                          backgroundColor: semesterLocked ? '#FF3B30' : '#007AFF',
+                          color: '#fff',
+                          fontWeight: 600
+                        }}
+                      />
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          height: '100%',
+                        }}
+                      >
+                        <Tooltip title="Edit" placement="bottom">
+                          <IconButton onClick={() => handleEdit(item.id)}>
+                            <IconEdit width={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
+
           <TableFooter>
             <TableRow>
               <TablePagination

@@ -38,7 +38,6 @@ const WaliSiswaForm = ({ setSuccess, setError }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // formState sekarang menyimpan daftar anak terpilih + flag wali utama per anak
   const [formState, setFormState] = useState({
     name: "",
     email: "",
@@ -47,8 +46,8 @@ const WaliSiswaForm = ({ setSuccess, setError }) => {
     pekerjaan: "",
     nomor_telepon: "",
     alamat: "",
-    siswaTerpilih: [], // array of option objects dari Autocomplete
-    anak: [] // [{ siswa_id, is_wali_utama }]
+    siswaTerpilih: [], 
+    anak: [] 
   });
 
   const { data: siswaOptions = [], isError: siswaError } = useQuery({

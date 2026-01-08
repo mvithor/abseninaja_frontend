@@ -11,26 +11,18 @@ import CustomOutlinedInput from "src/components/forms/theme-elements/CustomOutli
 import SubmitButton from "src/components/button-group/SubmitButton";
 import CancelButton from "src/components/button-group/CancelButton";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
-import { useQuery } from "@tanstack/react-query";
-import axiosInstance from "src/utils/axiosInstance";
 
 const EkskulEditForm = ({
   ekskulData,
+  pegawaiOptions = [],
   handleChange,
   handleSubmit,
   handleCancel,
   isLoading,
-  setError,
-  setEkskulData
+  isPegawaiLoading,
+  onPembinaChange,
+  onLogoChange,
 }) => {
-  const { data: pegawaiOptions = [], isLoading: isPegawaiLoading } = useQuery({
-    queryKey: ["pegawaiOptions"],
-    queryFn: async () => {
-      const response = await axiosInstance.get("/api/v1/admin-sekolah/dropdown/guru");
-      return response.data.data;
-    }
-  });
-
   if (isLoading || isPegawaiLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" height="40px">
@@ -42,7 +34,7 @@ const EkskulEditForm = ({
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4.5 }}>
       <Grid container spacing={2} rowSpacing={1}>
-      <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel htmlFor="nama_ekskul" sx={{ mt: 1.85 }}>Nama</CustomFormLabel>
           <CustomOutlinedInput
             id="nama_ekskul"
@@ -58,6 +50,7 @@ const EkskulEditForm = ({
             required
           />
         </Grid>
+
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel htmlFor="deskripsi" sx={{ mt: 1.85 }}>Deskripsi</CustomFormLabel>
           <CustomOutlinedInput
@@ -69,6 +62,7 @@ const EkskulEditForm = ({
             required
           />
         </Grid>
+
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel htmlFor="pembina" sx={{ mt: 1.85 }}>Pembina</CustomFormLabel>
           <Autocomplete
@@ -78,16 +72,14 @@ const EkskulEditForm = ({
             getOptionLabel={(option) => option.nama}
             value={ekskulData.pembinaTerpilih || []}
             onChange={(event, newValue) => {
-              setEkskulData((prev) => ({
-                ...prev,
-                pembinaTerpilih: newValue
-              }));
+              onPembinaChange(newValue);
             }}
             renderInput={(params) => (
               <CustomTextField {...params} placeholder="Pilih Pembina Ekskul" />
             )}
           />
         </Grid>
+
         <Grid size={{ xs: 12, md: 6 }}>
           <CustomFormLabel htmlFor="logo" sx={{ mt: 1.85 }}>
             Logo
@@ -127,24 +119,13 @@ const EkskulEditForm = ({
               name="logo"
               type="file"
               inputProps={{ accept: "image/*" }}
-              onChange={(e) => {
-                const file = e.target.files[0];
-                if (file && file.size > 1 * 1024 * 1024) {
-                  setError("Ukuran file maksimal 1MB");
-                  setTimeout(() => setError(""), 3000);
-                  setEkskulData((prev) => ({ ...prev, logo_file: null }));
-                  return;
-                }
-                setEkskulData((prev) => ({
-                  ...prev,
-                  logo_file: file,
-                }));
-              }}
+              onChange={onLogoChange}
               fullWidth
             />
           </Box>
         </Grid>
       </Grid>
+
       <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 4 }}>
         <SubmitButton type="submit">Simpan</SubmitButton>
         <CancelButton onClick={handleCancel}>Batal</CancelButton>
