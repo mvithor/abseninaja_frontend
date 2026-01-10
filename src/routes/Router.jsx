@@ -73,9 +73,12 @@ const KelasEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/
 // Mata Pelajaran
 const MataPelajaranList = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranList')));
 const MataPelajaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranAdd')));
+const MataPelajaranEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranEdit')));
+const MataPelajaranDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranDetail')));
 // Jadwal Mapel
 const JadwalMapelList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelList')));
 const JadwalMapelAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelAdd')));
+const JadwalMapelEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelEdit')));
 // Jadwal Ekskul
 const JadwalEkskulList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulList')));
 const JadwalEkskulAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulAdd')));
@@ -249,9 +252,12 @@ const Router = [
                     // Mata Pelajaran
                     { path: 'mata-pelajaran', element: <MataPelajaranList/> },
                     { path: 'mata-pelajaran/tambah-mapel', element: <MataPelajaranAdd/> },
+                    { path: 'mata-pelajaran/edit/:id', element: <MataPelajaranEdit/> },
+                    { path: 'mata-pelajaran/detail/:id', element: <MataPelajaranDetail/> },
                     // Jadwal Mapel
                     { path: 'jadwal-mapel', element: <JadwalMapelList/> },
                     { path: 'jadwal-mapel/tambah-jadwal', element: <JadwalMapelAdd/> },
+                    { path: 'jadwal-mapel/edit/:id', element: <JadwalMapelEdit/> },
                     // Jadwal Ekskul
                     { path: 'jadwal-ekskul', element: <JadwalEkskulList/> },
                     { path: 'jadwal-ekskul/tambah-jadwal', element: <JadwalEkskulAdd/> },
