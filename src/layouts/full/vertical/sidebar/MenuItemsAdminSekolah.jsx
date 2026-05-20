@@ -57,6 +57,11 @@ import {
         icon: IconMessage,
         href: '#'
     },
+
+    {
+        navlabel: true,
+        subheader: 'ABSENINAJA',
+    },
     {
         id: uniqueId(),
         title: 'Manajemen Absensi',
@@ -564,6 +569,263 @@ import {
                 title: 'Semester Ajaran',
                 icon: IconCategory2,
                 href: '/dashboard/admin-sekolah/semester-ajaran',
+            },
+        ],
+    },
+
+    {
+        navlabel: true,
+        subheader: 'Penerimaan Murid Baru',
+    },
+    {
+        id: uniqueId(),
+        title: 'Overview',
+        icon: IconClipboardText,
+        href: '/dashboard/admin-sekolah/ppdb-overview',
+    },
+    {
+        id: uniqueId(),
+        title: 'Perencanaan',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Periode',
+                icon: IconPhotoDown,
+                href: '/dashboard/admin-sekolah/ppdb-period',
+            },
+            {
+                id: uniqueId(),
+                title: 'Gelombang',
+                icon: IconClock,
+                href: '/dashboard/admin-sekolah/ppdb-gelombang',
+            },
+            {
+                id: uniqueId(),
+                title: 'Jalur Pendaftaran',
+                icon: IconPhotoDown,
+                href: '/dashboard/admin-sekolah/ppdb-jalur',
+            },
+            {
+                id: uniqueId(),
+                title: 'Jalur Per Gelombang',
+                icon: IconPhotoDown,
+                href: '/dashboard/admin-sekolah/ppdb-jalur-gelombang',
+            },
+            {
+                id: uniqueId(),
+                title: 'Tahapan',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-tahapan',
+            },
+            {
+                id: uniqueId(),
+                title: 'Jadwal Tahapan',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-jadwal-tahapan',
+            },
+                        {
+                id: uniqueId(),
+                title: 'Petugas',
+                icon: IconPhotoDown,
+                href: '/dashboard/admin-sekolah/ppdb-panitia',
+            },
+                        {
+                id: uniqueId(),
+                title: 'Komponen Tes',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-test-component',
+            },
+            {
+                id: uniqueId(),
+                title: 'Persyaratan Tes',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-persyaratan-tes',
+            }, 
+        ],
+    },
+     {
+        id: uniqueId(),
+        title: 'Pendaftaran',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Data Pendaftar',
+                icon: IconUsers,
+                href: '/dashboard/admin-sekolah/ppdb-pendaftar',
+            },
+            
+            {
+                id: uniqueId(),
+                title: 'Verifikasi Berkas',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-berkas',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Pelaksanaan Tes',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Sesi dan Jadwal Tes',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-sesi-jadwal',
+            }, 
+            {
+                id: uniqueId(),
+                title: 'Ruang',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-room',
+            },
+            {
+                id: uniqueId(),
+                title: 'Penempatan Ruang',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-sesi-room',
+            },  
+            {
+                id: uniqueId(),
+                title: 'Penugasan Pengawas',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-proctors',
+            }, 
+            {
+                id: uniqueId(),
+                title: 'Penempatan Peserta',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-peserta-tes',
+            }, 
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Penilaian',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Monitoring Penilaian',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-nilai',
+            }, 
+
+            {
+                id: uniqueId(),
+                title: 'Input Nilai',
+                icon: IconFiles,
+                href: '/dashboard/admin-sekolah/ppdb-input-nilai',
+            }, 
+                        {
+                id: uniqueId(),
+                title: 'Rekap Nilai',
+                icon: IconFiles,
+                href: '#',
+            }, 
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Seleksi',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Ranking dan Simulasi',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Keputusan Seleksi',
+                icon: IconFiles,
+                href: '#',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Publikasi',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Publish Hasil Seleksi',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Pengumuman Tahapan',
+                icon: IconFiles,
+                href: '#',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Aktivasi dan Kelas',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Aktivasi Siswa',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Penempatan Kelas',
+                icon: IconFiles,
+                href: '#',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Laporan dan Audit',
+        icon: IconFiles,
+        href: '#',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Rekap Pendaftar',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rekap Hasil Seleksi',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rekap Daftar Ulang',
+                icon: IconFiles,
+                href: '#',
+            },
+            {
+                id: uniqueId(),
+                title: 'Rekap Pembayaran',
+                icon: IconFiles,
+                href: '#',
+            },  
+            {
+                id: uniqueId(),
+                title: 'Audit Log',
+                icon: IconFiles,
+                href: '#',
             },
         ],
     },

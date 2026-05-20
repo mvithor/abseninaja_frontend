@@ -73,9 +73,12 @@ const KelasEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/
 // Mata Pelajaran
 const MataPelajaranList = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranList')));
 const MataPelajaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranAdd')));
+const MataPelajaranEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranEdit')));
+const MataPelajaranDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranDetail')));
 // Jadwal Mapel
 const JadwalMapelList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelList')));
 const JadwalMapelAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelAdd')));
+const JadwalMapelEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-mapel/JadwalMapelEdit')));
 // Jadwal Ekskul
 const JadwalEkskulList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulList')));
 const JadwalEkskulAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jadwal-ekskul/JadwalEkskulAdd')));
@@ -157,6 +160,100 @@ const DownloadDataSiswaList = Loadable(lazy(() => import('../views/apps/admin-se
 const DownloadDataWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-wali-siswa/DownloadDataWaliSiswaList')));
 // Rekap Absensi 
 const RekapAbsensiGlobalList = Loadable(lazy(() => import('../views/apps/admin-sekolah/rekap-absensi-global/RekapAbsensiGlobalList')));
+
+
+// Penerimaan Peserta Didik Baru (PPDB)
+
+// PPDB Overview
+const PpdbOverviewDashboard = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-overview/PpdbOverviewDashboard')));
+
+// PPDB Period
+const PpdbPeriodList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-period/PpdbPeriodList')));
+const PpdbPeriodAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-period/PpdbPeriodAdd')));
+const PpdbPeriodEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-period/PpdbPeriodEdit')));
+const PpdbPeriodDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-period/PpdbPeriodDetail')));
+
+// PPDB Gelombang
+const PpdbGelombangList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave/PpdbWaveList')));
+const PpdbGelombangAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave/PpdbWaveAdd')));
+const PpdbGelombangEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave/PpdbWaveEdit')));
+const PpdbGelombangDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave/PpdbWaveDetail')));
+
+// PPDB Jalur
+const PpdbJalurList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-track/PpdbTrackList')));
+const PpdbJalurAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-track/PpdbTrackAdd')));
+const PpdbJalurEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-track/PpdbTrackEdit')));
+
+// PPDB Jalur Per Gelombang
+const PpdbJalurGelombangList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-tracks/PpdbWaveTrackList')));
+const PpdbJalurGelombangAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-tracks/PpdbWaveTrackAdd')));
+const PpdbJalurGelombangEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-tracks/PpdbWaveTrackEdit')));
+
+// PPDB Panitia
+const PpdbPanitiaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-panitia/PpdbPanitiaList')));
+const PpdbPanitiaAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-panitia/PpdbPanitiaAdd')));
+const PpdbPanitiaEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-panitia/PpdbPanitiaEdit')));
+
+// PPDB Pendaftar
+const PpdbPendaftarList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-pendaftar/PpdbPendaftarList')));
+const PpdbPendaftarDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-pendaftar/PpdbPendaftarDetail')));
+
+// PPDB Berkas
+const PpdbBerkasList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-berkas/PpdbBerkasList')));
+const PpdbBerkasVerify = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-berkas/PpdbBerkasVerify')));
+
+// PPDB Tahapan
+const PpdbTahapanList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-tahapan/PpdbTahapanList')));
+const PpdbTahapanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-tahapan/PpdbTahapanAdd')));
+const PpdbTahapanEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-tahapan/PpdbTahapanEdit')));
+
+// PPDB Jadwal Tahapan
+const PpdbJadwalTahapanList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-jadwal-tahapan/PpdbJadwalTahapanList')));
+const PpdbJadwalTahapanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-jadwal-tahapan/PpdbJadwalTahapanAdd')));
+const PpdbJadwalTahapanEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-jadwal-tahapan/PpdbJadwalTahapanEdit')));
+
+// PPDB Komponen Test
+const PpdbTestComponentList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-test-component/PpdbTestComponentList')));
+const PpdbTestComponentAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-test-component/PpdbTestComponentAdd')));
+const PpdbTestComponentEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-test-component/PpdbTestComponentEdit')));
+
+// PPDB Persyaratan Tes
+const PpdbPersyaratanTesList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-track-requirement/PpdbWaveTrackRequirementList')));
+const PpdbPersyaratanTesAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-track-requirement/PpdbWaveTrackRequirementAdd')));
+const PpdbPersyaratanTesEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-wave-track-requirement/PpdbWaveTrackRequirementEdit')));
+
+// PPDB Sesi dan Jadwal Tes
+const PpdbSesiJadwalList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-jadwal/PpdbSesiJadwalList')));
+const PpdbSesiJadwalAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-jadwal/PpdbSesiJadwalAdd')));
+const PpdbSesiJadwalEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-jadwal/PpdbSesiJadwalEdit')));
+const PpdbSesiJadwalDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-jadwal/PpdbSesiJadwalDetail')));
+
+// PPDB Ruangan
+const PpdbRoomList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-room/PpdbRoomList')));
+const PpdbRoomAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-room/PpdbRoomAdd')));
+const PpdbRoomEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-room/PpdbRoomEdit')));
+
+// PPDB Ruangan Sesi Tes
+const PpdbSesiRoomList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-room/PpdbSesiRoomList')));
+const PpdbSesiRoomAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-room/PpdbSesiRoomAdd')));
+const PpdbSesiRoomEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-sesi-room/PpdbSesiRoomEdit')));
+
+// PPDB Peserta Tes
+const PpdbPesertaTesList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-peserta-tes/PpdbPesertaTesList')));
+const PpdbPesertaTesAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-peserta-tes/PpdbPesertaTesAdd')));
+
+// PPDB Pengawas ruangan
+const PpdbProctorList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-proctor/PpdbProctorList')));
+const PpdbProctorAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-proctor/PpdbProctorAdd')));
+const PpdbProctorEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-proctor/PpdbProctorEdit')));
+
+// PPDB Monitoring Nilai
+const PpdbNilaiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-nilai/PpdbNilaiList')));
+const PpdbNilaiDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-nilai/PpdbNilaiDetail')));
+
+// PPDB Input Nilai
+const PpdbInputNilaiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-input-nilai/PpdbInputList')));
+const PpdbInputNilaiDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-input-nilai/PpdbInputNilaiDetail')));
 
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
@@ -249,9 +346,12 @@ const Router = [
                     // Mata Pelajaran
                     { path: 'mata-pelajaran', element: <MataPelajaranList/> },
                     { path: 'mata-pelajaran/tambah-mapel', element: <MataPelajaranAdd/> },
+                    { path: 'mata-pelajaran/edit/:id', element: <MataPelajaranEdit/> },
+                    { path: 'mata-pelajaran/detail/:id', element: <MataPelajaranDetail/> },
                     // Jadwal Mapel
                     { path: 'jadwal-mapel', element: <JadwalMapelList/> },
                     { path: 'jadwal-mapel/tambah-jadwal', element: <JadwalMapelAdd/> },
+                    { path: 'jadwal-mapel/edit/:id', element: <JadwalMapelEdit/> },
                     // Jadwal Ekskul
                     { path: 'jadwal-ekskul', element: <JadwalEkskulList/> },
                     { path: 'jadwal-ekskul/tambah-jadwal', element: <JadwalEkskulAdd/> },
@@ -319,6 +419,81 @@ const Router = [
                      { path: 'download/data-wali-siswa', element: <DownloadDataWaliSiswaList/> },
                     // Rekap Absensi
                     { path: 'rekap-absensi', element: <RekapAbsensiGlobalList/> }, 
+
+                    // Penerimaan Peserta Didik Baru (PPDB)
+
+                    // PPDB Period
+                    { path: 'ppdb-overview', element: <PpdbOverviewDashboard/> }, 
+                    { path: 'ppdb-period', element: <PpdbPeriodList/> }, 
+                    { path: 'ppdb-period/tambah-period', element: <PpdbPeriodAdd/> }, 
+                    { path: 'ppdb-period/edit/:id', element: <PpdbPeriodEdit/> }, 
+                    { path: 'ppdb-period/detail/:id', element: <PpdbPeriodDetail/> }, 
+                    // PPDB Gelombang
+                    { path: 'ppdb-gelombang', element: <PpdbGelombangList/> },  
+                    { path: 'ppdb-gelombang/tambah-gelombang', element: <PpdbGelombangAdd/> }, 
+                    { path: 'ppdb-gelombang/edit/:id', element: <PpdbGelombangEdit/> },  
+                    { path: 'ppdb-gelombang/detail/:id', element: <PpdbGelombangDetail/> },
+                    // PPDB Jalur
+                    { path: 'ppdb-jalur', element: <PpdbJalurList/> }, 
+                    { path: 'ppdb-jalur/tambah-jalur', element: <PpdbJalurAdd/> },   
+                    { path: 'ppdb-jalur/edit/:id', element: <PpdbJalurEdit/> },  
+                    // PPDB Jalur Gelombang
+                    { path: 'ppdb-jalur-gelombang', element: <PpdbJalurGelombangList/> },
+                    { path: 'ppdb-jalur-gelombang/tambah-jalur-gelombang', element: <PpdbJalurGelombangAdd/> }, 
+                    { path: 'ppdb-jalur-gelombang/edit/:id', element: <PpdbJalurGelombangEdit/> },
+                    // PPDB Panitia
+                    { path: 'ppdb-panitia', element: <PpdbPanitiaList/> },
+                    { path: 'ppdb-panitia/tambah', element: <PpdbPanitiaAdd/> },
+                    {path: 'ppdb-panitia/edit/:id', element: <PpdbPanitiaEdit/> },
+                    // PPDB Pendaftar
+                    { path: 'ppdb-pendaftar', element: <PpdbPendaftarList/> },
+                    { path: 'ppdb-pendaftar/detail/:id', element: <PpdbPendaftarDetail/> },
+                    // PPDB Berkas
+                    { path: 'ppdb-berkas', element: <PpdbBerkasList/> },
+                    { path: 'ppdb-berkas/verifikasi/:id', element: <PpdbBerkasVerify/> },
+                    // PPDB Tahapan
+                    { path: 'ppdb-tahapan', element: <PpdbTahapanList/> },
+                    { path: 'ppdb-tahapan/tambah', element: <PpdbTahapanAdd/> },
+                    { path: 'ppdb-tahapan/edit/:id', element: <PpdbTahapanEdit/> },
+                    // PPDB Jadwal Tahapan
+                    { path: 'ppdb-jadwal-tahapan', element: <PpdbJadwalTahapanList/> },
+                    { path: 'ppdb-jadwal-tahapan/tambah', element: <PpdbJadwalTahapanAdd/> },
+                    { path: 'ppdb-jadwal-tahapan/edit/:id', element: <PpdbJadwalTahapanEdit/> },
+                    // PPDB Komponen Tes
+                    { path: 'ppdb-test-component', element: <PpdbTestComponentList/> },
+                    { path: 'ppdb-test-component/tambah', element: <PpdbTestComponentAdd/> },
+                    { path: 'ppdb-test-component/edit/:id', element: <PpdbTestComponentEdit/> },
+                    // PPDB Persyaratan Tes
+                    { path: 'ppdb-persyaratan-tes', element: <PpdbPersyaratanTesList/> },
+                    { path: 'ppdb-persyaratan-tes/tambah', element: <PpdbPersyaratanTesAdd/> },
+                    { path: 'ppdb-persyaratan-tes/edit/:id', element: <PpdbPersyaratanTesEdit/> },
+                    // PPDB Sesi Jadwal
+                    { path: 'ppdb-sesi-jadwal', element: <PpdbSesiJadwalList/> },
+                    { path: 'ppdb-sesi-jadwal/tambah', element: <PpdbSesiJadwalAdd/> },
+                    { path: 'ppdb-sesi-jadwal/edit/:id', element: <PpdbSesiJadwalEdit/> },
+                    { path: 'ppdb-sesi-jadwal/detail/:id', element: <PpdbSesiJadwalDetail/> },
+                    // PPDB Ruangan
+                    { path: 'ppdb-room', element: <PpdbRoomList/> },
+                    { path: 'ppdb-room/tambah', element: <PpdbRoomAdd/> },
+                    { path: 'ppdb-room/edit/:id', element: <PpdbRoomEdit/> },
+                    // PPDB Sesi Ruangan Tes
+                    { path: 'ppdb-sesi-room', element: <PpdbSesiRoomList/> },
+                    { path: 'ppdb-sesi-room/tambah', element: <PpdbSesiRoomAdd/> },
+                    { path: 'ppdb-sesi-room/edit/:id', element: <PpdbSesiRoomEdit/> },
+                    // PPDB Peserta Tes
+                    { path: 'ppdb-peserta-tes', element: <PpdbPesertaTesList/> },
+                    { path: 'ppdb-peserta-tes/tambah', element: <PpdbPesertaTesAdd/> },
+                    // PPDB Pengawas Ruangan
+                    { path: 'ppdb-proctors', element: <PpdbProctorList/> },
+                    { path: 'ppdb-proctors/tambah', element: <PpdbProctorAdd/> },
+                    { path: 'ppdb-proctors/edit/:id', element: <PpdbProctorEdit/> },
+                    // PPDB Monitoring Nilai
+                    { path: 'ppdb-nilai', element: <PpdbNilaiList/> },
+                    { path: 'ppdb-nilai/detail/:id', element: <PpdbNilaiDetail/> },
+                    // PPDB Input Nilai
+                    { path: 'ppdb-input-nilai', element: <PpdbInputNilaiList/> },
+                    { path: 'ppdb-input-nilai/detail/:participant_id', element: <PpdbInputNilaiDetail/> },
+                
                 ]
             },
             {
