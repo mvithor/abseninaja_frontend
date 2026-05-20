@@ -20,7 +20,7 @@ const KategoriPegawaiEditDetailForm =({ kategoriData, handleChange, handleSubmit
     }
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -3.5 }}>
             <Grid container spacing={2} rowSpacing={1}>
                 <Grid size={{ xs: 12 }}>
                     <Box display="flex" alignItems="center">

@@ -138,7 +138,7 @@ const PegawaiGuruForm = ({ setSuccess, setError }) => {
     }
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -2}}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -1}}>
             <Box sx={{ borderRadius: 2 }}>
                 <Typography variant="h6">
                     Detail Akun
