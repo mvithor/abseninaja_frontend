@@ -5,7 +5,6 @@ import {
 } from "@mui/material";
 import { TimePicker } from "@mui/x-date-pickers";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
-import CustomTextField from "src/components/forms/theme-elements/CustomTextField";
 import SubmitButton from "src/components/button-group/SubmitButton";
 import CancelButton from "src/components/button-group/CancelButton";
 
@@ -31,7 +30,7 @@ const PengaturanJamEditForm = ({
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: -3 }}>
       <Grid container spacing={2} rowSpacing={1}>
         {["jam_masuk", "jam_terlambat", "jam_alpa", "jam_pulang"].map((field) => (
           <Grid size={{ xs: 12, md: 6 }} key={field}>
