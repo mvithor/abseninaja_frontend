@@ -31,9 +31,11 @@ const UserGuruTable = ({
   isError,
   errorMessage
 }) => {
+  const safeData = Array.isArray(userGuru) ? userGuru : [];
+
   const paged = rowsPerPage > 0
-    ? userGuru.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-    : userGuru;
+    ? safeData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+    : safeData;
 
   return (
     <Paper variant="outlined">
@@ -76,7 +78,7 @@ const UserGuruTable = ({
                   </Box>
                 </TableCell>
               </TableRow>
-            ) : userGuru.length === 0 ? (
+            ) : safeData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5}>
                   <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', minHeight:100, textAlign:'center' }}>
@@ -85,43 +87,69 @@ const UserGuruTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              paged.map((guruUser, index) => (
-                <TableRow key={guruUser.User.id ?? index}>
-                  <TableCell>
-                    <Typography sx={{ fontSize:'1rem' }}>
-                      {page * rowsPerPage + index + 1}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography sx={{ fontSize:'1rem' }}>{guruUser.User.name}</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography sx={{ fontSize:'1rem' }}>{guruUser.User.email}</Typography>
-                  </TableCell>
-                  <TableCell align="center">
-                    <Typography sx={{ fontSize:'1rem' }}>{guruUser.User.updated_at || 'Tidak Ada'}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', gap:1 }}>
-                      <Tooltip title="Notifikasi" placement="bottom">
-                        <IconButton onClick={() => handleOpenPrefs?.(guruUser.User.id, guruUser.User.name)}>
-                          <IconBell width={18} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Edit" placement="bottom">
-                        <IconButton onClick={() => handleEdit(guruUser.User.id)}>
-                          <IconEdit width={18} />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="Hapus" placement="bottom">
-                        <IconButton onClick={() => handleDelete(guruUser.User.id)}>
-                          <IconTrash width={18} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
+              paged.map((row, index) => {
+                const user = row?.AkunPegawai || {};
+                const userId = user?.id;
+
+                return (
+                  <TableRow key={userId ?? `${index}-${user?.email ?? 'row'}`}>
+                    <TableCell>
+                      <Typography sx={{ fontSize:'1rem' }}>
+                        {page * rowsPerPage + index + 1}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Typography sx={{ fontSize:'1rem' }}>
+                        {user?.name || '-'}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Typography sx={{ fontSize:'1rem' }}>
+                        {user?.email || '-'}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell align="center">
+                      <Typography sx={{ fontSize:'1rem' }}>
+                        {user?.updated_at || 'Tidak Ada'}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Box sx={{ display:'flex', justifyContent:'center', alignItems:'center', gap:1 }}>
+                        <Tooltip title="Notifikasi" placement="bottom">
+                          <IconButton
+                            disabled={!userId}
+                            onClick={() => handleOpenPrefs?.(userId, user?.name)}
+                          >
+                            <IconBell width={18} />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Edit" placement="bottom">
+                          <IconButton
+                            disabled={!userId}
+                            onClick={() => handleEdit(userId)}
+                          >
+                            <IconEdit width={18} />
+                          </IconButton>
+                        </Tooltip>
+
+                        <Tooltip title="Hapus" placement="bottom">
+                          <IconButton
+                            disabled={!userId}
+                            onClick={() => handleDelete(userId)}
+                          >
+                            <IconTrash width={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
 
@@ -130,7 +158,7 @@ const UserGuruTable = ({
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: 'All', value: -1 }]}
                 colSpan={5}
-                count={userGuru.length}
+                count={safeData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}
@@ -154,7 +182,7 @@ UserGuruTable.propTypes = {
   handleChangeRowsPerPage: PropTypes.func.isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
-  handleOpenPrefs: PropTypes.func, 
+  handleOpenPrefs: PropTypes.func,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string

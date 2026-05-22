@@ -62,7 +62,7 @@ const TambahKategoriPegawaiDetailForm = ({ setSuccess, setError }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -5}}>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -3.5}}>
              <Grid container spacing={2} rowSpacing={1}>
                 <Grid size={{ xs: 12 }}>
                     <Box display="flex" alignItems="center">
@@ -80,7 +80,7 @@ const TambahKategoriPegawaiDetailForm = ({ setSuccess, setError }) => {
                         name="namaSubkategori"
                         value={namaSubkategori}
                         onChange={handleChange}
-                        placeholder= "Ilmu Pengetahuan Alam"
+                        placeholder= "Umum/Kejuruan/BK/Instruktur | Tata Usaha/Keuangan"
                         fullWidth
                         required
                     />

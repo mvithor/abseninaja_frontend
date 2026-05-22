@@ -7,159 +7,182 @@ import ParentCard from "src/components/shared/ParentCard";
 import Alerts from "src/components/alerts/Alerts";
 import PegawaiGuruEditForm from "src/apps/admin-sekolah/data-guru/Edit/PegawaiEditForm";
 
-const fetchPegawaiGuruById = async (id) => {
-    try {
-        const response = await axiosInstance.get(`/api/v1/admin-sekolah/pegawai/${id}`);
-        const guruData = response.data.data;
+const toISODateOnly = (value) => {
+  // backend contoh: "1984-08-03" (date only)
+  if (!value) return null;
 
-        return {
-            ...guruData,
-            name: guruData?.User?.name || "",
-            email: guruData?.User?.email || "", 
-        };
-    } catch (error) {
-        if (process.env.NODE_ENV !== 'production') {
-            console.error('Error fetching pegawai:', error);
-          }
-          throw new Error('Terjadi kesalahan saat mengambil data pegawai. Silakan coba lagi'); 
+  // jika sudah string yyyy-mm-dd
+  if (typeof value === "string") {
+    const s = value.trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+    const d = new Date(s);
+    if (Number.isNaN(d.getTime())) return null;
+
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  // Date object
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    const yyyy = value.getFullYear();
+    const mm = String(value.getMonth() + 1).padStart(2, "0");
+    const dd = String(value.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  return null;
+};
+
+const fetchPegawaiGuruById = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/api/v1/admin-sekolah/pegawai/${id}`);
+    const pegawai = response.data.data;
+
+    // ✅ mapping sesuai response: AkunPegawai
+    return {
+      ...pegawai,
+      name: pegawai?.AkunPegawai?.name || "",
+      email: pegawai?.AkunPegawai?.email || "",
+      current_password: "",
+    };
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Error fetching pegawai:", error);
     }
+    throw new Error("Terjadi kesalahan saat mengambil data pegawai. Silakan coba lagi");
+  }
 };
 
 const PegawaiGuruEdit = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [error, setError] = useState("");
-    const [success, setSuccess] = useState("");
-    const [guruData, setGuruData] = useState({
-        name: '',
-        email: '',
-        nip: '',
-        tempat_lahir: '',
-        tanggal_lahir: null,
-        alamat: '',
-        nomor_telepon: '',
-        kategori_pegawai_id: '',
-        subkategori_pegawai_id: ''
-    });
-    const [originalData, setOriginalData] = useState(null);
-    const queryClient = useQueryClient();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
-    const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
-        queryKey: ['PegawaiGuru', id],
-        queryFn: () => fetchPegawaiGuruById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
-    });
+  const [guruData, setGuruData] = useState({
+    name: "",
+    email: "",
+    current_password: "",
+    nip: "",
+    tempat_lahir: "",
+    tanggal_lahir: null,
+    alamat: "",
+    nomor_telepon: "",
+    kategori_pegawai_id: "",
+    subkategori_pegawai_id: "",
+  });
 
-    useEffect(() => {
-        if (data) {
-            setGuruData(data);
-            setOriginalData(data);
-        }
-    }, [data]);
+  const [originalData, setOriginalData] = useState(null);
+  const queryClient = useQueryClient();
 
-    const mutation = useMutation({
-        mutationFn: async (guru) => {
-            return await axiosInstance.put(`/api/v1/admin-sekolah/pegawai/${id}`, guru);
-        },
-        onSuccess: (response) => {
-            setGuruData(response.data.data); 
-            setOriginalData(response.data.data);
-            setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['PegawaiGuru']);
-            setTimeout(() => {
-                navigate('/dashboard/admin-sekolah/pegawai/guru');
-            }, 3000);
-        },
-        onError: (error) => {
-            const errorDetails = error.response?.data?.errors || [];
-            const errorMsg = error.response?.data?.msg || 'Terjadi kesalahan saat memperbarui data pegawai.';
-            if (errorDetails.length > 0) {
-                setError(errorDetails.join(', '));
-            } else {
-                setError(errorMsg);
-            }
-            setTimeout(() => setError(''), 3000);
-        }
-    });
+  const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
+    queryKey: ["PegawaiGuru", id],
+    queryFn: () => fetchPegawaiGuruById(id),
+    onError: (err) => {
+      const msg = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
+      setError(msg);
+      setTimeout(() => setError(""), 3000);
+    },
+  });
 
-    const handleChange = (event) => {
-        const { name, value } = event.target;
-        setGuruData((prevState) => ({
-            ...prevState,
-            [name]: value
-        }));
+  useEffect(() => {
+    if (data) {
+      setGuruData(data);
+      setOriginalData(data);
+    }
+  }, [data]);
+
+  const mutation = useMutation({
+    mutationFn: async (payload) => {
+      // ✅ payload harus body object sesuai backend: { data: {...} } ATAU flat
+      // backend kamu sudah support kedua bentuk (normalize payload). Kita tetap kirim flat yang bersih.
+      const response = await axiosInstance.put(`/api/v1/admin-sekolah/pegawai/${id}`, payload);
+      return response.data;
+    },
+    onSuccess: (res) => {
+      setSuccess(res.msg || "Data pegawai berhasil diperbarui");
+      queryClient.invalidateQueries(["PegawaiGuru", id]);
+      queryClient.invalidateQueries(["pegawaiGuru"]);
+      setTimeout(() => {
+        navigate("/dashboard/admin-sekolah/pegawai/guru");
+      }, 1500);
+    },
+    onError: (err) => {
+      const errorDetails = err?.response?.data?.errors || [];
+      const errorMsg = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memperbarui data pegawai.";
+      if (errorDetails.length > 0) setError(errorDetails.join(", "));
+      else setError(errorMsg);
+      setTimeout(() => setError(""), 3000);
+    },
+  });
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setGuruData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!guruData) return;
+
+    const originalEmail = String(originalData?.email || "").trim();
+    const nextEmail = String(guruData?.email || "").trim();
+    const isEmailChanged = originalData && nextEmail !== originalEmail;
+
+    // ✅ schema backend: current_password wajib saat email berubah
+    if (isEmailChanged && !String(guruData?.current_password || "").trim()) {
+      setError("Password saat ini wajib diisi untuk mengubah email.");
+      setTimeout(() => setError(""), 3000);
+      return;
+    }
+
+    const payload = {
+      kategori_pegawai_id: guruData.kategori_pegawai_id,
+      subkategori_pegawai_id: guruData.subkategori_pegawai_id || null,
+      nip: guruData.nip || null,
+      tempat_lahir: guruData.tempat_lahir || null,
+      tanggal_lahir: toISODateOnly(guruData.tanggal_lahir),
+      alamat: guruData.alamat || null,
+      nomor_telepon: guruData.nomor_telepon || null,
+
+      User: {
+        name: guruData.name,
+        email: guruData.email,
+        current_password: isEmailChanged ? guruData.current_password : "",
+      },
     };
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        if (!guruData) {
-            return;
-        }
-    
-        const dataToSend = {
-            data: { 
-                id: guruData.id,
-                kategori_pegawai_id: guruData.kategori_pegawai_id,
-                subkategori_pegawai_id: guruData.subkategori_pegawai_id,
-                nip: guruData.nip,
-                tempat_lahir: guruData.tempat_lahir,
-                tanggal_lahir: guruData.tanggal_lahir,
-                alamat: guruData.alamat,
-                nomor_telepon: guruData.nomor_telepon,
-                user_id: guruData.user_id, 
-                sekolah_id: guruData.sekolah_id,
-                User: { 
-                    name: guruData.name,
-                    email: guruData.email,
-                },
-            },
-        };
-    
-        // Tambahkan password jika email diubah
-        if (originalData && guruData.email !== originalData.email) {
-            if (!guruData.password) {
-                console.error("Password diperlukan untuk mengubah email.");
-                setError("Password diperlukan untuk mengubah email.");
-                return;
-            }
-            dataToSend.data.password = guruData.password;
-        }
+    mutation.mutate(payload);
+  };
 
-        mutation.mutate(dataToSend, {
-            onSuccess: (response) => {
-                setGuruData(response.data.data);
-                setOriginalData(response.data.data); 
-                setSuccess(response.data.msg);
-            },
-            onError: (error) => {
-                console.error("Error saat mengirim data:", error);
-                setError("Terjadi kesalahan saat memperbarui data. Silakan coba lagi.");
-            },
-        });
-    };
-    
-    const handleCancel = () => {
-        navigate(-1);
-    };
+  const handleCancel = () => {
+    navigate(-1);
+  };
 
-    return (
-        <PageContainer title="Form Edit Pegawai Guru" description="Form Edit Pegawai Guru">
-            <ParentCard title="Form Edit Pegawai Guru">
-                <Alerts error={error || (isError && queryError?.message)} success={success} />
-                <PegawaiGuruEditForm
-                    guruData={guruData || {}}
-                    handleChange={handleChange}
-                    handleSubmit={handleSubmit}
-                    handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
-                />
-            </ParentCard>
-        </PageContainer>
-    );
+  return (
+    <PageContainer title="Form Edit Pegawai Guru" description="Form Edit Pegawai Guru">
+      <ParentCard title="Form Edit Pegawai Guru">
+        <Alerts error={error || (isError && queryError?.message)} success={success} />
+
+        <PegawaiGuruEditForm
+          guruData={guruData || {}}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+          handleCancel={handleCancel}
+          isLoading={isFetching || mutation.isLoading}
+          originalEmail={originalData?.email || ""}
+        />
+      </ParentCard>
+    </PageContainer>
+  );
 };
 
 export default PegawaiGuruEdit;

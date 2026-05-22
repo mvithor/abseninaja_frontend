@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -50,7 +50,7 @@ const UserGuruList = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async ({ id , type}) => {
+    mutationFn: async ({ id, type }) => {
       const response = await axiosInstance.delete(`/api/v1/admin-sekolah/users/${id}`, {
         params: { type }
       });
@@ -70,22 +70,55 @@ const UserGuruList = () => {
     }
   });
 
-  const handleSearchChange = (event) => setSearchQuery(event.target.value);
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+    setPage(0);
+  };
 
-  const filteredUserGuru = (userGuru || [])
-    .filter((g) => g.User.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => a.User.name.localeCompare(b.User.name));
+  const filteredUserGuru = useMemo(() => {
+    const safe = Array.isArray(userGuru) ? userGuru : [];
+    const q = String(searchQuery || '').trim().toLowerCase();
+
+    return safe
+      .filter((g) => {
+        const name = g?.AkunPegawai?.name || '';
+        return q ? String(name).toLowerCase().includes(q) : true;
+      })
+      .sort((a, b) => {
+        const aName = (a?.AkunPegawai?.name || '').toLowerCase();
+        const bName = (b?.AkunPegawai?.name || '').toLowerCase();
+        return aName.localeCompare(bName);
+      });
+  }, [userGuru, searchQuery]);
 
   const handleChangePage = (event, newPage) => setPage(newPage);
-  const handleRowsPerPageChange = (event) => { setRowsPerPage(parseInt(event.target.value, 10)); setPage(0); };
 
-  const handleEdit = () => navigate('#');
+  const handleRowsPerPageChange = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleEdit = (userId) => {
+    // TODO: arahkan ke halaman edit user guru kalau sudah ada
+    // navigate(`/admin-sekolah/users/${userId}/edit`);
+    navigate('#');
+  };
 
   // delete flow
-  const handleOpenConfirmDialog = (id) => { setDeleteUserGuru(id); setConfirmDialogOpen(true); };
-  const handleCloseConfirmDialog = () => { setConfirmDialogOpen(false); setDeleteUserGuru(null); };
+  const handleOpenConfirmDialog = (id) => {
+    setDeleteUserGuru(id);
+    setConfirmDialogOpen(true);
+  };
+  const handleCloseConfirmDialog = () => {
+    setConfirmDialogOpen(false);
+    setDeleteUserGuru(null);
+  };
+
   const handleDelete = (user_id, type = 'pegawai') => {
-    if (!user_id || isNaN(Number(user_id))) { setError('User tidak valid'); return; }
+    if (!user_id || isNaN(Number(user_id))) {
+      setError('User tidak valid');
+      return;
+    }
     deleteMutation.mutate({ id: user_id, type });
     setConfirmDialogOpen(false);
   };
@@ -115,10 +148,10 @@ const UserGuruList = () => {
           handleChangeRowsPerPage={handleRowsPerPageChange}
           handleEdit={handleEdit}
           handleDelete={handleOpenConfirmDialog}
-          handleOpenPrefs={handleOpenPrefs}     // ← inject handler
+          handleOpenPrefs={handleOpenPrefs}
           isLoading={isLoading}
           isError={isError}
-          errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"}
+          errorMessage={queryError?.response?.data?.msg || queryError?.message || "Terjadi kesalahan saat memuat data"}
         />
       </ParentCard>
 
@@ -143,6 +176,7 @@ const UserGuruList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
       <NotificationPrefsDrawer
         open={prefsOpen}
         onClose={handleClosePrefs}

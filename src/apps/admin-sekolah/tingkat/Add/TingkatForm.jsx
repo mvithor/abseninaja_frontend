@@ -61,7 +61,7 @@ const TambahTingkatForm = ({ setSuccess, setError }) => {
     };
 
     return (
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: -4 }}>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: -3 }}>
         <Grid container spacing={2} rowSpacing={1}>
         <Grid size={{ xs: 12 }}>
             <Box display="flex" alignItems="center">
