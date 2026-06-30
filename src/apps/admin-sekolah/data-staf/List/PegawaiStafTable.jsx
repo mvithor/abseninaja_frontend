@@ -31,7 +31,7 @@ const PegawaiStafTable = ({
   errorMessage
 }) => {
 
-  const getNama = (row) => row?.AkunPegawai?.name || '-';
+  const getNama = (row) => row?.User?.name || '-';
   const getNip = (row) => (row?.nip && String(row.nip).trim() !== '' ? row.nip : '-');
   const getJabatan = (row) => row?.SubKategoriPegawai?.nama_subkategori || 'Tidak Ada';
   const getTelepon = (row) => (row?.nomor_telepon && String(row.nomor_telepon).trim() !== '' ? row.nomor_telepon : '-');

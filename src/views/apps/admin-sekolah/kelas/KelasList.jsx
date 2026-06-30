@@ -40,6 +40,8 @@ const KelasList = () => {
     const [success, setSuccess] = useState("");
     const [deleteKelas, setDeleteKelas] = useState(null);
     const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+    const [kelulusanTarget, setKelulusanTarget] = useState(null); // { id, nama_kelas }
+    const [kelulusanDialogOpen, setKelulusanDialogOpen] = useState(false);
     const navigate = useNavigate();
 
     const { data: kelas = [], isLoading, isError, error: queryError } = useQuery({
@@ -51,6 +53,23 @@ const KelasList = () => {
         }
       });
       const queryClient = useQueryClient();
+
+      const kelulusanMutation = useMutation({
+        mutationFn: async (id) => {
+          const response = await axiosInstance.post(`/api/v1/admin-sekolah/kelas/${id}/kelulusan`);
+          return response.data;
+        },
+        onSuccess: (data) => {
+          queryClient.invalidateQueries(['kelas']);
+          setSuccess(data.msg || 'Kelas berhasil ditandai lulus. Seluruh siswa dipindahkan ke data alumni.');
+          setTimeout(() => setSuccess(''), 4000);
+        },
+        onError: (error) => {
+          const msg = error.response?.data?.msg || 'Terjadi kesalahan saat memproses kelulusan';
+          setError(msg);
+          setTimeout(() => setError(''), 3000);
+        },
+      });
 
       const deleteMutation = useMutation({
         mutationFn: async (id) => {
@@ -143,6 +162,23 @@ const KelasList = () => {
         navigate(`/dashboard/admin-sekolah/kelas/detail/${id}`)
     }
 
+    const handleLulus = (id, nama_kelas) => {
+        setKelulusanTarget({ id, nama_kelas });
+        setKelulusanDialogOpen(true);
+    };
+
+    const handleConfirmLulus = () => {
+        if (!kelulusanTarget) return;
+        kelulusanMutation.mutate(kelulusanTarget.id);
+        setKelulusanDialogOpen(false);
+        setKelulusanTarget(null);
+    };
+
+    const handleCloseKelulusanDialog = () => {
+        setKelulusanDialogOpen(false);
+        setKelulusanTarget(null);
+    };
+
     const handleDelete = () => {
         if(!deleteKelas) {
             setError("Kelas tidak ditemukan");
@@ -205,11 +241,43 @@ const KelasList = () => {
                     handleDetail={handleDetail}
                     handleEdit={handleEdit}
                     handleDelete={handleOpenConfirmDialog}
+                    handleLulus={handleLulus}
                     isLoading={isLoading}
                     isError={isError}
                     errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"} 
                 />
             </ParentCard>
+            {/* Dialog Konfirmasi Kelulusan */}
+            <Dialog open={kelulusanDialogOpen} onClose={handleCloseKelulusanDialog} maxWidth="sm" fullWidth>
+                <DialogContent>
+                    <Typography variant="h5" align="center" sx={{ mt: 2, mb: 1 }}>
+                        Tandai Kelas Lulus
+                    </Typography>
+                    <Typography variant="body2" align="center" color="text.secondary" sx={{ mb: 1 }}>
+                        Kelas: <strong>{kelulusanTarget?.nama_kelas}</strong>
+                    </Typography>
+                    <Typography variant="body2" align="center" color="error" sx={{ mb: 2 }}>
+                        Tindakan ini bersifat permanen. Seluruh siswa di kelas ini akan ditandai lulus,
+                        akun mereka dinonaktifkan, dan data dipindahkan ke Manajemen Alumni.
+                        Siswa tidak akan muncul lagi di daftar kelas dan daftar siswa aktif.
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+                    <Button sx={{ mr: 2 }} variant="outlined" color="secondary" onClick={handleCloseKelulusanDialog}>
+                        Batal
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleConfirmLulus}
+                        disabled={kelulusanMutation.isLoading}
+                        sx={{ backgroundColor: '#973BE0', '&:hover': { backgroundColor: '#7d2dbd' } }}
+                    >
+                        {kelulusanMutation.isLoading ? <CircularProgress size={24} /> : 'Ya, Tandai Lulus'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog Konfirmasi Hapus */}
             <Dialog
                 open={confirmDialogOpen}
                 onClose={handleCloseConfirmDialog}

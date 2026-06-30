@@ -15,17 +15,18 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import { IconEdit } from '@tabler/icons-react';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
 const SiswaTable = ({
   siswa,
   page,
   rowsPerPage,
-  totalCount,                 
+  totalCount,
   handleChangePage,
   handleChangeRowsPerPage,
   handleEdit,
+  handleDelete,
   isLoading,
   isError,
   errorMessage
@@ -105,6 +106,11 @@ const SiswaTable = ({
                           <IconEdit width={18} />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Hapus" placement="bottom">
+                        <IconButton onClick={() => handleDelete(dataSiswa.id)}>
+                          <IconTrash width={18} />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                   </TableCell>
                 </TableRow>
@@ -137,10 +143,11 @@ SiswaTable.propTypes = {
   siswa: PropTypes.array.isRequired,
   page: PropTypes.number.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
-  totalCount: PropTypes.number.isRequired, 
+  totalCount: PropTypes.number.isRequired,
   handleChangePage: PropTypes.func.isRequired,
   handleChangeRowsPerPage: PropTypes.func.isRequired,
   handleEdit: PropTypes.func.isRequired,
+  handleDelete: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string

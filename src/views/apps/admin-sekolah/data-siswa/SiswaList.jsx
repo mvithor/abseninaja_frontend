@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem } from "@mui/material";
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, MenuItem, Typography, CircularProgress } from "@mui/material";
 import { IconPlus } from "@tabler/icons-react";
 import { validate as isUUID } from "uuid";
 import Alerts from "src/components/alerts/Alerts";
@@ -10,7 +10,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import SiswaTable from "src/apps/admin-sekolah/data-siswa/List/SiswaTable";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -48,7 +48,10 @@ const SiswaList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const [filters, setFilters] = useState({
     q: "",       
@@ -64,6 +67,7 @@ const SiswaList = () => {
   const [kelasOptions, setKelasOptions] = useState([]);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // dropdown kelas
   useEffect(() => {
@@ -111,9 +115,46 @@ const SiswaList = () => {
 
   const handleAdd = () => navigate("/dashboard/admin-sekolah/siswa/tambah");
 
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const response = await axiosInstance.delete(`/api/v1/admin-sekolah/siswa/${id}`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['siswa-paged'] });
+      setSuccess(data.msg || 'Data siswa berhasil dihapus');
+      setError('');
+      setTimeout(() => setSuccess(''), 3000);
+    },
+    onError: (err) => {
+      const msg = err.response?.data?.msg || 'Terjadi kesalahan saat menghapus data siswa';
+      setError(msg);
+      setSuccess('');
+      setTimeout(() => setError(''), 3000);
+    },
+  });
+
   const handleEdit = (id) => {
     if (!id || !isUUID(id)) return;
     navigate(`/dashboard/admin-sekolah/siswa/edit/${id}`);
+  };
+
+  const handleDelete = (id) => {
+    if (!id || !isUUID(id)) return;
+    setDeleteTarget(id);
+    setConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteMutation.mutate(deleteTarget);
+    setConfirmOpen(false);
+    setDeleteTarget(null);
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmOpen(false);
+    setDeleteTarget(null);
   };
 
   // Filter dialog controls
@@ -141,7 +182,7 @@ const SiswaList = () => {
   return (
     <PageContainer title="Data Siswa" description="Data Siswa">
       <ParentCard title="Data Siswa">
-        <Alerts error={error} />
+        <Alerts error={error} success={success} />
         <Box
           sx={{
             display: "flex",
@@ -167,18 +208,45 @@ const SiswaList = () => {
         </Box>
 
         <SiswaTable
-          siswa={rows}                       
+          siswa={rows}
           page={page}
-          rowsPerPage={rowsPerPage}     
-          totalCount={totalCount}        
+          rowsPerPage={rowsPerPage}
+          totalCount={totalCount}
           handleChangePage={handleChangePage}
           handleChangeRowsPerPage={handleChangeRowsPerPage}
           handleEdit={handleEdit}
+          handleDelete={handleDelete}
           isLoading={isLoading}
           isError={isError}
           errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"}
         />
       </ParentCard>
+      {/* Dialog Konfirmasi Hapus */}
+      <Dialog open={confirmOpen} onClose={handleCancelDelete} maxWidth="sm" fullWidth>
+        <DialogContent>
+          <Typography variant="h5" align="center" sx={{ mt: 2, mb: 2 }}>
+            Apakah Anda yakin ingin menghapus data siswa ini?
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
+          <Button variant="outlined" color="secondary" onClick={handleCancelDelete} sx={{ mr: 2 }}>
+            Batal
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleConfirmDelete}
+            disabled={deleteMutation.isLoading}
+            sx={{
+              backgroundColor: '#F48C06',
+              '&:hover': { backgroundColor: '#f7a944' },
+            }}
+          >
+            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Dialog Filter */}
       <Dialog open={filterOpen} onClose={closeFilter} fullWidth maxWidth="sm">
         <DialogTitle>Filter Siswa</DialogTitle>
         <DialogContent>

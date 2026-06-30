@@ -53,6 +53,12 @@ import {
     },
     {
         id: uniqueId(),
+        title: 'Alumni',
+        icon: IconUsersGroup,
+        href: '/dashboard/admin-sekolah/alumni'
+    },
+    {
+        id: uniqueId(),
         title: 'Pesan',
         icon: IconMessage,
         href: '#'

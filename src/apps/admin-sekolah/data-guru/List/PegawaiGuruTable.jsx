@@ -19,7 +19,7 @@ import { IconEdit, IconTrash } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
 const getNamaPegawai = (row) => {
-  return row?.AkunPegawai?.name || '-';
+  return row?.User?.name || '-';
 };
 
 const getNamaMapel = (row) => {
