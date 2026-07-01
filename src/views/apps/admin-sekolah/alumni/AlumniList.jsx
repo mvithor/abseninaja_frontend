@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { Box, MenuItem } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { Box, MenuItem, CircularProgress, Button } from '@mui/material';
+import { IconFileImport } from '@tabler/icons-react';
 import Alerts from 'src/components/alerts/Alerts';
 import SearchButton from 'src/components/button-group/SearchButton';
 import FilterButton from 'src/components/button-group/FilterButton';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import AlumniTable from 'src/apps/admin-sekolah/alumni/List/AlumniTable';
+import AlumniDetailContent from 'src/apps/admin-sekolah/alumni/List/AlumniDetailContent';
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import {
@@ -13,7 +16,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button,
 } from '@mui/material';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
 import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
@@ -34,16 +36,23 @@ const fetchAlumni = async ({ queryKey }) => {
   };
 };
 
+const fetchAlumniDetail = async (id) => {
+  const res = await axiosInstance.get(`/api/v1/admin-sekolah/alumni/${id}`);
+  return res.data?.data;
+};
+
 const currentYear = new Date().getFullYear();
 const tahunOptions = Array.from({ length: 10 }, (_, i) => currentYear - i);
 
 const AlumniList = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [exportingId, setExportingId] = useState(null);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedAlumniId, setSelectedAlumniId] = useState(null);
 
   const [filters, setFilters] = useState({ q: '', tahun_lulus: '', sort_order: 'desc' });
   const [draft, setDraft] = useState(filters);
@@ -56,6 +65,19 @@ const AlumniList = () => {
     keepPreviousData: true,
     refetchOnWindowFocus: false,
     onError: (err) => setError(err?.response?.data?.msg || 'Gagal memuat data alumni'),
+  });
+
+  const {
+    data: detailData,
+    isLoading: isDetailLoading,
+    isError: isDetailError,
+    error: detailError,
+  } = useQuery({
+    queryKey: ['alumniDetail', selectedAlumniId],
+    queryFn: () => fetchAlumniDetail(selectedAlumniId),
+    enabled: Boolean(selectedAlumniId),
+    refetchOnWindowFocus: false,
+    onError: (err) => setError(err?.response?.data?.msg || 'Gagal memuat detail alumni'),
   });
 
   const rows = data?.rows ?? [];
@@ -82,7 +104,7 @@ const AlumniList = () => {
       const a = document.createElement('a');
       a.href = url;
       const safeName = (nama || 'alumni').replace(/\s+/g, '_');
-      a.download = `data_alumni_${safeName}.pdf`;
+      a.download = `data_alumni_${safeName}.xlsx`;
       a.click();
       window.URL.revokeObjectURL(url);
     } catch {
@@ -98,6 +120,29 @@ const AlumniList = () => {
   const applyFilter = () => { setFilters(draft); setPage(0); setFilterOpen(false); };
   const clearFilter = () => setDraft((p) => ({ ...p, tahun_lulus: '', sort_order: 'desc' }));
 
+  const handleDetail = (id) => setSelectedAlumniId(id);
+  const handleBackFromDetail = () => setSelectedAlumniId(null);
+
+  if (selectedAlumniId) {
+    return (
+      <PageContainer title="Detail Alumni" description="Detail Data Alumni">
+        <ParentCard title="Detail Alumni">
+          <Alerts
+            error={error || (isDetailError && (detailError?.message || 'Gagal memuat data'))}
+            success={success}
+          />
+          {isDetailLoading ? (
+            <Box display="flex" justifyContent="center" alignItems="center" height="60px">
+              <CircularProgress />
+            </Box>
+          ) : (
+            <AlumniDetailContent detail={detailData} onBack={handleBackFromDetail} />
+          )}
+        </ParentCard>
+      </PageContainer>
+    );
+  }
+
   return (
     <PageContainer title="Manajemen Alumni" description="Data Alumni">
       <ParentCard title="Manajemen Alumni">
@@ -109,7 +154,17 @@ const AlumniList = () => {
             onChange={handleSearchChange}
             placeholder="Cari Nama Alumni"
           />
-          <FilterButton onClick={openFilter} />
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            <Button
+              variant="outlined"
+              startIcon={<IconFileImport size={16} />}
+              onClick={() => navigate('/dashboard/admin-sekolah/alumni/import')}
+              sx={{ textTransform: 'none', borderColor: '#973BE0', color: '#973BE0', '&:hover': { borderColor: '#7d2dbd', color: '#7d2dbd' } }}
+            >
+              Import
+            </Button>
+            <FilterButton onClick={openFilter} />
+          </Box>
         </Box>
 
         <AlumniTable
@@ -124,6 +179,7 @@ const AlumniList = () => {
           isLoading={isLoading}
           isError={isError}
           errorMessage={queryError?.message || 'Terjadi kesalahan saat memuat data'}
+          onDetail={handleDetail}
         />
       </ParentCard>
 
