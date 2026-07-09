@@ -14,112 +14,48 @@ import {
   Box,
   Paper,
   CircularProgress,
-  Chip,
-  Collapse,
 } from '@mui/material';
-import { IconFileDownload, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
-import { useState } from 'react';
+import { IconFileDownload, IconEye } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
-const WaliRow = ({ wali }) => (
-  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
-    {wali.map((w, i) => (
-      <Box key={i} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
-        <Typography variant="caption" color="text.secondary">
-          {w?.User?.name || '-'}
-        </Typography>
-        <Chip
-          label={w.hubungan || '-'}
-          size="small"
-          sx={{ fontSize: '0.65rem', height: 16 }}
-        />
-        {w.is_wali_utama && (
-          <Chip
-            label="Wali Utama"
-            size="small"
-            color="primary"
-            variant="outlined"
-            sx={{ fontSize: '0.65rem', height: 16 }}
-          />
-        )}
-        {w.nomor_telepon && (
-          <Typography variant="caption" color="text.secondary">
-            · {w.nomor_telepon}
-          </Typography>
-        )}
-      </Box>
-    ))}
-  </Box>
+const AlumniRow = ({ alumni, index, onExport, isExporting, onDetail }) => (
+  <TableRow key={alumni.id}>
+    <TableCell>
+      <Typography sx={{ fontSize: '0.9rem' }}>{index + 1}</Typography>
+    </TableCell>
+    <TableCell>
+      <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.User?.name || '-'}</Typography>
+    </TableCell>
+    <TableCell align="center">
+      <Typography sx={{ fontSize: '0.9rem' }}>{alumni.nis || '-'}</Typography>
+    </TableCell>
+    <TableCell align="center">
+      <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.KelasTermakhir?.nama_kelas || alumni?.Kelas?.nama_kelas || '-'}</Typography>
+    </TableCell>
+    <TableCell align="center">
+      <Typography sx={{ fontSize: '0.9rem' }}>{alumni.tahun_lulus || '-'}</Typography>
+    </TableCell>
+    <TableCell align="center">
+      <Tooltip title="Detail Alumni" placement="bottom">
+        <IconButton onClick={() => onDetail(alumni.id)}>
+          <IconEye width={18} />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Export Data Alumni" placement="bottom">
+        <span>
+          <IconButton
+            onClick={() => onExport(alumni.id, alumni?.User?.name)}
+            disabled={isExporting === alumni.id}
+          >
+            {isExporting === alumni.id
+              ? <CircularProgress size={16} />
+              : <IconFileDownload width={18} />}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </TableCell>
+  </TableRow>
 );
-
-const AlumniRow = ({ alumni, index, onExport, isExporting }) => {
-  const [open, setOpen] = useState(false);
-  const wali = alumni.WaliSiswa ?? [];
-
-  return (
-    <>
-      <TableRow key={alumni.id}>
-        <TableCell>
-          <Typography sx={{ fontSize: '0.9rem' }}>{index + 1}</Typography>
-        </TableCell>
-        <TableCell>
-          <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.User?.name || '-'}</Typography>
-        </TableCell>
-        <TableCell align="center">
-          <Typography sx={{ fontSize: '0.9rem' }}>{alumni.nis || '-'}</Typography>
-        </TableCell>
-        <TableCell align="center">
-          <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.Kelas?.nama_kelas || '-'}</Typography>
-        </TableCell>
-        <TableCell align="center">
-          <Typography sx={{ fontSize: '0.9rem' }}>{alumni.tahun_lulus || '-'}</Typography>
-        </TableCell>
-        <TableCell align="center">
-          {wali.length === 0 ? (
-            <Typography variant="caption" color="text.secondary">-</Typography>
-          ) : (
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
-              <Typography variant="caption">{wali.length} wali</Typography>
-              <IconButton size="small" onClick={() => setOpen((v) => !v)}>
-                {open ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
-              </IconButton>
-            </Box>
-          )}
-        </TableCell>
-        <TableCell align="center">
-          <Tooltip title="Export Data Alumni" placement="bottom">
-            <span>
-              <IconButton
-                onClick={() => onExport(alumni.id, alumni?.User?.name)}
-                disabled={isExporting === alumni.id}
-              >
-                {isExporting === alumni.id
-                  ? <CircularProgress size={16} />
-                  : <IconFileDownload width={18} />}
-              </IconButton>
-            </span>
-          </Tooltip>
-        </TableCell>
-      </TableRow>
-
-      {/* Baris ekspansi wali siswa */}
-      {open && wali.length > 0 && (
-        <TableRow>
-          <TableCell colSpan={7} sx={{ py: 0, bgcolor: 'action.hover' }}>
-            <Collapse in={open} timeout="auto" unmountOnExit>
-              <Box sx={{ px: 3, py: 1.5 }}>
-                <Typography variant="caption" fontWeight={700} mb={0.5} display="block">
-                  Data Orang Tua / Wali
-                </Typography>
-                <WaliRow wali={wali} />
-              </Box>
-            </Collapse>
-          </TableCell>
-        </TableRow>
-      )}
-    </>
-  );
-};
 
 const AlumniTable = ({
   alumni,
@@ -133,6 +69,7 @@ const AlumniTable = ({
   isLoading,
   isError,
   errorMessage,
+  onDetail,
 }) => {
   const baseIndex = page * rowsPerPage;
 
@@ -147,7 +84,6 @@ const AlumniTable = ({
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>NIS</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Kelas Terakhir</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Tahun Lulus</Typography></TableCell>
-              <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Wali Siswa</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Aksi</Typography></TableCell>
             </TableRow>
           </TableHead>
@@ -155,7 +91,7 @@ const AlumniTable = ({
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7}>
+                <TableCell colSpan={6}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
                     <CircularProgress />
                   </Box>
@@ -163,7 +99,7 @@ const AlumniTable = ({
               </TableRow>
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={7}>
+                <TableCell colSpan={6}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', minHeight: 100, alignItems: 'center' }}>
                     <Typography color="error" variant="h6">{errorMessage}</Typography>
                   </Box>
@@ -171,7 +107,7 @@ const AlumniTable = ({
               </TableRow>
             ) : alumni.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7}>
+                <TableCell colSpan={6}>
                   <Box sx={{ display: 'flex', justifyContent: 'center', minHeight: 100, alignItems: 'center' }}>
                     <Typography variant="h6">Belum ada data alumni</Typography>
                   </Box>
@@ -185,6 +121,7 @@ const AlumniTable = ({
                   index={baseIndex + index}
                   onExport={onExport}
                   isExporting={exportingId}
+                  onDetail={onDetail}
                 />
               ))
             )}
@@ -194,7 +131,7 @@ const AlumniTable = ({
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[10, 25, 50, { label: 'All', value: -1 }]}
-                colSpan={7}
+                colSpan={6}
                 count={totalCount}
                 rowsPerPage={rowsPerPage}
                 page={page}
@@ -223,6 +160,7 @@ AlumniTable.propTypes = {
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string,
+  onDetail: PropTypes.func.isRequired,
 };
 
 export default AlumniTable;
