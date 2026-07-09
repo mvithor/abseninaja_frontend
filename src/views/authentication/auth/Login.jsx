@@ -45,7 +45,7 @@ const Login = () => (
             <Logo />
           </Box>
           <AuthLogin
-            title="Sistem Manajemen Absensi Online QR-Code"
+            title="Sistem Tata Kelola Kegiatan Belajar Mengajar Sekolah"
             subtext={
               <Typography variant="subtitle1" sx={{ color: 'textPrimary', mb: 1 }}>
                 Solusi Terintegrasi untuk Absensi dan Manajemen Akademik Sekolah
