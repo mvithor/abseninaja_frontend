@@ -15,7 +15,7 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import { IconEdit, IconTrash, IconEye } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconEye, IconCertificate } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
 const KelasTable = ({
@@ -27,6 +27,7 @@ const KelasTable = ({
     handleEdit,
     handleDelete,
     handleDetail,
+    handleLulus,
     isLoading,
     isError,
     errorMessage
@@ -120,7 +121,7 @@ const KelasTable = ({
                   </TableCell>
                   <TableCell align="center">
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <Tooltip title="Detail" placement="bottom">
+                      <Tooltip title="Detail" placement="bottom">
                         <IconButton onClick={() => handleDetail(item.id)}>
                           <IconEye width={18} />
                         </IconButton>
@@ -129,6 +130,20 @@ const KelasTable = ({
                         <IconButton onClick={() => handleEdit(item.id)}>
                           <IconEdit width={18} />
                         </IconButton>
+                      </Tooltip>
+                      <Tooltip
+                        title={item.jumlah_siswa === 0 ? 'Kelas sudah pernah diluluskan' : 'Tandai Lulus'}
+                        placement="bottom"
+                      >
+                        <span>
+                          <IconButton
+                            onClick={() => handleLulus(item.id, item.nama_kelas)}
+                            disabled={item.jumlah_siswa === 0}
+                            sx={{ color: item.jumlah_siswa === 0 ? 'text.disabled' : 'warning.main' }}
+                          >
+                            <IconCertificate width={18} />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                       <Tooltip title="Hapus" placement="bottom">
                         <IconButton onClick={() => handleDelete(item.id)}>
@@ -171,6 +186,7 @@ KelasTable.propTypes = {
   handleDetail: PropTypes.func.isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
+  handleLulus: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string,

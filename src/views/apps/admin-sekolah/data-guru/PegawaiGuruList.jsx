@@ -32,7 +32,7 @@ const fetchPegawaiGuru = async () => {
   }
 };
 
-const getNama = (row) => (row?.AkunPegawai?.name || '').trim();
+const getNama = (row) => (row?.User?.name || '').trim();
 
 const PegawaiGuruList = () => {
   const [page, setPage] = useState(0);
