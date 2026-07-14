@@ -70,6 +70,9 @@ const KelasList = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/
 const KelasDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasDetail')));
 const KelasAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasAdd')));
 const KelasEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasEdit')));
+// Alumni
+const AlumniList = Loadable(lazy(() => import('../views/apps/admin-sekolah/alumni/AlumniList')));
+const AlumniImport = Loadable(lazy(() => import('../views/apps/admin-sekolah/alumni/AlumniImport')));
 // Mata Pelajaran
 const MataPelajaranList = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranList')));
 const MataPelajaranAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/mata-pelajaran/MataPelajaranAdd')));
@@ -339,10 +342,13 @@ const Router = [
                     { path: 'notifikasi-template/tambah', element: <NotifikasiTemplateAdd/> },
                     { path: 'notifikasi-template/edit/:id', element: <NotifikasiTemplateEdit/> },
                     // Kelas
-                    { path: 'kelas', element: <KelasList/> }, 
+                    { path: 'kelas', element: <KelasList/> },
                     { path: 'kelas/detail/:id', element: <KelasDetail/> },
-                    { path: 'kelas/tambah-kelas', element: <KelasAdd/> }, 
-                    { path: 'kelas/edit/:id', element: <KelasEdit/> }, 
+                    { path: 'kelas/tambah-kelas', element: <KelasAdd/> },
+                    { path: 'kelas/edit/:id', element: <KelasEdit/> },
+                    // Alumni
+                    { path: 'alumni', element: <AlumniList/> },
+                    { path: 'alumni/import', element: <AlumniImport/> },
                     // Mata Pelajaran
                     { path: 'mata-pelajaran', element: <MataPelajaranList/> },
                     { path: 'mata-pelajaran/tambah-mapel', element: <MataPelajaranAdd/> },

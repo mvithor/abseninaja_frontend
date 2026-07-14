@@ -82,12 +82,12 @@ const PegawaiStafList = () => {
 
     return (staf || [])
       .filter((row) => {
-        const nama = String(row?.AkunPegawai?.name || '').toLowerCase();
+        const nama = String(row?.User?.name || '').toLowerCase();
         return nama.includes(q);
       })
       .sort((a, b) => {
-        const na = String(a?.AkunPegawai?.name || '');
-        const nb = String(b?.AkunPegawai?.name || '');
+        const na = String(a?.User?.name || '');
+        const nb = String(b?.User?.name || '');
         return na.localeCompare(nb);
       });
   }, [staf, searchQuery]);

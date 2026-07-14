@@ -32,6 +32,32 @@ import moment from "moment-timezone";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomTextField from "src/components/forms/theme-elements/CustomTextField";
 
+// ===========================================================================
+// HELPER: Ekstrak tanggal lokal dari Date object tanpa konversi timezone
+// Tidak pakai moment().tz("Asia/Jakarta") — admin di sekolah WITA/WIT
+// akan mendapat tanggal yang salah kalau dikonversi ke WIB dulu.
+// getFullYear/getMonth/getDate mengambil nilai lokal browser (= lokal sekolah).
+// ===========================================================================
+const fmtLocalDate = (date) => {
+  if (!date) return null;
+  const yyyy = date.getFullYear();
+  const mm   = String(date.getMonth() + 1).padStart(2, '0');
+  const dd   = String(date.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+};
+
+// ===========================================================================
+// HELPER: Ekstrak jam lokal dari Date object tanpa konversi timezone
+// Admin WITA pilih 13:00 → getHours() = 13 → kirim "13:00:00" ke server
+// Kalau pakai moment().tz("Asia/Jakarta"): 13:00 WITA → 12:00 WIB → salah
+// ===========================================================================
+const fmtLocalTime = (date) => {
+  if (!date) return null;
+  const hh = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${hh}:${mm}:00`;
+};
+
 const fetchAbsensi = async ({ queryKey }) => {
   const [, filters] = queryKey;
   const params = new URLSearchParams(filters).toString();
@@ -68,11 +94,11 @@ const AbsensiList = () => {
   const [bulkOpen, setBulkOpen] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [bulkForm, setBulkForm] = useState({
-    tipe: "Pulang Cepat",           
-    tanggal: new Date(),         
-    jam_pulang: new Date(),        
-    kelas_id: "",                 
-    override: false,    
+    tipe: "Pulang Cepat",
+    tanggal: new Date(),
+    jam_pulang: new Date(),
+    kelas_id: "",
+    override: false,
   });
 
   const navigate = useNavigate();
@@ -96,8 +122,11 @@ const AbsensiList = () => {
     queryKey: [
       "absensi",
       {
-        tanggal_mulai: moment(filters.tanggal_mulai).tz("Asia/Jakarta").format("YYYY-MM-DD"),
-        tanggal_akhir: moment(filters.tanggal_akhir).tz("Asia/Jakarta").format("YYYY-MM-DD"),
+        // [FIX] fmtLocalDate — tidak pakai moment().tz("Asia/Jakarta")
+        // Admin WIT pilih 18 Jun → moment().tz("Asia/Jakarta") bisa geser ke 17 Jun
+        // fmtLocalDate pakai getFullYear/getMonth/getDate → ambil nilai lokal browser
+        tanggal_mulai: fmtLocalDate(filters.tanggal_mulai),
+        tanggal_akhir: fmtLocalDate(filters.tanggal_akhir),
         kelas_id: filters.kelas_id,
       },
     ],
@@ -112,34 +141,33 @@ const AbsensiList = () => {
     setSearchQuery(event.target.value);
   };
 
-// helper: ambil timestamp terakhir (prioritas jam_pulang, fallback jam_masuk)
-const lastActionMs = (row) => {
-  const tgl = row.tanggal; // "DD/MM/YYYY"
-  const time =
-    (row.jam_pulang && row.jam_pulang !== "—" && row.jam_pulang !== "-"
-      ? row.jam_pulang
-      : row.jam_masuk && row.jam_masuk !== "—" && row.jam_masuk !== "-"
-      ? row.jam_masuk
-      : "00:00:00");
+  // helper: ambil timestamp terakhir (prioritas jam_pulang, fallback jam_masuk)
+  const lastActionMs = (row) => {
+    const tgl = row.tanggal; // "DD/MM/YYYY"
+    const time =
+      (row.jam_pulang && row.jam_pulang !== "—" && row.jam_pulang !== "-"
+        ? row.jam_pulang
+        : row.jam_masuk && row.jam_masuk !== "—" && row.jam_masuk !== "-"
+        ? row.jam_masuk
+        : "00:00:00");
 
-  const m = moment.tz(`${tgl} ${time}`, "DD/MM/YYYY HH:mm:ss", "Asia/Jakarta");
-  return m.isValid() ? m.valueOf() : 0;
-};
+    const m = moment.tz(`${tgl} ${time}`, "DD/MM/YYYY HH:mm:ss", "Asia/Jakarta");
+    return m.isValid() ? m.valueOf() : 0;
+  };
 
-const filteredAbsensi = absensi
-  .filter((absensi) => {
-    const matchesSearchQuery = searchQuery
-      ? absensi.nama.toLowerCase().includes(searchQuery.toLowerCase())
-      : true;
-    const matchesKelas = filters.kelas_id ? absensi.kelas_id === filters.kelas_id : true;
-    return matchesSearchQuery && matchesKelas;
-  })
-  // urutkan terbaru -> terlama; kalau sama waktunya, urutkan nama
-  .sort((a, b) => {
-    const diff = lastActionMs(b) - lastActionMs(a);
-    return diff !== 0 ? diff : a.nama.localeCompare(b.nama);
-  });
-
+  const filteredAbsensi = absensi
+    .filter((absensi) => {
+      const matchesSearchQuery = searchQuery
+        ? absensi.nama.toLowerCase().includes(searchQuery.toLowerCase())
+        : true;
+      const matchesKelas = filters.kelas_id ? absensi.kelas_id === filters.kelas_id : true;
+      return matchesSearchQuery && matchesKelas;
+    })
+    // urutkan terbaru -> terlama; kalau sama waktunya, urutkan nama
+    .sort((a, b) => {
+      const diff = lastActionMs(b) - lastActionMs(a);
+      return diff !== 0 ? diff : a.nama.localeCompare(b.nama);
+    });
 
   const handleAdd = () => {
     navigate('/dashboard/admin-sekolah/absensi-siswa/tambah');
@@ -166,14 +194,17 @@ const filteredAbsensi = absensi
       setSuccess("");
 
       const payload = {
-        tipe: bulkForm.tipe, 
-        tanggal: moment(bulkForm.tanggal).tz("Asia/Jakarta").format("YYYY-MM-DD"),
-        jam_pulang: bulkForm.jam_pulang
-          ? moment(bulkForm.jam_pulang).tz("Asia/Jakarta").format("HH:mm:ss")
-          : null,
+        mode: bulkForm.tipe === 'Pulang Cepat' ? 'pulang_cepat' : 'pulang',
+        // [FIX] fmtLocalDate — admin WITA/WIT pilih tanggal → ambil nilai lokal
+        // tanpa konversi ke WIB yang bisa geser satu hari di mendekati midnight
+        tanggal: fmtLocalDate(bulkForm.tanggal) || fmtLocalDate(new Date()),
+        // [FIX] fmtLocalTime — admin WITA pilih 13:00 → kirim "13:00:00"
+        // moment().tz("Asia/Jakarta") akan mengubahnya jadi "12:00:00" (salah)
+        jam_pulang: fmtLocalTime(bulkForm.jam_pulang),
         override: !!bulkForm.override,
       };
       if (bulkForm.kelas_id) payload.kelas_id = bulkForm.kelas_id;
+
       const res = await axiosInstance.post("/api/v1/admin-sekolah/absensi/bulk-pulang", payload);
 
       setSuccess(res.data?.msg || "Berhasil menandai pulang");
@@ -202,7 +233,7 @@ const filteredAbsensi = absensi
       <StatistikAbsensiCard />
       <Alerts error={error} success={success} />
       <ParentCard title="Absensi Siswa">
-      <Box
+        <Box
           sx={{
             display: "flex",
             alignItems: "center",
@@ -210,7 +241,7 @@ const filteredAbsensi = absensi
             gap: 2,
             width: "100%",
             mb: 2,
-            flexWrap: { xs: "wrap", sm: "nowrap" }, 
+            flexWrap: { xs: "wrap", sm: "nowrap" },
           }}
         >
           <SearchButton
@@ -219,38 +250,37 @@ const filteredAbsensi = absensi
             placeholder="Cari Siswa"
           />
 
-        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-          <AddButton
-            icon={<IconPlus size={20} color="white" />}
-            onClick={handleAdd}
-          >
-            Tambah Absensi
-          </AddButton>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={openBulkModal}
-            sx={{
-              textTransform: "none",
-              display: { xs: "none", sm: "inline-flex" },
-            }}
-          >
-            Pulang Masal
-          </Button>
-          <Tooltip title="Tandai Pulang / Pulang Cepat">
-            <IconButton
+          <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+            <AddButton
+              icon={<IconPlus size={20} color="white" />}
+              onClick={handleAdd}
+            >
+              Tambah Absensi
+            </AddButton>
+            <Button
+              variant="contained"
               color="secondary"
               onClick={openBulkModal}
-              sx={{ display: { xs: "inline-flex", sm: "none" } }}
-              size="small"
+              sx={{
+                textTransform: "none",
+                display: { xs: "none", sm: "inline-flex" },
+              }}
             >
-              <IconLogout2 size={20} />
-            </IconButton>
-          </Tooltip>
+              Pulang Masal
+            </Button>
+            <Tooltip title="Tandai Pulang / Pulang Cepat">
+              <IconButton
+                color="secondary"
+                onClick={openBulkModal}
+                sx={{ display: { xs: "inline-flex", sm: "none" } }}
+                size="small"
+              >
+                <IconLogout2 size={20} />
+              </IconButton>
+            </Tooltip>
 
-          <FilterButton onClick={handleFilterClick} />
-        </Box>
-
+            <FilterButton onClick={handleFilterClick} />
+          </Box>
         </Box>
 
         <AbsensiTable
@@ -278,10 +308,9 @@ const filteredAbsensi = absensi
             <DatePicker
               value={filters.tanggal_mulai || null}
               onChange={(newValue) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  tanggal_mulai: moment(newValue).tz("Asia/Jakarta").toDate(),
-                }))
+                // [FIX] Simpan Date object langsung — tidak perlu konversi ke WIB
+                // fmtLocalDate di queryKey yang akan ekstrak YYYY-MM-DD secara lokal
+                setFilters((prev) => ({ ...prev, tanggal_mulai: newValue }))
               }
               placeholder="Tanggal Mulai"
               enableAccessibleFieldDOMStructure={false}
@@ -297,10 +326,8 @@ const filteredAbsensi = absensi
             <DatePicker
               value={filters.tanggal_akhir || null}
               onChange={(newValue) =>
-                setFilters((prev) => ({
-                  ...prev,
-                  tanggal_akhir: moment(newValue).tz("Asia/Jakarta").toDate(),
-                }))
+                // [FIX] Simpan Date object langsung — tidak perlu konversi ke WIB
+                setFilters((prev) => ({ ...prev, tanggal_akhir: newValue }))
               }
               placeholder="Tanggal Akhir"
               enableAccessibleFieldDOMStructure={false}
@@ -336,6 +363,7 @@ const filteredAbsensi = absensi
         </DialogContent>
         <DialogActions />
       </Dialog>
+
       <Dialog open={bulkOpen} onClose={closeBulkModal} fullWidth maxWidth="sm">
         <DialogTitle>Tandai Pulang / Pulang Cepat (Massal)</DialogTitle>
         <DialogContent>
