@@ -9,7 +9,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import AlumniTable from 'src/apps/admin-sekolah/alumni/List/AlumniTable';
 import AlumniDetailContent from 'src/apps/admin-sekolah/alumni/List/AlumniDetailContent';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import {
   Dialog,
@@ -62,9 +62,8 @@ const AlumniList = () => {
   const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ['alumni', { page: page + 1, limit: effectiveLimit, ...filters }],
     queryFn: fetchAlumni,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
-    onError: (err) => setError(err?.response?.data?.msg || 'Gagal memuat data alumni'),
   });
 
   const {
@@ -77,7 +76,6 @@ const AlumniList = () => {
     queryFn: () => fetchAlumniDetail(selectedAlumniId),
     enabled: Boolean(selectedAlumniId),
     refetchOnWindowFocus: false,
-    onError: (err) => setError(err?.response?.data?.msg || 'Gagal memuat detail alumni'),
   });
 
   const rows = data?.rows ?? [];
