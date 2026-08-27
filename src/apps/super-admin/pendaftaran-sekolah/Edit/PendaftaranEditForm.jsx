@@ -29,8 +29,16 @@ const PendaftaranEditForm = ({
     }
   }, [selectedPendaftaran]);
 
+  // Backend updatePendaftaranSekolah tidak punya validasi Joi — status_id
+  // dikirim mentah dan langsung dipakai (status_id || pendaftaran.status_id).
+  // Jadi validitas nilai ini murni tanggung jawab FE: pastikan status_id yang
+  // mau dikirim benar-benar ada di daftar statusOptions dari server, bukan
+  // cuma "ada nilai".
+  const isValidStatus = statusOptions.some((opt) => opt.id === Number(status_id));
+
   const onSubmit = async (e) => {
     e.preventDefault();
+    if (!isValidStatus) return;
     setIsSubmitting(true);
     await handleSubmit({ status_id: Number(status_id) });
     setIsSubmitting(false);
@@ -120,7 +128,7 @@ const PendaftaranEditForm = ({
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', gap: 2, mt: 4 }}>
         <SubmitButton
           type="submit"
-          disabled={isSubmitting || isLoadingStatus || !status_id}
+          disabled={isSubmitting || isLoadingStatus || !isValidStatus}
         >
           {isSubmitting ? 'Menyimpan...' : 'Simpan'}
         </SubmitButton>
