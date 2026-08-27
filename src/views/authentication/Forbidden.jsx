@@ -35,26 +35,60 @@ const Forbidden = () => {
         <Box
             display="flex"
             flexDirection="column"
-            height="100vh"
+            minHeight="100vh"
             textAlign="center"
             justifyContent="center"
+            sx={{
+                px: { xs: 2, sm: 3 },
+                py: { xs: 4, sm: 0 },
+            }}
         >
             <Container maxWidth="md">
-                <img src={ErrorImg} alt="403 Forbidden" />
-                <Typography align="center" variant="h1" mb={4}>
+                <Box
+                    component="img"
+                    src={ErrorImg}
+                    alt="403 Forbidden"
+                    sx={{
+                        width: { xs: '70%', sm: '55%', md: '400px' },
+                        maxWidth: '100%',
+                        height: 'auto',
+                        mx: 'auto',
+                        mb: { xs: 2, sm: 3 },
+                    }}
+                />
+                <Typography
+                    align="center"
+                    mb={{ xs: 2, sm: 4 }}
+                    sx={{
+                        fontSize: { xs: '2rem', sm: '3rem', md: '4rem' },
+                        fontWeight: 700,
+                        lineHeight: 1.2,
+                    }}
+                >
                     Oops!!!
                 </Typography>
-                <Typography align="center" variant="h4" mb={4}>
+                <Typography
+                    align="center"
+                    mb={4}
+                    sx={{
+                        fontSize: { xs: '1rem', sm: '1.25rem', md: '1.5rem' },
+                        px: { xs: 1, sm: 0 },
+                    }}
+                >
                     {getMessage()}
                 </Typography>
                 <Button
                     color="primary"
                     variant="contained"
                     onClick={() => navigate(getRedirectPath())}
-                    style={{ color: 'white' }}
                     disableElevation
+                    fullWidth
                     sx={{
+                        color: 'white',
                         backgroundColor: '#F48C06',
+                        maxWidth: { xs: '100%', sm: 320 },
+                        py: { xs: 1.25, sm: 1.5 },
+                        fontSize: { xs: '0.875rem', sm: '1rem' },
                         '&:hover': {
                             backgroundColor: '#2F327D',
                         },
