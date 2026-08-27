@@ -70,21 +70,6 @@ const fetchOfferingList = async () => {
   }
 };
 
-const fetchMapelList = async () => {
-  try {
-    // endpoint mapel standar { id, nama_mapel }
-    const res = await axiosInstance.get("/api/v1/admin-sekolah/dropdown/mata-pelajaran");
-    const arr = Array.isArray(res.data?.data) ? res.data.data : [];
-    return arr.map(m => ({
-      id: m.id,
-      nama_mapel: m.nama_mapel || m.name || m.label || "",
-    })).filter(m => m.id && m.nama_mapel);
-  } catch (e) {
-    if (process.env.NODE_ENV !== "production") console.error("Error mapel:", e);
-    return [];
-  }
-};
-
 const fetchGuruList = async () => {
   try {
     const res = await axiosInstance.get("/api/v1/admin-sekolah/dropdown/guru");
@@ -119,19 +104,16 @@ const GuruMapelList = () => {
 
   // dropdown options
   const [offeringOptions, setOfferingOptions] = useState([]);
-  const [mapelOptions, setMapelOptions] = useState([]);
   const [guruOptions, setGuruOptions] = useState([]);
 
   // load dropdown paralel
   useEffect(() => {
     (async () => {
-      const [offering, mapel, guru] = await Promise.all([
+      const [offering, guru] = await Promise.all([
         fetchOfferingList(),
-        fetchMapelList(),
         fetchGuruList(),
       ]);
       setOfferingOptions(offering);
-      setMapelOptions(mapel);
       setGuruOptions(guru);
     })();
   }, []);
@@ -234,10 +216,6 @@ const GuruMapelList = () => {
   // helper: saat pilih offering → kosongkan mapel_id & mapel (biar prioritas offering_id)
   const onSelectOffering = (val) => {
     setDraft((p) => ({ ...p, offering_id: val, mapel_id: "", mapel: "" }));
-  };
-  // saat pilih mapel_id → kosongkan offering_id & mapel (nama)
-  const onSelectMapelId = (val) => {
-    setDraft((p) => ({ ...p, mapel_id: val, offering_id: "", mapel: "" }));
   };
 
   return (
