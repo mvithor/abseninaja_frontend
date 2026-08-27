@@ -26,18 +26,14 @@ const KelasEdit = () => {
     const [success, setSuccess] = useState("");
     const [kelasData, setKelasData] = useState({
         nama_kelas: "",
-        tingkat_id: ""
+        tingkat_id: "",
+        jurusan_id: ""
     });
     const queryClient = useQueryClient();
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["kelas", id],
         queryFn: () => fetchKelasById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-            setTimeout(() => setError(""), 3000);
-        }
     });
 
     useEffect(() => {
@@ -50,7 +46,8 @@ const KelasEdit = () => {
         mutationFn: async (kelas) => {
             const response = await axiosInstance.put(`/api/v1/admin-sekolah/kelas/${id}`, {
                 nama_kelas: kelas.nama_kelas,
-                tingkat_id: kelas.tingkat_id
+                tingkat_id: kelas.tingkat_id,
+                jurusan_id: kelas.jurusan_id || null,
             });
             return response.data;
         },
@@ -99,7 +96,7 @@ const KelasEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

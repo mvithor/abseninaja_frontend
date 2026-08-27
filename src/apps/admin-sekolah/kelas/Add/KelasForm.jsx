@@ -15,15 +15,18 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import axiosInstance from "src/utils/axiosInstance";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
 
+const sanitizeForNamaKelas = (text) => (text || "").replace(/[^a-zA-Z0-9\s]/g, "").trim();
+
 const TambahKelasForm = ({ setSuccess, setError }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
+    const [namaKelasTouched, setNamaKelasTouched] = useState(false);
     const [formState, setFormState] = useState({
         nama_kelas: '',
         tingkat_id: '',
+        jurusan_id: '',
     });
 
-    // Fetch Tingkat Options
     const { data: tingkatOptions = [], isError: tingkatError } = useQuery({
         queryKey: ["kelasOptions"],
         queryFn: async () => {
@@ -32,10 +35,31 @@ const TambahKelasForm = ({ setSuccess, setError }) => {
         }
     });
 
+    const { data: fiturStatus } = useQuery({
+        queryKey: ["jurusanFiturStatus"],
+        queryFn: async () => {
+            const response = await axiosInstance.get('/api/v1/admin-sekolah/jurusan/fitur-status');
+            return response.data;
+        },
+    });
+    const fiturJurusanAktif = fiturStatus?.enabled === true;
+
+    const { data: jurusanOptions = [], isError: jurusanError } = useQuery({
+        queryKey: ["jurusanOptions"],
+        queryFn: async () => {
+            const response = await axiosInstance.get('/api/v1/admin-sekolah/jurusan');
+            return response.data.data;
+        },
+        enabled: fiturJurusanAktif,
+    });
+
     const mutation = useMutation({
         mutationKey: ["tambahKelas"],
         mutationFn: async (newKelas) => {
-            const response = await axiosInstance.post('/api/v1/admin-sekolah/kelas', newKelas);
+            const response = await axiosInstance.post('/api/v1/admin-sekolah/kelas', {
+                ...newKelas,
+                jurusan_id: newKelas.jurusan_id || null,
+            });
             return response.data;
         },
         onSuccess: (data) => {
@@ -63,12 +87,33 @@ const TambahKelasForm = ({ setSuccess, setError }) => {
         }
     });
 
-    const handleChange = (event) => {
+    const buildSuggestedNamaKelas = (tingkatId, jurusanId) => {
+        const tingkat = tingkatOptions.find((t) => String(t.id) === String(tingkatId));
+        const jurusan = jurusanOptions.find((j) => String(j.id) === String(jurusanId));
+        if (!tingkat || !jurusan) return null;
+
+        const kodeJurusan = sanitizeForNamaKelas(jurusan.kode_lokal || jurusan.nama);
+        if (!kodeJurusan) return null;
+
+        const suggestion = `${tingkat.nama_tingkat} ${kodeJurusan}`.replace(/\s+/g, ' ').trim().slice(0, 10);
+        return suggestion || null;
+    };
+
+    const handleNamaKelasChange = (event) => {
+        setNamaKelasTouched(true);
+        setFormState((prev) => ({ ...prev, nama_kelas: event.target.value }));
+    };
+
+    const handleTingkatOrJurusanChange = (event) => {
         const { name, value } = event.target;
-        setFormState((prevState) => ({
-            ...prevState,
-            [name]: value
-        }));
+        setFormState((prev) => {
+            const next = { ...prev, [name]: value };
+            if (fiturJurusanAktif && !namaKelasTouched) {
+                const suggestion = buildSuggestedNamaKelas(next.tingkat_id, next.jurusan_id);
+                if (suggestion) next.nama_kelas = suggestion;
+            }
+            return next;
+        });
     };
 
     const handleSubmit = (event) => {
@@ -93,7 +138,7 @@ const TambahKelasForm = ({ setSuccess, setError }) => {
                         id="nama_kelas"
                         name="nama_kelas"
                         value={formState.nama_kelas}
-                        onChange={handleChange}
+                        onChange={handleNamaKelasChange}
                         placeholder="Masukkan Nama Kelas"
                         startAdornment={
                             <InputAdornment position="start">
@@ -110,7 +155,7 @@ const TambahKelasForm = ({ setSuccess, setError }) => {
                         id="tingkat_id"
                         name="tingkat_id"
                         value={formState.tingkat_id}
-                        onChange={handleChange}
+                        onChange={handleTingkatOrJurusanChange}
                         fullWidth
                         required
                         displayEmpty
@@ -126,6 +171,41 @@ const TambahKelasForm = ({ setSuccess, setError }) => {
                         ))}
                     </CustomSelect>
                 </Grid>
+
+                {fiturJurusanAktif && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <CustomFormLabel htmlFor="jurusan_id" sx={{ mt: 1.85 }}>Jurusan</CustomFormLabel>
+                        <CustomSelect
+                            id="jurusan_id"
+                            name="jurusan_id"
+                            value={formState.jurusan_id}
+                            onChange={handleTingkatOrJurusanChange}
+                            fullWidth
+                            required
+                            displayEmpty
+                            inputProps={{ "aria-label": "Pilih Jurusan" }}
+                        >
+                            <MenuItem value="" disabled>
+                                Pilih Jurusan
+                            </MenuItem>
+                            {jurusanError && (
+                                <MenuItem value="" disabled>
+                                    Gagal memuat daftar jurusan
+                                </MenuItem>
+                            )}
+                            {!jurusanError && jurusanOptions.length === 0 && (
+                                <MenuItem value="" disabled>
+                                    Belum ada jurusan — tambah jurusan dulu
+                                </MenuItem>
+                            )}
+                            {jurusanOptions.map((jurusan) => (
+                                <MenuItem key={jurusan.id} value={jurusan.id}>
+                                    {jurusan.nama}
+                                </MenuItem>
+                            ))}
+                        </CustomSelect>
+                    </Grid>
+                )}
             </Grid>
             <Box sx={{display: 'flex', justifyContent: 'flex-start', gap: 2, mt: 4 }} >
                 <SubmitButton isLoading={loading}>Simpan</SubmitButton>
