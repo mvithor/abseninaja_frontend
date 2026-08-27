@@ -46,7 +46,6 @@ const SiswaEditForm = ({ siswaData, handleChange, handleSubmit, handleCancel, is
               onChange={handleChange}
               startAdornment={<InputAdornment position="start"><IconUser /></InputAdornment>}
               fullWidth
-              readOnly
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6 }}>

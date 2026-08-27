@@ -205,15 +205,16 @@ const AlumniImportForm = ({ setSuccess, setError }) => {
             </Typography>
           </Box>
           <Button
-            variant="outlined"
-            startIcon={isDownloading ? <CircularProgress size={14} /> : <IconDownload size={16} />}
+            variant="contained"
+            startIcon={isDownloading ? <CircularProgress size={14} color="inherit" /> : <IconDownload size={16} />}
             onClick={handleDownloadTemplate}
             disabled={isDownloading}
             sx={{
               textTransform: 'none',
-              borderColor: '#973BE0',
-              color: '#973BE0',
-              '&:hover': { borderColor: '#7d2dbd', color: '#7d2dbd' },
+              bgcolor: '#973BE0',
+              color: '#fff',
+              '&:hover': { bgcolor: '#7d2dbd', color: '#fff' },
+              '&.Mui-disabled': { bgcolor: '#973BE0', opacity: 0.7, color: '#fff' },
             }}
           >
             {isDownloading ? 'Mengunduh...' : 'Download Template'}
