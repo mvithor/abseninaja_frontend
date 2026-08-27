@@ -21,19 +21,19 @@ import TablePaginationActions from 'src/components/table-pagination-actions/Tabl
 const AlumniRow = ({ alumni, index, onExport, isExporting, onDetail }) => (
   <TableRow key={alumni.id}>
     <TableCell>
-      <Typography sx={{ fontSize: '0.9rem' }}>{index + 1}</Typography>
+      <Typography sx={{ fontSize: '1rem' }}>{index + 1}</Typography>
     </TableCell>
     <TableCell>
-      <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.User?.name || '-'}</Typography>
+      <Typography sx={{ fontSize: '1rem' }}>{alumni?.User?.name || '-'}</Typography>
     </TableCell>
     <TableCell align="center">
-      <Typography sx={{ fontSize: '0.9rem' }}>{alumni.nis || '-'}</Typography>
+      <Typography sx={{ fontSize: '1rem' }}>{alumni.nis || '-'}</Typography>
     </TableCell>
     <TableCell align="center">
-      <Typography sx={{ fontSize: '0.9rem' }}>{alumni?.KelasTermakhir?.nama_kelas || alumni?.Kelas?.nama_kelas || '-'}</Typography>
+      <Typography sx={{ fontSize: '1rem' }}>{alumni?.KelasTermakhir?.nama_kelas || alumni?.Kelas?.nama_kelas || '-'}</Typography>
     </TableCell>
     <TableCell align="center">
-      <Typography sx={{ fontSize: '0.9rem' }}>{alumni.tahun_lulus || '-'}</Typography>
+      <Typography sx={{ fontSize: '1rem' }}>{alumni.tahun_lulus || '-'}</Typography>
     </TableCell>
     <TableCell align="center">
       <Tooltip title="Detail Alumni" placement="bottom">
@@ -81,7 +81,7 @@ const AlumniTable = ({
             <TableRow>
               <TableCell><Typography variant="h6" sx={{ fontSize: '1rem' }}>No</Typography></TableCell>
               <TableCell><Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama Alumni</Typography></TableCell>
-              <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>NIS</Typography></TableCell>
+              <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>NISN</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Kelas Terakhir</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Tahun Lulus</Typography></TableCell>
               <TableCell align="center"><Typography variant="h6" sx={{ fontSize: '1rem' }}>Aksi</Typography></TableCell>

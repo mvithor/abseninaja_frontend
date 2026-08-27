@@ -46,7 +46,7 @@ const SiswaTable = ({
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Nama</Typography>
               </TableCell>
               <TableCell align='center'>
-                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NIS</Typography>
+                <Typography variant="h6" sx={{ fontSize: '1rem' }}>NISN</Typography>
               </TableCell>
               <TableCell align='center'>
                 <Typography variant="h6" sx={{ fontSize: '1rem' }}>Kelas</Typography>
