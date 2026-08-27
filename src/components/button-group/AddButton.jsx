@@ -20,7 +20,7 @@ const AddButton = ({ icon, onClick, children, ...props }) => {
           backgroundColor: isDarkMode ? 'transparent' : '#f5f5f5',
         },
         width: { xs: '100%', sm: '220px' },
-        maxWidth: '160px',
+        maxWidth: '165px',
         textTransform: 'none',
         ml: 'auto',
       }}
