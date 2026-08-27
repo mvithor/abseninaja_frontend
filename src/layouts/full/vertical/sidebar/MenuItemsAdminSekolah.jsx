@@ -1,16 +1,11 @@
 import {
-    IconBook2, IconBriefcase, IconBuilding, IconQrcode, 
-    IconScan, IconCalendarTime, IconPhotoDown,
-    IconFiles, IconSchool, IconWallet,
-    IconDashboard, IconSettings, IconDownload, IconUsers,
-    IconClock, IconMapPin, IconCategory, 
-    IconCalendarEvent, IconChartBar, IconUser, IconBuildingArch,
-    IconBooks, IconCategory2, IconCalendar, IconBell, IconCoin,
-    IconCreditCard, IconPoint, IconClipboardText,
-    IconMessage,IconKey, IconTemplate, IconBroadcast,
-    IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, IconLicense,
-    IconUsersGroup, IconDatabase, IconActivity, IconFileDownload,
-    IconCalendarClock
+    IconBook2, IconBriefcase, IconBuilding, IconQrcode, IconScan, IconCalendarTime, 
+    IconPhotoDown, IconFiles, IconSchool, IconWallet, IconDashboard, IconSettings, 
+    IconDownload, IconUsers, IconClock, IconMapPin, IconCategory, IconCalendarEvent, 
+    IconChartBar, IconUser, IconBuildingArch, IconBooks, IconCategory2, IconCalendar, 
+    IconBell, IconCoin, IconCreditCard, IconPoint, IconClipboardText, IconMessage,IconKey, 
+    IconTemplate, IconBroadcast, IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, 
+    IconLicense, IconUsersGroup, IconDatabase, IconActivity, IconFileDownload, IconCalendarClock
   } from '@tabler/icons-react';
   
   import { uniqueId } from 'lodash';
@@ -188,7 +183,7 @@ import {
         children: [
             {
                 id: uniqueId(),
-                title: 'Data Kelas',
+                title: 'Daftar Kelas',
                 icon: IconBuildingArch,
                 href: '/dashboard/admin-sekolah/kelas',
             },
@@ -203,6 +198,21 @@ import {
                 title: 'Tingkat Kelas',
                 icon: IconChartBar,
                 href: '/dashboard/admin-sekolah/tingkat',
+            },
+        ],
+    },
+    {
+        id: uniqueId(),
+        title: 'Manajemen Jurusan',
+        icon: IconBuilding,
+        href: '',
+        requiredFitur: 'jurusan_kompetensi',
+        children: [
+            {
+                id: uniqueId(),
+                title: 'Jurusan dan Kepala Jurusan',
+                icon: IconBuildingArch,
+                href: '/dashboard/admin-sekolah/jurusan',
             },
         ],
     },

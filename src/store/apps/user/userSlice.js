@@ -8,7 +8,8 @@ const initialState = {
   userId: null,
   accessToken: null,
   isLoggedIn: false,
-  deviceId: null, 
+  deviceId: null,
+  isKepalaJurusan: false,
 };
 
 const userSlice = createSlice({
@@ -17,7 +18,7 @@ const userSlice = createSlice({
   reducers: {
     setUser(state, action) {
       
-      const { name, role, email,  userId, accessToken, deviceId } = action.payload;
+      const { name, role, email,  userId, accessToken, deviceId, isKepalaJurusan } = action.payload;
       try {
         // Validasi token sebelum menyimpannya
         const decodedToken = jwtDecode(accessToken);
@@ -34,6 +35,7 @@ const userSlice = createSlice({
         state.accessToken = accessToken;
         state.deviceId = deviceId;
         state.isLoggedIn = true;
+        state.isKepalaJurusan = Boolean(isKepalaJurusan ?? decodedToken.isKepalaJurusan);
       } catch (error) {
         console.error('Error saat decode atau validasi token:', error.message);
       }
@@ -46,6 +48,7 @@ const userSlice = createSlice({
       state.accessToken = null;
       state.isLoggedIn = false;
       state.deviceId = null;
+      state.isKepalaJurusan = false;
     },
   },
 });

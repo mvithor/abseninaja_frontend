@@ -14,10 +14,14 @@ const DashboardSuperAdmin = Loadable(lazy(() => import('../views/dashboard/Super
 const PendaftaranSekolahList = Loadable(lazy(() => import('../views/apps/super-admin/pendaftaran-sekolah/PendaftaranSekolahList')));
 const PendaftaranSekolahAdd = Loadable(lazy(() => import('../views/apps/super-admin/pendaftaran-sekolah/PendaftaranSekolahAdd')));
 const PendaftaranSekolahEdit = Loadable(lazy(() => import('../views/apps/super-admin/pendaftaran-sekolah/PendaftaranSekolahEdit')));
-
 // Data Admin Sekolah
 const AdminSekolahList = Loadable(lazy(() => import('../views/apps/super-admin/admin-sekolah/AdminSekolahList')));
 const AdminSekolahAdd = Loadable(lazy(() => import('../views/apps/super-admin/admin-sekolah/AdminSekolahAdd')));
+// Fitur Tambahan Sekolah
+const FiturTambahanSekolahList = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanSekolahList')));
+const FiturTambahanSekolahEdit = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanEdit')));
+
+
 
 /* ****Dashboard Admin Sekolah***** */
 const DashboardAdminSekolah = Loadable(lazy(() => import('../views/dashboard/AdminSekolah')));
@@ -70,6 +74,13 @@ const KelasList = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/
 const KelasDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasDetail')));
 const KelasAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasAdd')));
 const KelasEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/kelas/KelasEdit')));
+// Jurusan
+const JurusanList = Loadable(lazy(() => import('../views/apps/admin-sekolah/jurusan/JurusanList')));
+const JurusanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/jurusan/JurusanAdd')));
+const JurusanEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/jurusan/JurusanEdit')));
+// Kepala Jurusan
+const KepalaJurusanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/kepala-jurusan/KepalaJurusanAdd')));
+
 // Alumni
 const AlumniList = Loadable(lazy(() => import('../views/apps/admin-sekolah/alumni/AlumniList')));
 const AlumniImport = Loadable(lazy(() => import('../views/apps/admin-sekolah/alumni/AlumniImport')));
@@ -258,8 +269,32 @@ const PpdbNilaiDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/
 const PpdbInputNilaiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-input-nilai/PpdbInputList')));
 const PpdbInputNilaiDetail = Loadable(lazy(() => import('../views/apps/admin-sekolah/ppdb/ppdb-input-nilai/PpdbInputNilaiDetail')));
 
+// DASHBOARD KEPALA JURUSAN
+/* ****Dashboard Kepala Jurusan***** */
+const DashboardKepalaJurusan = Loadable(lazy(() => import('../views/dashboard/KepalaJurusan')));
+
+// SKKNI Unit
+const SkkniUnitList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/skkni-unit/SkkniUnitList')));
+const SkkniUnitAdd = Loadable(lazy(() => import('../views/apps/kepala-jurusan/skkni-unit/SkkniUnitAdd')));
+const SkkniUnitEdit = Loadable(lazy(() => import('../views/apps/kepala-jurusan/skkni-unit/SkkniUnitEdit')));
+// Mitra Industri
+const MitraIndustriList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mitra-industri/MitraIndustriList')));
+const MitraIndustriAdd = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mitra-industri/MitraIndustriAdd')));
+const MitraIndustriEdit = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mitra-industri/MitraIndustriEdit')));
+// Mapel SKKNI Mapping
+const MapelSkkniMappingList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mapel-skkni-mapping/MapelSkkniMappingList')));
+// Konfigurasi Jurusan
+const KonfigurasiJurusanList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/konfigurasi-jurusan/KonfigurasiJurusan')));
+
+
+// DASHBOARD ADMIN MITRA INDUSTRI
+/* ****Dashboard Admin Mitra Industri***** */
+const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboard/AdminMitraIndustri')));
+
+
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
+const Activation = Loadable(lazy(() => import('../views/authentication/auth/Activation')));
 const PrivacyPolicy = Loadable(lazy(() => import('../views/privacy-policy/PrivacyPolicy')));
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Forbidden = Loadable(lazy(() => import('../views/authentication/Forbidden')));
@@ -273,6 +308,7 @@ const Router = [
           { path: '/404', element: <Error /> },
           { path: '/privacy-policy', element: <PrivacyPolicy/> },
           { path: '/forbidden', element: <Forbidden /> },
+          { path: '/aktivasi/:token', element: <Activation /> },
           { path: '*', element: <Navigate to="/404" /> },
         ],
     },
@@ -346,6 +382,17 @@ const Router = [
                     { path: 'kelas/detail/:id', element: <KelasDetail/> },
                     { path: 'kelas/tambah-kelas', element: <KelasAdd/> },
                     { path: 'kelas/edit/:id', element: <KelasEdit/> },
+                    // Jurusan
+                    {
+                        path: 'jurusan',
+                        element: <ProtectedRoute allowedRoles={['admin sekolah']} requireJurusanFiturAktif />,
+                        children: [
+                            { path: '', element: <JurusanList/> },
+                            { path: 'tambah-jurusan', element: <JurusanAdd/> },
+                            { path: 'edit/:id', element: <JurusanEdit/> },
+                            { path: ':id/kepala-jurusan', element: <KepalaJurusanAdd/> },
+                        ],
+                    },
                     // Alumni
                     { path: 'alumni', element: <AlumniList/> },
                     { path: 'alumni/import', element: <AlumniImport/> },
@@ -514,10 +561,38 @@ const Router = [
                     // Admin Sekolah
                     { path: 'manajemen-sekolah/admin-sekolah', element: <AdminSekolahList /> },
                     { path: 'manajemen-sekolah/tambah-admin/:sekolah_id', element: <AdminSekolahAdd /> },
-        
+                    // Fitur Tambahan Sekolah
+                    { path: 'fitur-tambahan', element: <FiturTambahanSekolahList /> },
+                    { path: 'fitur-tambahan/edit/:id', element: <FiturTambahanSekolahEdit /> },
                 ]
         
               },
+            {
+                path: 'dashboard/kepala-jurusan',
+                element: <ProtectedRoute allowedRoles={['pegawai']} requireKepalaJurusan />,
+                children: [
+                    { path: '', element: <DashboardKepalaJurusan /> },
+                    // SKKNI Unit
+                    { path: 'skkni-unit', element: <SkkniUnitList/> },
+                    { path: 'skkni-unit/tambah', element: <SkkniUnitAdd/> },
+                    { path: 'skkni-unit/edit/:id', element: <SkkniUnitEdit/> },
+                    // Mitra Industri
+                    { path: 'mitra-industri', element: <MitraIndustriList/> },
+                    { path: 'mitra-industri/tambah', element: <MitraIndustriAdd/> },
+                    { path: 'mitra-industri/edit/:id', element: <MitraIndustriEdit/> },
+                    // Mapel SKKNI Mapping
+                    { path: 'mapel-skkni-mapping', element: <MapelSkkniMappingList/> },
+                    // Konfigurasi Jurusan
+                    { path: 'konfigurasi-jurusan', element: <KonfigurasiJurusanList/> },
+                ]   
+            },
+            {
+                path: 'dashboard/admin-mitra-industri',
+                element: <ProtectedRoute allowedRoles={['admin mitra industri']} />,
+                children: [
+                    { path: '', element: <DashboardAdminMitraIndustri /> },
+                ]
+            },
         ]
     }
 ];

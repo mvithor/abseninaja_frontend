@@ -51,9 +51,9 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       });
       const { accessToken } = response.data;
       const decodedToken = jwtDecode(accessToken);
-      const { userId, name, role } = decodedToken;
+      const { userId, name, role, isKepalaJurusan } = decodedToken;
 
-      dispatch(setUser({ name, role, userId, accessToken, deviceId }));
+      dispatch(setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan }));
 
       setSuccess('Login berhasil! Mengarahkan...');
       setTimeout(() => {
@@ -63,6 +63,17 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             break;
           case 'admin sekolah':
             navigate('/dashboard/admin-sekolah');
+            break;
+          case 'pegawai':
+            if (isKepalaJurusan) {
+              navigate('/dashboard/kepala-jurusan');
+            } else {
+              setError('Akun Anda tidak memiliki akses ke dashboard ini.');
+              dispatch(clearUser());
+            }
+            break;
+          case 'admin mitra industri':
+            navigate('/dashboard/admin-mitra-industri');
             break;
           default:
             setError('Pengguna tidak valid.');

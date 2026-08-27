@@ -54,6 +54,12 @@ import { uniqueId } from 'lodash';
     },
     {
         id: uniqueId(),
+        title: 'Fitur Tambahan Sekolah',
+        icon: IconHealthRecognition,
+        href: '/dashboard/super-admin/fitur-tambahan',
+    },
+    {
+        id: uniqueId(),
         title: 'Pesan',
         icon: IconTrophy,
         href: '#'
