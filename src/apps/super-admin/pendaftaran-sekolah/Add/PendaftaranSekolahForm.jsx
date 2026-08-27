@@ -12,7 +12,7 @@ import {
   FormControl,
 } from '@mui/material';
 import Divider from '@mui/material/Divider';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   IconSchool,
   IconUser,
@@ -21,7 +21,8 @@ import {
   IconId,
   IconBrandTelegram,
   IconUsers,
-  IconClock,        
+  IconClock,
+  IconCertificate,
 } from '@tabler/icons-react';
 import Grid from '@mui/material/Grid';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
@@ -55,6 +56,17 @@ const TIMEZONE_OPTIONS = [
   },
 ];
 
+// ---------------------------------------------------------------------------
+// Bentuk pendidikan yang bernaung di bawah Kemenag — hanya bentuk ini yang
+// relevan memiliki NSM (Nomor Statistik Madrasah). Konsisten dengan kolom
+// nullable `nsm` di tabel sekolah (khusus sekolah Kemenag).
+// ---------------------------------------------------------------------------
+const KEMENAG_KODE = ['MI', 'MTs', 'MA', 'MAK'];
+
+const isBentukKemenag = (bentuk) =>
+  bentuk
+    ? KEMENAG_KODE.includes(bentuk.kode) || (bentuk.naungan || '').toLowerCase().includes('agama')
+    : false;
 
 const INITIAL_FORM_STATE = {
   nama_admin: '',
@@ -63,11 +75,13 @@ const INITIAL_FORM_STATE = {
   kontak_admin: '',
   nama: '',
   npsn: '',
+  bentuk_pendidikan_kode: '',
+  nsm: '',
   alamat: '',
   jumlah_siswa: '',
   jumlah_guru: '',
   jumlah_staf: '',
-  timezone_sekolah: 'Asia/Jakarta', 
+  timezone_sekolah: 'Asia/Jakarta',
 };
 
 const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
@@ -75,10 +89,38 @@ const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
   const navigate = useNavigate();
   const [formState, setFormState] = useState(INITIAL_FORM_STATE);
 
+  // Dropdown bentuk pendidikan — sumber data untuk field bentuk_pendidikan_kode
+  // yang wajib diisi sesuai validasi Joi di addPendaftaranForm
+  const { data: bentukPendidikanList = [], isLoading: isLoadingBentuk } = useQuery({
+    queryKey: ['bentukPendidikanDropdown'],
+    queryFn: async () => {
+      const response = await axiosInstance.get('/api/v1/super-admin/pendaftaran/bentuk-pendidikan');
+      return response.data;
+    },
+  });
+
+  const selectedBentuk = bentukPendidikanList.find(
+    (b) => b.kode === formState.bentuk_pendidikan_kode,
+  );
+  const isNsmApplicable = isBentukKemenag(selectedBentuk);
+
   // Handler generik untuk semua field — termasuk Select MUI
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormState((prev) => ({ ...prev, [name]: value }));
+    setFormState((prev) => {
+      const next = { ...prev, [name]: value };
+
+      // Reset NSM otomatis jika bentuk pendidikan yang dipilih bukan
+      // naungan Kemenag (NSM hanya relevan untuk MI/MTs/MA/MAK)
+      if (name === 'bentuk_pendidikan_kode') {
+        const bentuk = bentukPendidikanList.find((b) => b.kode === value);
+        if (!isBentukKemenag(bentuk)) {
+          next.nsm = '';
+        }
+      }
+
+      return next;
+    });
   };
 
   const mutation = useMutation({
@@ -108,9 +150,36 @@ const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
     },
   });
 
+  // Normalisasi payload sebelum dikirim ke BE — samakan dengan semantik
+  // Joi schema di addPendaftaranForm: jumlah_* optional (harus integer,
+  // bukan string kosong), nsm optional (dikirim null kalau kosong)
+  const buildPayload = () => {
+    const payload = { ...formState };
+
+    ['jumlah_siswa', 'jumlah_guru', 'jumlah_staf'].forEach((key) => {
+      if (payload[key] === '' || payload[key] === null || payload[key] === undefined) {
+        delete payload[key];
+      } else {
+        payload[key] = Number(payload[key]);
+      }
+    });
+
+    payload.nsm = payload.nsm ? payload.nsm.trim() : null;
+
+    return payload;
+  };
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    mutation.mutate(formState);
+
+    if (!formState.bentuk_pendidikan_kode) {
+      setSuccess('');
+      setError('Bentuk pendidikan wajib diisi');
+      setTimeout(() => setError(''), 3000);
+      return;
+    }
+
+    mutation.mutate(buildPayload());
   };
 
   const handleCancel = () => navigate(-1);
@@ -213,8 +282,26 @@ const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
               value={formState.npsn}
               onChange={handleChange}
               startAdornment={<InputAdornment position="start"><IconId /></InputAdornment>}
+              inputProps={{ maxLength: 8 }}
               fullWidth
               required
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <CustomFormLabel htmlFor="nsm" sx={{ mt: 1.85 }}>
+              NSM (Nomor Statistik Madrasah)
+            </CustomFormLabel>
+            <CustomOutlinedInput
+              id="nsm"
+              name="nsm"
+              value={formState.nsm}
+              onChange={handleChange}
+              startAdornment={<InputAdornment position="start"><IconId /></InputAdornment>}
+              inputProps={{ maxLength: 20 }}
+              disabled={!isNsmApplicable}
+              placeholder={isNsmApplicable ? '' : 'Hanya untuk MI/MTs/MA/MAK'}
+              fullWidth
             />
           </Grid>
 
@@ -229,6 +316,55 @@ const PendaftaranSekolahForm = ({ setSuccess, setError }) => {
               fullWidth
               required
             />
+          </Grid>
+
+                    <Grid size={{ xs: 12, md: 6 }}>
+            <CustomFormLabel htmlFor="bentuk_pendidikan_kode" sx={{ mt: 1.85 }}>
+              Bentuk Pendidikan
+            </CustomFormLabel>
+
+            <FormControl fullWidth required>
+              <Select
+                id="bentuk_pendidikan_kode"
+                name="bentuk_pendidikan_kode"
+                value={formState.bentuk_pendidikan_kode}
+                onChange={handleChange}
+                displayEmpty
+                disabled={isLoadingBentuk}
+                startAdornment={
+                  <InputAdornment position="start">
+                    <IconCertificate size={20} />
+                  </InputAdornment>
+                }
+                sx={{
+                  '& .MuiSelect-select': { py: '10.5px' },
+                }}
+              >
+                <MenuItem value="" disabled>
+                  {isLoadingBentuk ? 'Memuat...' : 'Pilih Bentuk Pendidikan'}
+                </MenuItem>
+                {bentukPendidikanList.map((b) => (
+                  <MenuItem key={b.kode} value={b.kode}>
+                    <Box>
+                      <Typography variant="body2" fontWeight={600}>
+                        {b.nama}&nbsp;
+                        <Typography component="span" variant="caption" color="text.secondary">
+                          ({b.kode})
+                        </Typography>
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        {b.jenjang}{b.naungan ? ` • ${b.naungan}` : ''}
+                      </Typography>
+                    </Box>
+                  </MenuItem>
+                ))}
+              </Select>
+              {selectedBentuk && (
+                <FormHelperText>
+                  {selectedBentuk.jenjang}{selectedBentuk.naungan ? ` • ${selectedBentuk.naungan}` : ''}
+                </FormHelperText>
+              )}
+            </FormControl>
           </Grid>
 
           <Grid size={{ xs: 12, md: 6 }}>
