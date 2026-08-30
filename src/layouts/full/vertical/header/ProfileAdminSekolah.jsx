@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { persistor } from 'src/store/Store';
 import { clearUser } from 'src/store/apps/user/userSlice';
+import { useQueryClient } from '@tanstack/react-query';
 import { Box, Menu, Avatar, Typography, Divider, Button, IconButton } from '@mui/material';
 import * as dropdownData from './data';
 import { IconMail } from '@tabler/icons-react';
@@ -18,15 +19,18 @@ const ProfileAdminSekolah = () => {
   const [anchorEl2, setAnchorEl2] = useState(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
   const handleLogout = async () => {
     try {
       await axiosInstance.delete('/api/v1/logout');
-  
+
+      queryClient.clear();
       localStorage.clear();
-      window.sessionStorage.clear(); 
-      dispatch(clearUser()); 
-      await persistor.purge(); 
-      navigate('/'); 
+      window.sessionStorage.clear();
+      dispatch(clearUser());
+      await persistor.purge();
+      navigate('/');
     } catch (error) {
       console.error('Logout failed:', error);
     }

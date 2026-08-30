@@ -5,12 +5,33 @@ import { IconQrcode, IconPencil, IconBrandWhatsapp, IconFileDownload } from '@ta
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import ExportLaporanKehadiranDialog from './ExportLaporanKehadiranDialog';
+import { useSchoolTimezone, TZ_LABEL } from 'src/hooks/useSchoolTimezone';
 
 const HARI = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 const BULAN = [
   'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
 ];
+const WEEKDAY_SHORT = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+
+const getSchoolParts = (timezone, date) => {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      weekday: 'short', hour: 'numeric', minute: 'numeric',
+      hour12: false,
+    }).formatToParts(date).map((p) => [p.type, p.value])
+  );
+  return {
+    dayIndex: WEEKDAY_SHORT[parts.weekday],
+    tgl: parseInt(parts.day),
+    bln: parseInt(parts.month) - 1,
+    thn: parseInt(parts.year),
+    hours: parseInt(parts.hour) % 24,
+    minutes: parseInt(parts.minute),
+  };
+};
 
 const fetchWaSession = async () => {
   const res = await axiosInstance.get('/api/v1/admin-sekolah/wa/session');
@@ -19,6 +40,7 @@ const fetchWaSession = async () => {
 
 const DashboardHeader = ({ pendingCount = 0 }) => {
   const theme = useTheme();
+  const timezone = useSchoolTimezone();
   const [now, setNow] = useState(new Date());
   const [exportOpen, setExportOpen] = useState(false);
 
@@ -37,12 +59,14 @@ const DashboardHeader = ({ pendingCount = 0 }) => {
     ? waSession.some((s) => s.status === 'connected')
     : false;
 
-  const hari = HARI[now.getDay()];
-  const tgl = now.getDate();
-  const bln = BULAN[now.getMonth()];
-  const thn = now.getFullYear();
-  const jam = String(now.getHours()).padStart(2, '0');
-  const mnt = String(now.getMinutes()).padStart(2, '0');
+  const p = getSchoolParts(timezone, now);
+  const hari = HARI[p.dayIndex];
+  const tgl = p.tgl;
+  const bln = BULAN[p.bln];
+  const thn = p.thn;
+  const jam = String(p.hours).padStart(2, '0');
+  const mnt = String(p.minutes).padStart(2, '0');
+  const tzLabel = TZ_LABEL[timezone] || 'WIB';
 
   const isDark = theme.palette.mode === 'dark';
   const cardBg = isDark ? theme.palette.action.hover : theme.palette.background.paper;
@@ -71,7 +95,7 @@ const DashboardHeader = ({ pendingCount = 0 }) => {
           </Typography>
 
           <Chip
-            label={`${jam}.${mnt} WITA`}
+            label={`${jam}.${mnt} ${tzLabel}`}
             size="small"
             sx={{ backgroundColor: '#EFF6FF', color: '#1D4ED8', fontWeight: 600, fontSize: '0.75rem' }}
           />
@@ -111,7 +135,12 @@ const DashboardHeader = ({ pendingCount = 0 }) => {
               borderRadius: '8px',
               color: '#4F46E5',
               borderColor: '#4F46E5',
-              '&:hover': { backgroundColor: '#EEF2FF', borderColor: '#4F46E5' },
+              '&:hover': {
+                backgroundColor: '#4F46E5',
+                borderColor: '#4338CA',
+                color: '#FFFFFF',
+                '& .MuiButton-startIcon': { color: '#FFFFFF' },
+              },
             }}
           >
             Export Kehadiran
@@ -151,7 +180,12 @@ const DashboardHeader = ({ pendingCount = 0 }) => {
               borderRadius: '8px',
               color: '#059669',
               borderColor: '#059669',
-              '&:hover': { backgroundColor: '#D1FAE5', borderColor: '#059669' },
+              '&:hover': {
+                backgroundColor: '#059669',
+                borderColor: '#047857',
+                color: '#FFFFFF',
+                '& .MuiButton-startIcon': { color: '#FFFFFF' },
+              },
             }}
           >
             Blast WA

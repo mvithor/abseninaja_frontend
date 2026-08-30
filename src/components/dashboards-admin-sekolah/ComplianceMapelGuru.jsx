@@ -2,6 +2,7 @@ import { Box, Typography, Button, CircularProgress, useTheme } from '@mui/materi
 import { IconBrandWhatsapp, IconAlertTriangle } from '@tabler/icons-react';
 import { useQuery } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
+import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
 
 const fetchCompliance = async () => {
   const res = await axiosInstance.get('/api/v1/admin-sekolah/monitoring/compliance-mapel-guru');
@@ -11,15 +12,23 @@ const fetchCompliance = async () => {
 };
 
 // Hitung apakah slot waktu sudah lewat berdasarkan jam_selesai (format "HH:MM")
-const hitungIsLewat = (jamSelesai) => {
+const hitungIsLewat = (jamSelesai, timezone = 'Asia/Jakarta') => {
   if (!jamSelesai) return false;
   const [h, m] = jamSelesai.split(':').map(Number);
-  const now = new Date();
-  return now.getHours() * 60 + now.getMinutes() > h * 60 + m;
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: timezone,
+      hour: 'numeric', minute: 'numeric',
+      hour12: false,
+    }).formatToParts(new Date()).map((p) => [p.type, p.value])
+  );
+  const nowH = parseInt(parts.hour) % 24;
+  const nowM = parseInt(parts.minute);
+  return nowH * 60 + nowM > h * 60 + m;
 };
 
-const SlotRow = ({ jamMulai, jamSelesai, sudahDiisi, total }) => {
-  const isLewat = hitungIsLewat(jamSelesai);
+const SlotRow = ({ jamMulai, jamSelesai, sudahDiisi, total, timezone }) => {
+  const isLewat = hitungIsLewat(jamSelesai, timezone);
   const persen = isLewat && total > 0 ? Math.round((sudahDiisi / total) * 100) : null;
   const belumDiisi = isLewat ? total - sudahDiisi : null;
   const isLow = persen != null && persen < 50;
@@ -65,6 +74,7 @@ const SlotRow = ({ jamMulai, jamSelesai, sudahDiisi, total }) => {
 const ComplianceMapelGuru = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const timezone = useSchoolTimezone();
 
   const { data: slots = [], isLoading, isError } = useQuery({
     queryKey: ['complianceMapelGuru'],
@@ -75,7 +85,7 @@ const ComplianceMapelGuru = () => {
 
   // Cari slot yang sudah lewat dan masih ada yang belum isi
   const overdueSlot = slots.find((s) => {
-    const isLewat = hitungIsLewat(s.jam_selesai);
+    const isLewat = hitungIsLewat(s.jam_selesai, timezone);
     return isLewat && s.belum_diisi > 0;
   });
 
@@ -119,6 +129,7 @@ const ComplianceMapelGuru = () => {
                 jamSelesai={slot.jam_selesai}
                 sudahDiisi={slot.sudah_diisi}
                 total={slot.total}
+                timezone={timezone}
               />
             ))}
           </Box>

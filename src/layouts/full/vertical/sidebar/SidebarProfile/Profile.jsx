@@ -6,6 +6,7 @@ import { persistor } from 'src/store/Store';
 import img1 from 'src/assets/images/profile/user-1.jpg';
 import { IconPower } from '@tabler/icons-react';
 import { clearUser } from 'src/store/apps/user/userSlice';
+import { useQueryClient } from '@tanstack/react-query';
 
 export const Profile = () => {
   const customizer = useSelector((state) => state.customizer);
@@ -14,6 +15,7 @@ export const Profile = () => {
   const hideMenu = lgUp ? customizer.isCollapse && !customizer.isSidebarHover : '';
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     try {
@@ -23,8 +25,8 @@ export const Profile = () => {
           Authorization: `Bearer ${user.accessToken}`,
         },
       });
-  
-      // Bersihkan data setelah berhasil
+
+      queryClient.clear();
       localStorage.clear();
       sessionStorage.clear();
       dispatch(clearUser());
