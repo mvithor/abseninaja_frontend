@@ -18,6 +18,12 @@ import { uniqueId } from 'lodash';
     },
     {
       id: uniqueId(),
+      title: 'Profil Siswa',
+      icon: IconDashboard,
+      href: '/dashboard/kepala-jurusan/profil-siswa',
+    },
+    {
+      id: uniqueId(),
       title: 'Unit Kompetensi (SKKNI)',
       icon: IconDashboard,
       href: '/dashboard/kepala-jurusan/skkni-unit',
