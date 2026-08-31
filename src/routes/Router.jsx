@@ -285,7 +285,8 @@ const MitraIndustriEdit = Loadable(lazy(() => import('../views/apps/kepala-jurus
 const MapelSkkniMappingList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mapel-skkni-mapping/MapelSkkniMappingList')));
 // Konfigurasi Jurusan
 const KonfigurasiJurusanList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/konfigurasi-jurusan/KonfigurasiJurusan')));
-
+// Profil Siswa
+const ProfilSiswaList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/profil-siswa/ProfilSiswaList')));
 
 // DASHBOARD ADMIN MITRA INDUSTRI
 /* ****Dashboard Admin Mitra Industri***** */
@@ -584,6 +585,9 @@ const Router = [
                     { path: 'mapel-skkni-mapping', element: <MapelSkkniMappingList/> },
                     // Konfigurasi Jurusan
                     { path: 'konfigurasi-jurusan', element: <KonfigurasiJurusanList/> },
+                    // Profil Siswa
+                    { path: 'profil-siswa', element: <ProfilSiswaList/> },
+
                 ]   
             },
             {
