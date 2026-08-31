@@ -12,23 +12,42 @@ const fetchAbsensiMapel = async () => {
   return res.data.data;
 };
 
+// py:'7px' + fontSize:0.75rem(≈17px line-height) = ~31px/row; 14 rows + header ≈ 490px
+const TABLE_MAX_H = 520;
+
+const COLS = [
+  { label: 'Jam',    width: 92 },
+  { label: 'Guru',   width: '26%' },
+  { label: 'Mapel',  width: '24%' },
+  { label: 'Kelas',  width: 52 },
+  { label: 'H/A',    width: 42 },
+  { label: 'Status', width: '22%' },
+];
+
+const STATUS_CFG = {
+  'Sudah diisi':      { color: '#059669' },
+  'Lewat, belum diisi': { color: '#D97706' },
+  'Belum mulai':      { color: '#9CA3AF' },
+  'Belum waktu':      { color: '#9CA3AF' },
+};
+
 const StatusDot = ({ status }) => {
-  const map = {
-    'Sudah diisi': { color: '#059669', label: 'Sudah diisi' },
-    'Lewat, belum diisi': { color: '#D97706', label: 'Lewat, belum diisi' },
-    'Belum mulai': { color: '#9CA3AF', label: 'Belum mulai' },
-    'Belum waktu': { color: '#9CA3AF', label: 'Belum waktu' },
-  };
-  const cfg = map[status] || { color: '#9CA3AF', label: status };
+  const cfg = STATUS_CFG[status] || { color: '#9CA3AF' };
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-      <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: cfg.color, flexShrink: 0 }} />
-      <Typography variant="caption" sx={{ color: cfg.color, fontWeight: 500 }}>
-        {cfg.label}
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+      <Box sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: cfg.color, flexShrink: 0 }} />
+      <Typography noWrap sx={{ fontSize: '0.7rem', color: cfg.color, fontWeight: 500 }}>
+        {status}
       </Typography>
     </Box>
   );
 };
+
+const LEGEND = [
+  { color: '#059669', label: 'Sudah diisi' },
+  { color: '#D97706', label: 'Lewat, belum diisi' },
+  { color: '#9CA3AF', label: 'Belum mulai' },
+];
 
 const AbsensiMapelPerSesi = () => {
   const theme = useTheme();
@@ -42,6 +61,7 @@ const AbsensiMapelPerSesi = () => {
   });
 
   const cardBg = isDark ? theme.palette.action.hover : theme.palette.background.paper;
+  const headBg = isDark ? theme.palette.grey[900] : theme.palette.grey[50];
 
   return (
     <Box
@@ -51,105 +71,172 @@ const AbsensiMapelPerSesi = () => {
         backgroundColor: cardBg,
         boxShadow: theme.shadows[1],
         border: isDark ? `1px solid ${theme.palette.divider}` : 'none',
-        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 1,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1.5 }}>
+      {/* ── Judul ── */}
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <Typography variant="subtitle2" fontWeight={700}>
           Absensi mapel per sesi
         </Typography>
+        {!isLoading && !isError && (
+          <Typography variant="caption" sx={{ color: 'text.disabled' }}>
+            {sesi.length} sesi hari ini
+          </Typography>
+        )}
       </Box>
 
+      {/* ── Loading ── */}
       {isLoading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+        <Box sx={{ py: 6, display: 'flex', justifyContent: 'center' }}>
           <CircularProgress size={24} />
         </Box>
       )}
 
-      {isError || (!isLoading && sesi.length === 0) ? (
+      {/* ── Kosong / Error ── */}
+      {!isLoading && (isError || sesi.length === 0) && (
         <Box
           sx={{
-            py: 4,
+            py: 6,
             textAlign: 'center',
-            color: 'text.disabled',
             border: `1px dashed ${theme.palette.divider}`,
             borderRadius: '8px',
           }}
         >
-          <Typography variant="body2">
+          <Typography variant="body2" color="text.disabled">
             {isError ? 'Gagal memuat data sesi mapel' : 'Belum ada data sesi hari ini'}
           </Typography>
         </Box>
-      ) : (
+      )}
+
+      {/* ── Tabel (max 14 baris terlihat, sisanya scroll) ── */}
+      {!isLoading && !isError && sesi.length > 0 && (
         <>
-          <Table size="small" sx={{ '& td, & th': { py: 0.7, px: 0.5, fontSize: '0.78rem' } }}>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', width: 80 }}>Jam</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>Guru</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>Mapel</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>Kelas</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary', width: 50 }}>H/A</TableCell>
-                <TableCell sx={{ fontWeight: 700, color: 'text.secondary' }}>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {sesi.map((row, i) => (
-                <TableRow key={i} hover>
-                  <TableCell>
-                    <Typography variant="caption" fontWeight={600} sx={{ display: 'block' }}>
-                      {row.jam_mulai}
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-                      →{row.jam_selesai}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.8 }}>
-                      <Box
-                        sx={{
-                          width: 24, height: 24, borderRadius: '50%',
-                          backgroundColor: 'primary.main', color: 'white',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontSize: '0.6rem', fontWeight: 700, flexShrink: 0,
-                        }}
-                      >
-                        {(row.nama_guru || '?').split(' ').map((w) => w[0]).slice(0, 2).join('')}
-                      </Box>
-                      <Typography variant="caption" noWrap sx={{ maxWidth: 80 }}>
+          <Box
+            sx={{
+              maxHeight: TABLE_MAX_H,
+              overflowY: 'auto',
+              borderRadius: '8px',
+              border: `1px solid ${theme.palette.divider}`,
+              '&::-webkit-scrollbar': { width: 4 },
+              '&::-webkit-scrollbar-track': { background: 'transparent' },
+              '&::-webkit-scrollbar-thumb': {
+                background: isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.18)',
+                borderRadius: 4,
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.3)',
+              },
+            }}
+          >
+            <Table
+              size="small"
+              stickyHeader
+              sx={{
+                tableLayout: 'fixed',
+                '& td, & th': { py: '7px', px: '8px', fontSize: '0.75rem', lineHeight: 1.4 },
+              }}
+            >
+              <TableHead>
+                <TableRow>
+                  {COLS.map(({ label, width }) => (
+                    <TableCell
+                      key={label}
+                      sx={{
+                        width,
+                        fontWeight: 700,
+                        fontSize: '0.72rem',
+                        color: 'text.secondary',
+                        whiteSpace: 'nowrap',
+                        backgroundColor: headBg,
+                        borderBottom: `1.5px solid ${theme.palette.divider}`,
+                      }}
+                    >
+                      {label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+
+              <TableBody>
+                {sesi.map((row, i) => (
+                  <TableRow
+                    key={i}
+                    hover
+                    sx={{
+                      '&:last-child td': { borderBottom: 0 },
+                      '&:nth-of-type(even)': {
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.025)' : 'rgba(0,0,0,0.018)',
+                      },
+                    }}
+                  >
+                    {/* Jam */}
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                      <Typography component="span" sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                        {row.jam_mulai}
+                      </Typography>
+                      <Typography component="span" sx={{ fontSize: '0.7rem', color: 'text.disabled', mx: '2px' }}>
+                        →
+                      </Typography>
+                      <Typography component="span" sx={{ fontSize: '0.7rem', color: 'text.disabled' }}>
+                        {row.jam_selesai}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Guru */}
+                    <TableCell>
+                      <Typography noWrap title={row.nama_guru || '-'} sx={{ fontSize: '0.75rem' }}>
                         {row.nama_guru || '-'}
                       </Typography>
-                    </Box>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption" noWrap sx={{ maxWidth: 90, display: 'block' }}>
-                      {row.nama_mapel || '-'}
-                    </Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">{row.nama_kelas || '-'}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography variant="caption">{row.hadir != null ? `${row.hadir}/${row.total}` : '—'}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <StatusDot status={row.status} />
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    </TableCell>
 
-          <Box sx={{ mt: 1.5, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Box sx={{ display: 'flex', gap: 1.5 }}>
-              {[
-                { color: '#059669', label: 'Sudah diisi' },
-                { color: '#D97706', label: 'Lewat, belum diisi' },
-                { color: '#9CA3AF', label: 'Belum mulai' },
-              ].map((leg) => (
+                    {/* Mapel */}
+                    <TableCell>
+                      <Typography noWrap title={row.nama_mapel || '-'} sx={{ fontSize: '0.75rem' }}>
+                        {row.nama_mapel || '-'}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Kelas */}
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '0.75rem' }}>{row.nama_kelas || '-'}</Typography>
+                    </TableCell>
+
+                    {/* H/A */}
+                    <TableCell sx={{ whiteSpace: 'nowrap' }}>
+                      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600 }}>
+                        {row.hadir != null ? `${row.hadir}/${row.total}` : '—'}
+                      </Typography>
+                    </TableCell>
+
+                    {/* Status */}
+                    <TableCell>
+                      <StatusDot status={row.status} />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Box>
+
+          {/* ── Footer: legenda + link ── */}
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              flexWrap: 'wrap',
+              gap: 0.5,
+              pt: 0.5,
+            }}
+          >
+            <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
+              {LEGEND.map((leg) => (
                 <Box key={leg.label} sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: leg.color }} />
-                  <Typography variant="caption" sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
+                  <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: leg.color, flexShrink: 0 }} />
+                  <Typography sx={{ color: 'text.disabled', fontSize: '0.65rem' }}>
                     {leg.label}
                   </Typography>
                 </Box>
@@ -158,7 +245,16 @@ const AbsensiMapelPerSesi = () => {
             <Box
               component={Link}
               to="/dashboard/admin-sekolah/absensi-siswa"
-              sx={{ display: 'flex', alignItems: 'center', gap: 0.4, color: 'primary.main', textDecoration: 'none', fontSize: '0.75rem', fontWeight: 600 }}
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.4,
+                color: 'primary.main',
+                textDecoration: 'none',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                whiteSpace: 'nowrap',
+              }}
             >
               Lihat semua sesi <IconArrowRight size={13} />
             </Box>

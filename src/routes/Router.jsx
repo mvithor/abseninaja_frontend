@@ -285,6 +285,8 @@ const MitraIndustriEdit = Loadable(lazy(() => import('../views/apps/kepala-jurus
 const MapelSkkniMappingList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/mapel-skkni-mapping/MapelSkkniMappingList')));
 // Konfigurasi Jurusan
 const KonfigurasiJurusanList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/konfigurasi-jurusan/KonfigurasiJurusan')));
+// Penempatan PKL
+const PenempatanPKL = Loadable(lazy(() => import('../views/apps/kepala-jurusan/penempatan-pkl/PenempatanPKL')));
 
 
 // DASHBOARD ADMIN MITRA INDUSTRI
@@ -584,7 +586,9 @@ const Router = [
                     { path: 'mapel-skkni-mapping', element: <MapelSkkniMappingList/> },
                     // Konfigurasi Jurusan
                     { path: 'konfigurasi-jurusan', element: <KonfigurasiJurusanList/> },
-                ]   
+                    // Penempatan PKL
+                    { path: 'penempatan-pkl', element: <PenempatanPKL/> },
+                ]
             },
             {
                 path: 'dashboard/admin-mitra-industri',

@@ -44,7 +44,7 @@ import { uniqueId } from 'lodash';
       id: uniqueId(),
       title: 'Penempatan PKL',
       icon: IconDashboard,
-      href: '#',
+      href: '/dashboard/kepala-jurusan/penempatan-pkl',
     },
     {
       id: uniqueId(),
