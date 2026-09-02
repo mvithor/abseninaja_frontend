@@ -1,19 +1,24 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Box, Typography, Button, Avatar, Skeleton, Dialog, DialogTitle,
   DialogContent, DialogActions, Snackbar, Alert, CircularProgress,
-  useTheme, useMediaQuery, IconButton, Tooltip,
+  useTheme, useMediaQuery, IconButton, Tooltip, Select, MenuItem, FormControl, TextField,
 } from '@mui/material';
 import {
-  IconChevronRight, IconUser, IconInfoCircle, IconMapPin,
-  IconAlertTriangle, IconX, IconCheck, IconArrowLeft,
+  IconUser, IconInfoCircle, IconMapPin, IconAlertTriangle,
+  IconX, IconCheck, IconArrowLeft, IconRefresh,
 } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
+import {
+  fetchClassOptions, fetchClassDashboard, fetchRecommendations,
+  createPlacement, cancelPlacement,
+} from './penempatanPklApi';
+import { adaptDashboard, adaptRecommendations } from './penempatanPklAdapter';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Design tokens (PRD §4.1) — light palette. Dark mode maps via helper below.
+// Design tokens
 // ═══════════════════════════════════════════════════════════════════════════
 const T = {
   bgPage: '#F3F2FB',
@@ -27,148 +32,46 @@ const T = {
   textStrong: '#1E2233',
   textBody: '#334155',
   textMuted: '#64748B',
-  textFaint: '#64748B', // PRD §12: bump #94A3B8 → #64748B for contrast
+  textFaint: '#64748B',
   success: '#16A34A',
+  danger: '#EF4444',
   border: '#E2E8F0',
   borderStrong: '#CBD5E1',
   track: '#EDF0F7',
 };
 
-// Kategori risiko — kode, label, warna (PRD §4.1). Urutan penanganan: RG→RB→RK→SP
+// Kategori risiko (kode server: SP/RB/RK/RG). Urutan grup sidebar: RG→RB→RK→SP.
 const RISK = {
   RG: { code: 'RG', label: 'Risiko Ganda', color: '#EF4444', bg: '#FEF2F2', border: '#FECACA', priority: true },
   RB: { code: 'RB', label: 'Risiko Behavior', color: '#F59E0B', bg: '#FFFBEB', border: '#FDE68A' },
   RK: { code: 'RK', label: 'Risiko Kompetensi', color: '#3B82F6', bg: '#EFF6FF', border: '#BFDBFE' },
   SP: { code: 'SP', label: 'Siap Penuh', color: '#16A34A', bg: '#F0FDF4', border: '#BBF7D0' },
 };
-const RISK_ORDER = ['RG', 'RB', 'RK', 'SP'];      // urutan grup sidebar (PRD §6.5.1)
-const CHIP_ORDER = ['SP', 'RB', 'RK', 'RG'];      // urutan filter chip (PRD §6.3)
+const NULL_GROUP = { label: 'Belum Terklasifikasi', color: '#64748B', bg: '#F1F5F9', border: '#E2E8F0' };
+const CHIP_ORDER = ['SP', 'RB', 'RK', 'RG'];
 
-// Kriteria penilaian — urutan tetap (PRD §6.8.D)
-const CRITERIA_ORDER = [
-  { key: 'kedisiplinan', label: 'Kedisiplinan' },
-  { key: 'supervisor', label: 'Pengalaman Supervisor' },
-  { key: 'mentoring', label: 'Kemauan Membimbing Teknis' },
-  { key: 'skkni', label: 'Relevansi Unit SKKNI' },
-  { key: 'trackRecord', label: 'Track Record (Profil Ini)' },
-];
-
-// Profil bobot per kategori risiko (Σ = 1.00). Dominan bila bobot ≥ 0.25.
-const WEIGHT_PROFILES = {
-  RG: { kedisiplinan: 0.35, supervisor: 0.30, mentoring: 0.20, skkni: 0.10, trackRecord: 0.05 },
-  RB: { kedisiplinan: 0.40, supervisor: 0.30, mentoring: 0.10, skkni: 0.10, trackRecord: 0.10 },
-  RK: { kedisiplinan: 0.10, supervisor: 0.10, mentoring: 0.30, skkni: 0.40, trackRecord: 0.10 },
-  SP: { kedisiplinan: 0.25, supervisor: 0.25, mentoring: 0.20, skkni: 0.20, trackRecord: 0.10 },
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Mock data — bentuk mengikuti Data Contract PRD §10
-// ═══════════════════════════════════════════════════════════════════════════
-const CLASS_INFO = { id: 'c-xi-tkj-1', name: 'XI TKJ', studentCount: 12 };
-
-const INITIAL_STUDENTS = [
-  // ── Risiko Ganda (1) ──
-  { id: 's-001', name: 'Rian Maulana', riskCode: 'RG', behaviorScore: 48, competencyScore: 52, ewsActive: true, ewsReason: 'Behavior & kompetensi di bawah ambang batas 3 minggu', placement: null },
-  // ── Risiko Behavior (4) ──
-  { id: 's-002', name: 'Hamdan Rizki', riskCode: 'RB', behaviorScore: 62, competencyScore: 74, ewsActive: true, ewsReason: 'Tren penurunan behavior score 4 minggu', placement: null },
-  { id: 's-003', name: 'Ilham Nugroho', riskCode: 'RB', behaviorScore: 59, competencyScore: 70, ewsActive: false, ewsReason: null, placement: null },
-  { id: 's-004', name: 'Dedi Kurniawan', riskCode: 'RB', behaviorScore: 64, competencyScore: 72, ewsActive: false, ewsReason: null, placement: null },
-  { id: 's-005', name: 'Joko Santoso', riskCode: 'RB', behaviorScore: 58, competencyScore: 71, ewsActive: false, ewsReason: null, placement: { industryId: 'i-090', industryName: 'Guru Komputer', source: 'manual' } },
-  // ── Risiko Kompetensi (2) ──
-  { id: 's-006', name: 'Fikri Ramadhan', riskCode: 'RK', behaviorScore: 80, competencyScore: 55, ewsActive: true, ewsReason: 'Nilai kompetensi jauh di bawah rata-rata kelas', placement: null },
-  { id: 's-007', name: 'Bagas Prasetyo', riskCode: 'RK', behaviorScore: 78, competencyScore: 58, ewsActive: false, ewsReason: null, placement: null },
-  // ── Siap Penuh (5) ──
-  { id: 's-008', name: 'Rizal Fauzan', riskCode: 'SP', behaviorScore: 90, competencyScore: 88, ewsActive: false, ewsReason: null, placement: null },
-  { id: 's-009', name: 'Yoga Pratama', riskCode: 'SP', behaviorScore: 86, competencyScore: 84, ewsActive: false, ewsReason: null, placement: null },
-  { id: 's-010', name: 'Nanda Saputri', riskCode: 'SP', behaviorScore: 89, competencyScore: 91, ewsActive: false, ewsReason: null, placement: null },
-  { id: 's-011', name: 'Eka Saputra', riskCode: 'SP', behaviorScore: 88, competencyScore: 90, ewsActive: false, ewsReason: null, placement: { industryId: 'i-070', industryName: 'AIC / Indigo Telkom', source: 'manual' } },
-  { id: 's-012', name: 'Aditya Wibowo', riskCode: 'SP', behaviorScore: 85, competencyScore: 87, ewsActive: false, ewsReason: null, placement: { industryId: 'i-011', industryName: 'PT. Solusi Jaringan Makassar', source: 'recommendation' } },
-];
-
-// Industri mitra + nilai kriteria mentah (0–100). Skor akhir dihitung per bobot siswa.
-const INDUSTRIES = [
-  {
-    id: 'i-011', name: 'PT. Solusi Jaringan Makassar', field: 'Teknologi Jaringan',
-    city: 'Makassar', distanceKm: 3, evaluatorBonus: 5,
-    criteria: { kedisiplinan: 80, supervisor: 100, mentoring: 80, skkni: 83, trackRecord: 62 },
-    reasons: [
-      'Kedisiplinan tinggi (4/5) — faktor bobot terbesar untuk profil ini',
-      'Supervisor berpengalaman (5/5) — pembimbing terstruktur tersedia',
-      'Track record: 62% siswa profil serupa berhasil menyelesaikan PKL — memadai',
-    ],
-    meta: { cohorts: 2, studentsHosted: 9, evaluationActive: true },
-  },
-  {
-    id: 'i-012', name: 'CV. Teknindo Makassar', field: 'Jaringan & Server',
-    city: 'Makassar', distanceKm: 5, evaluatorBonus: 5,
-    criteria: { kedisiplinan: 100, supervisor: 80, mentoring: 60, skkni: 50, trackRecord: 80 },
-    reasons: [
-      'Kedisiplinan sangat tinggi (5/5) — lingkungan kerja disiplin',
-      'Track record kuat: 80% siswa profil serupa berhasil menyelesaikan PKL',
-    ],
-    meta: { cohorts: 3, studentsHosted: 14, evaluationActive: true },
-  },
-  {
-    id: 'i-013', name: 'Rama Komputer', field: 'Perangkat Lunak',
-    city: 'Makassar', distanceKm: 8, evaluatorBonus: 5,
-    criteria: { kedisiplinan: 100, supervisor: 80, mentoring: 60, skkni: 33, trackRecord: 85 },
-    reasons: [
-      'Kedisiplinan sangat tinggi (5/5)',
-      'Track record terbaik: 85% siswa profil serupa berhasil',
-      'Relevansi SKKNI rendah — perlu pendampingan teknis tambahan',
-    ],
-    meta: { cohorts: 1, studentsHosted: 5, evaluationActive: true },
-  },
-];
-
-const INITIAL_SLOTS = { 'i-011': 2, 'i-012': 3, 'i-013': 3 };
-
-// ═══════════════════════════════════════════════════════════════════════════
-// Scoring (PRD §7) — dihitung di FE hanya untuk mock/assertion.
-// ═══════════════════════════════════════════════════════════════════════════
-const roundHalfUp = (n) => Math.floor(n + 0.5);
-
-const buildRecommendations = (student, slots) => {
-  const weights = WEIGHT_PROFILES[student.riskCode];
-  const scored = INDUSTRIES.map((ind) => {
-    const criteriaScores = CRITERIA_ORDER.map((c) => ({
-      key: c.key,
-      label: c.label,
-      value: ind.criteria[c.key],
-      weight: weights[c.key],
-      dominant: weights[c.key] >= 0.25,
-    }));
-    const raw = criteriaScores.reduce((sum, c) => sum + c.weight * c.value, 0);
-    const baseScore = roundHalfUp(raw);
-    const matchScore = Math.min(100, baseScore + ind.evaluatorBonus);
-
-    // PRD §7.3 — assertion mode dev: deteksi data tak konsisten
-    if (import.meta.env?.DEV && Math.abs(raw - baseScore) > 1) {
-      // eslint-disable-next-line no-console
-      console.warn(`[PKL] baseScore drift pada ${ind.name}: Σ=${raw.toFixed(2)} vs base=${baseScore}`);
-    }
-
-    return {
-      ...ind,
-      criteriaScores,
-      baseScore,
-      matchScore,
-      slotsAvailable: slots[ind.id] ?? 0,
-    };
-  });
-
-  scored.sort((a, b) => b.matchScore - a.matchScore || b.baseScore - a.baseScore);
-  return scored.slice(0, 3).map((r, i) => ({ ...r, rank: i + 1 }));
-};
-
-// warna match score (PRD §7.4): ≥85 hijau, 70–84 amber, <70 abu
+// warna match score: ≥85 hijau, 70–84 amber, <70 abu
 const matchColor = (score) => (score >= 85 ? T.success : score >= 70 ? '#F59E0B' : T.textMuted);
+const fmtScore = (v) => (v === null || v === undefined ? '—' : v);
+
+// Ekstrak {code,msg} dari error axios (semua error PKL membawa code+msg).
+const parseErr = (error) => ({
+  code: error?.response?.data?.code ?? null,
+  msg: error?.response?.data?.msg ?? 'Terjadi kesalahan. Silakan coba lagi.',
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Small presentational helpers
+// Presentational helpers
 // ═══════════════════════════════════════════════════════════════════════════
 const RiskBadge = ({ code, size = 'sm' }) => {
   const r = RISK[code];
+  if (!r) {
+    return (
+      <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', px: 0.75, py: 0.25, borderRadius: '999px', backgroundColor: NULL_GROUP.bg, color: NULL_GROUP.color, border: `1px solid ${NULL_GROUP.border}`, fontSize: '0.625rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+        —
+      </Box>
+    );
+  }
   return (
     <Box
       component="span"
@@ -201,13 +104,10 @@ const EwsBadge = ({ label = 'EWS' }) => (
   </Box>
 );
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.2 Progress Penempatan
-// ═══════════════════════════════════════════════════════════════════════════
-const ProgressPenempatan = ({ placed, total, cardBg, cardBorder }) => {
+const ProgressPenempatan = ({ placed, total, pending, cardBg, cardBorder }) => {
   const pct = total ? (placed / total) * 100 : 0;
-  const pending = total - placed;
   const done = placed === total && total > 0;
+  const sisa = pending ?? Math.max(0, total - placed);
   return (
     <Box sx={{ minWidth: 210, border: `1px solid ${cardBorder}`, borderRadius: '12px', p: 1.75, backgroundColor: cardBg }}>
       <Typography sx={{ fontSize: '0.75rem', color: T.textMuted, textAlign: 'right', fontWeight: 500 }}>
@@ -226,7 +126,7 @@ const ProgressPenempatan = ({ placed, total, cardBg, cardBorder }) => {
           <>
             <Box component="span" sx={{ color: T.success, fontWeight: 600 }}>✓ {placed} Ditempatkan</Box>
             <Box component="span" sx={{ color: T.textFaint }}> · </Box>
-            <Box component="span" sx={{ color: '#B45309', fontWeight: 600 }}>{pending} Pending</Box>
+            <Box component="span" sx={{ color: '#B45309', fontWeight: 600 }}>{sisa} Pending</Box>
           </>
         )}
       </Typography>
@@ -234,14 +134,11 @@ const ProgressPenempatan = ({ placed, total, cardBg, cardBorder }) => {
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.3 Risk Filter Chips
-// ═══════════════════════════════════════════════════════════════════════════
-const RiskFilterChips = ({ summary, active, onToggle }) => (
+const RiskFilterChips = ({ counts, active, onToggle }) => (
   <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
     {CHIP_ORDER.map((code) => {
       const r = RISK[code];
-      const count = summary[code] ?? 0;
+      const count = counts[code] ?? 0;
       const isActive = active.has(code);
       return (
         <Box
@@ -270,18 +167,12 @@ const RiskFilterChips = ({ summary, active, onToggle }) => (
   </Box>
 );
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.5.2 Student Card
-// ═══════════════════════════════════════════════════════════════════════════
 const StudentCard = ({ student, selected, onSelect }) => {
   const placed = Boolean(student.placement);
-
   const bg = selected ? T.primary100 : placed ? RISK.SP.bg : T.bgCard;
   const border = selected
     ? `2px solid ${T.primary600}`
-    : placed
-      ? `1px solid ${RISK.SP.border}`
-      : `1px solid ${T.border}`;
+    : placed ? `1px solid ${RISK.SP.border}` : `1px solid ${T.border}`;
 
   return (
     <Box
@@ -309,12 +200,10 @@ const StudentCard = ({ student, selected, onSelect }) => {
       </Box>
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 0.5, gap: 1 }}>
         <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>
-          B:{student.behaviorScore} · K:{student.competencyScore}
+          B:{fmtScore(student.behaviorScore)} · K:{fmtScore(student.competencyScore)}
         </Typography>
         {placed && (
-          <Typography sx={{ fontSize: '0.75rem', color: T.success, fontWeight: 600, whiteSpace: 'nowrap' }}>
-            ✓ Ditempatkan
-          </Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: T.success, fontWeight: 600, whiteSpace: 'nowrap' }}>✓ Ditempatkan</Typography>
         )}
       </Box>
       {placed && (
@@ -326,71 +215,53 @@ const StudentCard = ({ student, selected, onSelect }) => {
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.5 Student Sidebar (grup + kartu)
-// ═══════════════════════════════════════════════════════════════════════════
-const StudentSidebar = ({ students, selectedId, onSelect, onResetFilter }) => {
-  // kelompokkan + urutkan sesuai PRD §6.5.1
+// Grup mengikuti urutan server (JANGAN sortir ulang). Header pakai count/placed server.
+const StudentSidebar = ({ className, students, riskSummary, selectedId, onSelect, onResetFilter }) => {
   const groups = useMemo(() => {
-    return RISK_ORDER.map((code) => {
-      const inGroup = students.filter((s) => s.riskCode === code);
-      inGroup.sort((a, b) => {
-        const ap = a.placement ? 1 : 0;
-        const bp = b.placement ? 1 : 0;
-        if (ap !== bp) return ap - bp; // yang ditempatkan didorong ke bawah
-        return (a.behaviorScore + a.competencyScore) - (b.behaviorScore + b.competencyScore);
-      });
-      const placed = inGroup.filter((s) => s.placement).length;
-      return { code, students: inGroup, placed, total: inGroup.length };
-    }).filter((g) => g.total > 0);
+    const order = [];
+    const index = {};
+    students.forEach((s) => {
+      const code = s.riskCode ?? 'NULL';
+      if (!(code in index)) { index[code] = order.length; order.push({ code, students: [] }); }
+      order[index[code]].students.push(s);
+    });
+    return order;
   }, [students]);
-
-  const totalShown = students.length;
 
   return (
     <Box>
       <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.textFaint, mb: 1 }}>
-        Siswa — {CLASS_INFO.name} ({totalShown} Siswa)
+        Siswa — {className} ({students.length} Siswa)
       </Typography>
 
-      {totalShown === 0 ? (
+      {students.length === 0 ? (
         <Box sx={{ textAlign: 'center', py: 5, px: 2, border: `1px dashed ${T.border}`, borderRadius: '12px' }}>
-          <Typography sx={{ fontSize: '0.875rem', color: T.textMuted, mb: 1.5 }}>
-            Tidak ada siswa pada filter ini
-          </Typography>
-          <Button size="small" variant="outlined" onClick={onResetFilter} sx={{ textTransform: 'none', borderRadius: '8px' }}>
-            Reset filter
-          </Button>
+          <Typography sx={{ fontSize: '0.875rem', color: T.textMuted, mb: 1.5 }}>Tidak ada siswa pada filter ini</Typography>
+          <Button size="small" variant="outlined" onClick={onResetFilter} sx={{ textTransform: 'none', borderRadius: '8px' }}>Reset filter</Button>
         </Box>
       ) : (
         groups.map((g) => {
-          const r = RISK[g.code];
+          const isNull = g.code === 'NULL';
+          const r = isNull ? NULL_GROUP : RISK[g.code];
+          const summary = riskSummary[g.code];
+          const count = isNull ? g.students.length : (summary?.count ?? g.students.length);
+          const placed = isNull ? g.students.filter((s) => s.placement).length : (summary?.placed ?? 0);
           return (
             <Box key={g.code} sx={{ mb: 2 }}>
-              {/* Group header */}
-              <Box
-                sx={{
-                  display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                  p: '8px 12px', borderRadius: '8px', mb: 1,
-                  backgroundColor: r.bg, border: `1px solid ${r.border}`,
-                }}
-              >
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', p: '8px 12px', borderRadius: '8px', mb: 1, backgroundColor: r.bg, border: `1px solid ${r.border}` }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75, minWidth: 0 }}>
                   <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: r.color, flexShrink: 0 }} />
-                  <Typography sx={{ fontSize: '0.8125rem', fontWeight: 700, color: r.color, whiteSpace: 'nowrap' }}>
-                    {r.label}
-                  </Typography>
-                  {r.priority && (
+                  <Typography sx={{ fontSize: '0.8125rem', fontWeight: 700, color: r.color, whiteSpace: 'nowrap' }}>{r.label}</Typography>
+                  {!isNull && r.priority && (
                     <Box component="span" sx={{ px: 0.75, py: 0.125, borderRadius: '999px', backgroundColor: r.color, color: '#fff', fontSize: '0.5625rem', fontWeight: 700, letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
                       PRIORITAS UTAMA
                     </Box>
                   )}
                 </Box>
                 <Typography sx={{ fontSize: '0.75rem', color: T.textMuted, fontWeight: 500, whiteSpace: 'nowrap' }}>
-                  {g.placed}/{g.total} ditempatkan
+                  {placed}/{count} ditempatkan
                 </Typography>
               </Box>
-
               {g.students.map((s) => (
                 <StudentCard key={s.id} student={s} selected={s.id === selectedId} onSelect={onSelect} />
               ))}
@@ -402,19 +273,15 @@ const StudentSidebar = ({ students, selectedId, onSelect, onResetFilter }) => {
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.6 Student Detail Header
-// ═══════════════════════════════════════════════════════════════════════════
-const StudentDetailHeader = ({ student }) => {
+const StudentDetailHeader = ({ student, className }) => {
   const r = RISK[student.riskCode];
+  const borderColor = r ? r.border : NULL_GROUP.border;
   return (
-    <Box sx={{ border: `1px solid ${r.border}`, borderRadius: '12px', p: 2, mb: 2, backgroundColor: T.bgCard }}>
+    <Box sx={{ border: `1px solid ${borderColor}`, borderRadius: '12px', p: 2, mb: 2, backgroundColor: T.bgCard }}>
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
         <Box sx={{ minWidth: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
-            <Typography sx={{ fontSize: '1.25rem', lineHeight: 1.3, fontWeight: 700, color: T.textStrong }}>
-              {student.name}
-            </Typography>
+            <Typography sx={{ fontSize: '1.25rem', lineHeight: 1.3, fontWeight: 700, color: T.textStrong }}>{student.name}</Typography>
             {student.ewsActive && (
               <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 1, py: 0.25, borderRadius: '999px', backgroundColor: RISK.RB.bg, border: `1px solid ${RISK.RB.border}`, color: '#B45309' }}>
                 <IconAlertTriangle size={13} />
@@ -423,64 +290,47 @@ const StudentDetailHeader = ({ student }) => {
             )}
           </Box>
           <Typography sx={{ fontSize: '0.75rem', color: T.textMuted, mt: 0.5 }}>
-            {CLASS_INFO.name} · B:{student.behaviorScore} · K:{student.competencyScore}
+            {className} · B:{fmtScore(student.behaviorScore)} · K:{fmtScore(student.competencyScore)}
           </Typography>
           {student.ewsActive && student.ewsReason && (
-            <Typography sx={{ fontSize: '0.8125rem', color: r.color, fontWeight: 500, mt: 0.75 }}>
+            <Typography sx={{ fontSize: '0.8125rem', color: (r ? r.color : NULL_GROUP.color), fontWeight: 500, mt: 0.75 }}>
               {student.ewsReason}
             </Typography>
           )}
         </Box>
-        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, px: 1.75, py: 1, borderRadius: '999px', border: `1px solid ${r.color}`, color: r.color, flexShrink: 0 }}>
-          <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: r.color }} />
-          <Typography sx={{ fontSize: '0.8125rem', fontWeight: 700 }}>{r.label}</Typography>
+        <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, px: 1.75, py: 1, borderRadius: '999px', border: `1px solid ${r ? r.color : NULL_GROUP.color}`, color: r ? r.color : NULL_GROUP.color, flexShrink: 0 }}>
+          <Box sx={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: r ? r.color : NULL_GROUP.color }} />
+          <Typography sx={{ fontSize: '0.8125rem', fontWeight: 700 }}>{r ? r.label : NULL_GROUP.label}</Typography>
         </Box>
       </Box>
     </Box>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.7 Matching Weights (read-only)
-// ═══════════════════════════════════════════════════════════════════════════
-const MatchingWeights = ({ riskCode }) => {
-  const r = RISK[riskCode];
-  const weights = WEIGHT_PROFILES[riskCode];
-  return (
-    <Box sx={{ border: `1px solid ${T.border}`, borderRadius: '10px', p: 1.5, mb: 2, backgroundColor: T.bgCard }}>
-      <Typography sx={{ fontSize: '0.75rem', fontWeight: 600, color: T.textBody, mb: 1 }}>
-        Prioritas matching untuk {r.label}:
+// Banner penempatan aktif — jalur batal SELALU terjangkau (tak bergantung Top-3).
+const PlacedBanner = ({ placement, busy, onCancel }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', border: `1px solid ${RISK.SP.border}`, backgroundColor: RISK.SP.bg, borderRadius: '12px', p: 1.75, mb: 2 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, minWidth: 0 }}>
+      <IconCheck size={18} color={T.success} />
+      <Typography sx={{ fontSize: '0.875rem', color: T.textStrong, minWidth: 0 }}>
+        Ditempatkan di <b>{placement.industryName}</b>
       </Typography>
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
-        {CRITERIA_ORDER.map((c) => {
-          const w = weights[c.key];
-          const dominant = w >= 0.25;
-          return (
-            <Box
-              key={c.key}
-              sx={{
-                display: 'inline-flex', alignItems: 'center', gap: 0.5,
-                px: 1, py: 0.5, borderRadius: '999px',
-                backgroundColor: dominant ? RISK.RB.bg : T.bgSubtle,
-                border: `1px solid ${dominant ? RISK.RB.border : T.border}`,
-                color: dominant ? '#B45309' : T.textMuted,
-                fontSize: '0.6875rem', fontWeight: dominant ? 700 : 500,
-              }}
-            >
-              {c.label} {Math.round(w * 100)}%{dominant ? ' ★' : ''}
-            </Box>
-          );
-        })}
-      </Box>
     </Box>
-  );
-};
+    <Button
+      size="small"
+      onClick={onCancel}
+      disabled={busy}
+      startIcon={<IconX size={15} />}
+      sx={{ textTransform: 'none', fontWeight: 600, borderRadius: '8px', color: T.danger, '&:hover': { backgroundColor: '#FEF2F2' } }}
+    >
+      Batalkan penempatan
+    </Button>
+  </Box>
+);
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.8.D Criteria Row
-// ═══════════════════════════════════════════════════════════════════════════
 const CriteriaRow = ({ criteria }) => {
-  const { label, value, weight, dominant } = criteria;
+  const { label, value, weight, dominant, available } = criteria;
+  const pctWeight = weight === null || weight === undefined ? null : Math.round(weight * 100);
   return (
     <Box sx={{ mb: 1.25 }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
@@ -493,74 +343,73 @@ const CriteriaRow = ({ criteria }) => {
             DOMINAN
           </Box>
         )}
-        <Box component="span" sx={{ px: 0.75, py: 0.25, borderRadius: '6px', backgroundColor: '#F1F5F9', color: T.textMuted, fontSize: '0.6875rem', fontWeight: 500 }}>
-          {Math.round(weight * 100)}%
-        </Box>
-        <Typography sx={{ width: 28, textAlign: 'right', fontSize: '0.8125rem', fontWeight: 600, color: T.textStrong, flexShrink: 0 }}>
-          {value}
+        {pctWeight !== null && (
+          <Box component="span" sx={{ px: 0.75, py: 0.25, borderRadius: '6px', backgroundColor: '#F1F5F9', color: T.textMuted, fontSize: '0.6875rem', fontWeight: 500 }}>
+            {pctWeight}%
+          </Box>
+        )}
+        <Typography sx={{ width: 40, textAlign: 'right', fontSize: '0.8125rem', fontWeight: 600, color: T.textStrong, flexShrink: 0 }}>
+          {available && value !== null ? value : '—'}
         </Typography>
       </Box>
-      <Box
-        role="progressbar"
-        aria-valuenow={value}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`${label} ${value} dari 100`}
-        sx={{ height: 4, borderRadius: '999px', backgroundColor: T.track, overflow: 'hidden' }}
-      >
-        <Box sx={{ height: '100%', width: `${value}%`, borderRadius: '999px', backgroundColor: dominant ? T.primary600 : T.primary400 }} />
-      </Box>
+      {available && value !== null ? (
+        <Box
+          role="progressbar"
+          aria-valuenow={value}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`${label} ${value} dari 100`}
+          sx={{ height: 4, borderRadius: '999px', backgroundColor: T.track, overflow: 'hidden' }}
+        >
+          <Box sx={{ height: '100%', width: `${value}%`, borderRadius: '999px', backgroundColor: dominant ? T.primary600 : T.primary400 }} />
+        </Box>
+      ) : (
+        <Typography sx={{ fontSize: '0.6875rem', color: T.textMuted, fontStyle: 'italic' }}>Data belum tersedia</Typography>
+      )}
     </Box>
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// §6.8 Industry Recommendation Card
-// ═══════════════════════════════════════════════════════════════════════════
-const IndustryRecommendationCard = ({ rec, riskLabel, isPlacedHere, placementBusy, onPilih, onBatal }) => {
+const CONFIDENCE_COLOR = { TINGGI: T.success, SEDANG: '#F59E0B', RENDAH: T.textMuted };
+
+const IndustryRecommendationCard = ({ rec, riskLabel, isPlacedHere, studentPlaced, placementBusy, onPilih }) => {
   const slotFull = rec.slotsAvailable <= 0;
-  const disabled = slotFull && !isPlacedHere;
+  const disabledByOther = studentPlaced && !isPlacedHere;
+  const disabled = (slotFull && !isPlacedHere) || disabledByOther;
+  const conf = rec.confidence;
 
   return (
-    <Box
-      sx={{
-        border: `1px solid ${T.border}`, borderRadius: '12px', p: 2, mb: 2,
-        backgroundColor: T.bgCard, opacity: disabled ? 0.7 : 1,
-      }}
-    >
+    <Box sx={{ border: `1px solid ${T.border}`, borderRadius: '12px', p: 2, mb: 2, backgroundColor: T.bgCard, opacity: disabled && !isPlacedHere ? 0.75 : 1 }}>
       {/* A. Header */}
       <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2 }}>
         <Box sx={{ minWidth: 0 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Typography sx={{ fontSize: '0.9375rem', fontWeight: 800, color: T.primary600 }}>#{rec.rank}</Typography>
-            <Typography sx={{ fontSize: '1.125rem', lineHeight: 1.3, fontWeight: 700, color: T.textStrong }}>
-              {rec.name}
-            </Typography>
+            <Typography sx={{ fontSize: '1.125rem', lineHeight: 1.3, fontWeight: 700, color: T.textStrong }}>{rec.name}</Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
             <IconMapPin size={13} color={T.textMuted} />
             <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>
-              {rec.field} · {rec.city} · {rec.distanceKm} km · {rec.slotsAvailable} slot tersedia
+              {[rec.field, rec.city, `${rec.slotsAvailable} slot tersedia`].filter(Boolean).join(' · ')}
             </Typography>
           </Box>
         </Box>
         <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
-          <Typography sx={{ fontSize: '2rem', lineHeight: 1.05, fontWeight: 800, color: matchColor(rec.matchScore) }}>
-            {rec.matchScore}%
-          </Typography>
+          <Typography sx={{ fontSize: '2rem', lineHeight: 1.05, fontWeight: 800, color: matchColor(rec.matchScore) }}>{rec.matchScore}%</Typography>
           <Typography sx={{ fontSize: '0.6875rem', color: T.textFaint }}>match score</Typography>
         </Box>
       </Box>
 
-      {/* B. Strip skor dasar */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, backgroundColor: T.bgSubtle, borderRadius: '8px', px: 1.25, py: 0.75, mt: 1.5 }}>
-        <Typography sx={{ fontSize: '0.75rem', color: T.textBody }}>
-          Skor dasar: <b>{rec.baseScore}</b>
-        </Typography>
+      {/* B. Strip skor dasar + confidence */}
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap', backgroundColor: T.bgSubtle, borderRadius: '8px', px: 1.25, py: 0.75, mt: 1.5 }}>
+        <Typography sx={{ fontSize: '0.75rem', color: T.textBody }}>Skor dasar: <b>{rec.baseScore}</b></Typography>
         {rec.evaluatorBonus > 0 && (
-          <Typography sx={{ fontSize: '0.75rem', color: T.success, fontWeight: 600 }}>
-            ▲ +{rec.evaluatorBonus} evaluator aktif
-          </Typography>
+          <Typography sx={{ fontSize: '0.75rem', color: T.success, fontWeight: 600 }}>▲ +{rec.evaluatorBonus} evaluator aktif</Typography>
+        )}
+        {conf?.level && (
+          <Box component="span" sx={{ ml: 'auto', display: 'inline-flex', alignItems: 'center', gap: 0.5, px: 0.75, py: 0.25, borderRadius: '999px', border: `1px solid ${(CONFIDENCE_COLOR[conf.level] ?? T.textMuted)}33`, color: CONFIDENCE_COLOR[conf.level] ?? T.textMuted, fontSize: '0.625rem', fontWeight: 700 }}>
+            Keyakinan {conf.level}{conf.persen != null ? ` ${conf.persen}%` : ''}
+          </Box>
         )}
       </Box>
 
@@ -569,60 +418,40 @@ const IndustryRecommendationCard = ({ rec, riskLabel, isPlacedHere, placementBus
         — Bobot Disesuaikan Profil {riskLabel}
       </Typography>
 
-      {/* D. Baris kriteria */}
+      {/* D. Baris kriteria (selalu 5, hormati available:false) */}
       {rec.criteriaScores.map((c) => (
         <CriteriaRow key={c.key} criteria={c} />
       ))}
 
       {/* E. Kotak alasan */}
-      <Box sx={{ backgroundColor: RISK.SP.bg, border: `1px solid ${RISK.SP.border}`, borderRadius: '10px', p: 1.5, mt: 1.5 }}>
-        {rec.reasons.map((reason, i) => (
-          <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, mb: i < rec.reasons.length - 1 ? 0.75 : 0 }}>
-            <IconCheck size={15} color={T.success} style={{ marginTop: 2, flexShrink: 0 }} />
-            <Typography sx={{ fontSize: '0.75rem', color: T.textBody, lineHeight: 1.5 }}>{reason}</Typography>
-          </Box>
-        ))}
-      </Box>
-
-      {/* F. Footer meta */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1.5, flexWrap: 'wrap' }}>
-        <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>
-          {rec.meta.cohorts} angkatan, {rec.meta.studentsHosted} siswa
-        </Typography>
-        {rec.meta.evaluationActive && (
-          <>
-            <Typography sx={{ fontSize: '0.75rem', color: T.textFaint }}>·</Typography>
-            <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
-              <Box sx={{ width: 7, height: 7, borderRadius: '50%', backgroundColor: T.success }} />
-              <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>Aktif mengisi evaluasi</Typography>
+      {rec.reasons.length > 0 && (
+        <Box sx={{ backgroundColor: RISK.SP.bg, border: `1px solid ${RISK.SP.border}`, borderRadius: '10px', p: 1.5, mt: 1.5 }}>
+          {rec.reasons.map((reason, i) => (
+            <Box key={i} sx={{ display: 'flex', alignItems: 'flex-start', gap: 0.75, mb: i < rec.reasons.length - 1 ? 0.75 : 0 }}>
+              <IconCheck size={15} color={T.success} style={{ marginTop: 2, flexShrink: 0 }} />
+              <Typography sx={{ fontSize: '0.75rem', color: T.textBody, lineHeight: 1.5 }}>{reason}</Typography>
             </Box>
-          </>
-        )}
-      </Box>
-
-      {/* G. CTA */}
-      {isPlacedHere ? (
-        <Box sx={{ mt: 1.75 }}>
-          <Button
-            fullWidth
-            variant="contained"
-            startIcon={<IconCheck size={18} />}
-            sx={{ height: 44, borderRadius: '10px', textTransform: 'none', fontWeight: 700, backgroundColor: T.success, '&:hover': { backgroundColor: '#15803D' } }}
-          >
-            Ditempatkan di sini
-          </Button>
-          <Box sx={{ textAlign: 'center', mt: 0.75 }}>
-            <Typography
-              component="button"
-              onClick={onBatal}
-              sx={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.75rem', color: T.textMuted, textDecoration: 'underline', '&:hover': { color: '#EF4444' } }}
-            >
-              Batalkan penempatan
-            </Typography>
-          </Box>
+          ))}
         </Box>
+      )}
+
+      {/* F. CTA */}
+      {isPlacedHere ? (
+        <Button
+          fullWidth
+          variant="contained"
+          disableElevation
+          startIcon={<IconCheck size={18} />}
+          sx={{ mt: 1.75, height: 44, borderRadius: '10px', textTransform: 'none', fontWeight: 700, backgroundColor: T.success, '&:hover': { backgroundColor: '#15803D' }, '&.Mui-disabled': { backgroundColor: T.success, color: '#fff', opacity: 0.9 } }}
+          disabled
+        >
+          Ditempatkan di sini
+        </Button>
       ) : (
-        <Tooltip title={disabled ? 'Slot penuh — tidak dapat menempatkan siswa di sini' : ''} disableHoverListener={!disabled}>
+        <Tooltip
+          title={disabledByOther ? 'Siswa sudah ditempatkan — batalkan dulu untuk memilih industri lain' : (slotFull ? 'Slot penuh — tidak dapat menempatkan siswa di sini' : '')}
+          disableHoverListener={!disabled}
+        >
           <span>
             <Button
               fullWidth
@@ -632,14 +461,12 @@ const IndustryRecommendationCard = ({ rec, riskLabel, isPlacedHere, placementBus
                 mt: 1.75, height: 44, borderRadius: '10px', textTransform: 'none', fontWeight: 700,
                 border: `1.5px solid ${disabled ? T.borderStrong : T.primary600}`,
                 color: disabled ? T.borderStrong : T.primary600, backgroundColor: 'transparent',
-                '&:hover': { backgroundColor: T.primary050 },
-                '&:active': { backgroundColor: T.primary100 },
+                '&:hover': { backgroundColor: T.primary050, borderColor: T.primary700, color: T.primary700 },
+                '&:active': { backgroundColor: T.primary100, color: T.primary700 },
                 '&.Mui-disabled': { color: T.borderStrong, borderColor: T.borderStrong },
               }}
             >
-              {placementBusy ? (
-                <><CircularProgress size={16} sx={{ mr: 1, color: T.primary600 }} /> Menempatkan…</>
-              ) : slotFull ? 'Slot penuh' : 'Pilih Industri Ini'}
+              {placementBusy ? (<><CircularProgress size={16} sx={{ mr: 1, color: T.primary600 }} /> Menempatkan…</>) : slotFull ? 'Slot penuh' : 'Pilih Industri Ini'}
             </Button>
           </span>
         </Tooltip>
@@ -648,9 +475,6 @@ const IndustryRecommendationCard = ({ rec, riskLabel, isPlacedHere, placementBus
   );
 };
 
-// ═══════════════════════════════════════════════════════════════════════════
-// Panel skeleton (loading saat ganti siswa)
-// ═══════════════════════════════════════════════════════════════════════════
 const PanelSkeleton = () => (
   <Box>
     <Skeleton variant="rounded" height={92} sx={{ borderRadius: '12px', mb: 2 }} />
@@ -661,6 +485,31 @@ const PanelSkeleton = () => (
   </Box>
 );
 
+const SidebarSkeleton = () => (
+  <Box>
+    <Skeleton variant="text" width={160} height={20} sx={{ mb: 1 }} />
+    {[0, 1, 2].map((g) => (
+      <Box key={g} sx={{ mb: 2 }}>
+        <Skeleton variant="rounded" height={34} sx={{ borderRadius: '8px', mb: 1 }} />
+        {[0, 1].map((i) => <Skeleton key={i} variant="rounded" height={62} sx={{ borderRadius: '12px', mb: 1 }} />)}
+      </Box>
+    ))}
+  </Box>
+);
+
+const StateCard = ({ icon, title, message, actionLabel, onAction }) => (
+  <Box sx={{ backgroundColor: T.bgCard, borderRadius: '16px', border: `1px solid ${T.border}`, p: { xs: 4, md: 6 }, textAlign: 'center' }}>
+    {icon}
+    <Typography sx={{ fontSize: '1.0625rem', fontWeight: 700, color: T.textStrong, mt: 1.5 }}>{title}</Typography>
+    <Typography sx={{ fontSize: '0.875rem', color: T.textMuted, mt: 0.5, maxWidth: 460, mx: 'auto' }}>{message}</Typography>
+    {onAction && (
+      <Button onClick={onAction} startIcon={<IconRefresh size={16} />} variant="outlined" sx={{ mt: 2.5, textTransform: 'none', fontWeight: 600, borderRadius: '999px', borderColor: T.primary600, color: T.primary600, '&:hover': { borderColor: T.primary700, backgroundColor: T.primary050 } }}>
+        {actionLabel}
+      </Button>
+    )}
+  </Box>
+);
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Main Component
 // ═══════════════════════════════════════════════════════════════════════════
@@ -668,85 +517,118 @@ const PenempatanPKL = () => {
   const theme = useTheme();
   const user = useSelector((state) => state.user);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const queryClient = useQueryClient();
 
-  const [students, setStudents] = useState(INITIAL_STUDENTS);
-  const [slots, setSlots] = useState(INITIAL_SLOTS);
+  const [classId, setClassId] = useState(null);
   const [activeFilters, setActiveFilters] = useState(() => new Set());
   const [selectedId, setSelectedId] = useState(null);
-  const [panelLoading, setPanelLoading] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null); // { student, rec }
   const [cancelDialog, setCancelDialog] = useState(null);   // { student }
-  const [placementBusy, setPlacementBusy] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const [toast, setToast] = useState(null);
-  const [mobileView, setMobileView] = useState('list'); // 'list' | 'detail'
-  const panelTimer = useRef(null);
+  const [mobileView, setMobileView] = useState('list');
 
   const cardBorder = T.border;
   const cardBg = T.bgCard;
 
-  // Ringkasan risiko (count per kategori) — dari seluruh kelas, bukan hasil filter
-  const riskSummary = useMemo(() => {
-    return students.reduce((acc, s) => {
-      acc[s.riskCode] = (acc[s.riskCode] || 0) + 1;
-      return acc;
-    }, {});
-  }, [students]);
+  // ── Queries ────────────────────────────────────────────────────────────────
+  const classOptionsQuery = useQuery({
+    queryKey: ['pkl-class-options'],
+    queryFn: fetchClassOptions,
+    staleTime: 5 * 60_000,
+  });
+  const classOptions = useMemo(() => classOptionsQuery.data ?? [], [classOptionsQuery.data]);
 
-  const progress = useMemo(() => {
-    const placed = students.filter((s) => s.placement).length;
-    return { placed, total: students.length };
-  }, [students]);
+  useEffect(() => {
+    if (classId == null && classOptions.length) setClassId(classOptions[0].id);
+  }, [classOptions, classId]);
 
-  // Filter siswa untuk sidebar (multi-select). Kosong = tampil semua.
+  const dashboardQuery = useQuery({
+    queryKey: ['pkl-class-dashboard', classId],
+    queryFn: () => fetchClassDashboard(classId),
+    enabled: classId != null,
+    select: adaptDashboard,
+    staleTime: 30_000,
+  });
+  const dashboard = dashboardQuery.data;
+
+  const students = useMemo(() => dashboard?.students ?? [], [dashboard]);
+  const riskSummary = useMemo(() => dashboard?.riskSummary ?? {}, [dashboard]);
+  const chipCounts = useMemo(
+    () => CHIP_ORDER.reduce((acc, code) => { acc[code] = riskSummary[code]?.count ?? 0; return acc; }, {}),
+    [riskSummary],
+  );
+
   const filteredStudents = useMemo(() => {
     if (activeFilters.size === 0) return students;
-    return students.filter((s) => activeFilters.has(s.riskCode));
+    return students.filter((s) => s.riskCode && activeFilters.has(s.riskCode));
   }, [students, activeFilters]);
 
-  // §8.1 — pilih otomatis siswa prioritas tertinggi yang belum ditempatkan
-  const pickDefaultStudent = useCallback((list) => {
-    for (const code of RISK_ORDER) {
-      const candidates = list
-        .filter((s) => s.riskCode === code && !s.placement)
-        .sort((a, b) => (a.behaviorScore + a.competencyScore) - (b.behaviorScore + b.competencyScore));
-      if (candidates.length) return candidates[0].id;
-    }
-    return list[0]?.id ?? null;
-  }, []);
+  const pickDefault = useCallback((list) => (list.find((s) => !s.placement) ?? list[0])?.id ?? null, []);
 
+  // Pilih siswa default saat data kelas berubah; pertahankan pilihan bila masih ada.
   useEffect(() => {
-    if (selectedId === null && students.length) {
-      setSelectedId(pickDefaultStudent(students));
-    }
-  }, [selectedId, students, pickDefaultStudent]);
+    if (!students.length) { setSelectedId(null); return; }
+    setSelectedId((cur) => (cur && students.some((s) => s.id === cur) ? cur : pickDefault(students)));
+  }, [students, pickDefault]);
 
-  // Jika siswa terpilih tersaring keluar, pindah ke default hasil filter
-  useEffect(() => {
-    if (selectedId && !filteredStudents.some((s) => s.id === selectedId) && filteredStudents.length) {
-      setSelectedId(pickDefaultStudent(filteredStudents));
-    }
-  }, [filteredStudents, selectedId, pickDefaultStudent]);
+  const selectedStudent = useMemo(() => students.find((s) => s.id === selectedId) ?? null, [students, selectedId]);
 
-  useEffect(() => () => clearTimeout(panelTimer.current), []);
+  // Rekomendasi untuk siswa terpilih.
+  const recoQuery = useQuery({
+    queryKey: ['pkl-recos', selectedId],
+    queryFn: () => fetchRecommendations(selectedId),
+    enabled: Boolean(selectedId),
+    select: adaptRecommendations,
+    staleTime: 60_000,
+  });
+  const reco = recoQuery.data;
 
-  const selectedStudent = useMemo(
-    () => students.find((s) => s.id === selectedId) ?? null,
-    [students, selectedId],
-  );
+  // ── Mutations ────────────────────────────────────────────────────────────
+  const placeMutation = useMutation({
+    mutationFn: createPlacement,
+    onSuccess: (_res, variables) => {
+      const name = confirmDialog?.student?.name ?? 'Siswa';
+      const indName = confirmDialog?.rec?.name ?? 'industri';
+      setConfirmDialog(null);
+      setToast({ severity: 'success', msg: `${name} ditempatkan di ${indName}` });
+      queryClient.invalidateQueries({ queryKey: ['pkl-class-dashboard', classId] });
+      queryClient.invalidateQueries({ queryKey: ['pkl-recos', variables.studentId] });
+    },
+    onError: (error, variables) => {
+      const { code, msg } = parseErr(error);
+      if (code === 'SLOT_UNAVAILABLE' || code === 'STALE_RECOMMENDATION') {
+        queryClient.invalidateQueries({ queryKey: ['pkl-recos', variables.studentId] });
+      } else if (code === 'STUDENT_ALREADY_PLACED') {
+        queryClient.invalidateQueries({ queryKey: ['pkl-class-dashboard', classId] });
+      }
+      setConfirmDialog(null);
+      setToast({ severity: 'error', msg });
+    },
+  });
 
-  const recommendations = useMemo(
-    () => (selectedStudent ? buildRecommendations(selectedStudent, slots) : []),
-    [selectedStudent, slots],
-  );
+  const cancelMutation = useMutation({
+    mutationFn: ({ placementId, reason }) => cancelPlacement(placementId, reason),
+    onSuccess: (_res, variables) => {
+      setCancelDialog(null);
+      setCancelReason('');
+      setToast({ severity: 'info', msg: 'Penempatan dibatalkan. Slot dikembalikan.' });
+      queryClient.invalidateQueries({ queryKey: ['pkl-class-dashboard', classId] });
+      if (variables.studentId) queryClient.invalidateQueries({ queryKey: ['pkl-recos', variables.studentId] });
+    },
+    onError: (error) => {
+      const { code, msg } = parseErr(error);
+      if (code === 'PLACEMENT_NOT_FOUND' || code === 'ALREADY_CANCELLED') {
+        queryClient.invalidateQueries({ queryKey: ['pkl-class-dashboard', classId] });
+      }
+      setToast({ severity: 'error', msg });
+    },
+  });
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
+  // ── Handlers ────────────────────────────────────────────────────────────
   const handleSelectStudent = (id) => {
-    if (id === selectedId) { if (isMobile) setMobileView('detail'); return; }
-    setPanelLoading(true);
     setSelectedId(id);
     if (isMobile) setMobileView('detail');
-    clearTimeout(panelTimer.current);
-    panelTimer.current = setTimeout(() => setPanelLoading(false), 260);
   };
 
   const toggleFilter = (code) => {
@@ -760,205 +642,234 @@ const PenempatanPKL = () => {
   const openConfirm = (rec) => setConfirmDialog({ student: selectedStudent, rec });
 
   const commitPlacement = () => {
-    if (!confirmDialog) return;
-    const { student, rec } = confirmDialog;
-    setPlacementBusy(true);
-    // Simulasi API POST /api/placements + update optimistis
-    setTimeout(() => {
-      setStudents((prev) => prev.map((s) =>
-        s.id === student.id
-          ? { ...s, placement: { industryId: rec.id, industryName: rec.name, source: 'recommendation' } }
-          : s,
-      ));
-      setSlots((prev) => ({ ...prev, [rec.id]: Math.max(0, (prev[rec.id] ?? 0) - 1) }));
-      setPlacementBusy(false);
+    if (!confirmDialog || !reco?.recommendationToken) {
+      setToast({ severity: 'error', msg: 'Sesi rekomendasi tidak valid. Memuat ulang…' });
       setConfirmDialog(null);
-      setToast({ severity: 'success', msg: `${student.name} ditempatkan di ${rec.name}` });
-
-      // §8.1 — fokus otomatis ke siswa berikutnya yang belum ditempatkan
-      setTimeout(() => {
-        setStudents((cur) => {
-          const nextId = pickDefaultStudent(cur.filter((s) => s.id !== student.id));
-          if (nextId) setSelectedId(nextId);
-          return cur;
-        });
-      }, 400);
-    }, 700);
+      if (selectedId) queryClient.invalidateQueries({ queryKey: ['pkl-recos', selectedId] });
+      return;
+    }
+    const { student, rec } = confirmDialog;
+    placeMutation.mutate({
+      studentId: student.id,
+      industryId: rec.id,
+      decisionPath: 'terima_rekomendasi',
+      recommendationRank: rec.rank,
+      recommendationToken: reco.recommendationToken,
+    });
   };
 
-  const openCancel = () => setCancelDialog({ student: selectedStudent });
+  const openCancel = () => { setCancelReason(''); setCancelDialog({ student: selectedStudent }); };
 
   const commitCancel = () => {
-    if (!cancelDialog) return;
-    const { student } = cancelDialog;
-    const industryId = student.placement?.industryId;
-    setStudents((prev) => prev.map((s) => (s.id === student.id ? { ...s, placement: null } : s)));
-    if (industryId && INITIAL_SLOTS[industryId] !== undefined) {
-      setSlots((prev) => ({ ...prev, [industryId]: (prev[industryId] ?? 0) + 1 }));
-    }
-    setCancelDialog(null);
-    setToast({ severity: 'info', msg: `Penempatan ${student.name} dibatalkan` });
+    const placement = cancelDialog?.student?.placement;
+    if (!placement?.id || !cancelReason.trim()) return;
+    cancelMutation.mutate({ placementId: placement.id, reason: cancelReason.trim(), studentId: cancelDialog.student.id });
   };
 
-  const topTitle = 'PKL Placement Engine';
-  const riskLabel = selectedStudent ? RISK[selectedStudent.riskCode].label : '';
+  const riskLabel = selectedStudent && RISK[selectedStudent.riskCode] ? RISK[selectedStudent.riskCode].label : (reco?.quadrantLabel ?? '');
   const showDetail = !isMobile || mobileView === 'detail';
   const showList = !isMobile || mobileView === 'list';
+  const studentPlaced = Boolean(selectedStudent?.placement);
+  const className = dashboard?.classInfo?.name ?? '';
+
+  const placementBusyFor = (recId) => placeMutation.isPending && confirmDialog?.rec?.id === recId;
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  const renderDetailPanel = () => {
+    if (!selectedStudent) {
+      return (
+        <Box sx={{ textAlign: 'center', py: 8, color: T.textMuted }}>
+          <Typography sx={{ fontSize: '0.875rem' }}>Pilih siswa untuk melihat rekomendasi</Typography>
+        </Box>
+      );
+    }
+    if (recoQuery.isPending || (recoQuery.isFetching && !reco)) return <PanelSkeleton />;
+    if (recoQuery.isError) {
+      return (
+        <StateCard
+          icon={<IconAlertTriangle size={36} color={T.danger} />}
+          title="Gagal memuat rekomendasi"
+          message={parseErr(recoQuery.error).msg}
+          actionLabel="Coba Lagi"
+          onAction={() => recoQuery.refetch()}
+        />
+      );
+    }
+
+    return (
+      <Box aria-live="polite">
+        <StudentDetailHeader student={selectedStudent} className={className} />
+
+        {studentPlaced && (
+          <PlacedBanner placement={selectedStudent.placement} busy={cancelMutation.isPending} onCancel={openCancel} />
+        )}
+
+        {reco && !reco.eligible ? (
+          <Box sx={{ textAlign: 'center', py: 5, px: 2, border: `1px dashed ${T.border}`, borderRadius: '12px' }}>
+            <IconInfoCircle size={28} color={T.textMuted} />
+            <Typography sx={{ fontSize: '0.875rem', color: T.textBody, mt: 1 }}>
+              {reco.msg || 'Profil siswa belum lengkap — rekomendasi butuh profil dua sisi.'}
+            </Typography>
+          </Box>
+        ) : (
+          <>
+            <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.textFaint, mb: 1.5 }}>
+              Rekomendasi Industri — Top {reco?.recommendations.length ?? 0}
+            </Typography>
+
+            {(reco?.recommendations.length ?? 0) === 0 ? (
+              <Box sx={{ textAlign: 'center', py: 6, border: `1px dashed ${T.border}`, borderRadius: '12px' }}>
+                <Typography sx={{ fontSize: '0.875rem', color: T.textMuted }}>
+                  Belum ada industri mitra yang cocok dengan profil siswa ini
+                </Typography>
+              </Box>
+            ) : (
+              reco.recommendations.map((rec) => (
+                <IndustryRecommendationCard
+                  key={rec.id}
+                  rec={rec}
+                  riskLabel={riskLabel}
+                  isPlacedHere={selectedStudent.placement?.industryId === rec.id}
+                  studentPlaced={studentPlaced}
+                  placementBusy={placementBusyFor(rec.id)}
+                  onPilih={openConfirm}
+                />
+              ))
+            )}
+
+            {!studentPlaced && (reco?.recommendations.length ?? 0) > 0 && (
+              <Box sx={{ textAlign: 'center', mt: 1 }}>
+                <Typography
+                  component="button"
+                  onClick={() => setToast({ severity: 'info', msg: 'Penempatan manual di luar Top-3 akan tersedia berikutnya.' })}
+                  sx={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8125rem', color: T.primary600, textDecoration: 'underline' }}
+                >
+                  Tempatkan ke industri lain…
+                </Typography>
+              </Box>
+            )}
+          </>
+        )}
+      </Box>
+    );
+  };
 
   return (
     <PageContainer title="Penempatan PKL" description="PKL Placement Engine – Kepala Jurusan">
-      {/* Wrapper: reclaim gutter Container (FullLayout) di layar lebar agar konten
-          memakai ruang kiri-kanan secara maksimal. Nilai negatif = besar padding
-          gutter MUI Container (16px xs, 24px sm+). */}
-      <Box sx={{ mx: { xs: 0, sm: '-24px', lg: '-24px' } }}>
-      {/* ═══ Topbar ═══ (PRD §6.1) */}
       <Box
         sx={{
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          gap: 2, flexWrap: 'wrap', px: { xs: 2, md: 2.5 }, py: 1.25, mb: 2,
-          borderRadius: '12px', backgroundColor: cardBg, border: `1px solid ${cardBorder}`,
+          backgroundColor: T.bgPage,
+          mx: { xs: -2, sm: '-24px' },
+          mt: { xs: -2, sm: '-24px' },
+          px: { xs: 2, md: 4 },
+          py: { xs: 2, md: 4 },
+          minHeight: 'calc(100vh - 64px)',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-          <Typography component={Link} to="/dashboard/kepala-jurusan/konfigurasi-jurusan" sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.primary600, textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}>
-            {CLASS_INFO.name}
-          </Typography>
-          <IconChevronRight size={15} color={T.textFaint} />
-          <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textStrong }}>Penempatan PKL</Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
-          <Avatar sx={{ width: 40, height: 40, backgroundColor: T.primary100, color: T.primary600 }}>
-            <IconUser size={22} />
-          </Avatar>
-          <Box sx={{ lineHeight: 1.2 }}>
-            <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textStrong }}>
-              {user?.name || 'Kepala Jurusan'}
-            </Typography>
-            <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>Kepala Jurusan {CLASS_INFO.name}</Typography>
-          </Box>
-        </Box>
-      </Box>
-
-      {/* ═══ Page Card ═══ */}
-      <Box sx={{ backgroundColor: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '16px', p: { xs: 2, md: 3 }, boxShadow: '0 1px 3px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.04)' }}>
-        {/* Judul + Progress widget */}
-        <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2 }}>
-          <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, lineHeight: 1.2, fontWeight: 700, color: T.textStrong }}>
-            {topTitle}
-          </Typography>
-          <ProgressPenempatan placed={progress.placed} total={progress.total} cardBg={cardBg} cardBorder={cardBorder} />
-        </Box>
-
-        {/* Filter chips + disclaimer */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 3 }}>
-          <RiskFilterChips summary={riskSummary} active={activeFilters} onToggle={toggleFilter} />
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <IconInfoCircle size={14} color={T.textFaint} />
-            <Typography sx={{ fontSize: '0.75rem', color: T.textFaint }}>
-              Sistem merekomendasikan · Keputusan final ada pada Kepala Jurusan
-            </Typography>
-          </Box>
-        </Box>
-
-        {/* Master-detail */}
-        <Box sx={{ display: 'flex', gap: { xs: 2, md: '20px', xl: '28px' }, alignItems: 'flex-start', flexDirection: { xs: 'column', md: 'row' } }}>
-          {/* Sidebar — melebar bertahap: tablet 260 → desktop 300 → wide 340 */}
-          {showList && (
-            <Box
-              sx={{
-                flex: { xs: '1 1 auto', md: '0 0 260px', lg: '0 0 300px', xl: '0 0 340px' },
-                width: { xs: '100%', md: 260, lg: 300, xl: 340 },
-                position: { md: 'sticky' }, top: { md: 88 },
-                maxHeight: { md: 'calc(100vh - 112px)' }, overflowY: { md: 'auto' },
-                pr: { md: 0.5 },
-              }}
-            >
-              <StudentSidebar
-                students={filteredStudents}
-                selectedId={selectedId}
-                onSelect={handleSelectStudent}
-                onResetFilter={() => setActiveFilters(new Set())}
-              />
-            </Box>
-          )}
-
-          {/* Detail panel */}
-          {showDetail && (
-            <Box sx={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
-              {isMobile && (
-                <Button
-                  size="small"
-                  startIcon={<IconArrowLeft size={16} />}
-                  onClick={() => setMobileView('list')}
-                  sx={{ mb: 1.5, textTransform: 'none', color: T.primary600 }}
+        <Box sx={{ maxWidth: 1440, mx: 'auto' }}>
+          {/* ═══ Topbar ═══ */}
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', px: { xs: 2, md: 2.5 }, py: 1.25, mb: 2, borderRadius: '12px', backgroundColor: cardBg, border: `1px solid ${cardBorder}` }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, minWidth: 0 }}>
+              <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textStrong, whiteSpace: 'nowrap' }}>Penempatan PKL</Typography>
+              <Typography sx={{ color: T.textFaint }}>·</Typography>
+              <FormControl size="small" sx={{ minWidth: 160 }}>
+                <Select
+                  value={classOptions.some((k) => k.id === classId) ? classId : ''}
+                  displayEmpty
+                  onChange={(e) => setClassId(e.target.value)}
+                  disabled={classOptionsQuery.isPending || classOptions.length === 0}
+                  sx={{ fontSize: '0.875rem', fontWeight: 600, borderRadius: '8px', '& .MuiSelect-select': { py: 0.75 } }}
                 >
-                  Pilih siswa lain
-                </Button>
-              )}
+                  {classOptions.length === 0 && <MenuItem value="">Memuat kelas…</MenuItem>}
+                  {classOptions.map((k) => (
+                    <MenuItem key={k.id} value={k.id}>{k.nama_kelas}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+              <Avatar sx={{ width: 40, height: 40, backgroundColor: T.primary100, color: T.primary600 }}>
+                <IconUser size={22} />
+              </Avatar>
+              <Box sx={{ lineHeight: 1.2 }}>
+                <Typography sx={{ fontSize: '0.875rem', fontWeight: 600, color: T.textStrong }}>{user?.name || 'Kepala Jurusan'}</Typography>
+                <Typography sx={{ fontSize: '0.75rem', color: T.textMuted }}>Kepala Jurusan</Typography>
+              </Box>
+            </Box>
+          </Box>
 
-              {panelLoading ? (
-                <PanelSkeleton />
-              ) : !selectedStudent ? (
-                <Box sx={{ textAlign: 'center', py: 8, color: T.textMuted }}>
-                  <Typography sx={{ fontSize: '0.875rem' }}>Pilih siswa untuk melihat rekomendasi</Typography>
+          {/* ═══ Content ═══ */}
+          {classOptionsQuery.isError ? (
+            <StateCard icon={<IconAlertTriangle size={40} color={T.danger} />} title="Gagal memuat daftar kelas" message={parseErr(classOptionsQuery.error).msg} actionLabel="Coba Lagi" onAction={() => classOptionsQuery.refetch()} />
+          ) : !classOptionsQuery.isPending && classOptions.length === 0 ? (
+            <StateCard icon={<IconInfoCircle size={40} color={T.textMuted} />} title="Belum ada kelas" message="Jurusan Anda belum memiliki kelas pada tahun ajaran aktif." />
+          ) : dashboardQuery.isError ? (
+            <StateCard icon={<IconAlertTriangle size={40} color={T.danger} />} title="Gagal memuat data kelas" message={parseErr(dashboardQuery.error).msg} actionLabel="Coba Lagi" onAction={() => dashboardQuery.refetch()} />
+          ) : (
+            <Box sx={{ backgroundColor: cardBg, border: `1px solid ${cardBorder}`, borderRadius: '16px', p: { xs: 2, md: 3 }, boxShadow: '0 1px 3px rgba(16,24,40,.06), 0 8px 24px rgba(16,24,40,.04)' }}>
+              {/* Judul + Progress */}
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 2 }}>
+                <Typography sx={{ fontSize: { xs: '1.5rem', md: '1.75rem' }, lineHeight: 1.2, fontWeight: 700, color: T.textStrong }}>PKL Placement Engine</Typography>
+                {dashboard ? (
+                  <ProgressPenempatan placed={dashboard.progress.placed} total={dashboard.progress.total} pending={dashboard.progress.pending} cardBg={cardBg} cardBorder={cardBorder} />
+                ) : (
+                  <Skeleton variant="rounded" width={210} height={92} sx={{ borderRadius: '12px' }} />
+                )}
+              </Box>
+
+              {/* Filter chips + disclaimer */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap', mb: 3 }}>
+                {dashboard ? (
+                  <RiskFilterChips counts={chipCounts} active={activeFilters} onToggle={toggleFilter} />
+                ) : (
+                  <Box sx={{ display: 'flex', gap: 1 }}>{[0, 1, 2, 3].map((i) => <Skeleton key={i} variant="rounded" width={120} height={32} sx={{ borderRadius: '999px' }} />)}</Box>
+                )}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  <IconInfoCircle size={14} color={T.textFaint} />
+                  <Typography sx={{ fontSize: '0.75rem', color: T.textFaint }}>Sistem merekomendasikan · Keputusan final ada pada Kepala Jurusan</Typography>
                 </Box>
-              ) : (
-                <Box aria-live="polite">
-                  <StudentDetailHeader student={selectedStudent} />
-                  <MatchingWeights riskCode={selectedStudent.riskCode} />
+              </Box>
 
-                  <Typography sx={{ fontSize: '0.6875rem', fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: T.textFaint, mb: 1.5 }}>
-                    Rekomendasi Industri — Top {recommendations.length}
-                  </Typography>
+              {/* Master-detail */}
+              <Box sx={{ display: 'flex', gap: { xs: 2, md: '20px', xl: '28px' }, alignItems: 'flex-start', flexDirection: { xs: 'column', md: 'row' } }}>
+                {showList && (
+                  <Box sx={{ flex: { xs: '1 1 auto', md: '0 0 260px', lg: '0 0 300px', xl: '0 0 340px' }, width: { xs: '100%', md: 260, lg: 300, xl: 340 }, position: { md: 'sticky' }, top: { md: 88 }, maxHeight: { md: 'calc(100vh - 112px)' }, overflowY: { md: 'auto' }, pr: { md: 0.5 } }}>
+                    {dashboard ? (
+                      <StudentSidebar
+                        className={className}
+                        students={filteredStudents}
+                        riskSummary={riskSummary}
+                        selectedId={selectedId}
+                        onSelect={handleSelectStudent}
+                        onResetFilter={() => setActiveFilters(new Set())}
+                      />
+                    ) : (
+                      <SidebarSkeleton />
+                    )}
+                  </Box>
+                )}
 
-                  {recommendations.length === 0 ? (
-                    <Box sx={{ textAlign: 'center', py: 6, border: `1px dashed ${T.border}`, borderRadius: '12px' }}>
-                      <Typography sx={{ fontSize: '0.875rem', color: T.textMuted }}>
-                        Belum ada industri mitra yang cocok dengan profil siswa ini
-                      </Typography>
-                    </Box>
-                  ) : (
-                    recommendations.map((rec) => {
-                      const isPlacedHere = selectedStudent.placement?.industryId === rec.id;
-                      return (
-                        <IndustryRecommendationCard
-                          key={rec.id}
-                          rec={rec}
-                          riskLabel={riskLabel}
-                          isPlacedHere={isPlacedHere}
-                          placementBusy={placementBusy && confirmDialog?.rec?.id === rec.id}
-                          onPilih={openConfirm}
-                          onBatal={openCancel}
-                        />
-                      );
-                    })
-                  )}
-
-                  {/* §8.5 — jalur penempatan manual di luar rekomendasi */}
-                  {!selectedStudent.placement && recommendations.length > 0 && (
-                    <Box sx={{ textAlign: 'center', mt: 1 }}>
-                      <Typography
-                        component="button"
-                        onClick={() => setToast({ severity: 'info', msg: 'Pencarian industri manual akan tersedia setelah integrasi API.' })}
-                        sx={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.8125rem', color: T.primary600, textDecoration: 'underline' }}
-                      >
-                        Tempatkan ke industri lain…
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              )}
+                {showDetail && (
+                  <Box sx={{ flex: '1 1 auto', minWidth: 0, width: '100%' }}>
+                    {isMobile && (
+                      <Button size="small" startIcon={<IconArrowLeft size={16} />} onClick={() => setMobileView('list')} sx={{ mb: 1.5, textTransform: 'none', color: T.primary600 }}>
+                        Pilih siswa lain
+                      </Button>
+                    )}
+                    {dashboard ? renderDetailPanel() : <PanelSkeleton />}
+                  </Box>
+                )}
+              </Box>
             </Box>
           )}
         </Box>
       </Box>
-      </Box>
 
-      {/* ═══ Modal konfirmasi penempatan (PRD §8.2) ═══ */}
-      <Dialog open={Boolean(confirmDialog)} onClose={() => !placementBusy && setConfirmDialog(null)} maxWidth="xs" fullWidth>
+      {/* ═══ Modal konfirmasi penempatan ═══ */}
+      <Dialog open={Boolean(confirmDialog)} onClose={() => !placeMutation.isPending && setConfirmDialog(null)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           Konfirmasi Penempatan
-          <IconButton size="small" onClick={() => !placementBusy && setConfirmDialog(null)}><IconX size={18} /></IconButton>
+          <IconButton size="small" onClick={() => !placeMutation.isPending && setConfirmDialog(null)}><IconX size={18} /></IconButton>
         </DialogTitle>
         <DialogContent>
           {confirmDialog && (
@@ -981,50 +892,48 @@ const PenempatanPKL = () => {
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setConfirmDialog(null)} disabled={placementBusy} sx={{ textTransform: 'none', color: T.textMuted }}>
-            Batal
-          </Button>
-          <Button
-            onClick={commitPlacement}
-            disabled={placementBusy}
-            variant="contained"
-            sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '8px', backgroundColor: T.primary600, '&:hover': { backgroundColor: T.primary700 } }}
-          >
-            {placementBusy ? <><CircularProgress size={16} sx={{ mr: 1, color: '#fff' }} /> Menempatkan…</> : 'Tetapkan Penempatan'}
+          <Button onClick={() => setConfirmDialog(null)} disabled={placeMutation.isPending} sx={{ textTransform: 'none', color: T.textMuted }}>Batal</Button>
+          <Button onClick={commitPlacement} disabled={placeMutation.isPending} variant="contained" sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '8px', backgroundColor: T.primary600, '&:hover': { backgroundColor: T.primary700 } }}>
+            {placeMutation.isPending ? <><CircularProgress size={16} sx={{ mr: 1, color: '#fff' }} /> Menempatkan…</> : 'Tetapkan Penempatan'}
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* ═══ Modal konfirmasi pembatalan (PRD §8.4) ═══ */}
-      <Dialog open={Boolean(cancelDialog)} onClose={() => setCancelDialog(null)} maxWidth="xs" fullWidth>
+      {/* ═══ Modal konfirmasi pembatalan (butuh reason) ═══ */}
+      <Dialog open={Boolean(cancelDialog)} onClose={() => !cancelMutation.isPending && setCancelDialog(null)} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: 700 }}>Batalkan Penempatan</DialogTitle>
         <DialogContent>
           {cancelDialog && (
-            <Typography sx={{ fontSize: '0.875rem', color: T.textBody }}>
-              Batalkan penempatan <b>{cancelDialog.student.name}</b> di{' '}
-              <b>{cancelDialog.student.placement?.industryName}</b>? Slot industri akan dikembalikan.
-            </Typography>
+            <>
+              <Typography sx={{ fontSize: '0.875rem', color: T.textBody, mb: 1.5 }}>
+                Batalkan penempatan <b>{cancelDialog.student.name}</b> di <b>{cancelDialog.student.placement?.industryName}</b>? Slot industri akan dikembalikan.
+              </Typography>
+              <TextField
+                fullWidth
+                multiline
+                minRows={2}
+                size="small"
+                label="Alasan pembatalan"
+                placeholder="Mis. Industri menutup kuota mendadak"
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                required
+              />
+            </>
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setCancelDialog(null)} sx={{ textTransform: 'none', color: T.textMuted }}>Tidak</Button>
-          <Button onClick={commitCancel} variant="contained" color="error" sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '8px' }}>
-            Ya, Batalkan
+          <Button onClick={() => setCancelDialog(null)} disabled={cancelMutation.isPending} sx={{ textTransform: 'none', color: T.textMuted }}>Tidak</Button>
+          <Button onClick={commitCancel} disabled={cancelMutation.isPending || !cancelReason.trim()} variant="contained" color="error" sx={{ textTransform: 'none', fontWeight: 700, borderRadius: '8px' }}>
+            {cancelMutation.isPending ? <><CircularProgress size={16} sx={{ mr: 1, color: '#fff' }} /> Membatalkan…</> : 'Ya, Batalkan'}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* ═══ Toast ═══ */}
-      <Snackbar
-        open={Boolean(toast)}
-        autoHideDuration={3500}
-        onClose={() => setToast(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
+      <Snackbar open={Boolean(toast)} autoHideDuration={3800} onClose={() => setToast(null)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
         {toast ? (
-          <Alert severity={toast.severity} variant="filled" onClose={() => setToast(null)} sx={{ borderRadius: '10px' }}>
-            {toast.msg}
-          </Alert>
+          <Alert severity={toast.severity} variant="filled" onClose={() => setToast(null)} sx={{ borderRadius: '10px' }}>{toast.msg}</Alert>
         ) : undefined}
       </Snackbar>
     </PageContainer>
