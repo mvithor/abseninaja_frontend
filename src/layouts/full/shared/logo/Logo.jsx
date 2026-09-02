@@ -7,13 +7,14 @@ import { styled } from '@mui/material';
 const Header = styled('header')({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   height: '80px',
-  padding: '0 4px',
+  padding: '12px',
 });
 
 const LogoWrapper = styled(Link)({
   display: 'block',
-  height: '30px',
+  height: '32px',
   '& img': {
     height: '100%',
     width: 'auto',
