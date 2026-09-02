@@ -161,7 +161,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
             size="large"
             fullWidth
             sx={{
-              backgroundColor: '#973BE0',
+              backgroundColor: '#5E5CE6',
               '&:hover': {
                 backgroundColor: '#2A85FF',
               },
