@@ -5,11 +5,12 @@ const CancelButton = ({ onClick }) => {
     return (
         <Button
             sx={{
-                backgroundColor: "#2F327D",
-                '&:hover': { backgroundColor: "#280274" }
+                backgroundColor: "transparent",
+                borderColor: "#D1D5DB",
+                color: "#374151",
+                '&:hover': { backgroundColor: "#F3F4F6", borderColor: "#D1D5DB", color: "#374151" }
             }}
-            variant="contained"
-            color="secondary"
+            variant="outlined"
             type="button"
             onClick={onClick}
         >

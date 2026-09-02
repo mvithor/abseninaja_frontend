@@ -1,4 +1,3 @@
-import React from "react";
 import { Button, CircularProgress, Box } from "@mui/material";
 
 const SubmitButton = ({ isLoading = false, children }) => {
@@ -8,7 +7,7 @@ const SubmitButton = ({ isLoading = false, children }) => {
       variant="contained"
       disabled={isLoading}
       sx={{
-        backgroundColor: "#973BE0",
+        backgroundColor: "#5E5CE6",
         color: "white",
         minWidth: "100px",
         height: "38px",
@@ -21,10 +20,10 @@ const SubmitButton = ({ isLoading = false, children }) => {
         justifyContent: "center",
         gap: 2,
         '&:hover': {
-          backgroundColor: "#7d2dbd",
+          backgroundColor: "#5E5CE6",
         },
         '&.Mui-disabled': {
-          backgroundColor: "#973BE0",
+          backgroundColor: "#5E5CE6",
           opacity: 0.8,
           color: "#fff",
         },
