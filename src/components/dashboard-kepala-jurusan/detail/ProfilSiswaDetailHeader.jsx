@@ -1,6 +1,6 @@
 import { Box, Typography, Chip, useTheme } from '@mui/material';
 import UserIcon from 'src/assets/images/svgs/user.svg?react';
-import { KUADRAN_CONFIG } from '../kuadranConfig';
+import { KUADRAN_CONFIG } from '../sga/KuadranConfig';
 
 const ProfilSiswaDetailHeader = ({ header }) => {
   const theme = useTheme();

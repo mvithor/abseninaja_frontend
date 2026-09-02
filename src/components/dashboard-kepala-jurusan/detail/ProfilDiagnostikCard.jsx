@@ -1,6 +1,6 @@
 import { Box, Typography, useTheme } from '@mui/material';
 import Chart from 'react-apexcharts';
-import { KUADRAN_CONFIG } from '../kuadranConfig';
+import { KUADRAN_CONFIG } from '../sga/KuadranConfig';
 
 const REKOMENDASI_RINGKAS = {
   SIAP_PENUH: 'Pertahankan performa saat ini',
