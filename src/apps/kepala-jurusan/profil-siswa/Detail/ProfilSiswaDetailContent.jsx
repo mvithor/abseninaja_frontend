@@ -15,7 +15,7 @@ import TrenSkorChart from 'src/components/dashboard-kepala-jurusan/detail/TrenSk
 // Presentational murni: tidak fetching, tidak punya query state.
 // Semua data datang dari props `data` (bentuknya sama persis dengan
 // res.data.data dari GET /api/v1/kepala-jurusan/profile-siswa/:siswaId).
-const ProfilSiswaDetailContent = ({ data }) => {
+const ProfilSiswaDetailContent = ({ data, onCetak, exporting }) => {
   return (
     <Box sx={{ p: { xs: 1, md: 2 } }}>
       <ProfilSiswaDetailHeader header={data.header} />
@@ -83,7 +83,11 @@ const ProfilSiswaDetailContent = ({ data }) => {
               industriDirekomendasikan={data.industri_direkomendasikan}
             />
             <RekomendasiIntervensiCard rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi} />
-            <CatatanRencanaPklCard catatan={data.rencana_pkl?.catatan_rencana_pkl} />
+            <CatatanRencanaPklCard
+              catatan={data.rencana_pkl?.catatan_rencana_pkl}
+              onCetak={onCetak}
+              exporting={exporting}
+            />
           </Box>
         </Grid>
       </Grid>
@@ -98,6 +102,8 @@ const ProfilSiswaDetailContent = ({ data }) => {
 };
 
 ProfilSiswaDetailContent.propTypes = {
+  onCetak: PropTypes.func,
+  exporting: PropTypes.bool,
   data: PropTypes.shape({
     header: PropTypes.object.isRequired,
     behavior_score_cumulative: PropTypes.number,
