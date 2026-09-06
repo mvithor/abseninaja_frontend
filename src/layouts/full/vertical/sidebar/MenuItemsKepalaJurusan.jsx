@@ -54,6 +54,12 @@ import { uniqueId } from 'lodash';
     },
     {
       id: uniqueId(),
+      title: 'Pembekalan PKL',
+      icon: IconDashboard,
+      href: '/dashboard/kepala-jurusan/pembekalan-pkl',
+    },
+    {
+      id: uniqueId(),
       title: 'Evaluasi Industri',
       icon: IconDashboard,
       href: '#',

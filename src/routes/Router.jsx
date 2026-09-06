@@ -287,6 +287,8 @@ const MapelSkkniMappingList = Loadable(lazy(() => import('../views/apps/kepala-j
 const KonfigurasiJurusanList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/konfigurasi-jurusan/KonfigurasiJurusan')));
 // Penempatan PKL
 const PenempatanPKL = Loadable(lazy(() => import('../views/apps/kepala-jurusan/penempatan-pkl/PenempatanPKL')));
+// Pembekalan PKL
+const PembekalanPKL = Loadable(lazy(() => import('../views/apps/kepala-jurusan/pembekalan-pkl/PembekalanPKL')));
 // Profil Siswa
 const ProfilSiswaList = Loadable(lazy(() => import('../views/apps/kepala-jurusan/profil-siswa/ProfilSiswaList')));
 const ProfilSiswaDetail = Loadable(lazy(() => import('../views/apps/kepala-jurusan/profil-siswa/ProfilSiswaDetail')));
@@ -591,6 +593,8 @@ const Router = [
                     { path: 'konfigurasi-jurusan', element: <KonfigurasiJurusanList/> },
                     // Penempatan PKL
                     { path: 'penempatan-pkl', element: <PenempatanPKL/> },
+                    // Pembekalan PKL
+                    { path: 'pembekalan-pkl', element: <PembekalanPKL/> },
                     // Profil Siswa
                     { path: 'profil-siswa', element: <ProfilSiswaList/> },
                     { path: 'profil-siswa/detail/:siswaId', element: <ProfilSiswaDetail/> }
