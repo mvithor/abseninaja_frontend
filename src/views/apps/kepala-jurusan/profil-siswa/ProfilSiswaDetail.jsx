@@ -60,10 +60,24 @@ const ProfilSiswaDetail = () => {
     );
   }
 
+  // [PLACEHOLDER] Tindak lanjut ke guru yang bersangkutan. Response
+  // detail siswa belum memuat data kontak/ID guru, jadi handler ini
+  // sengaja dibuat sebagai titik sambung: ganti isinya dengan navigasi
+  // ke halaman/pesan guru begitu backend menyediakan data guru pengampu.
+  // Payload: { jenis, target, targetLabel, kodeUnit?, komponen?, ... }
+  const handleTindakLanjutGuru = (payload) => {
+    console.log('[TindakLanjutGuru]', payload);
+  };
+
   return (
     <PageContainer title={`Profil — ${data.header.nama}`} description="Detail Profil Kesiapan PKL">
       <Alerts error={exportError} success={exportSuccess} />
-      <ProfilSiswaDetailContent data={data} onCetak={handleCetak} exporting={exporting} />
+      <ProfilSiswaDetailContent
+        data={data}
+        onCetak={handleCetak}
+        exporting={exporting}
+        onTindakLanjutGuru={handleTindakLanjutGuru}
+      />
     </PageContainer>
   );
 };

@@ -9,13 +9,14 @@ import BreakdownBehaviorCard from 'src/components/dashboard-kepala-jurusan/detai
 import KesiapanPklCard from 'src/components/dashboard-kepala-jurusan/detail/KesiapanPklCard';
 import UnitKompetensiCard from 'src/components/dashboard-kepala-jurusan/detail/UnitKompetensiCard';
 import RekomendasiIntervensiCard from 'src/components/dashboard-kepala-jurusan/detail/RekomendasiIntervensiCard';
+import TindakLanjutGuruCard from 'src/components/dashboard-kepala-jurusan/detail/TindakLanjutGuruCard';
 import CatatanRencanaPklCard from 'src/components/dashboard-kepala-jurusan/detail/CatatanRencanaPklCard';
 import TrenSkorChart from 'src/components/dashboard-kepala-jurusan/detail/TrenSkorChart';
 
 // Presentational murni: tidak fetching, tidak punya query state.
 // Semua data datang dari props `data` (bentuknya sama persis dengan
 // res.data.data dari GET /api/v1/kepala-jurusan/profile-siswa/:siswaId).
-const ProfilSiswaDetailContent = ({ data, onCetak, exporting }) => {
+const ProfilSiswaDetailContent = ({ data, onCetak, exporting, onTindakLanjutGuru }) => {
   return (
     <Box sx={{ p: { xs: 1, md: 2 } }}>
       <ProfilSiswaDetailHeader header={data.header} />
@@ -83,6 +84,14 @@ const ProfilSiswaDetailContent = ({ data, onCetak, exporting }) => {
               industriDirekomendasikan={data.industri_direkomendasikan}
             />
             <RekomendasiIntervensiCard rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi} />
+            <TindakLanjutGuruCard
+              profilStatus={data.header.profil_status}
+              behaviorPerKomponen={data.behavior_per_komponen}
+              ambangBehavior={data.kesiapan_pkl.behavior.ambang}
+              daftarUnit={data.daftar_unit}
+              namaSiswa={data.header.nama}
+              onTindakLanjut={onTindakLanjutGuru}
+            />
             <CatatanRencanaPklCard
               catatan={data.rencana_pkl?.catatan_rencana_pkl}
               onCetak={onCetak}
@@ -104,6 +113,7 @@ const ProfilSiswaDetailContent = ({ data, onCetak, exporting }) => {
 ProfilSiswaDetailContent.propTypes = {
   onCetak: PropTypes.func,
   exporting: PropTypes.bool,
+  onTindakLanjutGuru: PropTypes.func,
   data: PropTypes.shape({
     header: PropTypes.object.isRequired,
     behavior_score_cumulative: PropTypes.number,
