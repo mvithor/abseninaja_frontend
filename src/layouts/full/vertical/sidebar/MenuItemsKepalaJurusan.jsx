@@ -1,8 +1,7 @@
 import {
     IconLayoutDashboard, IconUserCircle, IconSettings, IconBriefcase, IconTargetArrow, IconUsers, IconHistory,
     IconActivity, IconClipboardCheck, IconAlertTriangle, IconDatabase, IconAdjustmentsHorizontal, IconCertificate,
-    IconArrowsRightLeft, IconBuildingFactory2, IconBook,
- 
+    IconArrowsRightLeft, IconBuildingFactory2, IconBook, IconSchool,
   } from '@tabler/icons-react';
   
 import { uniqueId } from 'lodash';
@@ -32,6 +31,12 @@ import { uniqueId } from 'lodash';
         icon: IconBriefcase,
         href: '',
         children: [
+            {
+                id: uniqueId(),
+                title: 'Pembekalan PKL',
+                icon: IconSchool,
+                href: '/dashboard/kepala-jurusan/pembekalan-pkl',
+            },
             {
                 id: uniqueId(),
                 title: 'Penempatan PKL',
