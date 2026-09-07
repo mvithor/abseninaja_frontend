@@ -82,7 +82,11 @@ const ProfilSiswaDetailContent = ({ data }) => {
               estimasiSlotPkl={data.estimasi_slot_pkl}
               industriDirekomendasikan={data.industri_direkomendasikan}
             />
-            <RekomendasiIntervensiCard rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi} />
+            <RekomendasiIntervensiCard
+              rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi}
+              tersedia={data.rencana_pkl?.tersedia}
+              catatan={data.rencana_pkl?.catatan_rencana_pkl}
+            />
             <CatatanRencanaPklCard catatan={data.rencana_pkl?.catatan_rencana_pkl} />
           </Box>
         </Grid>

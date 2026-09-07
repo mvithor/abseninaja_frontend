@@ -5,7 +5,7 @@ const BADGE_CONFIG = {
   SEDANG: { color: '#D97706', bg: '#FF7B0114' },
 };
 
-const RekomendasiIntervensiCard = ({ rekomendasiIntervensi }) => {
+const RekomendasiIntervensiCard = ({ rekomendasiIntervensi, tersedia = true, catatan }) => {
   const theme = useTheme();
   const items = rekomendasiIntervensi || [];
 
@@ -16,7 +16,13 @@ const RekomendasiIntervensiCard = ({ rekomendasiIntervensi }) => {
         Dihasilkan oleh sistem · Keputusan final ada pada kepala jurusan
       </Typography>
 
-      {items.length === 0 ? (
+      {!tersedia ? (
+        <Box sx={{ p: 1.5, borderRadius: '8px', backgroundColor: theme.palette.action.hover, border: `1px dashed ${theme.palette.divider}` }}>
+          <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            {catatan || 'Data belum cukup untuk menyusun rekomendasi intervensi.'}
+          </Typography>
+        </Box>
+      ) : items.length === 0 ? (
         <Box sx={{ p: 1.5, borderRadius: '8px', backgroundColor: '#34C75914' }}>
           <Typography variant="body2" sx={{ color: '#059669', fontWeight: 600 }}>
             Tidak ada rekomendasi intervensi — seluruh unit dan komponen behavior sudah memenuhi ambang.

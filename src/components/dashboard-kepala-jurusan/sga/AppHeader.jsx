@@ -1,5 +1,6 @@
 import { Box, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { IconAlertTriangle, IconUser } from '@tabler/icons-react';
+import { IconAlertTriangle } from '@tabler/icons-react';
+import UserIcon from 'src/assets/images/svgs/user.svg?react';
 import { T, RADIUS, SHADOW_HEADER } from './sgaConfig';
 
 // PRD §5.2 — pill peringatan. Disembunyikan bila count === 0.
@@ -25,20 +26,18 @@ export const EwsBadge = ({ count, onClick }) => {
   );
 };
 
-// PRD §5.3 — avatar + nama + role. Tanpa dropdown di v1.0.
 export const UserChip = ({ user, compact }) => (
   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
     <Box
       sx={{
         width: 44, height: 44, borderRadius: '50%', flexShrink: 0, overflow: 'hidden',
-        backgroundColor: T.primary, color: '#fff',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
       }}
     >
       {user.avatarUrl ? (
         <Box component="img" src={user.avatarUrl} alt="" sx={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
-        <IconUser size={22} />
+        <Box component={UserIcon} sx={{ width: '100%', height: '100%' }} />
       )}
     </Box>
     {!compact && (
@@ -73,9 +72,9 @@ const AppHeader = ({ schoolName, academicYear, semester, ewsCount, user }) => {
       <Box sx={{ minWidth: 0 }}>
         <Typography
           component="h1"
-          sx={{ fontSize: { xs: '1.5rem', md: '2rem' }, lineHeight: 1.25, fontWeight: 700, letterSpacing: '-0.01em', color: T.textPrimary }}
+          sx={{ fontSize: { xs: '1.5rem', md: '1.6rem' }, lineHeight: 1.25, fontWeight: 700, letterSpacing: '-0.01em', color: T.textPrimary }}
         >
-          Skill Gap Advisor
+          Prakersa
         </Typography>
         <Typography sx={{ fontSize: '0.9375rem', lineHeight: 1.45, color: T.textSecondary, mt: 0.5 }}>
           {schoolName} · TA {academicYear} · Semester {semester}

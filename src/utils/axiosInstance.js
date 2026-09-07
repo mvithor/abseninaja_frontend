@@ -9,10 +9,15 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-console.log(import.meta.env.VITE_API_URL)
+const PUBLIC_AUTH_ENDPOINTS = ['/api/v1/login'];
+const isPublicAuthRequest = (url) => PUBLIC_AUTH_ENDPOINTS.some((path) => url?.includes(path));
 
 axiosInstance.interceptors.request.use(
   (config) => {
+    if (isPublicAuthRequest(config.url)) {
+      return config;
+    }
+
     const state = store.getState();
     const token = state.user.accessToken;
 
@@ -24,7 +29,7 @@ axiosInstance.interceptors.request.use(
         // Periksa apakah token sudah kadaluarsa
         if (decodedToken.exp < currentTime) {
           store.dispatch(clearUser());
-          window.location.href = '/';
+          window.location.href = '/?expired=true';
           return Promise.reject(new Error('Token expired'));
         }
 
@@ -33,7 +38,7 @@ axiosInstance.interceptors.request.use(
       } catch (error) {
         console.error('Token decoding error:', error?.message || error);
         store.dispatch(clearUser());
-        window.location.href = '/';
+        window.location.href = '/?expired=true';
         return Promise.reject(error);
       }
     }
@@ -67,9 +72,11 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    if (error.response?.status === 401) {
+    const isPublicAuthCall = isPublicAuthRequest(error.config?.url);
+
+    if (error.response?.status === 401 && !isPublicAuthCall) {
       store.dispatch(clearUser());
-      window.location.href = '/';
+      window.location.href = '/?expired=true';
     }
 
     console.error('Response Error:', error.message);
@@ -78,5 +85,3 @@ axiosInstance.interceptors.response.use(
 );
 
 export default axiosInstance;
-
-

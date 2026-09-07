@@ -1,6 +1,6 @@
-import { Box, Typography, useTheme, Chip, Stack, Divider } from '@mui/material';
+import { Box, Typography, useTheme, Stack, Divider, Button } from '@mui/material';
 import {
-  IconCheck, IconX, IconClock, IconTrendingDown, IconAlertTriangle, IconBuilding,
+  IconCheck, IconX, IconClock, IconTrendingDown, IconAlertTriangle, IconArrowRight,
 } from '@tabler/icons-react';
 
 const StatusBox = ({ ok, label, keterangan }) => (
@@ -71,68 +71,42 @@ const EstimasiSiapPklBox = ({ estimasiSlotPkl }) => {
   );
 };
 
-// industriDirekomendasikan:
-//   { tersedia: false, alasan } ATAU
-//   { tersedia: true, pratinjau: true, catatan, kandidat: [{ mitra_id,
-//     nama_industri, match_score_final, tingkat_keyakinan,
-//     konteks_riwayat: { total, berhasil } | null }] }
-const IndustriRekomendasiBox = ({ industriDirekomendasikan }) => {
-  if (!industriDirekomendasikan?.tersedia || !industriDirekomendasikan.kandidat?.length) {
-    return (
-      <Box sx={{ p: 1.5, borderRadius: '8px', backgroundColor: 'action.hover', border: (t) => `1px dashed ${t.palette.divider}` }}>
-        <Typography variant="caption" fontWeight={700} sx={{ color: 'text.secondary', display: 'block', mb: 0.3 }}>Industri yang Direkomendasikan</Typography>
-        <Typography variant="caption" sx={{ color: 'text.disabled' }}>
-          {industriDirekomendasikan?.alasan || 'Belum ada mitra yang cocok untuk profil ini saat ini.'}
-        </Typography>
-      </Box>
-    );
-  }
+// [DIRETIRE, Langkah 3] Sebelumnya menampilkan 1-2 kandidat mitra hasil
+// engine lama (matching-engine-service.js). Sekarang cuma CTA ke PKL
+// Placement Engine — satu-satunya sumber rekomendasi mitra di aplikasi.
+// `placementEngineHref` opsional: kalau belum di-supply dari pemanggil,
+// tombol disembunyikan dan cuma teks ajakan yang tampil (menghindari
+// link ke rute yang belum dikonfirmasi benar).
+const IndustriRekomendasiBox = ({ industriDirekomendasikan, placementEngineHref }) => {
+  const pesan = industriDirekomendasikan?.msg
+    || 'Rekomendasi mitra industri terkini tersedia di PKL Placement Engine.';
 
   return (
     <Box sx={{ p: 1.5, borderRadius: '8px', backgroundColor: 'action.hover' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1, gap: 1 }}>
-        <Typography variant="caption" fontWeight={700} sx={{ color: 'text.secondary' }}>Industri yang Direkomendasikan</Typography>
-        {industriDirekomendasikan.pratinjau && (
-          <Chip
-            label="Pratinjau — bukan keputusan resmi"
-            size="small"
-            sx={{ height: 18, fontSize: '0.65rem', backgroundColor: '#FF9F0A22', color: '#B25E00', fontWeight: 700 }}
-          />
-        )}
-      </Box>
-
-      <Stack spacing={1}>
-        {industriDirekomendasikan.kandidat.map((k) => (
-          <Box key={k.mitra_id} sx={{ display: 'flex', alignItems: 'center', gap: 1.2, p: 1, borderRadius: '6px', backgroundColor: (t) => t.palette.background.paper }}>
-            <Box sx={{ width: 28, height: 28, borderRadius: '6px', backgroundColor: '#5E5CE6', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <IconBuilding size={16} color="#fff" />
-            </Box>
-            <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-              <Typography variant="body2" fontWeight={700} noWrap>{k.nama_industri}</Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Skor kecocokan {Math.round(k.match_score_final)} · {k.tingkat_keyakinan}
-                {k.konteks_riwayat ? ` · Riwayat ${k.konteks_riwayat.berhasil} dari ${k.konteks_riwayat.total} berhasil` : ''}
-              </Typography>
-            </Box>
-          </Box>
-        ))}
-      </Stack>
-
-      {industriDirekomendasikan.catatan && (
-        <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mt: 1 }}>
-          {industriDirekomendasikan.catatan}
-        </Typography>
+      <Typography variant="caption" fontWeight={700} sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
+        Industri yang Direkomendasikan
+      </Typography>
+      <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mb: placementEngineHref ? 1.2 : 0 }}>
+        {pesan}
+      </Typography>
+      {placementEngineHref && (
+        <Button
+          href={placementEngineHref}
+          size="small"
+          variant="outlined"
+          endIcon={<IconArrowRight size={14} />}
+          sx={{ textTransform: 'none' }}
+        >
+          Buka PKL Placement Engine
+        </Button>
       )}
     </Box>
   );
 };
 
-// [FIX] Keterangan kompetensi sekarang bandingkan angka asli dulu
-// (skorMemenuhiAmbang), baru tentukan kalimat mana yang dipakai —
-// sebelumnya `overridden` langsung dianggap berarti "skor sudah cukup",
-// padahal overridden dan skor-di-bawah-ambang bisa terjadi BERSAMAAN
-// (skor memang rendah, DAN ada unit Kritis) — persis bug yang sama
-// dengan DimensiScoreCard, ditemukan lewat skenario skor 64 < ambang 70.
+// Keterangan kompetensi bandingkan angka asli dulu (skorMemenuhiAmbang),
+// baru tentukan kalimat mana yang dipakai — overridden dan skor-di-bawah-
+// ambang bisa terjadi BERSAMAAN (skor memang rendah, DAN ada unit Kritis).
 const buildKeteranganKompetensi = (competency) => {
   const skor = Number(competency.skor);
   const ambang = Number(competency.ambang);
@@ -147,7 +121,7 @@ const buildKeteranganKompetensi = (competency) => {
   return `Skor ${Math.round(skor)} ${skorMemenuhiAmbang ? '≥' : '<'} threshold ${Math.round(ambang)}`;
 };
 
-const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl, industriDirekomendasikan }) => {
+const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl, industriDirekomendasikan, placementEngineHref }) => {
   const theme = useTheme();
 
   return (
@@ -168,7 +142,10 @@ const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl, industriDirekomendasika
       <Divider sx={{ my: 1.5 }} />
 
       <EstimasiSiapPklBox estimasiSlotPkl={estimasiSlotPkl} />
-      <IndustriRekomendasiBox industriDirekomendasikan={industriDirekomendasikan} />
+      <IndustriRekomendasiBox
+        industriDirekomendasikan={industriDirekomendasikan}
+        placementEngineHref={placementEngineHref}
+      />
     </Box>
   );
 };
