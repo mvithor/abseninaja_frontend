@@ -44,7 +44,6 @@ const SiswaPklList = () => {
   });
 
   const rawList = useMemo(() => query.data?.students ?? [], [query.data]);
-  const semesterLabel = query.data?.semester?.label || "";
 
   const kelasOptions = useMemo(() => {
     const set = new Set(rawList.map((r) => r.kelas).filter(Boolean));
@@ -125,7 +124,7 @@ const SiswaPklList = () => {
 
   return (
     <PageContainer title="Siswa PKL" description="Siswa yang sedang menjalani PKL semester ini">
-      <ParentCard title={`Siswa PKL${semesterLabel ? ` — ${semesterLabel}` : ''}`}>
+      <ParentCard title="Siswa PKL">
         <Alerts error={error} success={success} />
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, width: "100%", mb: 3 }}>
           <SearchButton value={search} onChange={handleSearchChange} placeholder="Cari Nama Siswa / Mitra" />

@@ -13,12 +13,6 @@ import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
 
-// [KONTEKS] Response endpoint ini bentuknya OBJEK ({ total_siswa,
-// kelas_options, semua_siswa }), BUKAN array langsung seperti Mitra
-// Industri — jadi fetch function return res.data.data apa adanya, dipecah
-// di komponen. `data: null` (kasus tidak ada semester aktif) otomatis
-// tertangani lewat optional chaining di bawah, tidak perlu percabangan
-// terpisah.
 const fetchProfilSiswaList = async () => {
   const res = await axiosInstance.get("/api/v1/kepala-jurusan/profile-siswa/list");
   return res.data?.data ?? null;
@@ -45,10 +39,14 @@ const ProfilSiswaList = () => {
   // kelas kosong string = "Semua Kelas", sesuai pola status di Mitra
   // Industri — dibandingkan langsung ke nama_kelas (string), bukan id,
   // karena field 'kelas' di semua_siswa memang string nama kelas.
+  // [ASUMSI — PERLU DIKONFIRMASI] sort_by default diubah dari "nama" ke
+  // "tingkat" supaya tampilan awal langsung tersusun tingkat rendah->tinggi,
+  // dalam tingkat sama alfabet nama. Kalau maunya default tetap murni
+  // alfabet global, balikin ke "nama".
   const [filters, setFilters] = useState({
     kelas: "",
     status: "",
-    sort_by: "nama",
+    sort_by: "tingkat",
     sort_order: "asc",
   });
   const [draft, setDraft] = useState(filters);
@@ -96,6 +94,28 @@ const ProfilSiswaList = () => {
     // arah urutannya, bukan ikut terbandingkan sebagai 0.
     const numericFields = ["behavior_score", "competency_score"];
     const sorted = [...result].sort((a, b) => {
+      // [BARU] Compound sort tingkat + nama. Tingkat mengikuti arah
+      // sort_order (asc = X→XII, desc = XII→X). Dalam tingkat yang sama,
+      // nama SELALU naik alfabet, terlepas dari sort_order — sesuai
+      // permintaan eksplisit. [ASUMSI — PERLU DIKONFIRMASI] Perbandingan
+      // tingkat pakai string compare biasa ("X" < "XI" < "XII" kebetulan
+      // benar secara alfabetis karena sifat prefix). Rapuh kalau field
+      // nama_tingkat di database suatu saat diisi di luar pola romawi SMK
+      // standar. Sama seperti asumsi yang saya tandai di backend.
+      if (filters.sort_by === "tingkat") {
+        const at = (a.tingkat || "").toLowerCase();
+        const bt = (b.tingkat || "").toLowerCase();
+        if (at !== bt) {
+          if (at < bt) return filters.sort_order === "asc" ? -1 : 1;
+          if (at > bt) return filters.sort_order === "asc" ? 1 : -1;
+        }
+        const an = (a.nama || "").toLowerCase();
+        const bn = (b.nama || "").toLowerCase();
+        if (an < bn) return -1;
+        if (an > bn) return 1;
+        return 0;
+      }
+
       const av = a[filters.sort_by];
       const bv = b[filters.sort_by];
 
@@ -148,7 +168,7 @@ const ProfilSiswaList = () => {
   };
   const closeFilter = () => setFilterOpen(false);
   const clearFilter = () => {
-    setDraft({ kelas: "", status: "", sort_by: "nama", sort_order: "asc" });
+    setDraft({ kelas: "", status: "", sort_by: "tingkat", sort_order: "asc" });
   };
   const applyFilter = () => {
     setFilters(draft);
@@ -245,6 +265,7 @@ const ProfilSiswaList = () => {
             fullWidth
             displayEmpty
           >
+            <MenuItem value="tingkat">Tingkat & Nama</MenuItem>
             <MenuItem value="nama">Nama</MenuItem>
             <MenuItem value="behavior_score">Behavior Score</MenuItem>
             <MenuItem value="competency_score">Skor Kompetensi</MenuItem>

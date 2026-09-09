@@ -27,10 +27,6 @@ const RiwayatPklList = () => {
 
   const [filters, setFilters] = useState({ kelas: "", status: "", sort_by: "nama", sort_order: "asc" });
   const [draft, setDraft] = useState(filters);
-  // [BARU] Semester punya "draft"-nya sendiri, terpisah dari `filters` —
-  // karena berbeda sifat (memicu fetch baru, bukan filter client-side atas
-  // data yang sudah dimuat) — disinkronkan ke semesterId aktual cuma saat
-  // "Terapkan" ditekan, sama seperti filter lain.
   const [draftSemesterId, setDraftSemesterId] = useState(null);
 
   const navigate = useNavigate();
@@ -130,8 +126,7 @@ const RiwayatPklList = () => {
 
   return (
     <PageContainer title="Riwayat PKL" description="Arsip Penempatan PKL Lintas Semester">
-      <ParentCard title={`Riwayat PKL${selectedSemesterLabel ? ` — ${selectedSemesterLabel}` : ''}`}>
-
+      <ParentCard title="Riwayat PKL">
         <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, width: "100%", mb: 3 }}>
           <SearchButton value={search} onChange={handleSearchChange} placeholder="Cari Nama Siswa / Mitra" />
           <Box sx={{ display: "flex", gap: 1 }}>

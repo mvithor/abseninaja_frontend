@@ -1,6 +1,8 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button } from '@mui/material';
 import { useSelector } from 'react-redux';
+import { validate as isUUID } from 'uuid';
 import { IconAlertTriangle, IconRefresh, IconInfoCircle } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
 import { T, RADIUS, SHADOW_CARD } from 'src/components/dashboard-kepala-jurusan/sga/sgaConfig';
@@ -41,6 +43,7 @@ const StateCard = ({ icon, title, message, actionLabel, onAction }) => (
 
 const KepalaJurusan = () => {
   const reduxUser = useSelector((state) => state.user);
+  const navigate = useNavigate();
   const [classId, setClassId] = useState('all');
 
   const { data, isFetching, isError, error, refetch, isEmpty, emptyMsg } = useDashboard(classId);
@@ -49,11 +52,15 @@ const KepalaJurusan = () => {
     setClassId(id); // React Query refetch otomatis via queryKey
   }, []);
 
-  // v1.0: drill-down siswa belum ada — handler aman. Nanti navigasi ke
-  // /kepala-jurusan/profile-siswa/{siswa_id} (dok §7).
+  // [BARU] Drill-down siswa: navigasi ke /kepala-jurusan/profil-siswa/detail/{siswa_id}
+  // (dok §7). Dipakai bersama oleh QuadrantMatrix (list & scatter) dan
+  // EarlyWarningPanel, karena ketiganya diteruskan id yang sama dari
+  // mapStudent()/earlyWarnings di sgaAdapter.js. Validasi UUID mengikuti
+  // pola handleLihatDetail di ProfilSiswaList.jsx supaya konsisten.
   const handleStudentClick = useCallback((studentId) => {
-    console.log('[SGA] student clicked:', studentId);
-  }, []);
+    if (!studentId || !isUUID(studentId)) return;
+    navigate(`/dashboard/kepala-jurusan/profil-siswa/detail/${studentId}`);
+  }, [navigate]);
 
   const errMsg = error?.response?.data?.msg || 'Gagal memuat data dashboard. Periksa koneksi lalu coba lagi.';
 
