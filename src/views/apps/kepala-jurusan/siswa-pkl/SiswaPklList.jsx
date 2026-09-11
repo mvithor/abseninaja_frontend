@@ -11,7 +11,7 @@ import SiswaPklTable from "src/apps/kepala-jurusan/siswa-pkl/List/SiswaPklTable"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
-import { fetchSiswaPklAktif, cancelPlacement } from "../penempatan-pkl/penempatanPklApi";
+import { fetchSiswaPklAktif, cancelPlacement, downloadReadinessProfilePdf } from "src/views/apps/kepala-jurusan/penempatan-pkl/penempatanPklApi";
 
 const DRIFT_OPTIONS = [
   { value: "", label: "Semua" },
@@ -30,6 +30,7 @@ const SiswaPklList = () => {
   const [filterOpen, setFilterOpen] = useState(false);
   const [cancelDialog, setCancelDialog] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
+  const [downloadingSiswaId, setDownloadingSiswaId] = useState(null);
 
   const [filters, setFilters] = useState({ kelas: "", drift: "", sort_by: "nama", sort_order: "asc" });
   const [draft, setDraft] = useState(filters);
@@ -111,6 +112,21 @@ const SiswaPklList = () => {
     navigate(`/dashboard/kepala-jurusan/profil-siswa/detail/${id}`);
   };
 
+  // [BARU] Unduh PDF profil kesiapan kerja satu siswa.
+  const handleDownloadPdf = async (row) => {
+    if (downloadingSiswaId) return; // cegah klik ganda sambil unduhan lain jalan
+    setDownloadingSiswaId(row.siswaId);
+    setError("");
+    try {
+      await downloadReadinessProfilePdf(row.siswaId);
+    } catch (err) {
+      setError(err.message);
+      setTimeout(() => setError(""), 4000);
+    } finally {
+      setDownloadingSiswaId(null);
+    }
+  };
+
   const openCancelDialog = (row) => { setCancelReason(""); setCancelDialog({ row }); };
   const commitCancel = () => {
     if (!cancelDialog || !cancelReason.trim()) return;
@@ -142,6 +158,8 @@ const SiswaPklList = () => {
           handleChangeRowsPerPage={handleChangeRowsPerPage}
           onBatalkan={openCancelDialog}
           onLihatDetail={handleLihatDetail}
+          onDownloadPdf={handleDownloadPdf}
+          downloadingSiswaId={downloadingSiswaId}
           isLoading={query.isPending}
           isError={query.isError}
           errorMessage={query.error?.message || "Terjadi kesalahan saat memuat data"}

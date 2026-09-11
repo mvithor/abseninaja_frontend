@@ -4,7 +4,7 @@ import {
   TablePagination, TableRow, TableFooter, IconButton, TableContainer,
   Box, Paper, CircularProgress,
 } from '@mui/material';
-import { IconEye, IconX } from '@tabler/icons-react';
+import { IconEye, IconX, IconDownload } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import { KuadranCell, EwsCell } from 'src/helpers/monitoringPklHelpers';
 import { JALUR_LABEL, formatTanggal } from 'src/utils/monitoringPklUtils';
@@ -12,7 +12,7 @@ import { JALUR_LABEL, formatTanggal } from 'src/utils/monitoringPklUtils';
 const SiswaPklTable = ({
   rosterList, page, rowsPerPage, totalCount,
   handleChangePage, handleChangeRowsPerPage,
-  onBatalkan, onLihatDetail,
+  onBatalkan, onLihatDetail, onDownloadPdf, downloadingSiswaId,
   isLoading, isError, errorMessage, emptyMessage,
 }) => {
   const baseIndex = rowsPerPage === -1 ? 0 : page * rowsPerPage;
@@ -61,36 +61,46 @@ const SiswaPklTable = ({
                 </TableCell>
               </TableRow>
             ) : (
-              rosterList.map((row, index) => (
-                <TableRow key={row.placementId}>
-                  <TableCell><Typography sx={{ fontSize: '1rem' }}>{baseIndex + index + 1}</Typography></TableCell>
-                  <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{row.nama || '-'}</Typography></TableCell>
-                  <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{row.kelas || '-'}</Typography></TableCell>
-                  <TableCell align='center'>
-                    <Tooltip title={[row.mitra?.namaKontak, row.mitra?.teleponKontak].filter(Boolean).join(' · ')}>
-                      <Typography sx={{ fontSize: '1rem' }}>{row.mitra?.nama || '-'}</Typography>
-                    </Tooltip>
-                  </TableCell>
-                  <TableCell align='center'><KuadranCell row={row} /></TableCell>
-                  <TableCell align='center'><EwsCell row={row} /></TableCell>
-                  <TableCell align='center'><Typography sx={{ fontSize: '0.9rem' }}>{JALUR_LABEL[row.jalurKeputusan] || row.jalurKeputusan}</Typography></TableCell>
-                  <TableCell align='center'><Typography sx={{ fontSize: '0.9rem' }}>{formatTanggal(row.keputusanPada)}</Typography></TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
-                      <Tooltip title="Lihat Profil Siswa" placement="bottom">
-                        <IconButton onClick={() => onLihatDetail(row.siswaId)}>
-                          <IconEye width={18} />
-                        </IconButton>
+              rosterList.map((row, index) => {
+                const sedangUnduh = downloadingSiswaId === row.siswaId;
+                return (
+                  <TableRow key={row.placementId}>
+                    <TableCell><Typography sx={{ fontSize: '1rem' }}>{baseIndex + index + 1}</Typography></TableCell>
+                    <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{row.nama || '-'}</Typography></TableCell>
+                    <TableCell align='center'><Typography sx={{ fontSize: '1rem' }}>{row.kelas || '-'}</Typography></TableCell>
+                    <TableCell align='center'>
+                      <Tooltip title={[row.mitra?.namaKontak, row.mitra?.teleponKontak].filter(Boolean).join(' · ')}>
+                        <Typography sx={{ fontSize: '1rem' }}>{row.mitra?.nama || '-'}</Typography>
                       </Tooltip>
-                      <Tooltip title="Batalkan Penempatan" placement="bottom">
-                        <IconButton onClick={() => onBatalkan(row)} sx={{ color: 'error.main' }}>
-                          <IconX width={18} />
-                        </IconButton>
-                      </Tooltip>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell align='center'><KuadranCell row={row} /></TableCell>
+                    <TableCell align='center'><EwsCell row={row} /></TableCell>
+                    <TableCell align='center'><Typography sx={{ fontSize: '0.9rem' }}>{JALUR_LABEL[row.jalurKeputusan] || row.jalurKeputusan}</Typography></TableCell>
+                    <TableCell align='center'><Typography sx={{ fontSize: '0.9rem' }}>{formatTanggal(row.keputusanPada)}</Typography></TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 0.5 }}>
+                        <Tooltip title="Lihat Profil Siswa" placement="bottom">
+                          <IconButton onClick={() => onLihatDetail(row.siswaId)}>
+                            <IconEye width={18} />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Unduh PDF Profil Kesiapan Kerja" placement="bottom">
+                          <span>
+                            <IconButton onClick={() => onDownloadPdf(row)} disabled={sedangUnduh}>
+                              {sedangUnduh ? <CircularProgress size={18} /> : <IconDownload width={18} />}
+                            </IconButton>
+                          </span>
+                        </Tooltip>
+                        <Tooltip title="Batalkan Penempatan" placement="bottom">
+                          <IconButton onClick={() => onBatalkan(row)} sx={{ color: 'error.main' }}>
+                            <IconX width={18} />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             )}
           </TableBody>
 
@@ -124,6 +134,8 @@ SiswaPklTable.propTypes = {
   handleChangeRowsPerPage: PropTypes.func.isRequired,
   onBatalkan: PropTypes.func.isRequired,
   onLihatDetail: PropTypes.func.isRequired,
+  onDownloadPdf: PropTypes.func.isRequired,
+  downloadingSiswaId: PropTypes.string,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string,
