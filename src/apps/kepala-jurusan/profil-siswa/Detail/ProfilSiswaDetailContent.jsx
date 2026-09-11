@@ -8,7 +8,6 @@ import ProfilDiagnostikCard from 'src/components/dashboard-kepala-jurusan/detail
 import BreakdownBehaviorCard from 'src/components/dashboard-kepala-jurusan/detail/BreakdownBehaviorCard';
 import KesiapanPklCard from 'src/components/dashboard-kepala-jurusan/detail/KesiapanPklCard';
 import UnitKompetensiCard from 'src/components/dashboard-kepala-jurusan/detail/UnitKompetensiCard';
-import RekomendasiIntervensiCard from 'src/components/dashboard-kepala-jurusan/detail/RekomendasiIntervensiCard';
 import TindakLanjutGuruCard from 'src/components/dashboard-kepala-jurusan/detail/TindakLanjutGuruCard';
 import CatatanRencanaPklCard from 'src/components/dashboard-kepala-jurusan/detail/CatatanRencanaPklCard';
 import TrenSkorChart from 'src/components/dashboard-kepala-jurusan/detail/TrenSkorChart';
@@ -63,9 +62,16 @@ const ProfilSiswaDetailContent = ({ data, onCetak, exporting, onTindakLanjutGuru
           kedua (Unit Kompetensi) terpaksa mulai setelah SELURUH baris
           pertama selesai, menyisakan jeda kosong di bawah kartu yang
           lebih pendek. Sekarang jadi DUA KOLOM independen (kiri:
-          Breakdown → Unit Kompetensi, kanan: Kesiapan PKL → Rekomendasi
-          → Catatan) — tiap kolom mengalir sesuai tinggi kontennya
-          sendiri, tidak terikat tinggi kolom sebelahnya. */}
+          Breakdown → Unit Kompetensi, kanan: Kesiapan PKL → Tindak
+          Lanjut Guru → Catatan) — tiap kolom mengalir sesuai tinggi
+          kontennya sendiri, tidak terikat tinggi kolom sebelahnya.
+
+          [DIHAPUS] RekomendasiIntervensiCard — isinya (narasi
+          rekomendasi per unit/komponen) sekarang jadi bagian dari
+          TindakLanjutGuruCard, sumbernya sama-sama
+          data.rencana_pkl.rekomendasi_intervensi. Dua kartu yang
+          menampilkan daftar unit bermasalah yang sama dari dua sumber
+          berbeda dianggap redundan dan berisiko divergen. */}
       <Grid container spacing={2} sx={{ mb: 3 }}>
         <Grid size={{ xs: 12, md: 7 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -78,21 +84,18 @@ const ProfilSiswaDetailContent = ({ data, onCetak, exporting, onTindakLanjutGuru
         </Grid>
         <Grid size={{ xs: 12, md: 5 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {/* [DIHAPUS] prop industriDirekomendasikan — KesiapanPklCard
+                tidak lagi menampilkan kartu rekomendasi industri. */}
             <KesiapanPklCard
               kesiapanPkl={data.kesiapan_pkl}
               estimasiSlotPkl={data.estimasi_slot_pkl}
-              industriDirekomendasikan={data.industri_direkomendasikan}
-            />
-            <RekomendasiIntervensiCard
-              rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi}
-              tersedia={data.rencana_pkl?.tersedia}
-              catatan={data.rencana_pkl?.catatan_rencana_pkl}
             />
             <TindakLanjutGuruCard
               profilStatus={data.header.profil_status}
-              behaviorPerKomponen={data.behavior_per_komponen}
+              rekomendasiIntervensi={data.rencana_pkl?.rekomendasi_intervensi}
+              kekuatan={data.rencana_pkl?.kekuatan}
               ambangBehavior={data.kesiapan_pkl.behavior.ambang}
-              daftarUnit={data.daftar_unit}
+              tersedia={data.rencana_pkl?.tersedia}
               namaSiswa={data.header.nama}
               onTindakLanjut={onTindakLanjutGuru}
             />
@@ -126,7 +129,6 @@ ProfilSiswaDetailContent.propTypes = {
     daftar_unit: PropTypes.array,
     kesiapan_pkl: PropTypes.object.isRequired,
     estimasi_slot_pkl: PropTypes.object,
-    industri_direkomendasikan: PropTypes.object,
     rencana_pkl: PropTypes.object,
     tren_skor: PropTypes.object,
   }).isRequired,

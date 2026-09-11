@@ -1,6 +1,6 @@
-import { Box, Typography, useTheme, Stack, Divider, Button } from '@mui/material';
+import { Box, Typography, useTheme, Stack, Divider } from '@mui/material';
 import {
-  IconCheck, IconX, IconClock, IconTrendingDown, IconAlertTriangle, IconArrowRight,
+  IconCheck, IconX, IconClock, IconTrendingDown, IconAlertTriangle,
 } from '@tabler/icons-react';
 
 const StatusBox = ({ ok, label, keterangan }) => (
@@ -71,39 +71,6 @@ const EstimasiSiapPklBox = ({ estimasiSlotPkl }) => {
   );
 };
 
-// [DIRETIRE, Langkah 3] Sebelumnya menampilkan 1-2 kandidat mitra hasil
-// engine lama (matching-engine-service.js). Sekarang cuma CTA ke PKL
-// Placement Engine — satu-satunya sumber rekomendasi mitra di aplikasi.
-// `placementEngineHref` opsional: kalau belum di-supply dari pemanggil,
-// tombol disembunyikan dan cuma teks ajakan yang tampil (menghindari
-// link ke rute yang belum dikonfirmasi benar).
-const IndustriRekomendasiBox = ({ industriDirekomendasikan, placementEngineHref }) => {
-  const pesan = industriDirekomendasikan?.msg
-    || 'Rekomendasi mitra industri terkini tersedia di PKL Placement Engine.';
-
-  return (
-    <Box sx={{ p: 1.5, borderRadius: '8px', backgroundColor: 'action.hover' }}>
-      <Typography variant="caption" fontWeight={700} sx={{ color: 'text.secondary', display: 'block', mb: 0.5 }}>
-        Industri yang Direkomendasikan
-      </Typography>
-      <Typography variant="caption" sx={{ color: 'text.disabled', display: 'block', mb: placementEngineHref ? 1.2 : 0 }}>
-        {pesan}
-      </Typography>
-      {placementEngineHref && (
-        <Button
-          href={placementEngineHref}
-          size="small"
-          variant="outlined"
-          endIcon={<IconArrowRight size={14} />}
-          sx={{ textTransform: 'none' }}
-        >
-          Buka PKL Placement Engine
-        </Button>
-      )}
-    </Box>
-  );
-};
-
 // Keterangan kompetensi bandingkan angka asli dulu (skorMemenuhiAmbang),
 // baru tentukan kalimat mana yang dipakai — overridden dan skor-di-bawah-
 // ambang bisa terjadi BERSAMAAN (skor memang rendah, DAN ada unit Kritis).
@@ -121,7 +88,14 @@ const buildKeteranganKompetensi = (competency) => {
   return `Skor ${Math.round(skor)} ${skorMemenuhiAmbang ? '≥' : '<'} threshold ${Math.round(ambang)}`;
 };
 
-const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl, industriDirekomendasikan, placementEngineHref }) => {
+// [DIHAPUS] IndustriRekomendasiBox — kartu CTA ke PKL Placement Engine
+// yang sebelumnya di bawah EstimasiSiapPklBox. Ikut dihapus: prop
+// industriDirekomendasikan & placementEngineHref (tidak dipakai lagi di
+// mana pun di file ini), import Button & IconArrowRight (cuma dipakai
+// komponen yang dihapus). Backend (getProfilSiswaDetail) masih mengirim
+// field industri_direkomendasikan di response — sekarang jadi field
+// mati, tidak dikonsumsi FE manapun, belum dibersihkan di sisi backend.
+const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl }) => {
   const theme = useTheme();
 
   return (
@@ -142,10 +116,6 @@ const KesiapanPklCard = ({ kesiapanPkl, estimasiSlotPkl, industriDirekomendasika
       <Divider sx={{ my: 1.5 }} />
 
       <EstimasiSiapPklBox estimasiSlotPkl={estimasiSlotPkl} />
-      <IndustriRekomendasiBox
-        industriDirekomendasikan={industriDirekomendasikan}
-        placementEngineHref={placementEngineHref}
-      />
     </Box>
   );
 };
