@@ -30,7 +30,7 @@ const ProfileAdminSekolah = () => {
       window.sessionStorage.clear();
       dispatch(clearUser());
       await persistor.purge();
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }

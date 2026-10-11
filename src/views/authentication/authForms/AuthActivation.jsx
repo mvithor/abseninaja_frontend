@@ -46,7 +46,7 @@ const AuthActivation = ({ title, subtext }) => {
     onSuccess: (resData) => {
       setSuccess(resData.msg || 'Akun berhasil diaktivasi. Mengarahkan ke halaman login...');
       setError('');
-      setTimeout(() => navigate('/'), 2500);
+      setTimeout(() => navigate('/login'), 2500);
     },
     onError: (err) => {
       const msg = err.response?.data?.msg || 'Terjadi kesalahan saat aktivasi akun';
@@ -98,7 +98,7 @@ const AuthActivation = ({ title, subtext }) => {
             component="span"
             color="primary.main"
             sx={{ cursor: 'pointer', fontWeight: 600 }}
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/login')}
           >
             login di sini
           </Typography>.

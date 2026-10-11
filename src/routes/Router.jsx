@@ -303,6 +303,9 @@ const ProfilSiswaDetail = Loadable(lazy(() => import('../views/apps/kepala-jurus
 const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboard/AdminMitraIndustri')));
 
 
+// Landing
+const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
+
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
 const Activation = Loadable(lazy(() => import('../views/authentication/auth/Activation')));
@@ -315,7 +318,8 @@ const Router = [
         path: '/',
         element: <BlankLayout />, 
         children: [
-          { path: '/', element: <Login /> },
+          { path: '/', element: <Landing /> },
+          { path: '/login', element: <Login /> },
           { path: '/404', element: <Error /> },
           { path: '/privacy-policy', element: <PrivacyPolicy/> },
           { path: '/forbidden', element: <Forbidden /> },

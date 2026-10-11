@@ -29,7 +29,7 @@ axiosInstance.interceptors.request.use(
         // Periksa apakah token sudah kadaluarsa
         if (decodedToken.exp < currentTime) {
           store.dispatch(clearUser());
-          window.location.href = '/?expired=true';
+          window.location.href = '/login?expired=true';
           return Promise.reject(new Error('Token expired'));
         }
 
@@ -38,7 +38,7 @@ axiosInstance.interceptors.request.use(
       } catch (error) {
         console.error('Token decoding error:', error?.message || error);
         store.dispatch(clearUser());
-        window.location.href = '/?expired=true';
+        window.location.href = '/login?expired=true';
         return Promise.reject(error);
       }
     }
@@ -76,7 +76,7 @@ axiosInstance.interceptors.response.use(
 
     if (error.response?.status === 401 && !isPublicAuthCall) {
       store.dispatch(clearUser());
-      window.location.href = '/?expired=true';
+      window.location.href = '/login?expired=true';
     }
 
     console.error('Response Error:', error.message);

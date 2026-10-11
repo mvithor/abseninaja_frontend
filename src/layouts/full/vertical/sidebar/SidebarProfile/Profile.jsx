@@ -31,7 +31,7 @@ export const Profile = () => {
       sessionStorage.clear();
       dispatch(clearUser());
       await persistor.purge();
-      navigate('/');
+      navigate('/login');
     } catch (error) {
       console.error('❌ [FE] Logout failed:', error);
       console.error('📥 [FE] Response error:', error?.response?.data || error.message);
