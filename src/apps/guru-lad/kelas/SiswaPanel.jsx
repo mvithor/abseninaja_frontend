@@ -5,7 +5,9 @@ import {
   Alert, Box, Button, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, TextField, Tooltip, Typography,
 } from '@mui/material';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
-import { uraiDaftarSiswa, MAKS_SISWA_PER_PERMINTAAN } from '../nilai/tempel';
+import {
+  uraiDaftarSiswa, pisahDuplikat, kePayloadSiswa, MAKS_SISWA_PER_PERMINTAAN,
+} from '../nilai/tempel';
 import {
   tambahSiswa, ubahSiswa, hapusSiswa, pesanGalat,
 } from '../api';
@@ -20,14 +22,17 @@ export default function SiswaPanel({
   const [ubah, setUbah] = useState(null);
   const [hapus, setHapus] = useState(null);
   const hasil = useMemo(() => uraiDaftarSiswa(teks), [teks]);
+  // Baris yang identik dengan siswa yang sudah ada dilewati; NIS bentrok dengan nama berbeda diblokir.
+  const pilah = useMemo(() => pisahDuplikat(hasil.rincian, siswa), [hasil, siswa]);
+  const baru = useMemo(() => kePayloadSiswa(pilah.tambah), [pilah]);
 
   const tambah = useMutation({
-    mutationFn: () => tambahSiswa(kelasId, hasil.siswa),
+    mutationFn: () => tambahSiswa(kelasId, baru),
     onSuccess: () => { setTeks(''); setGalat(''); onBerubah(); },
     onError: (error) => setGalat(pesanGalat(error)),
   });
 
-  const terlaluBanyak = siswa.length + hasil.siswa.length > MAKS_SISWA_PER_PERMINTAAN;
+  const terlaluBanyak = siswa.length + baru.length > MAKS_SISWA_PER_PERMINTAAN;
 
   return (
     <Stack spacing={3}>
@@ -50,10 +55,10 @@ export default function SiswaPanel({
           <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 1 }}>
             <Button
               variant="contained"
-              disabled={hasil.siswa.length === 0 || hasil.galat.length > 0 || terlaluBanyak || tambah.isPending}
+              disabled={baru.length === 0 || hasil.galat.length > 0 || pilah.bentrok.length > 0 || terlaluBanyak || tambah.isPending}
               onClick={() => tambah.mutate()}
             >
-              {tambah.isPending ? 'Menyimpan...' : `Tambah ${hasil.siswa.length} siswa`}
+              {tambah.isPending ? 'Menyimpan...' : `Tambah ${baru.length} siswa`}
             </Button>
             {hasil.galat.length > 0 && (
               <Typography variant="body2" color="error">
@@ -65,7 +70,29 @@ export default function SiswaPanel({
                 Jumlah siswa per kelas paling banyak {MAKS_SISWA_PER_PERMINTAAN}.
               </Typography>
             )}
+            {pilah.dilewati.length > 0 && (
+              <Typography variant="body2" color="text.secondary">
+                {baru.length === 0 && pilah.bentrok.length === 0
+                  ? 'Semua siswa pada tempelan ini sudah ada di daftar.'
+                  : `${pilah.dilewati.length} siswa sudah ada di daftar dan akan dilewati.`}
+              </Typography>
+            )}
           </Stack>
+          {pilah.bentrok.length > 0 && (
+            <Alert severity="error" sx={{ mt: 1 }}>
+              <Typography variant="body2" fontWeight={600}>
+                NIS berikut sudah dipakai siswa lain dengan nama berbeda. Perbaiki NIS-nya atau hapus barisnya, lalu coba lagi.
+              </Typography>
+              {pilah.bentrok.slice(0, 5).map((b) => (
+                <Typography variant="body2" key={b.baris}>
+                  {`Baris ${b.baris}: ${b.nama} memakai NIS ${b.nis}, yang sudah dipakai ${b.dipakaiOleh}${b.asal === 'daftar' ? '' : ' pada baris tempelan sebelumnya'}.`}
+                </Typography>
+              ))}
+              {pilah.bentrok.length > 5 && (
+                <Typography variant="body2">{`dan ${pilah.bentrok.length - 5} baris lainnya.`}</Typography>
+              )}
+            </Alert>
+          )}
           {galat && <Alert severity="error" sx={{ mt: 1 }}>{galat}</Alert>}
         </Box>
       )}
