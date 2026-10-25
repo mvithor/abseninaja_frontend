@@ -1,46 +1,18 @@
-import axiosInstance from 'src/utils/axiosInstance';
-import { useNavigate } from 'react-router-dom';
 import { Box, Avatar, Typography, IconButton, Tooltip, useMediaQuery, Container } from '@mui/material';
-import { useSelector, useDispatch } from 'react-redux';
-import { persistor } from 'src/store/Store';
+import { useSelector } from 'react-redux';
 import img1 from 'src/assets/images/profile/user-1.jpg';
 import { IconPower } from '@tabler/icons-react';
-import { clearUser } from 'src/store/apps/user/userSlice';
-import { useQueryClient } from '@tanstack/react-query';
+import useLogout from 'src/hooks/useLogout';
+import { getUserPortals } from 'src/portals/registry';
 
 export const Profile = () => {
   const customizer = useSelector((state) => state.customizer);
   const user = useSelector((state) => state.user);
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const hideMenu = lgUp ? customizer.isCollapse && !customizer.isSidebarHover : '';
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
+  const handleLogout = useLogout();
+  const roleLabel = getUserPortals(user).map((portal) => portal.label).join(', ') || user?.role || 'User';
 
-  const handleLogout = async () => {
-    try {
-       await axiosInstance.delete('/api/v1/logout', {
-        headers: {
-          'x-device-id': user.deviceId,
-          Authorization: `Bearer ${user.accessToken}`,
-        },
-      });
-
-      queryClient.clear();
-      localStorage.clear();
-      sessionStorage.clear();
-      dispatch(clearUser());
-      await persistor.purge();
-      navigate('/login');
-    } catch (error) {
-      console.error('❌ [FE] Logout failed:', error);
-      console.error('📥 [FE] Response error:', error?.response?.data || error.message);
-    }
-  };
-  
-  
-
-  
   return (
     <Container
       sx={{
@@ -68,7 +40,7 @@ export const Profile = () => {
 
             <Box>
               <Typography variant="h6" color="textPrimary">{user?.name || 'Guest'}</Typography>
-              <Typography variant="caption" color="textSecondary">{user?.role || 'User'}</Typography>
+              <Typography variant="caption" color="textSecondary">{roleLabel}</Typography>
             </Box>
             <Box sx={{ ml: 'auto' }}>
               <Tooltip title="Logout" placement="top">

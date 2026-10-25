@@ -19,6 +19,7 @@ import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel
 import { Visibility, VisibilityOff, MailOutline, LockOutlined } from '@mui/icons-material';
 import { setUser, clearUser } from 'src/store/apps/user/userSlice';
 import { jwtDecode } from 'jwt-decode';
+import { getDefaultPortal } from 'src/portals/registry';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [email, setEmail] = useState('');
@@ -27,6 +28,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
@@ -36,54 +38,58 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
     if (searchParams.get('expired')) {
       setError('Sesi anda telah berakhir. Silakan login kembali.');
       dispatch(clearUser());
-      setTimeout(() => navigate('/login'), 5000);
+      const timer = setTimeout(() => navigate('/login'), 5000);
+      return () => clearTimeout(timer);
     }
   }, [location.search, dispatch, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     setError('');
+    setSuccess('');
+
+    // Form memakai noValidate, jadi atribut `required` tidak dicek browser.
+    // Cek di sini agar tidak mengirim request yang pasti ditolak backend.
+    if (!email.trim() || !password) {
+      setError('Email dan password wajib diisi.');
+      return;
+    }
+
+    setIsSubmitting(true);
     try {
       const response = await axiosInstance.post('/api/v1/login', {
-        email,
+        email: email.trim(),
         password,
         deviceId,
       });
       const { accessToken } = response.data;
       const decodedToken = jwtDecode(accessToken);
-      const { userId, name, role, isKepalaJurusan } = decodedToken;
+      const { userId, name, role, isKepalaJurusan, isGuruMapel, personas } = decodedToken;
+      
+      const portal = getDefaultPortal({ role, personas, isKepalaJurusan, isGuruMapel });
+      if (!portal) {
+        setError(
+          role === 'pegawai'
+            ? 'Akun Anda tidak memiliki akses ke dashboard ini.'
+            : 'Pengguna tidak valid.',
+        );
+        dispatch(clearUser());
+        setIsSubmitting(false);
+        return;
+      }
 
-      dispatch(setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan }));
+      dispatch(
+        setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas }),
+      );
 
       setSuccess('Login berhasil! Mengarahkan...');
-      setTimeout(() => {
-        switch (role) {
-          case 'super admin':
-            navigate('/dashboard/super-admin');
-            break;
-          case 'admin sekolah':
-            navigate('/dashboard/admin-sekolah');
-            break;
-          case 'pegawai':
-            if (isKepalaJurusan) {
-              navigate('/dashboard/kepala-jurusan');
-            } else {
-              setError('Akun Anda tidak memiliki akses ke dashboard ini.');
-              dispatch(clearUser());
-            }
-            break;
-          case 'admin mitra industri':
-            navigate('/dashboard/admin-mitra-industri');
-            break;
-          default:
-            setError('Pengguna tidak valid.');
-            dispatch(clearUser());
-        }
-      }, 2000);
+      setTimeout(() => navigate(portal.path), 2000);
     } catch (error) {
       const msg = error.response?.data?.msg || 'Terjadi kesalahan. Silakan coba lagi.';
       setError(msg);
       dispatch(clearUser());
+      setIsSubmitting(false);
     }
   };
 
@@ -178,6 +184,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
           size="large"
           fullWidth
           disableElevation
+          disabled={isSubmitting}
           sx={{
             py: 1.4,
             borderRadius: 2,

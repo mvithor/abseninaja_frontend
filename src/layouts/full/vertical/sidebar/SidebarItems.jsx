@@ -4,13 +4,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { toggleMobileSidebar } from 'src/store/customizer/CustomizerSlice';
 import axiosInstance from 'src/utils/axiosInstance';
+import { getUserPortals } from 'src/portals/registry';
 import MenuitemsSuperAdmin from './MenuItemsSuperAdmin';
 import MenuitemsAdminSekolah from './MenuItemsAdminSekolah';
 import MenuitemsKepalaJurusan from './MenuItemsKepalaJurusan';
 import MenuitemsAdminMitraIndustri from './MenuItemsAdminMitraIndustri';
+import MenuitemsGuruSekolah from './MenuItemsGuruSekolah';
 import NavItem from './NavItem';
 import NavCollapse from './NavCollapse';
 import NavGroup from './NavGroup/NavGroup';
+
+// Peta portal (key di src/portals/registry.js) ke daftar menunya.
+// Menu tetap di folder ini; registri sengaja tidak mengimpor menu agar halaman login ringan.
+const MENU_BY_PORTAL = {
+  'super-admin': MenuitemsSuperAdmin,
+  'admin-sekolah': MenuitemsAdminSekolah,
+  'kepala-jurusan': MenuitemsKepalaJurusan,
+  'guru': MenuitemsGuruSekolah,
+  'admin-mitra-industri': MenuitemsAdminMitraIndustri,
+};
 
 const SidebarItems = () => {
   const { pathname } = useLocation();
@@ -19,7 +31,6 @@ const SidebarItems = () => {
   const customizer = useSelector((state) => state.customizer);
   const user = useSelector((state) => state.user); 
   const role = user ? user.role : ''; 
-  const isKepalaJurusan = user ? user.isKepalaJurusan : false;
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
   const hideMenu = lgUp ? customizer.isCollapse && !customizer.isSidebarHover : '';
   const dispatch = useDispatch();
@@ -37,27 +48,16 @@ const SidebarItems = () => {
     jurusan_kompetensi: Boolean(jurusanFiturStatus?.enabled),
   };
 
-  // Pilih menu items berdasarkan user role
-  let menuItems;
-  switch (role) {
-    case 'super admin':
-      menuItems = MenuitemsSuperAdmin;
-      break;
-    case 'admin sekolah':
-      menuItems = MenuitemsAdminSekolah.filter(
-        (item) => !item.requiredFitur || fiturEnabledMap[item.requiredFitur],
-      );
-      break;
-    case 'pegawai':
-      menuItems = isKepalaJurusan ? MenuitemsKepalaJurusan : [];
-      break;
-    case 'admin mitra industri':
-      menuItems = MenuitemsAdminMitraIndustri;
-      break;
-    default:
-      menuItems = []; // Kosongkan menu items jika role tidak dikenali
-      break;
-  }
+  // Menu = gabungan menu semua portal yang boleh diakses akun ini, urut prioritas.
+  // Pegawai yang merangkap (mis. kepala jurusan dan guru) melihat kedua grup menu.
+  // Tanpa portal apa pun, menu kosong.
+  const menuItems = getUserPortals(user).flatMap((portal) => {
+    const menu = MENU_BY_PORTAL[portal.key] || [];
+    if (portal.key === 'admin-sekolah') {
+      return menu.filter((item) => !item.requiredFitur || fiturEnabledMap[item.requiredFitur]);
+    }
+    return menu;
+  });
 
   return (
     <Box sx={{ px: 3 }}>
