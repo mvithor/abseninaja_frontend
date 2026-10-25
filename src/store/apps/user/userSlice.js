@@ -21,6 +21,8 @@ const initialState = {
   isLoggedIn: false,
   deviceId: null,
   isKepalaJurusan: false,
+  isGuruMapel: false,
+  personas: [],
   timezone_sekolah: 'Asia/Jakarta',
 };
 
@@ -29,7 +31,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action) {
-      const { name, role, email, userId, accessToken, deviceId, isKepalaJurusan } = action.payload;
+      const { name, role, email, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas } = action.payload;
       try {
         const decodedToken = jwtDecode(accessToken);
         const currentTime = Math.floor(Date.now() / 1000);
@@ -43,9 +45,15 @@ const userSlice = createSlice({
         state.email = email || decodedToken.email;
         state.userId = userId;
         state.accessToken = accessToken;
-        state.deviceId = deviceId;
+        state.deviceId = deviceId ?? decodedToken.deviceId ?? null;
         state.isLoggedIn = true;
         state.isKepalaJurusan = Boolean(isKepalaJurusan ?? decodedToken.isKepalaJurusan);
+        state.isGuruMapel = Boolean(isGuruMapel ?? decodedToken.isGuruMapel);
+        state.personas = Array.isArray(personas)
+          ? personas
+          : Array.isArray(decodedToken.personas)
+            ? decodedToken.personas
+            : [];
         state.timezone_sekolah = decodedToken.timezone_sekolah || 'Asia/Jakarta';
       } catch (error) {
         console.error('Error saat decode atau validasi token:', error.message);
@@ -60,6 +68,8 @@ const userSlice = createSlice({
       state.isLoggedIn = false;
       state.deviceId = null;
       state.isKepalaJurusan = false;
+      state.isGuruMapel = false;
+      state.personas = [];
       state.timezone_sekolah = 'Asia/Jakarta';
     },
   },

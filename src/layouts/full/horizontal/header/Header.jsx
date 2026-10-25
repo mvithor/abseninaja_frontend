@@ -4,10 +4,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import { toggleMobileSidebar } from 'src/store/customizer/CustomizerSlice';
 import { IconMenu2 } from '@tabler/icons-react';
 import Notifications from 'src/layouts/full/vertical/header/Notifications';
-import ProfileSuperAdmin from '../../vertical/header/ProfileSuperAdmin';
+import ProfileMenu from '../../vertical/header/ProfileMenu';
 import SearchAdminSekolah from 'src/layouts/full/vertical/header/SearchAdminSekolah';
 import Navigation from 'src/layouts/full/vertical/header/Navigation';
 import Logo from 'src/layouts/full/shared/logo/Logo';
+
+// Didefinisikan DI LUAR komponen: styled() di dalam komponen membuat tipe komponen
+// baru pada setiap render, sehingga seluruh isi header (termasuk menu profil yang
+// sedang terbuka) di-mount ulang setiap kali Header dirender.
+const AppBarStyled = styled(AppBar)(({ theme }) => ({
+  background: theme.palette.background.paper,
+  justifyContent: 'center',
+  backdropFilter: 'blur(4px)',
+}));
+const ToolbarStyled = styled(Toolbar)(({theme}) => ({ margin: '0 auto', width: '100%', color: `${theme.palette.text.secondary} !important`, }));
 
 const Header = () => {
   const lgDown = useMediaQuery((theme) => theme.breakpoints.down('lg'));
@@ -17,19 +27,20 @@ const Header = () => {
   const customizer = useSelector((state) => state.customizer);
   const dispatch = useDispatch();
 
-  const AppBarStyled = styled(AppBar)(({ theme }) => ({
-    background: theme.palette.background.paper,
-    justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
-
-    [theme.breakpoints.up('lg')]: {
-      minHeight: customizer.TopbarHeight,
-    },
-  }));
-  const ToolbarStyled = styled(Toolbar)(({theme}) => ({ margin: '0 auto', width: '100%', color: `${theme.palette.text.secondary} !important`, }));
+  // role
+  const role = useSelector((state) => state.user.role);
 
   return (
-    <AppBarStyled position="sticky" color="default" elevation={8}>
+    <AppBarStyled
+      position="sticky"
+      color="default"
+      elevation={8}
+      sx={(theme) => ({
+        [theme.breakpoints.up('lg')]: {
+          minHeight: customizer.TopbarHeight,
+        },
+      })}
+    >
       <ToolbarStyled
         sx={{
           maxWidth: customizer.isLayout === 'boxed' ? 'lg' : '100%!important',
@@ -55,7 +66,7 @@ const Header = () => {
         {/* ------------------------------------------- */}
         {/* Search Dropdown */}
         {/* ------------------------------------------- */}
-        <SearchAdminSekolah />
+        {role === 'admin sekolah' && <SearchAdminSekolah />}
         {lgUp ? (
           <>
             <Navigation />
@@ -65,7 +76,7 @@ const Header = () => {
         <Stack spacing={1} direction="row" alignItems="center">
 
           <Notifications />
-          <ProfileSuperAdmin />
+          <ProfileMenu />
         </Stack>
       </ToolbarStyled>
     </AppBarStyled>

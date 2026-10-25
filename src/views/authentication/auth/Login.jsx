@@ -1,10 +1,14 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { useState } from 'react';
+import { Link as RouterLink, Navigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Box, Grid, Stack, Typography, Link, useTheme, alpha } from '@mui/material';
 import { IconCircleCheck, IconArrowLeft } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
 import logoLight from 'src/assets/images/logos/light-logo.svg';
 import logoDark from 'src/assets/images/logos/dark-logo.svg';
 import AuthLogin from '../authForms/AuthLogin';
+import { getDefaultPortal } from 'src/portals/registry';
+import isTokenExpired from 'src/utils/isTokenExpired';
 
 const highlights = [
   'Absensi digital real-time via QR Code',
@@ -16,6 +20,22 @@ const Login = () => {
   const theme = useTheme();
   const primary = theme.palette.primary.main;
   const secondary = theme.palette.secondary.main;
+  const user = useSelector((state) => state.user);
+  const location = useLocation();
+
+  // Pengguna yang SUDAH login tidak perlu melihat form lagi: arahkan ke portalnya.
+  // Dihitung SEKALI saat halaman dibuka (initializer useState), bukan reaktif, supaya
+  // pesan "Login berhasil! Mengarahkan..." di AuthLogin tampil penuh, dan alur
+  // ?expired=true (yang membersihkan sesi di AuthLogin) tidak berputar balik ke dashboard.
+  const [redirectPath] = useState(() => {
+    if (new URLSearchParams(location.search).get('expired')) return null;
+    if (isTokenExpired(user?.accessToken)) return null;
+    return getDefaultPortal(user)?.path || null;
+  });
+
+  if (redirectPath) {
+    return <Navigate to={redirectPath} replace />;
+  }
 
   return (
     <PageContainer title="Masuk | Absenin Aja" description="Masuk ke akun Absenin Aja Anda">

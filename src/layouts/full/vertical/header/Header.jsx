@@ -6,8 +6,30 @@ import { IconMenu2 } from '@tabler/icons-react';
 // components
 import Notifications from './Notifications';
 import SearchAdminSekolah from './SearchAdminSekolah';
-import ProfileSuperAdmin from './ProfileSuperAdmin';
-import ProfileAdminSekolah from './ProfileAdminSekolah';
+import ProfileMenu from './ProfileMenu';
+
+// Didefinisikan DI LUAR komponen: styled() di dalam komponen membuat tipe komponen
+// baru pada setiap render, sehingga seluruh isi header (termasuk menu profil yang
+// sedang terbuka) di-mount ulang setiap kali Header dirender.
+const AppBarStyled = styled(AppBar)(({ theme }) => ({
+  boxShadow: 'none',
+  background: theme.palette.background.paper,
+  justifyContent: 'center',
+  backdropFilter: 'blur(4px)',
+  minHeight: '64px', // Pastikan tinggi tidak lebih dari 64px
+  [theme.breakpoints.up('lg')]: {
+    minHeight: '64px', // Samakan tinggi header di desktop
+  },
+}));
+
+const ToolbarStyled = styled(Toolbar)(({ theme }) => ({
+  width: '100%',
+  maxHeight: '64px', // Batasi tinggi toolbar agar tidak lebih tinggi
+  color: theme.palette.text.secondary,
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+}));
 
 const Header = () => {
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'));
@@ -16,27 +38,6 @@ const Header = () => {
 
   // role
   const role = useSelector((state) => state.user.role);
-
-  const AppBarStyled = styled(AppBar)(({ theme }) => ({
-    boxShadow: 'none',
-    background: theme.palette.background.paper,
-    justifyContent: 'center',
-    backdropFilter: 'blur(4px)',
-    minHeight: '64px', // Pastikan tinggi tidak lebih dari 64px
-    [theme.breakpoints.up('lg')]: {
-      minHeight: '64px', // Samakan tinggi header di desktop
-    },
-  }));
-  
-  const ToolbarStyled = styled(Toolbar)(({ theme }) => ({
-    width: '100%',
-    maxHeight: '64px', // Batasi tinggi toolbar agar tidak lebih tinggi
-    color: theme.palette.text.secondary,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }));
-  
 
   return (
     <AppBarStyled position="sticky" color="default">
@@ -66,7 +67,7 @@ const Header = () => {
         {/* ------------------------------------------- */}
         <Stack spacing={0} direction="row" alignItems="center">
           <Notifications />
-          {role === 'super admin' ? <ProfileSuperAdmin /> : <ProfileAdminSekolah />}
+          <ProfileMenu />
         </Stack>
       </ToolbarStyled>
     </AppBarStyled>

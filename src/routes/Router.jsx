@@ -303,6 +303,10 @@ const ProfilSiswaDetail = Loadable(lazy(() => import('../views/apps/kepala-jurus
 const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboard/AdminMitraIndustri')));
 
 
+// DASHBOARD GURU SEKOLAH
+/* ****Dashboard Guru Sekolah***** */
+const DashboardGuruSekolah = Loadable(lazy(() => import('../views/dashboard/GuruSekolah')));
+
 // Landing
 const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
 
@@ -584,7 +588,7 @@ const Router = [
               },
             {
                 path: 'dashboard/kepala-jurusan',
-                element: <ProtectedRoute allowedRoles={['pegawai']} requireKepalaJurusan />,
+                element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="kepala-jurusan" />,
                 children: [
                     { path: '', element: <DashboardKepalaJurusan /> },
                     // SKKNI Unit
@@ -617,6 +621,13 @@ const Router = [
                 element: <ProtectedRoute allowedRoles={['admin mitra industri']} />,
                 children: [
                     { path: '', element: <DashboardAdminMitraIndustri /> },
+                ]
+            },
+             {
+                path: 'dashboard/guru-sekolah',
+                element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="guru" />,
+                children: [
+                    { path: '', element: <DashboardGuruSekolah /> },
                 ]
             },
         ]
