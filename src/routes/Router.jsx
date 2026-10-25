@@ -306,6 +306,8 @@ const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboa
 // DASHBOARD GURU SEKOLAH
 /* ****Dashboard Guru Sekolah***** */
 const DashboardGuruSekolah = Loadable(lazy(() => import('../views/dashboard/GuruSekolah')));
+const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
+const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 
 // Landing
 const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
@@ -628,6 +630,15 @@ const Router = [
                 element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="guru" />,
                 children: [
                     { path: '', element: <DashboardGuruSekolah /> },
+                ]
+            },
+            {
+                // LAD: akses akhir diputuskan server (fitur sekolah + guru terdaftar); halaman menangani 403.
+                path: 'dashboard/guru-lad',
+                element: <ProtectedRoute allowedRoles={['pegawai']} />,
+                children: [
+                    { path: '', element: <LadBeranda /> },
+                    { path: 'kelas/:kelasId', element: <LadKelas /> },
                 ]
             },
         ]
