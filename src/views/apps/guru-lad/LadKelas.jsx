@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,6 +19,9 @@ export default function LadKelas() {
   const qc = useQueryClient();
   const akses = useAksesLad();
   const [tabPilihan, setTabPilihan] = useState(null);
+  // Tab awal ditentukan sekali, dari keadaan kelas saat pertama dibuka. Bila dihitung ulang setiap data
+  // berubah, menambah siswa pada kelas kosong melempar guru ke tab lain sebelum ia sempat melihat hasilnya.
+  const tabAwalRef = useRef(null);
 
   const { data, isLoading, error } = useQuery({
     queryKey: kunciLad.masukan(kelasId),
@@ -57,8 +60,10 @@ export default function LadKelas() {
     kelas, siswa, lm, nilai_tp: nilaiTp,
   } = data;
   const readOnly = kelas.jenis !== 'NYATA';
-  const tabAwal = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
-  const tab = tabPilihan ?? tabAwal;
+  if (tabAwalRef.current === null) {
+    tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
+  }
+  const tab = tabPilihan ?? tabAwalRef.current;
 
   return (
     <PageContainer title={`${kelas.nama_kelas} ${kelas.mapel} | Analitik Pembelajaran`} description="Isi data kelas">

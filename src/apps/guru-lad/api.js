@@ -1,5 +1,6 @@
 import axiosInstance from 'src/utils/axiosInstance';
 import { potong, MAKS_SEL_PER_PERMINTAAN } from './nilai/tempel';
+import { pesanDariRespons } from './galat';
 
 // Pembungkus tipis untuk API LAD (backend: /api/v1/lad). Semua rute melewati gerbang akses di server;
 // halaman tidak boleh menebak hak akses sendiri, hanya menanggapi 403.
@@ -77,8 +78,5 @@ export async function simpanNilaiTp(kelasId, sel) {
 export function pesanGalat(error, cadangan = 'Terjadi kesalahan. Coba lagi.') {
   const data = error?.response?.data;
   if (!data) return error?.message === 'Network Error' ? 'Tidak dapat terhubung ke server.' : cadangan;
-  const rincian = Array.isArray(data.galat) && data.galat.length > 0
-    ? data.galat.slice(0, 5).map((g) => (g.kolom && g.kolom !== '-' ? `${g.kolom}: ${g.pesan}` : g.pesan)).join('; ')
-    : '';
-  return [data.msg, rincian].filter(Boolean).join(' ') || cadangan;
+  return pesanDariRespons(data, cadangan);
 }
