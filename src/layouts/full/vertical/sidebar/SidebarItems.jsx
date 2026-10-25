@@ -10,6 +10,8 @@ import MenuitemsAdminSekolah from './MenuItemsAdminSekolah';
 import MenuitemsKepalaJurusan from './MenuItemsKepalaJurusan';
 import MenuitemsAdminMitraIndustri from './MenuItemsAdminMitraIndustri';
 import MenuitemsGuruSekolah from './MenuItemsGuruSekolah';
+import MenuitemsGuruLad from './MenuItemsGuruLad';
+import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import NavItem from './NavItem';
 import NavCollapse from './NavCollapse';
 import NavGroup from './NavGroup/NavGroup';
@@ -51,13 +53,18 @@ const SidebarItems = () => {
   // Menu = gabungan menu semua portal yang boleh diakses akun ini, urut prioritas.
   // Pegawai yang merangkap (mis. kepala jurusan dan guru) melihat kedua grup menu.
   // Tanpa portal apa pun, menu kosong.
-  const menuItems = getUserPortals(user).flatMap((portal) => {
+  const menuPortal = getUserPortals(user).flatMap((portal) => {
     const menu = MENU_BY_PORTAL[portal.key] || [];
     if (portal.key === 'admin-sekolah') {
       return menu.filter((item) => !item.requiredFitur || fiturEnabledMap[item.requiredFitur]);
     }
     return menu;
   });
+
+  // Menu LAD tidak berasal dari registri portal: aksesnya diputuskan server (fitur sekolah dan
+  // pendaftaran guru LAD), jadi tampil hanya bila probe berhasil.
+  const { boleh: bolehLad } = useAksesLad();
+  const menuItems = bolehLad ? [...menuPortal, ...MenuitemsGuruLad] : menuPortal;
 
   return (
     <Box sx={{ px: 3 }}>
