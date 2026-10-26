@@ -11,7 +11,9 @@ import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import SiswaPanel from 'src/apps/guru-lad/kelas/SiswaPanel';
 import StrukturPanel from 'src/apps/guru-lad/kelas/StrukturPanel';
 import NilaiTpGrid from 'src/apps/guru-lad/nilai/NilaiTpGrid';
-import { bacaMasukan, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
+import EvaluasiPanel from 'src/apps/guru-lad/evaluasi/EvaluasiPanel';
+import { bacaEvaluasi, bacaMasukan, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
+import { labelTabPerhatian } from 'src/apps/guru-lad/evaluasi/penjelasan';
 import { tampilAngka } from 'src/apps/guru-lad/rentang';
 
 export default function LadKelas() {
@@ -27,6 +29,15 @@ export default function LadKelas() {
   const { data, isLoading, error } = useQuery({
     queryKey: kunciLad.masukan(kelasId),
     queryFn: () => bacaMasukan(kelasId),
+    enabled: akses.boleh,
+    retry: false,
+  });
+
+  // Kunci sama dengan EvaluasiPanel, jadi satu permintaan dipakai bersama. Hasilnya hanya untuk angka di label
+  // tab; kegagalannya tidak boleh mengganggu halaman, label cukup tanpa angka.
+  const evaluasi = useQuery({
+    queryKey: kunciLad.evaluasi(kelasId),
+    queryFn: () => bacaEvaluasi(kelasId),
     enabled: akses.boleh,
     retry: false,
   });
@@ -62,7 +73,8 @@ export default function LadKelas() {
   } = data;
   const readOnly = kelas.jenis !== 'NYATA';
   if (tabAwalRef.current === null) {
-    tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
+    if (readOnly) tabAwalRef.current = 'perhatian';
+    else tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
   }
   const tab = tabPilihan ?? tabAwalRef.current;
 
@@ -85,6 +97,7 @@ export default function LadKelas() {
 
         <Tabs value={tab} onChange={(_, v) => setTabPilihan(v)} sx={{ mb: 2 }} aria-label="Bagian data kelas">
           <Tab value="nilai" label="Nilai TP" />
+          <Tab value="perhatian" label={labelTabPerhatian(evaluasi.data)} />
           <Tab value="struktur" label={`Struktur (${lm.length})`} />
           <Tab value="siswa" label={`Siswa (${siswa.length})`} />
         </Tabs>
@@ -100,6 +113,7 @@ export default function LadKelas() {
             onTersimpan={muatUlang}
           />
         )}
+        {tab === 'perhatian' && <EvaluasiPanel kelasId={kelasId} lm={lm} />}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
         {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
       </ParentCard>

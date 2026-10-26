@@ -87,8 +87,9 @@ function ParameterKelas({ kelas, readOnly, onBerubah }) {
     <Box>
       <Typography variant="subtitle1" fontWeight={600} gutterBottom>Parameter kelas</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-        Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas
-        mengubah ikon di tabel nilai dan hasil peringatan kelas ini.
+        {readOnly
+          ? 'Batas nilai TP kelas ini. Nilai tepat di batas masuk ke rentang di atasnya.'
+          : 'Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas mengubah ikon di tabel nilai dan hasil peringatan kelas ini.'}
       </Typography>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
         {bidangAmbang('ambang_bagian', 'Remedial bagian tertentu mulai dari', 'Di bawah ini: remedial seluruh bagian')}
@@ -205,7 +206,7 @@ export default function StrukturPanel({
                     <Typography variant="body2" fontWeight={600} sx={{ minWidth: 64 }}>
                       {labelTp(t)}
                     </Typography>
-                    <Typography variant="body2" sx={{ flexGrow: 1 }}>{t.rumusan || <i>tanpa rumusan</i>}</Typography>
+                    <Typography variant="body2" sx={{ flexGrow: 1 }}>{t.rumusan || (readOnly ? null : <i>tanpa rumusan</i>)}</Typography>
                     {!readOnly && (
                       <>
                         <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah TP ${t.kode || t.urutan}`} onClick={() => setForm({ jenis: 'tp-ubah', lm: m, tp: t })}><IconPencil size={16} /></IconButton></Tooltip>
