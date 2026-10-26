@@ -9,8 +9,9 @@ import { IconChevronDown } from '@tabler/icons-react';
 import { bacaEvaluasi, kunciLad, pesanGalat } from '../api';
 import {
   KODE_POLA, POLA_INFO, alasanBelumCukup, barisKonteks, dataDibutuhkan, definisiPola, hitungRingkasan,
-  susunSiswa, uraikanBukti,
+  namaTp, susunSiswa, uraikanBukti,
 } from './penjelasan';
+import { cariTpId } from '../remedial/remedial';
 
 const WARNA_POLA = { perhatian: 'warning', pengayaan: 'info' };
 
@@ -38,7 +39,9 @@ function DaftarBukti({ baris }) {
 }
 DaftarBukti.propTypes = { baris: PropTypes.arrayOf(PropTypes.string).isRequired };
 
-function BarisSiswa({ h, ctx, ambilBelumCukup }) {
+function BarisSiswa({
+  h, ctx, ambilBelumCukup, onCatatRemedial,
+}) {
   const belum = KODE_POLA.filter((k) => h.pola[k].status === 'BELUM_CUKUP');
   return (
     <Accordion disableGutters variant="outlined" slotProps={{ transition: { unmountOnExit: true } }}>
@@ -57,6 +60,25 @@ function BarisSiswa({ h, ctx, ambilBelumCukup }) {
             <Box key={k}>
               <Typography variant="subtitle2" gutterBottom>{`${k} ${POLA_INFO[k].judul}`}</Typography>
               <DaftarBukti baris={uraikanBukti(k, h.pola[k].bukti, ctx)} />
+              {k === 'P1' && onCatatRemedial && (
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+                  {(h.pola.P1.bukti?.tp ?? []).map((t) => {
+                    const tpId = cariTpId(ctx.lm, t.lm, t.tp);
+                    if (tpId === null) return null;
+                    return (
+                      <Button
+                        key={`${t.lm}.${t.tp}`}
+                        size="small"
+                        variant="outlined"
+                        onClick={() => onCatatRemedial({ siswaId: h.siswa_id, tpId })}
+                        aria-label={`Catat remedial ${h.nama}, ${namaTp(t.lm, t.tp, ctx.lm)}`}
+                      >
+                        {`Catat remedial ${namaTp(t.lm, t.tp, ctx.lm)}`}
+                      </Button>
+                    );
+                  })}
+                </Stack>
+              )}
             </Box>
           ))}
           {belum.length > 0 && (
@@ -77,9 +99,10 @@ BarisSiswa.propTypes = {
   h: PropTypes.object.isRequired,
   ctx: PropTypes.object.isRequired,
   ambilBelumCukup: PropTypes.func.isRequired,
+  onCatatRemedial: PropTypes.func,
 };
 
-export default function EvaluasiPanel({ kelasId, lm }) {
+export default function EvaluasiPanel({ kelasId, lm, onCatatRemedial }) {
   const [hanyaDitandai, setHanyaDitandai] = useState(true);
   const [pola, setPola] = useState([]);
 
@@ -174,7 +197,7 @@ export default function EvaluasiPanel({ kelasId, lm }) {
         <Stack spacing={1} aria-label="Daftar siswa" role="list">
           {daftar.map((h) => (
             <Box key={h.siswa_id} role="listitem">
-              <BarisSiswa h={h} ctx={ctx} ambilBelumCukup={(k) => dataDibutuhkan(k, data.parameter)} />
+              <BarisSiswa h={h} ctx={ctx} ambilBelumCukup={(k) => dataDibutuhkan(k, data.parameter)} onCatatRemedial={onCatatRemedial} />
             </Box>
           ))}
         </Stack>
@@ -234,4 +257,5 @@ export default function EvaluasiPanel({ kelasId, lm }) {
 EvaluasiPanel.propTypes = {
   kelasId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   lm: PropTypes.array.isRequired,
+  onCatatRemedial: PropTypes.func,
 };

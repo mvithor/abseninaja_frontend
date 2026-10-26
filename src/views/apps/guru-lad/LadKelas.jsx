@@ -12,6 +12,10 @@ import SiswaPanel from 'src/apps/guru-lad/kelas/SiswaPanel';
 import StrukturPanel from 'src/apps/guru-lad/kelas/StrukturPanel';
 import NilaiTpGrid from 'src/apps/guru-lad/nilai/NilaiTpGrid';
 import EvaluasiPanel from 'src/apps/guru-lad/evaluasi/EvaluasiPanel';
+import ProyekPanel from 'src/apps/guru-lad/proyek/ProyekPanel';
+import RemedialPanel from 'src/apps/guru-lad/remedial/RemedialPanel';
+import RemedialDialog from 'src/apps/guru-lad/remedial/RemedialDialog';
+import KehadiranPanel from 'src/apps/guru-lad/kehadiran/KehadiranPanel';
 import { bacaEvaluasi, bacaMasukan, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
 import { labelTabPerhatian } from 'src/apps/guru-lad/evaluasi/penjelasan';
 import { tampilAngka } from 'src/apps/guru-lad/rentang';
@@ -22,6 +26,8 @@ export default function LadKelas() {
   const qc = useQueryClient();
   const akses = useAksesLad();
   const [tabPilihan, setTabPilihan] = useState(null);
+  // Dialog remedial dipakai bersama tab Remedial dan bukti penanda P1; null berarti tertutup.
+  const [remedialAwal, setRemedialAwal] = useState(null);
   // Tab awal ditentukan sekali, dari keadaan kelas saat pertama dibuka. Bila dihitung ulang setiap data
   // berubah, menambah siswa pada kelas kosong melempar guru ke tab lain sebelum ia sempat melihat hasilnya.
   const tabAwalRef = useRef(null);
@@ -69,7 +75,8 @@ export default function LadKelas() {
   }
 
   const {
-    kelas, siswa, lm, nilai_tp: nilaiTp,
+    kelas, siswa, lm, nilai_tp: nilaiTp, proyek, nilai_proyek: nilaiProyek, remedial,
+    pertemuan, kehadiran, waktu_sekolah: waktuSekolah,
   } = data;
   const readOnly = kelas.jenis !== 'NYATA';
   if (tabAwalRef.current === null) {
@@ -95,8 +102,11 @@ export default function LadKelas() {
           <Alert severity="info" sx={{ mb: 2 }}>Kelas kasus hanya dapat dilihat, tidak dapat diubah.</Alert>
         )}
 
-        <Tabs value={tab} onChange={(_, v) => setTabPilihan(v)} sx={{ mb: 2 }} aria-label="Bagian data kelas">
+        <Tabs value={tab} onChange={(_, v) => setTabPilihan(v)} variant="scrollable" scrollButtons="auto" sx={{ mb: 2 }} aria-label="Bagian data kelas">
           <Tab value="nilai" label="Nilai TP" />
+          <Tab value="proyek" label={`Proyek (${proyek.length})`} />
+          <Tab value="remedial" label={`Remedial (${remedial.length})`} />
+          <Tab value="kehadiran" label={`Kehadiran (${pertemuan.length})`} />
           <Tab value="perhatian" label={labelTabPerhatian(evaluasi.data)} />
           <Tab value="struktur" label={`Struktur (${lm.length})`} />
           <Tab value="siswa" label={`Siswa (${siswa.length})`} />
@@ -113,9 +123,51 @@ export default function LadKelas() {
             onTersimpan={muatUlang}
           />
         )}
-        {tab === 'perhatian' && <EvaluasiPanel kelasId={kelasId} lm={lm} />}
+        {tab === 'proyek' && (
+          <ProyekPanel
+            kelasId={kelasId}
+            siswa={siswa}
+            proyek={proyek}
+            nilaiProyek={nilaiProyek}
+            readOnly={readOnly}
+            onBerubah={muatUlang}
+          />
+        )}
+        {tab === 'remedial' && (
+          <RemedialPanel kelas={kelas} siswa={siswa} lm={lm} remedial={remedial} readOnly={readOnly} onBuka={setRemedialAwal} />
+        )}
+        {tab === 'kehadiran' && (
+          <KehadiranPanel
+            kelasId={kelasId}
+            siswa={siswa}
+            pertemuan={pertemuan}
+            lm={lm}
+            kehadiran={kehadiran}
+            waktuSekolah={waktuSekolah}
+            readOnly={readOnly}
+            onBerubah={muatUlang}
+          />
+        )}
+        {tab === 'perhatian' && (
+          <EvaluasiPanel kelasId={kelasId} lm={lm} onCatatRemedial={readOnly ? undefined : setRemedialAwal} />
+        )}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
         {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
+        {!readOnly && (
+          <RemedialDialog
+            buka={remedialAwal !== null}
+            awal={remedialAwal ?? undefined}
+            kelasId={kelasId}
+            kelas={kelas}
+            siswa={siswa}
+            lm={lm}
+            nilaiTp={nilaiTp}
+            remedial={remedial}
+            hariIni={waktuSekolah?.hari_ini}
+            onBerubah={muatUlang}
+            onTutup={() => setRemedialAwal(null)}
+          />
+        )}
       </ParentCard>
     </PageContainer>
   );
