@@ -14,7 +14,7 @@ export const URUTAN_PRIORITAS = Object.freeze(['P2', 'P3', 'P1', 'P4', 'P5']);
 
 export const POLA_INFO = Object.freeze({
   P1: { judul: 'Kesulitan pada TP tertentu', jenis: 'perhatian' },
-  P2: { judul: 'Akses belajar terganggu', jenis: 'perhatian' },
+  P2: { judul: 'Sering alpa', jenis: 'perhatian' },
   P3: { judul: 'Proyek individu tidak dikumpulkan', jenis: 'perhatian' },
   P4: { judul: 'Capaian menurun', jenis: 'perhatian' },
   P5: { judul: 'Capaian sangat tinggi', jenis: 'pengayaan' },
@@ -28,7 +28,7 @@ export function definisiPola(kode, p) {
     case 'P1':
       return `Ditandai bila ada TP yang nilainya di bawah KKTP (${a(p.kktp)}) dan belum dituntaskan lewat remedial.`;
     case 'P2':
-      return `Ditandai bila siswa alpa (A) pada paling sedikit ${a(p.a_min)} pertemuan, dengan syarat sudah ada ${a(p.pertemuan_min)} pertemuan tercatat. Yang dihitung jumlah alpa, bukan persentase hadir.`;
+      return `Ditandai bila siswa alpa (tanpa keterangan) pada paling sedikit ${a(p.a_min)} pertemuan, dengan syarat sudah ada ${a(p.pertemuan_min)} pertemuan tercatat. Yang dihitung jumlah alpa, bukan persentase hadir. Penyebab tidak hadir tidak diketahui sistem.`;
     case 'P3':
       return 'Ditandai bila ada proyek individu yang bernilai 0 (tidak dikumpulkan). Proyek kelompok tidak dipakai.';
     case 'P4':
@@ -101,7 +101,7 @@ function bukti1(b, ctx) {
 function bukti2(b) {
   const k = b.komposisi || {};
   const baris = [
-    `Alpa (A) ${b.jumlah_a} kali dari ${b.pertemuan_tercatat} pertemuan tercatat (pertemuan ${daftarKata(b.pertemuan_a)}).`,
+    `Alpa (tanpa keterangan) ${b.jumlah_a} kali dari ${b.pertemuan_tercatat} pertemuan tercatat (pertemuan ${daftarKata(b.pertemuan_a)}).`,
     `Hadir ${k.H ?? 0}, sakit ${k.S ?? 0}, izin ${k.I ?? 0}, alpa ${k.A ?? 0}.`,
   ];
   if (Array.isArray(b.nr_lm) && b.nr_lm.length > 0) {
@@ -204,6 +204,17 @@ export function hitungRingkasan(data) {
     belumCukup,
     jumlahGalat: Array.isArray(data.galat) ? data.galat.length : 0,
   };
+}
+
+/**
+ * Label tab: jumlah siswa bertanda hanya ditampilkan bila lebih dari nol. Angka 0 tidak ditampilkan karena
+ * dapat terbaca "aman", padahal bisa juga berarti data belum cukup untuk menandai siapa pun.
+ */
+export function labelTabPerhatian(data) {
+  const dasar = 'Perlu Perhatian';
+  if (!data || !Array.isArray(data.hasil)) return dasar;
+  const n = hitungRingkasan(data).ditandai;
+  return n > 0 ? `${dasar} (${n})` : dasar;
 }
 
 /** Baris pembanding kelas: rata-rata NR kelas per LM, dan apakah dipakai sebagai pembanding. */

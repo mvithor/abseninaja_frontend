@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   KODE_POLA, URUTAN_PRIORITAS, POLA_INFO, definisiPola, dataDibutuhkan, namaLm, namaTp, uraikanBukti,
-  susunSiswa, hitungRingkasan, barisKonteks, alasanBelumCukup,
+  susunSiswa, hitungRingkasan, barisKonteks, alasanBelumCukup, labelTabPerhatian,
 } from './penjelasan.js';
 
 const PARAMETER = {
@@ -85,7 +85,7 @@ test('P1 tanpa tersembunyi tidak menambah catatan rata-rata', () => {
 
 test('P2: jumlah alpa, daftar pertemuan, komposisi, dan rata-rata per LM; angka berkoma desimal', () => {
   const k = uraikanBukti('P2', P2, CTX);
-  assert.equal(k[0], 'Alpa (A) 6 kali dari 15 pertemuan tercatat (pertemuan 7, 9, 10, 12, 14 dan 15).');
+  assert.equal(k[0], 'Alpa (tanpa keterangan) 6 kali dari 15 pertemuan tercatat (pertemuan 7, 9, 10, 12, 14 dan 15).');
   assert.equal(k[1], 'Hadir 9, sakit 0, izin 0, alpa 6.');
   assert.equal(k[2], 'Rata-rata nilai per LM: LM 1 84; LM 2 73,33.');
   assert.equal(uraikanBukti('P2', { ...P2, nr_lm: [] }, CTX).length, 2);
@@ -224,4 +224,20 @@ test('barisKonteks: rata-rata kelas per LM dengan nama LM, koma desimal, dan pen
   assert.equal(b[1].dipakai, false);
   assert.equal(b[2].rata, '-');
   assert.deepEqual(barisKonteks(undefined, LM), []);
+});
+
+test('P2 berjudul "Sering alpa" (deskriptif, tidak menyatakan sebab) dan definisinya menyebut tanpa keterangan', () => {
+  assert.equal(POLA_INFO.P2.judul, 'Sering alpa');
+  const d = definisiPola('P2', PARAMETER);
+  assert.match(d, /alpa \(tanpa keterangan\) pada paling sedikit 3 pertemuan/);
+  assert.match(d, /sudah ada 5 pertemuan tercatat/);
+  assert.match(d, /bukan persentase hadir/);
+});
+
+test('labelTabPerhatian: jumlah hanya bila ada siswa bertanda; nol dan data belum cukup tidak diberi angka', () => {
+  const tanda = (k) => ({ pola: { P1: { status: k } }, penanda: k === 'DITANDAI' ? ['P1'] : [] });
+  assert.equal(labelTabPerhatian(undefined), 'Perlu Perhatian');
+  assert.equal(labelTabPerhatian({ hasil: [] }), 'Perlu Perhatian');
+  assert.equal(labelTabPerhatian({ hasil: [tanda('TIDAK'), tanda('BELUM_CUKUP')] }), 'Perlu Perhatian');
+  assert.equal(labelTabPerhatian({ hasil: [tanda('DITANDAI'), tanda('TIDAK'), tanda('DITANDAI')] }), 'Perlu Perhatian (2)');
 });
