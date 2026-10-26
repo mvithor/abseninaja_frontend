@@ -209,15 +209,18 @@ export function deretP4(bukti) {
  * Titik grafik garis P4 dalam koordinat SVG. Rentang sumbu Y mengikuti data dan garis KKTP, dibulatkan ke
  * kelipatan 5, tidak pernah di luar 0 sampai 100.
  */
-export function titikGrafikP4(deret, kktp, { lebar = 392, tinggi = 120, kiri = 36, kanan = 16, atas = 10, bawah = 22 } = {}) {
+export function titikGrafikP4(deret, kktp, {
+  lebar = 392, tinggi = 120, kiri = 36, kanan = 16, atas = 10, bawah = 22, inset = 0,
+} = {}) {
   if (!Array.isArray(deret) || deret.length === 0) return null;
   const nilai = deret.flatMap((d) => [d.siswa, d.kelas]).filter((v) => v !== null && Number.isFinite(v));
   if (adaNilai(kktp)) nilai.push(Number(kktp));
   const min = Math.max(0, Math.floor((Math.min(...nilai) - 3) / 5) * 5);
   const maks = Math.min(100, Math.ceil((Math.max(...nilai) + 3) / 5) * 5);
-  const lebarIsi = lebar - kiri - kanan;
+  // `inset` menggeser titik pertama dan terakhir ke dalam supaya tidak menempel pada sumbu dan labelnya.
+  const lebarIsi = lebar - kiri - kanan - 2 * inset;
   const tinggiIsi = tinggi - atas - bawah;
-  const x = (i) => (deret.length === 1 ? kiri + lebarIsi / 2 : kiri + (lebarIsi * i) / (deret.length - 1));
+  const x = (i) => (deret.length === 1 ? kiri + inset + lebarIsi / 2 : kiri + inset + (lebarIsi * i) / (deret.length - 1));
   const y = (v) => atas + tinggiIsi * (1 - (v - min) / (maks - min || 1));
   const garis = (ambil) => deret.map((d, i) => (ambil(d) === null ? null : { x: x(i), y: y(ambil(d)), nilai: ambil(d), lm: d.lm })).filter(Boolean);
   return {
@@ -254,7 +257,9 @@ export function susunRincian(h, ctx, konteks, kktp) {
     }
     if (kode === 'P4') {
       const deret = deretP4(bukti);
-      return { ...dasar, kalimat: uraikanBukti(kode, bukti, ctx), deret, grafik: titikGrafikP4(deret, kktp) };
+      return {
+        ...dasar, kalimat: uraikanBukti(kode, bukti, ctx), deret, kktp: adaNilai(kktp) ? Number(kktp) : null, grafik: titikGrafikP4(deret, kktp),
+      };
     }
     return { ...dasar, kalimat: uraikanBukti(kode, bukti, ctx) };
   });

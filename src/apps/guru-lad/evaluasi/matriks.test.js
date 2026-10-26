@@ -296,3 +296,23 @@ test('susunRincian: pola BELUM_CUKUP dicatat terpisah beserta alasan dan data ya
   assert.match(r.belumCukup[0].butuh, /paling sedikit 5 pertemuan/);
   assert.deepEqual(r.bagian, [], 'belum cukup bukan penanda');
 });
+
+test('titikGrafikP4: inset menggeser titik pertama dan terakhir ke dalam tanpa mengubah urutan', () => {
+  const deret = deretP4({ lm: [1, 2, 3], nr: [84, 73.33, 68], acuan_kelas: false });
+  const a = titikGrafikP4(deret, 75, { lebar: 400, kiri: 40, kanan: 20 });
+  const b = titikGrafikP4(deret, 75, { lebar: 400, kiri: 40, kanan: 20, inset: 30 });
+  assert.equal(a.siswa[0].x, 40);
+  assert.equal(a.siswa[2].x, 380);
+  assert.equal(b.siswa[0].x, 70);
+  assert.equal(b.siswa[2].x, 350);
+  assert.equal(b.siswa[1].x, 210);
+  const satu = titikGrafikP4([{ lm: 1, siswa: 80, kelas: null }], 75, { lebar: 400, kiri: 40, kanan: 20, inset: 30 });
+  assert.equal(satu.siswa[0].x, 210);
+});
+
+test('susunRincian: bagian P4 membawa kktp untuk grafik yang menyesuaikan lebar', () => {
+  const h = siswaEval(1, 1, 'Ani', { P4: { lm: [1, 2, 3], nr: [90, 80, 70], total_turun: 20, acuan_kelas: false, nr_kelas: null, turun_kelas: null, lebih_dari_kelas: null } });
+  const r = susunRincian(h, { lm: LM, parameter: {} }, siapkanKonteks({ siswa: [{ id: 1 }] }), 75);
+  assert.equal(r.bagian[0].kktp, 75);
+  assert.equal(susunRincian(h, { lm: LM, parameter: {} }, siapkanKonteks({ siswa: [{ id: 1 }] }), null).bagian[0].kktp, null);
+});

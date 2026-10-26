@@ -9,7 +9,6 @@ import DeretKehadiran from '../komponen/DeretKehadiran';
 import GrafikTren from '../komponen/GrafikTren';
 import { KETERANGAN_RENTANG, legendaRentang, tampilAngka } from '../rentang';
 import { TEKS_KODE } from '../kehadiran/kehadiran';
-import { titikGrafikP4 } from '../evaluasi/matriks';
 import {
   capaianPerLm, kehadiranSiswa, kunciP1, proyekSiswa, riwayatRemedial, trenPerLm,
 } from './profil';
@@ -49,7 +48,6 @@ export default function ProfilSiswa({
   const deretTren = useMemo(() => tren.filter((t) => t.siswa !== null).map((t) => ({
     lm: t.lm, siswa: t.siswa, kelas: t.kelas !== null && t.jumlahKelas >= kelasMin ? t.kelas : null,
   })), [tren, kelasMin]);
-  const grafik = useMemo(() => (deretTren.length >= 2 ? titikGrafikP4(deretTren, ambang.kktp) : null), [deretTren, ambang.kktp]);
   const proyekS = useMemo(() => proyekSiswa(siswa.id, proyek, ctx), [siswa.id, proyek, ctx]);
   const hadir = useMemo(() => kehadiranSiswa(siswa.id, ctx), [siswa.id, ctx]);
   const remedial = useMemo(() => riwayatRemedial(siswa.id, lm, ctx), [siswa.id, lm, ctx]);
@@ -81,14 +79,15 @@ export default function ProfilSiswa({
                     {g.rata === null ? 'Nilai rata-rata: belum ada nilai' : `Nilai rata-rata ${tampilAngka(g.rata)}`}
                   </Typography>
                 </Stack>
-                <Box sx={{ overflowX: 'auto' }}><Table size="small" aria-label={`Capaian ${g.judul}`}>
+                <Box sx={{ overflowX: 'auto' }}>{/* Lebar kolom tetap dan sama di semua LM, supaya kolom Nilai, Rentang, dan Status lurus dari satu LM ke LM berikutnya. */}
+                <Table size="small" aria-label={`Capaian ${g.judul}`} sx={{ tableLayout: 'fixed', minWidth: 640 }}>
                   <TableHead>
                     <TableRow>
-                      <TableCell>TP</TableCell>
-                      <TableCell align="right">Nilai</TableCell>
-                      <TableCell>Rentang</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Remedial</TableCell>
+                      <TableCell sx={{ width: '29%' }}>TP</TableCell>
+                      <TableCell align="right" sx={{ width: '8%' }}>Nilai</TableCell>
+                      <TableCell sx={{ width: '31%', pl: 3 }}>Rentang</TableCell>
+                      <TableCell sx={{ width: '17%' }}>Status</TableCell>
+                      <TableCell sx={{ width: '15%' }}>Remedial</TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -100,7 +99,7 @@ export default function ProfilSiswa({
                           {t.ditandaiP1 && <Chip size="small" variant="outlined" label="Bukti penanda P1" sx={{ ml: 0.5 }} />}
                         </TableCell>
                         <TableCell align="right">{t.nilai === null ? <span aria-label="belum dinilai">-</span> : tampilAngka(t.nilai)}</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ pl: 3 }}>
                           <Stack direction="row" spacing={0.75} alignItems="center">
                             <IkonRentang rentang={t.rentang} teksBaca={false} />
                             <Typography variant="body2">{t.nilai === null ? 'Belum dinilai' : KETERANGAN_RENTANG[t.rentang]}</Typography>
@@ -123,10 +122,11 @@ export default function ProfilSiswa({
       </Bagian>
 
       <Bagian id="bagian-tren" judul="Tren nilai rata-rata per LM">
-        {grafik ? (
+        {deretTren.length >= 2 ? (
           <>
             <GrafikTren
-              g={grafik}
+              deret={deretTren}
+              kktp={ambang.kktp}
               ringkasan={`Nilai rata-rata siswa per LM: ${deretTren.map((d) => `LM ${d.lm} ${tampilAngka(d.siswa)}`).join(', ')}.`}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>

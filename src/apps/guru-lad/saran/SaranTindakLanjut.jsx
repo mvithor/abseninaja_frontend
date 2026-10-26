@@ -119,7 +119,7 @@ function KotakSaran({
         />
         {keadaan === KEADAAN.DRAF && (
           <Typography variant="body2" color="text.secondary">
-            {`Draf dari sistem (templat ${templatVersi}). Setiap kalimat dapat diubah. LAD tidak mengirim saran ke siapa pun.`}
+            {`Draf dari sistem (templat ${templatVersi}). ${readOnly ? '' : 'Setiap kalimat dapat diubah. '}LAD tidak mengirim saran ke siapa pun.`}
           </Typography>
         )}
         {t && <Typography variant="body2" color="text.secondary">{`Disimpan ${tanggalSimpan(t.disimpan_pada)}`}</Typography>}
@@ -160,6 +160,7 @@ function KotakSaran({
             fullWidth
             required={k.kunci === 'langkah'}
             disabled={keadaan === KEADAAN.DIABAIKAN}
+            sx={!bolehUbah ? { '& .MuiInputBase-root': { bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderStyle: 'dashed' } } : undefined}
             slotProps={{
               htmlInput: { maxLength: MAKS_KOLOM, readOnly: !bolehUbah },
               inputLabel: { shrink: true },
@@ -214,6 +215,14 @@ function KotakSaran({
             <Button onClick={() => { setModeAbaikan(false); setGalatAlasan(''); }} disabled={sibuk}>Batal</Button>
           </Stack>
         </Box>
+      )}
+
+      {bolehUbah && !modeAbaikan && (
+        <Typography variant="body2" color="text.secondary">
+          {keadaan === KEADAAN.DRAF
+            ? 'Isi kotak di atas dapat diubah. Belum ada yang tersimpan: tombol "Pakai saran ini" atau "Pakai versi saya" menyimpan isian ini sebagai keputusan Anda.'
+            : 'Tombol "Pakai versi saya" menyimpan perubahan ini sebagai keputusan Anda.'}
+        </Typography>
       )}
 
       {!readOnly && !modeAbaikan && (
