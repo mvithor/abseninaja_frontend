@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   uraiTempel, bacaNilaiSel, tampilNilai, terapkanTempel, uraiDaftarSiswa, potong, pisahDuplikat, kePayloadSiswa,
+  hitungPengosongan,
 } from './tempel.js';
 
 test('uraiTempel: baris baru penutup Excel tidak menjadi baris data, sel kosong dipertahankan', () => {
@@ -120,4 +121,13 @@ test('pisahDuplikat: NIS dibandingkan persis, awalan nol tidak diabaikan', () =>
 
 test('kePayloadSiswa: NIS kosong tidak dikirim dan nomor baris tidak ikut', () => {
   assert.deepEqual(kePayloadSiswa([r(4, 'A', '1'), r(5, 'B')]), [{ nama: 'A', nis: '1' }, { nama: 'B' }]);
+});
+
+test('hitungPengosongan: hanya sel yang di server bernilai dan diisi kosong; 0 bukan kosong', () => {
+  const server = new Map([['1:1', 80], ['1:2', 0], ['1:3', null]]);
+  assert.equal(hitungPengosongan({ '1:1': '', '1:2': ' ', '1:3': '' }, server), 2);
+  assert.equal(hitungPengosongan({ '1:1': '0' }, server), 0);
+  assert.equal(hitungPengosongan({ '2:2': '' }, server), 0);
+  assert.equal(hitungPengosongan({ '1:1': 'x' }, server), 0);
+  assert.equal(hitungPengosongan({}, server), 0);
 });

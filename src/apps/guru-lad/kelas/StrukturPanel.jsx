@@ -11,45 +11,102 @@ import {
 } from '../api';
 import FormDialog from '../komponen/FormDialog';
 import HapusDialog from '../komponen/HapusDialog';
+import { galatPerKolom } from '../galat';
+import { BAWAAN_AMBANG, periksaAmbang, tampilAngka } from '../rentang';
+import { judulLm, labelTp } from '../label';
 
 const tampil = (x) => String(x ?? '').replace('.', ',');
 
 function ParameterKelas({ kelas, readOnly, onBerubah }) {
   const [f, setF] = useState({
-    kktp: tampil(kelas.kktp), nilai: tampil(kelas.bobot_nilai_akhir), sas: tampil(kelas.bobot_sas),
+    ambang_bagian: tampil(kelas.ambang_bagian),
+    kktp: tampil(kelas.kktp),
+    ambang_pengayaan: tampil(kelas.ambang_pengayaan),
+    nilai: tampil(kelas.bobot_nilai_akhir),
+    sas: tampil(kelas.bobot_sas),
   });
   const [pesan, setPesan] = useState(null);
+  const [galatServer, setGalatServer] = useState({});
   const [sibuk, setSibuk] = useState(false);
-  const ubah = (k) => (e) => setF((s) => ({ ...s, [k]: e.target.value }));
+  const ubah = (k) => (e) => {
+    setF((s) => ({ ...s, [k]: e.target.value }));
+    setGalatServer((g) => { if (!(k in g)) return g; const l = { ...g }; delete l[k]; return l; });
+  };
   const bersih = (t) => String(t).trim().replace(',', '.');
+  const galatLokal = periksaAmbang(f);
+  const galatAmbang = (k) => galatLokal[k] ?? galatServer[k];
+  const adaGalat = Object.keys(galatLokal).length > 0;
+
+  const usulanAwal = () => {
+    setF((s) => ({
+      ...s,
+      ambang_bagian: tampilAngka(BAWAAN_AMBANG.ambang_bagian),
+      kktp: tampilAngka(BAWAAN_AMBANG.kktp),
+      ambang_pengayaan: tampilAngka(BAWAAN_AMBANG.ambang_pengayaan),
+    }));
+    setGalatServer({});
+  };
 
   const simpan = async () => {
     setSibuk(true);
     setPesan(null);
+    setGalatServer({});
     try {
       await ubahKelas(kelas.id, {
-        kktp: bersih(f.kktp), bobot_nilai_akhir: bersih(f.nilai), bobot_sas: bersih(f.sas),
+        ambang_bagian: bersih(f.ambang_bagian),
+        kktp: bersih(f.kktp),
+        ambang_pengayaan: bersih(f.ambang_pengayaan),
+        bobot_nilai_akhir: bersih(f.nilai),
+        bobot_sas: bersih(f.sas),
       });
       setPesan({ jenis: 'success', teks: 'Parameter kelas disimpan.' });
       onBerubah();
     } catch (error) {
+      setGalatServer(galatPerKolom(error.response?.data));
       setPesan({ jenis: 'error', teks: pesanGalat(error) });
     } finally {
       setSibuk(false);
     }
   };
 
+  const bidangAmbang = (kunci, label, bantu) => (
+    <TextField
+      label={label}
+      value={f[kunci]}
+      onChange={ubah(kunci)}
+      disabled={readOnly}
+      size="small"
+      error={Boolean(galatAmbang(kunci))}
+      helperText={galatAmbang(kunci) ?? bantu}
+      inputProps={{ inputMode: 'decimal' }}
+      sx={{ minWidth: 190 }}
+    />
+  );
+
   return (
     <Box>
       <Typography variant="subtitle1" fontWeight={600} gutterBottom>Parameter kelas</Typography>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
-        <TextField label="KKTP" value={f.kktp} onChange={ubah('kktp')} disabled={readOnly} size="small" helperText="Batas ketercapaian tujuan pembelajaran" />
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+        Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas
+        mengubah ikon di tabel nilai dan hasil peringatan kelas ini.
+      </Typography>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
+        {bidangAmbang('ambang_bagian', 'Remedial bagian tertentu mulai dari', 'Di bawah ini: remedial seluruh bagian')}
+        {bidangAmbang('kktp', 'Sudah mencapai (KKTP) mulai dari', 'Di bawah ini: belum mencapai')}
+        {bidangAmbang('ambang_pengayaan', 'Perlu pengayaan mulai dari', 'Di atas ini: pengayaan')}
+      </Stack>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} sx={{ mt: 2 }}>
         <TextField label="Bobot nilai akhir (%)" value={f.nilai} onChange={ubah('nilai')} disabled={readOnly} size="small" helperText="Bobot nilai akhir + SAS = 100" />
         <TextField label="Bobot SAS (%)" value={f.sas} onChange={ubah('sas')} disabled={readOnly} size="small" />
         {!readOnly && (
-          <Button variant="outlined" onClick={simpan} disabled={sibuk} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-            {sibuk ? 'Menyimpan...' : 'Simpan parameter'}
-          </Button>
+          <>
+            <Button variant="outlined" onClick={simpan} disabled={sibuk || adaGalat} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              {sibuk ? 'Menyimpan...' : 'Simpan parameter'}
+            </Button>
+            <Button variant="text" onClick={usulanAwal} disabled={sibuk} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+              Kembalikan ke usulan awal ({tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, {tampilAngka(BAWAAN_AMBANG.kktp)}, {tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)})
+            </Button>
+          </>
         )}
       </Stack>
       {pesan && <Alert severity={pesan.jenis} sx={{ mt: 1 }}>{pesan.teks}</Alert>}
@@ -110,7 +167,7 @@ export default function StrukturPanel({
 
   return (
     <Stack spacing={3}>
-      <ParameterKelas key={`${kelas.kktp}-${kelas.bobot_sas}`} kelas={kelas} readOnly={readOnly} onBerubah={onBerubah} />
+      <ParameterKelas key={`${kelas.ambang_bagian}-${kelas.kktp}-${kelas.ambang_pengayaan}-${kelas.bobot_sas}`} kelas={kelas} readOnly={readOnly} onBerubah={onBerubah} />
       <Divider />
       <Box>
         <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
@@ -129,7 +186,7 @@ export default function StrukturPanel({
             <Paper key={m.id} variant="outlined" sx={{ p: 2 }}>
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography fontWeight={700} sx={{ flexGrow: 1 }}>
-                  LM {m.urutan}. {m.nama}
+                  {judulLm(m)}
                 </Typography>
                 {!readOnly && (
                   <>
@@ -146,7 +203,7 @@ export default function StrukturPanel({
                 {m.tp.map((t) => (
                   <Stack key={t.id} direction="row" alignItems="flex-start" spacing={1} sx={{ py: 0.5 }}>
                     <Typography variant="body2" fontWeight={600} sx={{ minWidth: 64 }}>
-                      {t.kode || `TP ${t.urutan}`}
+                      {labelTp(t)}
                     </Typography>
                     <Typography variant="body2" sx={{ flexGrow: 1 }}>{t.rumusan || <i>tanpa rumusan</i>}</Typography>
                     {!readOnly && (

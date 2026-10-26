@@ -1,12 +1,18 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Box, Button, Stack, Typography } from '@mui/material';
+import {
+  Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Typography,
+} from '@mui/material';
 import { simpanNilaiTp, pesanGalat } from '../api';
 import {
-  bacaNilaiSel, tampilNilai, uraiTempel, terapkanTempel,
+  bacaNilaiSel, tampilNilai, uraiTempel, terapkanTempel, hitungPengosongan,
 } from './tempel';
+import { legendaRentang, rentangNilai, RENTANG } from '../rentang';
+import { judulLm, labelTp } from '../label';
+import IkonRentang from '../komponen/IkonRentang';
 
 const kunci = (siswaId, tpId) => `${siswaId}:${tpId}`;
+const potongJudul = (teks) => (teks.length > 28 ? `${teks.slice(0, 27)}…` : teks);
 
 // Gaya grid ditulis sekali di wadah, bukan per sel, supaya ratusan sel tetap ringan.
 const gayaGrid = (theme) => ({
@@ -34,13 +40,15 @@ const gayaGrid = (theme) => ({
   '& thead .nama': { zIndex: 3 },
   '& .no': { width: 40, textAlign: 'right', color: theme.palette.text.secondary },
   '& .sel': { minWidth: 88, padding: 0 },
-  '& .isi': { display: 'flex', alignItems: 'center' },
+  '& .isi': { display: 'flex', alignItems: 'center', position: 'relative' },
   '& input': {
     width: 68, height: 30, border: 'none', outline: 'none', background: 'transparent', textAlign: 'right',
     font: 'inherit', padding: '0 4px', color: theme.palette.text.primary,
   },
   '& input:focus': { outline: `2px solid ${theme.palette.primary.main}`, outlineOffset: -2 },
-  '& .tanda': { width: 16, fontSize: 11, lineHeight: 1, textAlign: 'center' },
+  '& .tanda': {
+    width: 20, fontSize: 12, fontWeight: 700, lineHeight: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center',
+  },
   // Status tidak hanya lewat warna (NFR-06): bentuk garis dan simbol ikut membedakan.
   '& td.kotor': { background: theme.palette.action.selected, boxShadow: `inset 0 0 0 1px ${theme.palette.text.secondary}` },
   '& td.salah': { background: theme.palette.error.light, boxShadow: `inset 0 0 0 2px ${theme.palette.error.main}` },
@@ -63,6 +71,7 @@ export default function NilaiTpGrid({
   const [galatServer, setGalatServer] = useState({});
   const [pesan, setPesan] = useState(null);
   const [sibuk, setSibuk] = useState(false);
+  const [konfirmasiKosong, setKonfirmasiKosong] = useState(0);
   const wadah = useRef(null);
 
   const jumlahKotor = Object.keys(edit).length;
@@ -123,7 +132,20 @@ export default function NilaiTpGrid({
 
   const adaGalatLokal = Object.values(edit).some((t) => bacaNilaiSel(t).galat);
 
+  const ambang = useMemo(
+    () => ({ ambang_bagian: kelas.ambang_bagian, kktp: kelas.kktp, ambang_pengayaan: kelas.ambang_pengayaan }),
+    [kelas.ambang_bagian, kelas.kktp, kelas.ambang_pengayaan],
+  );
+  const legenda = useMemo(() => legendaRentang(ambang), [ambang]);
+
+  // Mengosongkan nilai yang sudah tersimpan tidak bisa dibatalkan, jadi diminta konfirmasi dulu.
+  const mintaSimpan = () => {
+    const kosong = hitungPengosongan(edit, server);
+    if (kosong > 0) setKonfirmasiKosong(kosong); else simpan();
+  };
+
   const simpan = async () => {
+    setKonfirmasiKosong(0);
     const sel = Object.entries(edit).map(([k, teks]) => {
       const [siswaId, tpId] = k.split(':').map(Number);
       return { siswa_id: siswaId, tp_id: tpId, nilai: bacaNilaiSel(teks).nilai };
@@ -172,8 +194,29 @@ export default function NilaiTpGrid({
     <Stack spacing={2}>
       <Typography variant="body2" color="text.secondary">
         Ketik langsung, atau salin blok nilai dari Excel lalu tempel (Ctrl+V) di sel awal.
-        Sel kosong berarti belum dinilai; <b>0</b> adalah nilai nol. Tanda ▼ berarti di bawah KKTP ({tampilNilai(kelas.kktp)}).
+        Sel kosong berarti belum dinilai; <b>0</b> adalah nilai nol. Ikon di samping nilai menunjukkan rentang
+        pencapaian menurut batas kelas ini.
       </Typography>
+      <Stack
+        direction="row"
+        spacing={2.5}
+        flexWrap="wrap"
+        useFlexGap
+        component="ul"
+        aria-label="Keterangan ikon rentang nilai"
+        sx={{ listStyle: 'none', m: 0, p: 0, rowGap: 0.5 }}
+      >
+        {legenda.map((l) => (
+          <Stack key={l.rentang} component="li" direction="row" spacing={0.75} alignItems="center">
+            <IkonRentang rentang={l.rentang} teksBaca={false} />
+            <Typography variant="caption" color="text.secondary">
+              <b>{l.batas}</b>
+              {': '}
+              {l.teks}
+            </Typography>
+          </Stack>
+        ))}
+      </Stack>
       {!readOnly && (
         <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end" flexWrap="wrap" useFlexGap>
           <Typography variant="body2" aria-live="polite" sx={{ whiteSpace: 'nowrap' }}>
@@ -182,7 +225,7 @@ export default function NilaiTpGrid({
           <Button variant="outlined" onClick={buang} disabled={jumlahKotor === 0 || sibuk} sx={{ whiteSpace: 'nowrap' }}>
             Batalkan
           </Button>
-          <Button variant="contained" onClick={simpan} disabled={jumlahKotor === 0 || adaGalatLokal || sibuk} sx={{ whiteSpace: 'nowrap' }}>
+          <Button variant="contained" onClick={mintaSimpan} disabled={jumlahKotor === 0 || adaGalatLokal || sibuk} sx={{ whiteSpace: 'nowrap' }}>
             {sibuk ? 'Menyimpan...' : 'Simpan nilai'}
           </Button>
         </Stack>
@@ -200,12 +243,12 @@ export default function NilaiTpGrid({
               <th className="no" rowSpan={2}>No</th>
               <th className="nama" rowSpan={2}>Nama siswa</th>
               {lm.filter((m) => m.tp.length > 0).map((m) => (
-                <th key={m.id} colSpan={m.tp.length} title={m.nama}>LM {m.urutan}. {m.nama.length > 28 ? `${m.nama.slice(0, 27)}…` : m.nama}</th>
+                <th key={m.id} colSpan={m.tp.length} title={judulLm(m)}>{potongJudul(judulLm(m))}</th>
               ))}
             </tr>
             <tr>
               {tpList.map((t) => (
-                <th key={t.id} title={t.rumusan || undefined}>{t.kode || `TP ${t.urutan}`}</th>
+                <th key={t.id} title={t.rumusan || undefined}>{labelTp(t)}</th>
               ))}
             </tr>
           </thead>
@@ -221,7 +264,7 @@ export default function NilaiTpGrid({
                   const baca = bacaNilaiSel(teks);
                   const galat = (diEdit && baca.galat) || galatServer[k];
                   const efektif = galat ? null : baca.nilai;
-                  const bawah = efektif !== null && efektif !== undefined && efektif < kelas.kktp;
+                  const rentang = galat ? RENTANG.BELUM_DINILAI : rentangNilai(efektif, ambang);
                   let kelasSel = 'sel';
                   if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor';
                   return (
@@ -233,14 +276,15 @@ export default function NilaiTpGrid({
                           data-c={c}
                           inputMode="decimal"
                           readOnly={readOnly}
-                          aria-label={`Nilai ${s.nama}, ${t.kode || `TP ${t.urutan}`}`}
+                          aria-label={`Nilai ${s.nama}, ${labelTp(t)}`}
                           aria-invalid={galat ? 'true' : undefined}
                           onChange={(e) => ubahSel(k, e.target.value)}
                           onPaste={(e) => !readOnly && tempel(e, r, c)}
                           onKeyDown={(e) => tombol(e, r, c)}
                         />
-                        <span className="tanda" aria-hidden="true">{galat ? '!' : (bawah ? '▼' : '')}</span>
-                        {bawah && <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>di bawah KKTP</span>}
+                        <span className="tanda">
+                          {galat ? <span aria-hidden="true">!</span> : <IkonRentang rentang={rentang} />}
+                        </span>
                       </div>
                     </td>
                   );
@@ -250,6 +294,20 @@ export default function NilaiTpGrid({
           </tbody>
         </table>
       </Box>
+
+      <Dialog open={konfirmasiKosong > 0} onClose={() => setKonfirmasiKosong(0)} aria-labelledby="judul-kosongkan">
+        <DialogTitle id="judul-kosongkan">Kosongkan nilai yang sudah tersimpan?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            {konfirmasiKosong} nilai yang sudah tersimpan akan dikosongkan (menjadi belum dinilai). Nilai yang
+            dikosongkan tidak bisa dikembalikan dari sini. Lanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setKonfirmasiKosong(0)} autoFocus>Kembali</Button>
+          <Button onClick={simpan} color="error" variant="contained">Kosongkan dan simpan</Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }

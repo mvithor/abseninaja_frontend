@@ -129,3 +129,20 @@ export function potong(daftar, ukuran) {
   for (let i = 0; i < daftar.length; i += ukuran) hasil.push(daftar.slice(i, i + ukuran));
   return hasil;
 }
+
+/**
+ * Hitung sel yang akan DIKOSONGKAN oleh simpanan ini: isian kosong pada sel yang di server sudah
+ * bernilai. Dipakai untuk meminta konfirmasi sebelum nilai yang sudah ada terhapus.
+ * `edit` = { kunci: teks }, `server` = Map(kunci -> nilai | null).
+ */
+export function hitungPengosongan(edit, server) {
+  let jumlah = 0;
+  Object.entries(edit).forEach(([k, teks]) => {
+    const baca = bacaNilaiSel(teks);
+    if (!baca.galat && baca.nilai === null) {
+      const ada = server.get(k);
+      if (ada !== null && ada !== undefined) jumlah += 1;
+    }
+  });
+  return jumlah;
+}

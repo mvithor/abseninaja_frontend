@@ -12,6 +12,7 @@ import SiswaPanel from 'src/apps/guru-lad/kelas/SiswaPanel';
 import StrukturPanel from 'src/apps/guru-lad/kelas/StrukturPanel';
 import NilaiTpGrid from 'src/apps/guru-lad/nilai/NilaiTpGrid';
 import { bacaMasukan, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
+import { tampilAngka } from 'src/apps/guru-lad/rentang';
 
 export default function LadKelas() {
   const { kelasId } = useParams();
@@ -74,7 +75,7 @@ export default function LadKelas() {
       <ParentCard title={`${kelas.nama_kelas} · ${kelas.mapel}`}>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={{ mb: 2 }}>
           <Typography variant="body2" color="text.secondary">
-            {kelas.semester} {kelas.tahun_ajaran} · {siswa.length} siswa · KKTP {String(kelas.kktp).replace('.', ',')}
+            {kelas.semester} {kelas.tahun_ajaran} · {siswa.length} siswa · KKTP {tampilAngka(Number(kelas.kktp))} (remedial bagian dari {tampilAngka(Number(kelas.ambang_bagian))}, pengayaan dari {tampilAngka(Number(kelas.ambang_pengayaan))})
           </Typography>
           {readOnly && <Chip size="small" color="warning" label={`Kelas kasus ${kelas.kasus_kode ?? ''}`.trim()} />}
         </Stack>

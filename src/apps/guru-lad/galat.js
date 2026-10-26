@@ -4,6 +4,7 @@
 
 const LABEL_BIDANG = {
   nama: 'Nama', nis: 'NIS', kode: 'Kode', kktp: 'KKTP', sas: 'SAS', lm: 'LM', tp: 'TP', nilai: 'Nilai',
+  ambang_bagian: 'Batas remedial bagian tertentu', ambang_pengayaan: 'Batas pengayaan',
 };
 const LABEL_BUTIR = { siswa: 'Baris', sel: 'Sel' };
 const MAKS_RINCIAN = 5;
@@ -37,4 +38,13 @@ export function pesanDariRespons(data, cadangan = 'Terjadi kesalahan. Coba lagi.
   const isi = rincian.join('; ');
   if (data.msg && isi) return `${data.msg}: ${isi}`;
   return data.msg || isi || cadangan;
+}
+
+/** Peta { kolom: pesan } dari galat 422 server, untuk menandai isian yang salah (kolom pertama menang). */
+export function galatPerKolom(data) {
+  const peta = {};
+  (Array.isArray(data?.galat) ? data.galat : []).forEach((g) => {
+    if (g?.kolom && g.kolom !== '-' && !(g.kolom in peta)) peta[g.kolom] = g.pesan;
+  });
+  return peta;
 }

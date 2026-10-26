@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { labelKolom, pesanDariRespons } from './galat.js';
+import { labelKolom, pesanDariRespons, galatPerKolom } from './galat.js';
 
 test('labelKolom: indeks server (dari 0) menjadi nomor baris guru (dari 1), kolom teknis menjadi label', () => {
   assert.equal(labelKolom('siswa[0].nis'), 'Baris 1, NIS');
@@ -35,4 +35,27 @@ test('pesanDariRespons: tanpa rincian, tanpa pesan, dan kolom "-"', () => {
   assert.equal(pesanDariRespons({}, 'cadangan'), 'cadangan');
   assert.equal(pesanDariRespons({ galat: [{ kolom: '-', pesan: 'Terlalu banyak' }] }), 'Terlalu banyak');
   assert.equal(pesanDariRespons(undefined, 'cadangan'), 'cadangan');
+});
+
+test('label ambang rentang memakai bahasa guru, bukan nama kolom teknis', () => {
+  assert.equal(labelKolom('ambang_bagian'), 'Batas remedial bagian tertentu');
+  assert.equal(labelKolom('ambang_pengayaan'), 'Batas pengayaan');
+  assert.equal(labelKolom('kktp'), 'KKTP');
+  const p = pesanDariRespons({
+    msg: 'Ambang rentang KKTP tidak sah menurut aturan',
+    galat: [{ kolom: 'ambang_pengayaan', pesan: 'harus lebih besar dari kktp' }],
+  });
+  assert.equal(p, 'Ambang rentang KKTP tidak sah menurut aturan: Batas pengayaan: harus lebih besar dari kktp');
+});
+
+test('galatPerKolom: peta kolom ke pesan, kolom pertama menang, "-" dan tanpa kolom diabaikan', () => {
+  const peta = galatPerKolom({
+    galat: [
+      { kolom: 'kktp', pesan: 'a' }, { kolom: 'kktp', pesan: 'b' }, { kolom: '-', pesan: 'c' }, { pesan: 'd' },
+      { kolom: 'ambang_bagian', pesan: 'e' },
+    ],
+  });
+  assert.deepEqual(peta, { kktp: 'a', ambang_bagian: 'e' });
+  assert.deepEqual(galatPerKolom(undefined), {});
+  assert.deepEqual(galatPerKolom({ galat: 'bukan daftar' }), {});
 });

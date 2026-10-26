@@ -10,6 +10,7 @@ import ParentCard from 'src/components/shared/ParentCard';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import BuatKelasDialog from 'src/apps/guru-lad/beranda/BuatKelasDialog';
 import { daftarKelas, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
+import { ringkasAmbang } from 'src/apps/guru-lad/rentang';
 
 export default function LadBeranda() {
   const navigate = useNavigate();
@@ -68,7 +69,7 @@ export default function LadBeranda() {
                   <TableCell>Mata pelajaran</TableCell>
                   <TableCell>Semester</TableCell>
                   <TableCell align="right">Siswa</TableCell>
-                  <TableCell align="right">KKTP</TableCell>
+                  <TableCell align="right" title="Remedial bagian tertentu / KKTP / pengayaan">Batas nilai</TableCell>
                   <TableCell>Jenis</TableCell>
                 </TableRow>
               </TableHead>
@@ -84,7 +85,7 @@ export default function LadBeranda() {
                     <TableCell>{k.mapel}</TableCell>
                     <TableCell>{k.semester} {k.tahun_ajaran}</TableCell>
                     <TableCell align="right">{k.jumlah_siswa}</TableCell>
-                    <TableCell align="right">{String(k.kktp).replace('.', ',')}</TableCell>
+                    <TableCell align="right" title="Remedial bagian tertentu / KKTP / pengayaan">{ringkasAmbang(k)}</TableCell>
                     <TableCell>
                       {k.jenis === 'NYATA'
                         ? <Chip size="small" variant="outlined" label="Kelas nyata" />
