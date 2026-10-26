@@ -149,7 +149,19 @@ export default function LadKelas() {
           />
         )}
         {tab === 'perhatian' && (
-          <EvaluasiPanel kelasId={kelasId} lm={lm} onCatatRemedial={readOnly ? undefined : setRemedialAwal} />
+          <EvaluasiPanel
+            kelasId={kelasId}
+            kelas={kelas}
+            siswa={siswa}
+            lm={lm}
+            nilaiTp={nilaiTp}
+            proyek={proyek}
+            nilaiProyek={nilaiProyek}
+            remedial={remedial}
+            pertemuan={pertemuan}
+            kehadiran={kehadiran}
+            onCatatRemedial={readOnly ? undefined : setRemedialAwal}
+          />
         )}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
         {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
