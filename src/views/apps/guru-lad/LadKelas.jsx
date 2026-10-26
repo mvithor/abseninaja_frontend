@@ -11,6 +11,7 @@ import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import SiswaPanel from 'src/apps/guru-lad/kelas/SiswaPanel';
 import StrukturPanel from 'src/apps/guru-lad/kelas/StrukturPanel';
 import NilaiTpGrid from 'src/apps/guru-lad/nilai/NilaiTpGrid';
+import EvaluasiPanel from 'src/apps/guru-lad/evaluasi/EvaluasiPanel';
 import { bacaMasukan, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
 import { tampilAngka } from 'src/apps/guru-lad/rentang';
 
@@ -62,7 +63,8 @@ export default function LadKelas() {
   } = data;
   const readOnly = kelas.jenis !== 'NYATA';
   if (tabAwalRef.current === null) {
-    tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
+    if (readOnly) tabAwalRef.current = 'perhatian';
+    else tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
   }
   const tab = tabPilihan ?? tabAwalRef.current;
 
@@ -85,6 +87,7 @@ export default function LadKelas() {
 
         <Tabs value={tab} onChange={(_, v) => setTabPilihan(v)} sx={{ mb: 2 }} aria-label="Bagian data kelas">
           <Tab value="nilai" label="Nilai TP" />
+          <Tab value="perhatian" label="Perlu Perhatian" />
           <Tab value="struktur" label={`Struktur (${lm.length})`} />
           <Tab value="siswa" label={`Siswa (${siswa.length})`} />
         </Tabs>
@@ -100,6 +103,7 @@ export default function LadKelas() {
             onTersimpan={muatUlang}
           />
         )}
+        {tab === 'perhatian' && <EvaluasiPanel kelasId={kelasId} lm={lm} />}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
         {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
       </ParentCard>

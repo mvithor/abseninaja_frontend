@@ -13,6 +13,8 @@ export const kunciLad = {
   akses: ['lad', 'akses'],
   daftarKelas: ['lad', 'kelas'],
   masukan: (kelasId) => ['lad', 'kelas', kelasId, 'masukan'],
+  // Berawalan sama dengan daftarKelas, jadi setiap invalidasi daftarKelas ikut menyegarkan evaluasi.
+  evaluasi: (kelasId) => ['lad', 'kelas', kelasId, 'evaluasi'],
 };
 
 /** Probe akses: 200 bila fitur aktif dan akun terdaftar sebagai guru LAD, 403 bila tidak. */
@@ -22,6 +24,7 @@ export const daftarKelas = () => ambil(axiosInstance.get(`${DASAR}/kelas`));
 export const buatKelas = (badan) => ambil(axiosInstance.post(`${DASAR}/kelas`, badan));
 export const ubahKelas = (kelasId, badan) => ambil(axiosInstance.patch(kelasUrl(kelasId), badan));
 export const bacaMasukan = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/masukan`));
+export const bacaEvaluasi = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/evaluasi`));
 
 // ---- struktur
 export const tambahLm = (kelasId, nama) => ambil(axiosInstance.post(`${kelasUrl(kelasId)}/lm`, { nama }));
