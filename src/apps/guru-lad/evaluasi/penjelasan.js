@@ -68,6 +68,8 @@ export function namaTp(lmNo, tpNo, lm) {
   return `TP ${kode || tpNo} (LM ${lmNo})`;
 }
 
+const namaTpDari = (t, ctx) => namaTp(t.lm, t.tp, ctx.lm);
+
 const daftarKata = (daftar, penghubung = 'dan') => {
   const x = daftar.map(String);
   if (x.length <= 1) return x.join('');
@@ -79,23 +81,32 @@ const RENTANG_TEKS = Object.freeze({
   BELUM_MENCAPAI_SEBAGIAN: 'remedial bagian tertentu',
 });
 
-function bukti1(b, ctx) {
-  const baris = b.tp.map((t) => {
+/** Satu kalimat per TP yang ditandai P1. */
+export function barisTpP1(b, ctx) {
+  return b.tp.map((t) => {
     const rem = t.remedial_terbaru === null || t.remedial_terbaru === undefined
       ? 'belum ada remedial'
       : `remedial terbaru ${a(t.remedial_terbaru)} masih di bawah KKTP`;
     const rentang = RENTANG_TEKS[t.rentang] ? `, ${RENTANG_TEKS[t.rentang]}` : '';
-    return `${namaTp(t.lm, t.tp, ctx.lm)}: nilai ${a(t.nilai)}${rentang}; ${rem}.`;
+    return `${namaTpDari(t, ctx)}: nilai ${a(t.nilai)}${rentang}; ${rem}.`;
   });
-  if (b.tersembunyi) {
-    const dilihat = new Set();
-    b.tp.filter((t) => t.tersembunyi).forEach((t) => {
-      if (dilihat.has(t.lm)) return;
-      dilihat.add(t.lm);
-      baris.push(`Tidak terlihat dari rata-rata: rata-rata ${namaLm(t.lm, ctx.lm)} (${a(t.nr_lm)}) sudah mencapai KKTP.`);
-    });
-  }
+}
+
+/** Kalimat tambahan bila rata-rata LM sudah mencapai KKTP sehingga TP rendah tertutup (satu kalimat per LM). */
+export function catatanTersembunyiP1(b, ctx) {
+  if (!b.tersembunyi) return [];
+  const dilihat = new Set();
+  const baris = [];
+  b.tp.filter((t) => t.tersembunyi).forEach((t) => {
+    if (dilihat.has(t.lm)) return;
+    dilihat.add(t.lm);
+    baris.push(`Tidak terlihat dari rata-rata: rata-rata ${namaLm(t.lm, ctx.lm)} (${a(t.nr_lm)}) sudah mencapai KKTP.`);
+  });
   return baris;
+}
+
+function bukti1(b, ctx) {
+  return [...barisTpP1(b, ctx), ...catatanTersembunyiP1(b, ctx)];
 }
 
 function bukti2(b) {
@@ -161,11 +172,18 @@ export function uraikanBukti(kode, bukti, ctx) {
 }
 
 /**
- * Susun daftar siswa untuk tampilan. Yang ditandai lebih dulu menurut prioritas pola utama, lalu yang
- * punya lebih banyak penanda, lalu nomor urut. Siswa tanpa penanda mengikuti menurut nomor urut.
- * @param {object[]} hasil `hasil` dari server
- * @param {{hanyaDitandai?: boolean, pola?: string[]}} opsi `pola` kosong berarti semua pola
+ * Pembanding urutan prioritas TAMPILAN: pola utama menurut URUTAN_PRIORITAS, lalu yang punya lebih banyak
+ * penanda, lalu nomor urut. Tidak memengaruhi siapa yang ditandai.
  */
+export function bandingPrioritas(x, y) {
+  const peringkat = (h) => (h.pola_utama ? URUTAN_PRIORITAS.indexOf(h.pola_utama) : URUTAN_PRIORITAS.length);
+  const dp = peringkat(x) - peringkat(y);
+  if (dp !== 0) return dp;
+  const dj = y.penanda.length - x.penanda.length;
+  if (dj !== 0) return dj;
+  return (x.urutan ?? 0) - (y.urutan ?? 0) || String(x.siswa_id).localeCompare(String(y.siswa_id), 'en', { numeric: true });
+}
+
 export function susunSiswa(hasil, { hanyaDitandai = true, pola = [] } = {}) {
   const terpilih = new Set(pola);
   const lolos = hasil.filter((h) => {
@@ -173,14 +191,7 @@ export function susunSiswa(hasil, { hanyaDitandai = true, pola = [] } = {}) {
     if (terpilih.size > 0 && !h.penanda.some((k) => terpilih.has(k))) return false;
     return true;
   });
-  const peringkat = (h) => (h.pola_utama ? URUTAN_PRIORITAS.indexOf(h.pola_utama) : URUTAN_PRIORITAS.length);
-  return [...lolos].sort((x, y) => {
-    const dp = peringkat(x) - peringkat(y);
-    if (dp !== 0) return dp;
-    const dj = y.penanda.length - x.penanda.length;
-    if (dj !== 0) return dj;
-    return (x.urutan ?? 0) - (y.urutan ?? 0) || String(x.siswa_id).localeCompare(String(y.siswa_id), 'en', { numeric: true });
-  });
+  return [...lolos].sort(bandingPrioritas);
 }
 
 /** Hitungan untuk ringkasan: ditandai per pola, dan siswa yang pola itu BELUM_CUKUP datanya. */
@@ -207,13 +218,31 @@ export function hitungRingkasan(data) {
 }
 
 /**
- * Label tab: jumlah siswa bertanda hanya ditampilkan bila lebih dari nol. Angka 0 tidak ditampilkan karena
- * dapat terbaca "aman", padahal bisa juga berarti data belum cukup untuk menandai siapa pun.
+ * Golongan tampilan satu siswa: 'perhatian' bila punya penanda selain pengayaan (kode yang tidak dikenal
+ * dihitung perhatian supaya tidak ada yang terlewat), 'pengayaan' bila penandanya hanya pengayaan (P5),
+ * 'tanpa' bila tidak ada penanda. Siswa dengan P5 DAN penanda lain masuk 'perhatian'.
+ */
+export function golonganSiswa(h) {
+  if (!h || !Array.isArray(h.penanda) || h.penanda.length === 0) return 'tanpa';
+  return h.penanda.some((k) => !POLA_INFO[k] || POLA_INFO[k].jenis !== 'pengayaan') ? 'perhatian' : 'pengayaan';
+}
+
+/** Jumlah siswa per golongan tampilan. */
+export function hitungGolongan(hasil) {
+  const n = { perhatian: 0, pengayaan: 0, tanpa: 0 };
+  (hasil ?? []).forEach((h) => { n[golonganSiswa(h)] += 1; });
+  return n;
+}
+
+/**
+ * Label tab: hanya siswa golongan perhatian yang dihitung. Peluang pengayaan bukan peringatan, dan angka di
+ * tab terbaca sebagai peringatan. Angka 0 tidak ditampilkan karena dapat terbaca "aman", padahal bisa juga
+ * berarti data belum cukup untuk menandai siapa pun.
  */
 export function labelTabPerhatian(data) {
   const dasar = 'Perlu Perhatian';
   if (!data || !Array.isArray(data.hasil)) return dasar;
-  const n = hitungRingkasan(data).ditandai;
+  const n = hitungGolongan(data.hasil).perhatian;
   return n > 0 ? `${dasar} (${n})` : dasar;
 }
 

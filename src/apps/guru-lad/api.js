@@ -50,22 +50,22 @@ export const hapusSiswa = (kelasId, siswaId, konfirmasi = false) => ambil(
 );
 
 // ---- nilai
-const simpanSatuPotong = (kelasId, sel) => ambil(axiosInstance.put(`${kelasUrl(kelasId)}/nilai-tp`, { sel }));
+const simpanSatuPotong = (kelasId, sel, rute) => ambil(axiosInstance.put(`${kelasUrl(kelasId)}/${rute}`, { sel }));
 
 /**
- * Simpan sel nilai TP yang berubah. Dikirim bertahap (paling banyak 1500 sel per permintaan, batas server).
+ * Simpan sel nilai yang berubah. Dikirim bertahap (paling banyak 1500 sel per permintaan, batas server).
  * Berhenti di potongan pertama yang ditolak: potongan sebelumnya sudah tersimpan dan dilaporkan di `tersimpan`,
  * sehingga pemanggil dapat menandai sel-sel itu bersih.
  * Mengembalikan { tersimpan: <sel yang diterima server>, ringkasan } atau melempar error dengan `.tersimpan`.
  */
-export async function simpanNilaiTp(kelasId, sel) {
+async function simpanBertahap(kelasId, sel, rute) {
   const tersimpan = [];
   const ringkasan = {
     disimpan: 0, tidak_berubah: 0, dikosongkan: 0, remedial_disinkronkan: 0,
   };
   for (const potongan of potong(sel, MAKS_SEL_PER_PERMINTAAN)) {
     try {
-      const hasil = await simpanSatuPotong(kelasId, potongan);
+      const hasil = await simpanSatuPotong(kelasId, potongan, rute);
       tersimpan.push(...potongan);
       Object.keys(ringkasan).forEach((k) => { ringkasan[k] += hasil[k] ?? 0; });
     } catch (error) {
@@ -76,6 +76,58 @@ export async function simpanNilaiTp(kelasId, sel) {
   }
   return { tersimpan, ringkasan };
 }
+
+export const simpanNilaiTp = (kelasId, sel) => simpanBertahap(kelasId, sel, 'nilai-tp');
+export const simpanNilaiProyek = (kelasId, sel) => simpanBertahap(kelasId, sel, 'nilai-proyek');
+
+// ---- proyek
+export const tambahProyek = (kelasId, badan) => ambil(axiosInstance.post(`${kelasUrl(kelasId)}/proyek`, badan));
+export const ubahProyek = (kelasId, proyekId, badan) => ambil(axiosInstance.patch(`${kelasUrl(kelasId)}/proyek/${proyekId}`, badan));
+export const hapusProyek = (kelasId, proyekId, konfirmasi = false) => ambil(
+  axiosInstance.delete(`${kelasUrl(kelasId)}/proyek/${proyekId}`, { params: konfirmasi ? { konfirmasi: 'hapus' } : undefined }),
+);
+
+// ---- pertemuan dan kehadiran
+export const tambahPertemuan = (kelasId, badan) => ambil(axiosInstance.post(`${kelasUrl(kelasId)}/pertemuan`, badan));
+export const ubahPertemuan = (kelasId, pertemuanId, badan) => ambil(axiosInstance.patch(`${kelasUrl(kelasId)}/pertemuan/${pertemuanId}`, badan));
+export const hapusPertemuan = (kelasId, pertemuanId, konfirmasi = false) => ambil(
+  axiosInstance.delete(`${kelasUrl(kelasId)}/pertemuan/${pertemuanId}`, { params: konfirmasi ? { konfirmasi: 'hapus' } : undefined }),
+);
+export const urutPertemuan = (kelasId, idBerurutan) => ambil(
+  axiosInstance.put(`${kelasUrl(kelasId)}/pertemuan/urutan`, { id_berurutan: idBerurutan }),
+);
+
+/**
+ * Simpan kehadiran banyak pertemuan: satu permintaan per pertemuan (itu bentuk API-nya), berurutan.
+ * `muatan` = Map(pertemuanId -> [{ siswa_id, kode }]), kode null menghapus catatan. Berhenti di pertemuan
+ * pertama yang ditolak; pertemuan sebelumnya sudah tersimpan dan dilaporkan di `error.berhasil`, sedangkan
+ * pertemuan yang gagal ada di `error.pertemuanGagal` beserta daftar catatannya di `error.catatanGagal`
+ * (indeks galat dari server menunjuk ke daftar itu).
+ */
+export async function simpanKehadiranBanyak(kelasId, muatan) {
+  const berhasil = [];
+  const ringkasan = { disimpan: 0, tidak_berubah: 0, dihapus: 0 };
+  for (const [pertemuanId, catatan] of muatan) {
+    for (const potongan of potong(catatan, MAKS_SEL_PER_PERMINTAAN)) {
+      try {
+        const hasil = await ambil(axiosInstance.put(`${kelasUrl(kelasId)}/pertemuan/${pertemuanId}/kehadiran`, { catatan: potongan }));
+        Object.keys(ringkasan).forEach((k) => { ringkasan[k] += hasil[k] ?? 0; });
+        berhasil.push(...potongan.map((c) => ({ pertemuan_id: pertemuanId, siswa_id: c.siswa_id })));
+      } catch (error) {
+        error.berhasil = berhasil;
+        error.pertemuanGagal = pertemuanId;
+        error.catatanGagal = potongan;
+        throw error;
+      }
+    }
+  }
+  return { berhasil, ringkasan };
+}
+
+// ---- remedial
+export const tambahRemedial = (kelasId, badan) => ambil(axiosInstance.post(`${kelasUrl(kelasId)}/remedial`, badan));
+export const ubahRemedial = (kelasId, remedialId, badan) => ambil(axiosInstance.patch(`${kelasUrl(kelasId)}/remedial/${remedialId}`, badan));
+export const hapusRemedial = (kelasId, remedialId) => ambil(axiosInstance.delete(`${kelasUrl(kelasId)}/remedial/${remedialId}`));
 
 /** Ambil pesan yang layak ditampilkan dari error axios, termasuk daftar galat per kolom (422). */
 export function pesanGalat(error, cadangan = 'Terjadi kesalahan. Coba lagi.') {
