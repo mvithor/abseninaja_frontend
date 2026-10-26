@@ -308,6 +308,7 @@ const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboa
 const DashboardGuruSekolah = Loadable(lazy(() => import('../views/dashboard/GuruSekolah')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
+const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
 
 // Landing
 const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
@@ -639,6 +640,7 @@ const Router = [
                 children: [
                     { path: '', element: <LadBeranda /> },
                     { path: 'kelas/:kelasId', element: <LadKelas /> },
+                    { path: 'kelas/:kelasId/siswa/:siswaId', element: <LadSiswa /> },
                 ]
             },
         ]

@@ -2,7 +2,8 @@ import { alpha } from '@mui/material/styles';
 
 // Teks yang hanya dibaca pembaca layar (sama dengan yang dipakai IkonRentang).
 export const sembunyi = {
-  position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap',
+  // Piksel eksplisit: di sx MUI angka 1 berarti 100%, bukan 1px.
+  position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap',
 };
 
 // Lebar tiga kolom kiri yang lengket; offset `left` kolom berikutnya adalah jumlah lebar sebelumnya.
@@ -41,6 +42,7 @@ export const gayaMatriks = (theme) => ({
     left: LEBAR_NO, width: LEBAR_NAMA, minWidth: LEBAR_NAMA, maxWidth: LEBAR_NAMA, padding: '0 8px', textAlign: 'left',
     whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
   },
+  '& .ringkas-saran': { display: 'block', fontSize: 11, lineHeight: 1.2, color: theme.palette.text.secondary, whiteSpace: 'normal' },
   '& .k-pen': {
     left: LEBAR_NO + LEBAR_NAMA, width: LEBAR_PENANDA, minWidth: LEBAR_PENANDA, textAlign: 'left',
     boxShadow: `2px 0 0 ${theme.palette.divider}`,

@@ -15,6 +15,9 @@ export const kunciLad = {
   masukan: (kelasId) => ['lad', 'kelas', kelasId, 'masukan'],
   // Berawalan sama dengan daftarKelas, jadi setiap invalidasi daftarKelas ikut menyegarkan evaluasi.
   evaluasi: (kelasId) => ['lad', 'kelas', kelasId, 'evaluasi'],
+  // Ringkasan keputusan saran seluruh kelas (untuk penanda di matriks) dan saran lengkap satu siswa.
+  saranKelas: (kelasId) => ['lad', 'kelas', kelasId, 'saran'],
+  saranSiswa: (kelasId, siswaId) => ['lad', 'kelas', kelasId, 'saran-siswa', String(siswaId)],
 };
 
 /** Probe akses: 200 bila fitur aktif dan akun terdaftar sebagai guru LAD, 403 bila tidak. */
@@ -25,6 +28,18 @@ export const buatKelas = (badan) => ambil(axiosInstance.post(`${DASAR}/kelas`, b
 export const ubahKelas = (kelasId, badan) => ambil(axiosInstance.patch(kelasUrl(kelasId), badan));
 export const bacaMasukan = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/masukan`));
 export const bacaEvaluasi = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/evaluasi`));
+
+// ---- saran tindak lanjut
+// Draf disusun server dari bukti; yang dikirim klien hanya versi akhir guru. Keputusan (pakai, abaikan,
+// buka kembali) selalu menyimpan salinan draf saat itu di server, jadi klien tidak mengirim draf.
+const saranUrl = (kelasId, siswaId, pola) => `${kelasUrl(kelasId)}/siswa/${siswaId}/saran${pola ? `/${pola}` : ''}`;
+export const bacaSaranKelas = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/saran`));
+export const bacaSaranSiswa = (kelasId, siswaId) => ambil(axiosInstance.get(saranUrl(kelasId, siswaId)));
+export const pakaiSaran = (kelasId, siswaId, pola, akhir) => ambil(axiosInstance.put(saranUrl(kelasId, siswaId, pola), { akhir }));
+export const abaikanSaran = (kelasId, siswaId, pola, alasan) => ambil(
+  axiosInstance.post(`${saranUrl(kelasId, siswaId, pola)}/abaikan`, { alasan }),
+);
+export const bukaKembaliSaran = (kelasId, siswaId, pola) => ambil(axiosInstance.delete(saranUrl(kelasId, siswaId, pola)));
 
 // ---- struktur
 export const tambahLm = (kelasId, nama) => ambil(axiosInstance.post(`${kelasUrl(kelasId)}/lm`, { nama }));

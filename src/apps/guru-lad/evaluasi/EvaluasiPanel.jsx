@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, CircularProgress, Collapse,
   FormControlLabel, Paper, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
 import { IconChevronDown } from '@tabler/icons-react';
-import { bacaEvaluasi, kunciLad, pesanGalat } from '../api';
+import { bacaEvaluasi, bacaSaranKelas, kunciLad, pesanGalat } from '../api';
+import { ringkasKeputusan } from '../saran/saran';
 import IkonRentang from '../komponen/IkonRentang';
 import { legendaRentang } from '../rentang';
 import {
@@ -32,12 +34,21 @@ export default function EvaluasiPanel({
   const [urut, setUrut] = useState(MODE_URUT.PRIORITAS);
   const [terpilihId, setTerpilihId] = useState(null);
   const [legenda, setLegenda] = useState(false);
+  const navigate = useNavigate();
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: kunciLad.evaluasi(kelasId),
     queryFn: () => bacaEvaluasi(kelasId),
     retry: false,
   });
+
+  // Keputusan saran per siswa, hanya untuk keterangan kecil di matriks. Gagal memuatnya tidak boleh mengganggu tab.
+  const saranKelas = useQuery({
+    queryKey: kunciLad.saranKelas(kelasId),
+    queryFn: () => bacaSaranKelas(kelasId),
+    retry: false,
+  });
+  const keputusan = useMemo(() => ringkasKeputusan(saranKelas.data?.saran), [saranKelas.data]);
 
   const ctx = useMemo(() => ({ lm, parameter: data?.parameter ?? {} }), [lm, data]);
   const ringkasan = useMemo(() => (data ? hitungRingkasan(data) : null), [data]);
@@ -189,6 +200,7 @@ export default function EvaluasiPanel({
           terpilihId={terpilihId}
           onBuka={bukaSiswa}
           tampilTanpa={tampilTanpa}
+          keputusan={keputusan}
         />
       )}
 
@@ -240,7 +252,12 @@ export default function EvaluasiPanel({
         </AccordionDetails>
       </Accordion>
 
-      <RincianSiswa rincian={rincian} onTutup={tutupRincian} onCatatRemedial={onCatatRemedial} />
+      <RincianSiswa
+        rincian={rincian}
+        onTutup={tutupRincian}
+        onCatatRemedial={onCatatRemedial}
+        onBukaProfil={(id) => navigate(`/dashboard/guru-lad/kelas/${kelasId}/siswa/${id}`)}
+      />
     </Stack>
   );
 }
