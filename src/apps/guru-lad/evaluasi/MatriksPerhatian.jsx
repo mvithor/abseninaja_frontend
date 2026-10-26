@@ -7,6 +7,7 @@ import { RENTANG, tampilAngka } from '../rentang';
 import { MODE_URUT, ringkasKolomTp, susunBaris } from './matriks';
 import { gayaMatriks, sembunyi } from './gayaMatriks';
 import PilKode from './PilKode';
+import { teksKeputusan } from '../saran/saran';
 
 const KELAS_RENTANG = {
   [RENTANG.SELURUH]: 'r-seluruh',
@@ -47,8 +48,9 @@ function SelTp({ s, k, pisah }) {
 SelTp.propTypes = { s: PropTypes.object.isRequired, k: PropTypes.object.isRequired, pisah: PropTypes.bool };
 
 const BarisSiswaMatriks = memo(function BarisSiswaMatriks({
-  b, kolom, terpilih, onBuka,
+  b, kolom, terpilih, onBuka, keputusan,
 }) {
+  const teksSaran = teksKeputusan(keputusan);
   let tpSebelumnya = null;
   return (
     <tr className={terpilih ? 'terpilih' : undefined}>
@@ -70,6 +72,7 @@ const BarisSiswaMatriks = memo(function BarisSiswaMatriks({
         {b.penanda.length === 0
           ? <span aria-hidden="true">&middot;</span>
           : b.penanda.map((kode) => <PilKode key={kode} kode={kode} sx={{ mr: 0.5, my: 0.25 }} />)}
+        {teksSaran && <small className="ringkas-saran" title="Keputusan guru pada saran tindak lanjut">{teksSaran}</small>}
       </td>
       {b.sel.map((s, i) => {
         const k = kolom.kolomTp[i];
@@ -120,6 +123,7 @@ BarisSiswaMatriks.propTypes = {
   kolom: PropTypes.object.isRequired,
   terpilih: PropTypes.bool.isRequired,
   onBuka: PropTypes.func.isRequired,
+  keputusan: PropTypes.object,
 };
 
 function TombolUrut({ mode, aktif, onUrut, children, label }) {
@@ -139,7 +143,7 @@ TombolUrut.propTypes = {
 };
 
 export default function MatriksPerhatian({
-  bagi, kolom, konteks, ambang, kktp, semuaSiswaId, urut, onUrut, terpilihId, onBuka, tampilTanpa,
+  bagi, kolom, konteks, ambang, kktp, semuaSiswaId, urut, onUrut, terpilihId, onBuka, tampilTanpa, keputusan,
 }) {
   const ringkas = useMemo(() => ringkasKolomTp(kolom.kolomTp, semuaSiswaId, konteks, kktp), [kolom, semuaSiswaId, konteks, kktp]);
   const golongan = ['perhatian', 'pengayaan', ...(tampilTanpa ? ['tanpa'] : [])].filter((g) => bagi[g].length > 0);
@@ -220,7 +224,7 @@ export default function MatriksPerhatian({
                 <td colSpan={kolom.jumlahKolom}><div>{`${JUDUL_GOLONGAN[g]} · ${bagi[g].length} siswa`}</div></td>
               </tr>
               {barisPer[g].map((b) => (
-                <BarisSiswaMatriks key={b.siswaId} b={b} kolom={kolom} terpilih={terpilihId === b.siswaId} onBuka={onBuka} />
+                <BarisSiswaMatriks key={b.siswaId} b={b} kolom={kolom} terpilih={terpilihId === b.siswaId} onBuka={onBuka} keputusan={keputusan?.get(b.siswaId)} />
               ))}
             </Fragment>
           ))}
@@ -242,4 +246,5 @@ MatriksPerhatian.propTypes = {
   terpilihId: PropTypes.number,
   onBuka: PropTypes.func.isRequired,
   tampilTanpa: PropTypes.bool.isRequired,
+  keputusan: PropTypes.instanceOf(Map),
 };

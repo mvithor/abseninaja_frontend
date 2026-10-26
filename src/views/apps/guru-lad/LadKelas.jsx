@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert, Box, Button, Chip, CircularProgress, Stack, Tab, Tabs, Typography,
@@ -23,6 +23,7 @@ import { tampilAngka } from 'src/apps/guru-lad/rentang';
 export default function LadKelas() {
   const { kelasId } = useParams();
   const navigate = useNavigate();
+  const lokasi = useLocation();
   const qc = useQueryClient();
   const akses = useAksesLad();
   const [tabPilihan, setTabPilihan] = useState(null);
@@ -80,7 +81,10 @@ export default function LadKelas() {
   } = data;
   const readOnly = kelas.jenis !== 'NYATA';
   if (tabAwalRef.current === null) {
-    if (readOnly) tabAwalRef.current = 'perhatian';
+    // Kembali dari profil siswa membuka tab yang tadi dipakai.
+    const dariProfil = typeof lokasi.state?.tab === 'string' ? lokasi.state.tab : null;
+    if (dariProfil) tabAwalRef.current = dariProfil;
+    else if (readOnly) tabAwalRef.current = 'perhatian';
     else tabAwalRef.current = siswa.length === 0 ? 'siswa' : (lm.length === 0 ? 'struktur' : 'nilai');
   }
   const tab = tabPilihan ?? tabAwalRef.current;

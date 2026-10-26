@@ -4,12 +4,10 @@ import { useSelector } from 'react-redux';
 import {
   Alert, Box, Button, Chip, Divider, Drawer, IconButton, Stack, Typography,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
 import { IconX } from '@tabler/icons-react';
-import { tampilAngka } from '../rentang';
-import { TEKS_KODE } from '../kehadiran/kehadiran';
 import PilKode from './PilKode';
-import { sembunyi } from './gayaMatriks';
+import DeretKehadiran from '../komponen/DeretKehadiran';
+import GrafikTren from '../komponen/GrafikTren';
 
 const LEBAR_PANEL = 440;
 
@@ -21,74 +19,6 @@ function Kalimat({ baris }) {
   );
 }
 Kalimat.propTypes = { baris: PropTypes.arrayOf(PropTypes.string).isRequired };
-
-function DeretKehadiran({ deret }) {
-  const theme = useTheme();
-  const gaya = (kode) => {
-    if (kode === 'A') {
-      return { bgcolor: alpha(theme.palette.error.main, 0.3), color: theme.palette.text.primary, border: `2px solid ${theme.palette.error.main}`, fontWeight: 800 };
-    }
-    if (kode === null) return { border: `1px dashed ${theme.palette.text.secondary}`, color: theme.palette.text.secondary };
-    if (kode === 'H') return { border: `1px solid ${theme.palette.divider}`, bgcolor: theme.palette.grey[100] };
-    return { border: `1px solid ${theme.palette.warning.main}`, bgcolor: alpha(theme.palette.warning.main, 0.2) };
-  };
-  return (
-    <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.5} role="list" aria-label="Kehadiran per pertemuan">
-      {deret.map((d) => (
-        <Box
-          key={d.nomor}
-          role="listitem"
-          title={`Pertemuan ${d.nomor}: ${d.kode ? TEKS_KODE[d.kode] : 'belum dicatat'}`}
-          sx={{
-            width: 28, height: 28, borderRadius: 0.75, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700, ...gaya(d.kode),
-          }}
-        >
-          <span aria-hidden="true">{d.kode ?? '-'}</span>
-          <Box component="span" sx={sembunyi}>{`Pertemuan ${d.nomor}: ${d.kode ? TEKS_KODE[d.kode] : 'belum dicatat'}`}</Box>
-        </Box>
-      ))}
-    </Stack>
-  );
-}
-DeretKehadiran.propTypes = { deret: PropTypes.array.isRequired };
-
-function GrafikP4({ g }) {
-  const theme = useTheme();
-  if (!g) return null;
-  const garis = (titik) => titik.map((t) => `${t.x.toFixed(1)},${t.y.toFixed(1)}`).join(' ');
-  const tick = [g.min, g.maks];
-  return (
-    <Box>
-      <svg viewBox={`0 0 ${g.lebar} ${g.tinggi}`} width="100%" aria-hidden="true" focusable="false" style={{ display: 'block' }}>
-        {tick.map((v) => (
-          <g key={v}>
-            <line x1={g.kiri} x2={g.lebar - g.kanan} y1={g.petakY(v)} y2={g.petakY(v)} stroke={theme.palette.divider} />
-            <text x={g.kiri - 6} y={g.petakY(v) + 4} textAnchor="end" fontSize="10" fill={theme.palette.text.secondary}>{v}</text>
-          </g>
-        ))}
-        {g.yKktp !== null && (
-          <line x1={g.kiri} x2={g.lebar - g.kanan} y1={g.yKktp} y2={g.yKktp} stroke={theme.palette.error.main} strokeDasharray="4 4" />
-        )}
-        {g.kelas && <polyline points={garis(g.kelas)} fill="none" stroke={theme.palette.grey[600]} strokeWidth="2" />}
-        <polyline points={garis(g.siswa)} fill="none" stroke={theme.palette.primary.main} strokeWidth="2.5" />
-        {g.siswa.map((t) => (
-          <g key={t.lm}>
-            <circle cx={t.x} cy={t.y} r="4" fill={theme.palette.primary.main} />
-            <text x={t.x} y={t.y - 8} textAnchor="middle" fontSize="10" fontWeight="600" fill={theme.palette.text.primary}>{tampilAngka(Math.round(t.nilai * 10) / 10)}</text>
-            <text x={t.x} y={g.tinggi - 6} textAnchor="middle" fontSize="10" fill={theme.palette.text.secondary}>{`LM ${t.lm}`}</text>
-          </g>
-        ))}
-      </svg>
-      <Stack direction="row" spacing={2} sx={{ mt: 0.5, fontSize: 12 }} flexWrap="wrap" useFlexGap>
-        <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'primary.main', verticalAlign: 'middle', mr: 0.75 }} />Siswa</Box>
-        {g.kelas && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'grey.600', verticalAlign: 'middle', mr: 0.75 }} />Rata-rata kelas</Box>}
-        {g.yKktp !== null && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, borderTop: '2px dashed', borderColor: 'error.main', verticalAlign: 'middle', mr: 0.75 }} />KKTP</Box>}
-      </Stack>
-    </Box>
-  );
-}
-GrafikP4.propTypes = { g: PropTypes.object };
 
 function BagianP1({ b, namaSiswa, onCatatRemedial }) {
   return (
@@ -130,7 +60,7 @@ BagianP1.propTypes = { b: PropTypes.object.isRequired, namaSiswa: PropTypes.stri
  * jadi guru tetap dapat membaca matriks dan berpindah siswa dengan satu klik. Esc menutup; fokus pindah ke
  * judul saat dibuka dan kembali ke nama siswa saat ditutup.
  */
-export default function RincianSiswa({ rincian, onTutup, onCatatRemedial }) {
+export default function RincianSiswa({ rincian, onTutup, onCatatRemedial, onBukaProfil }) {
   const tinggiTopbar = useSelector((s) => s.customizer?.TopbarHeight) ?? 70;
   const judulRef = useRef(null);
   const siswaId = rincian ? rincian.siswaId : null;
@@ -182,6 +112,11 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial }) {
           </Stack>
 
           <Box sx={{ px: 2.5, pb: 2 }}>
+            {onBukaProfil && (
+              <Button variant="contained" size="small" sx={{ mb: 1.5 }} onClick={() => onBukaProfil(rincian.siswaId)}>
+                Buka profil dan saran tindak lanjut
+              </Button>
+            )}
             {rincian.bagian.length > 0 && (
               <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} sx={{ mb: 1 }}>
                 {rincian.bagian.map((b) => <PilKode key={b.kode} kode={b.kode} panjang />)}
@@ -208,7 +143,7 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial }) {
                 {b.kode === 'P1'
                   ? <BagianP1 b={{ ...b, siswaId: rincian.siswaId }} namaSiswa={rincian.nama} onCatatRemedial={onCatatRemedial} />
                   : <Kalimat baris={b.kalimat} />}
-                {b.kode === 'P4' && <GrafikP4 g={b.grafik} />}
+                {b.kode === 'P4' && <GrafikTren g={b.grafik} />}
               </Stack>
             </Box>
           ))}
@@ -234,4 +169,5 @@ RincianSiswa.propTypes = {
   rincian: PropTypes.object,
   onTutup: PropTypes.func.isRequired,
   onCatatRemedial: PropTypes.func,
+  onBukaProfil: PropTypes.func,
 };
