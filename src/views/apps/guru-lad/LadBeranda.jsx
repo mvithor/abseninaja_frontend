@@ -4,11 +4,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert, Box, Button, Chip, CircularProgress, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
-import { IconPlus } from '@tabler/icons-react';
+import { IconFileImport, IconPlus } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import BuatKelasDialog from 'src/apps/guru-lad/beranda/BuatKelasDialog';
+import ImporBlankoDialog from 'src/apps/guru-lad/impor/ImporBlankoDialog';
+import { ringkasHasilSimpan } from 'src/apps/guru-lad/impor/impor';
 import { daftarKelas, kunciLad, pesanGalat } from 'src/apps/guru-lad/api';
 import { ringkasAmbang } from 'src/apps/guru-lad/rentang';
 
@@ -17,6 +19,8 @@ export default function LadBeranda() {
   const qc = useQueryClient();
   const akses = useAksesLad();
   const [dialog, setDialog] = useState(false);
+  const [dialogImpor, setDialogImpor] = useState(false);
+  const [infoImpor, setInfoImpor] = useState('');
 
   const { data, isLoading, error } = useQuery({
     queryKey: kunciLad.daftarKelas,
@@ -46,17 +50,24 @@ export default function LadBeranda() {
           <Typography variant="body2" color="text.secondary">
             Setiap baris adalah satu mata pelajaran pada satu kelas dan semester.
           </Typography>
-          <Button variant="contained" startIcon={<IconPlus size={18} />} onClick={() => setDialog(true)}>
-            Tambah Kelas
-          </Button>
+          <Stack direction="row" spacing={1}>
+            <Button variant="outlined" startIcon={<IconFileImport size={18} />} onClick={() => setDialogImpor(true)}>
+              Impor dari Blanko
+            </Button>
+            <Button variant="contained" startIcon={<IconPlus size={18} />} onClick={() => setDialog(true)}>
+              Tambah Kelas
+            </Button>
+          </Stack>
         </Stack>
+
+        {infoImpor && <Alert severity="success" onClose={() => setInfoImpor('')} sx={{ mb: 2 }}>{infoImpor}</Alert>}
 
         {error && <Alert severity="error" sx={{ mb: 2 }}>{pesanGalat(error)}</Alert>}
         {isLoading && <Box sx={{ p: 3, textAlign: 'center' }}><CircularProgress size={24} /></Box>}
 
         {!isLoading && !error && kelas.length === 0 && (
           <Alert severity="info">
-            Belum ada kelas. Pilih Tambah Kelas, lalu isi daftar siswa, struktur TP, dan nilainya.
+            Belum ada kelas. Pilih Tambah Kelas lalu isi daftar siswa, struktur TP, dan nilainya, atau Impor dari Blanko bila nilai sudah ada di Excel.
           </Alert>
         )}
 
@@ -107,6 +118,17 @@ export default function LadBeranda() {
           setDialog(false);
           qc.invalidateQueries({ queryKey: kunciLad.daftarKelas });
           if (hasil?.kelas?.id) navigate(`/dashboard/guru-lad/kelas/${hasil.kelas.id}`);
+        }}
+      />
+
+      <ImporBlankoDialog
+        buka={dialogImpor}
+        onTutup={() => setDialogImpor(false)}
+        onSukses={(hasil) => {
+          setDialogImpor(false);
+          qc.invalidateQueries({ queryKey: kunciLad.daftarKelas });
+          if (hasil?.kelas?.length === 1) navigate(`/dashboard/guru-lad/kelas/${hasil.kelas[0].id}`);
+          else setInfoImpor(ringkasHasilSimpan(hasil));
         }}
       />
     </PageContainer>

@@ -26,6 +26,19 @@ export const cekAkses = () => ambil(axiosInstance.get(`${DASAR}/ping`));
 export const daftarKelas = () => ambil(axiosInstance.get(`${DASAR}/kelas`));
 export const buatKelas = (badan) => ambil(axiosInstance.post(`${DASAR}/kelas`, badan));
 export const ubahKelas = (kelasId, badan) => ambil(axiosInstance.patch(kelasUrl(kelasId), badan));
+
+// ---- impor blanko (FR-07)
+// Berkas dikirim sebagai multipart. Pratinjau tidak menulis apa pun; simpan memeriksa ulang dari awal dan
+// membuat semua kelas dalam satu transaksi (semua-atau-tidak-sama-sekali), jadi berkas dikirim ulang saat menyimpan.
+function kirimBerkasImpor(jalur, berkas, meta) {
+  const form = new FormData();
+  berkas.forEach((f) => form.append('berkas', f, f.name));
+  form.append('meta', JSON.stringify(meta));
+  return ambil(axiosInstance.post(`${DASAR}/kelas/impor${jalur}`, form));
+}
+export const pratinjauImpor = (berkas, meta) => kirimBerkasImpor('/pratinjau', berkas, meta);
+export const simpanImpor = (berkas, meta) => kirimBerkasImpor('', berkas, meta);
+
 export const bacaMasukan = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/masukan`));
 export const bacaEvaluasi = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/evaluasi`));
 
