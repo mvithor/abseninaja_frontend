@@ -143,7 +143,7 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial, onBuka
                 {b.kode === 'P1'
                   ? <BagianP1 b={{ ...b, siswaId: rincian.siswaId }} namaSiswa={rincian.nama} onCatatRemedial={onCatatRemedial} />
                   : <Kalimat baris={b.kalimat} />}
-                {b.kode === 'P4' && <GrafikTren g={b.grafik} />}
+                {b.kode === 'P4' && <GrafikTren deret={b.deret} kktp={b.kktp} />}
               </Stack>
             </Box>
           ))}
