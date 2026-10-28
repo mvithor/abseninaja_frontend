@@ -1,7 +1,7 @@
 import { Button, Box, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-const AddButton = ({ icon, onClick, children, ...props }) => {
+const AddButton = ({ icon, onClick, children, sx, ...props }) => {
   const theme = useTheme(); // Mengambil tema aktif
   const isDarkMode = theme.palette.mode === 'dark';
 
@@ -9,21 +9,25 @@ const AddButton = ({ icon, onClick, children, ...props }) => {
     <Button
       variant="outlined"
       onClick={onClick}
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        borderRadius: '10px',
-        padding: '6px 12px',
-        borderColor: isDarkMode ? theme.palette.text.primary : '#D3D3D3',
-        backgroundColor: isDarkMode ? 'transparent' : '#ffffff', // Transparan di dark mode
-        '&:hover': {
-          backgroundColor: isDarkMode ? 'transparent' : '#f5f5f5',
+      sx={[
+        {
+          display: 'flex',
+          alignItems: 'center',
+          borderRadius: '10px',
+          padding: '6px 12px',
+          borderColor: isDarkMode ? theme.palette.text.primary : '#D3D3D3',
+          backgroundColor: isDarkMode ? 'transparent' : '#ffffff', // Transparan di dark mode
+          '&:hover': {
+            backgroundColor: isDarkMode ? 'transparent' : '#f5f5f5',
+          },
+          width: { xs: '100%', sm: '220px' },
+          maxWidth: '165px',
+          textTransform: 'none',
+          ml: 'auto',
         },
-        width: { xs: '100%', sm: '220px' },
-        maxWidth: '165px',
-        textTransform: 'none',
-        ml: 'auto',
-      }}
+        // sx dari pemanggil ditumpuk di atas gaya dasar (sebelumnya menimpa seluruhnya).
+        ...(Array.isArray(sx) ? sx : [sx]),
+      ]}
       {...props}
     >
       <Typography
