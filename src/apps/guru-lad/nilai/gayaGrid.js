@@ -33,6 +33,9 @@ export const gayaGrid = (theme) => ({
   '& .tanda': {
     width: 20, fontSize: 12, fontWeight: 700, lineHeight: 1, display: 'inline-flex', justifyContent: 'center', alignItems: 'center',
   },
+  // Kolom TP yang disorot dari Ringkasan: garis tebal di kiri dan kanan, header ditebalkan (bukan hanya warna).
+  '& th.sorot': { boxShadow: `inset 0 -3px 0 ${theme.palette.text.primary}`, fontWeight: 800 },
+  '& td.sorot': { borderLeft: `2px solid ${theme.palette.text.primary}`, borderRight: `2px solid ${theme.palette.text.primary}` },
   // Status tidak hanya lewat warna (NFR-06): bentuk garis dan simbol ikut membedakan.
   '& td.kotor': { background: theme.palette.action.selected, boxShadow: `inset 0 0 0 1px ${theme.palette.text.secondary}` },
   '& td.salah': { background: theme.palette.error.light, boxShadow: `inset 0 0 0 2px ${theme.palette.error.main}` },

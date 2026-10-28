@@ -11,12 +11,13 @@ import { legendaRentang, rentangNilai, RENTANG } from '../rentang';
 import { judulLm, labelTp } from '../label';
 import IkonRentang from '../komponen/IkonRentang';
 import { gayaGrid } from './gayaGrid';
+import { cariTpId, labelTpRingkas } from '../ringkasan/ringkasan';
 
 const kunci = (siswaId, tpId) => `${siswaId}:${tpId}`;
 const potongJudul = (teks) => (teks.length > 28 ? `${teks.slice(0, 27)}…` : teks);
 
 export default function NilaiTpGrid({
-  kelasId, kelas, siswa, lm, nilaiTp, readOnly, onTersimpan,
+  kelasId, kelas, siswa, lm, nilaiTp, readOnly, onTersimpan, sorot, onHapusSorot,
 }) {
   const tpList = useMemo(
     () => lm.flatMap((m) => m.tp.map((t) => ({ ...t, lmId: m.id }))),
@@ -36,6 +37,15 @@ export default function NilaiTpGrid({
   const wadah = useRef(null);
 
   const jumlahKotor = Object.keys(edit).length;
+
+  // Sorotan dari Ringkasan: satu kolom TP diberi penanda dan digulir ke tampilan. Tidak mengubah data atau isian.
+  const tpSorot = sorot ? cariTpId(lm, sorot.lm, sorot.tp) : null;
+  const labelSorot = sorot ? labelTpRingkas({ lm: sorot.lm, tp: sorot.tp, kode: tpList.find((t) => t.id === tpSorot)?.kode }) : '';
+  useEffect(() => {
+    if (tpSorot === null) return;
+    const el = wadah.current?.querySelector(`th[data-tp="${tpSorot}"]`);
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest', inline: 'center' });
+  }, [tpSorot]);
 
   // Peringatan bila halaman ditutup saat masih ada isian belum tersimpan.
   useEffect(() => {
@@ -192,6 +202,16 @@ export default function NilaiTpGrid({
         </Stack>
       )}
 
+      {sorot && (
+        <Alert
+          severity="info"
+          action={onHapusSorot && <Button color="inherit" onClick={onHapusSorot}>Hapus sorotan</Button>}
+        >
+          {tpSorot === null
+            ? 'TP yang disorot dari Ringkasan tidak ditemukan lagi di struktur kelas ini.'
+            : `Menyorot ${labelSorot} dari Ringkasan. Kolomnya diberi garis tebal.`}
+        </Alert>
+      )}
       {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
@@ -209,7 +229,7 @@ export default function NilaiTpGrid({
             </tr>
             <tr>
               {tpList.map((t) => (
-                <th key={t.id} title={t.rumusan || undefined}>{labelTp(t)}</th>
+                <th key={t.id} data-tp={t.id} className={t.id === tpSorot ? 'sorot' : undefined} title={t.rumusan || undefined}>{labelTp(t)}</th>
               ))}
             </tr>
           </thead>
@@ -227,6 +247,7 @@ export default function NilaiTpGrid({
                   const efektif = galat ? null : baca.nilai;
                   const rentang = galat ? RENTANG.BELUM_DINILAI : rentangNilai(efektif, ambang);
                   let kelasSel = 'sel';
+                  if (t.id === tpSorot) kelasSel += ' sorot';
                   if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor';
                   return (
                     <td key={t.id} className={kelasSel} title={galat || (diEdit ? 'Belum disimpan' : undefined)}>
@@ -281,4 +302,6 @@ NilaiTpGrid.propTypes = {
   nilaiTp: PropTypes.array.isRequired,
   readOnly: PropTypes.bool,
   onTersimpan: PropTypes.func.isRequired,
+  sorot: PropTypes.shape({ lm: PropTypes.number, tp: PropTypes.number }),
+  onHapusSorot: PropTypes.func,
 };

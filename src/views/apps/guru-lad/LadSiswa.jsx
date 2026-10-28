@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert, Box, Button, CircularProgress, Link, Paper, Stack, Typography,
@@ -28,7 +28,10 @@ export default function LadSiswa() {
   const qc = useQueryClient();
   const akses = useAksesLad();
   const [remedialAwal, setRemedialAwal] = useState(null);
-  const balik = () => navigate(`/dashboard/guru-lad/kelas/${kelasId}`, { state: { tab: 'perhatian' } });
+  const lokasi = useLocation();
+  // Dari Ringkasan, kembali ke Ringkasan; dari tab Perlu Perhatian (atau tanpa keterangan), kembali ke tab itu.
+  const asal = lokasi.state?.dari === 'ringkasan' ? 'ringkasan' : 'perhatian';
+  const balik = () => navigate(`/dashboard/guru-lad/kelas/${kelasId}`, { state: { tab: asal } });
 
   const masukan = useQuery({
     queryKey: kunciLad.masukan(kelasId), queryFn: () => bacaMasukan(kelasId), enabled: akses.boleh, retry: false,
@@ -99,7 +102,7 @@ export default function LadSiswa() {
   return (
     <PageContainer title={`${siswa.nama} | Analitik Pembelajaran`} description="Profil siswa dan saran tindak lanjut">
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
-        <Button startIcon={<IconArrowLeft size={18} />} onClick={balik}>{`Perlu Perhatian, ${kelas.nama_kelas} · ${kelas.mapel}`}</Button>
+        <Button startIcon={<IconArrowLeft size={18} />} onClick={balik}>{`${asal === 'ringkasan' ? 'Ringkasan' : 'Perlu Perhatian'}, ${kelas.nama_kelas} · ${kelas.mapel}`}</Button>
       </Stack>
 
       <Stack spacing={2.5}>

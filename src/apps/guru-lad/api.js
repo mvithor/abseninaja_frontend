@@ -15,6 +15,10 @@ export const kunciLad = {
   masukan: (kelasId) => ['lad', 'kelas', kelasId, 'masukan'],
   // Berawalan sama dengan daftarKelas, jadi setiap invalidasi daftarKelas ikut menyegarkan evaluasi.
   evaluasi: (kelasId) => ['lad', 'kelas', kelasId, 'evaluasi'],
+  // Ringkasan satu kelas (FR-10, L-2) dan ringkasan semua kelas untuk Beranda (L-1). Keduanya juga berawalan
+  // daftarKelas, jadi setiap penyimpanan nilai, kehadiran, atau struktur ikut menyegarkannya.
+  ringkasan: (kelasId) => ['lad', 'kelas', kelasId, 'ringkasan'],
+  ringkasanSemua: ['lad', 'kelas', 'ringkasan'],
   // Ringkasan keputusan saran seluruh kelas (untuk penanda di matriks) dan saran lengkap satu siswa.
   saranKelas: (kelasId) => ['lad', 'kelas', kelasId, 'saran'],
   saranSiswa: (kelasId, siswaId) => ['lad', 'kelas', kelasId, 'saran-siswa', String(siswaId)],
@@ -41,6 +45,10 @@ export const simpanImpor = (berkas, meta) => kirimBerkasImpor('', berkas, meta);
 
 export const bacaMasukan = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/masukan`));
 export const bacaEvaluasi = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/evaluasi`));
+
+// ---- ringkasan (FR-10). Semua angka dihitung server dari evaluasi yang sama dengan tab Perlu Perhatian.
+export const bacaRingkasan = (kelasId) => ambil(axiosInstance.get(`${kelasUrl(kelasId)}/ringkasan`));
+export const bacaRingkasanSemuaKelas = () => ambil(axiosInstance.get(`${DASAR}/kelas/ringkasan`));
 
 // ---- saran tindak lanjut
 // Draf disusun server dari bukti; yang dikirim klien hanya versi akhir guru. Keputusan (pakai, abaikan,
