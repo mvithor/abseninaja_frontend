@@ -108,8 +108,8 @@ function KotakSaran({
   const baris1 = entri.pola === 'P1' && bukti ? barisP1(bukti, ctxPenjelasan.lm).filter((b) => b.tpId !== null) : [];
 
   return (
-    <Stack spacing={2}>
-      <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+    <Stack spacing={2.5}>
+      <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
         <Chip
           size="small"
           variant={keadaan === KEADAAN.DRAF ? 'outlined' : 'filled'}
@@ -182,7 +182,6 @@ function KotakSaran({
               {baris1.map((b) => (
                 <Button
                   key={b.kunci}
-                  size="small"
                   variant="outlined"
                   onClick={() => onCatatRemedial({ siswaId, tpId: b.tpId })}
                   aria-label={`Catat remedial ${namaSiswa}, ${b.nama}`}
@@ -330,7 +329,7 @@ export default function SaranTindakLanjut({
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       {daftar.length > 0 && (
         <>
           <Tabs value={aktif.pola} onChange={(_, v) => setPilih(v)} variant="scrollable" scrollButtons="auto" aria-label="Saran per penanda">
@@ -346,7 +345,7 @@ export default function SaranTindakLanjut({
                   label={(
                     <Box sx={{ textAlign: 'left' }}>
                       <Box component="span" sx={{ display: 'block', fontWeight: 600 }}>{`${e.pola} ${POLA_INFO[e.pola]?.judul ?? ''}`}</Box>
-                      <Box component="span" sx={{ display: 'block', fontSize: 11 }}>{k === KEADAAN.DRAF ? 'Draf, belum dipakai' : LABEL_KEADAAN[k]}</Box>
+                      <Box component="span" sx={{ display: 'block', fontSize: 13 }}>{k === KEADAAN.DRAF ? 'Draf, belum dipakai' : LABEL_KEADAAN[k]}</Box>
                     </Box>
                   )}
                 />

@@ -47,7 +47,7 @@ export default function KehadiranLm({ data, onBukaKehadiran }) {
               </Box>
             ))}
           </Box>
-          <Box sx={{ fontSize: 12, color: w.sekunder, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
+          <Box sx={{ fontSize: 13, color: w.sekunder, display: 'flex', justifyContent: 'space-between', gap: 1 }}>
             <span>0%</span>
             <span>{`skala sampai ${skala}% dari catatan kehadiran`}</span>
           </Box>

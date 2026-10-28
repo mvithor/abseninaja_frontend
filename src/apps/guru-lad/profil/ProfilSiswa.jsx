@@ -1,12 +1,14 @@
 import { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Chip, Paper, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography,
+  Alert, Box, Chip, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { IconCheck, IconCircleDashed, IconX } from '@tabler/icons-react';
 import IkonRentang from '../komponen/IkonRentang';
 import DeretKehadiran from '../komponen/DeretKehadiran';
 import GrafikTren from '../komponen/GrafikTren';
+import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { KETERANGAN_RENTANG, legendaRentang, tampilAngka } from '../rentang';
 import { TEKS_KODE } from '../kehadiran/kehadiran';
 import {
@@ -14,11 +16,12 @@ import {
 } from './profil';
 
 function Bagian({ id, judul, children }) {
+  const w = warnaRingkasan(useTheme());
   return (
-    <Paper variant="outlined" component="section" aria-labelledby={id} sx={{ p: 2.5 }}>
-      <Typography id={id} variant="h6" component="h2" sx={{ mb: 1.5 }}>{judul}</Typography>
+    <Box component="section" aria-labelledby={id} sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 } }}>
+      <Typography id={id} component="h2" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 2 }}>{judul}</Typography>
       {children}
-    </Paper>
+    </Box>
   );
 }
 Bagian.propTypes = { id: PropTypes.string.isRequired, judul: PropTypes.string.isRequired, children: PropTypes.node };
@@ -54,12 +57,12 @@ export default function ProfilSiswa({
   const legenda = useMemo(() => legendaRentang(kelas), [kelas]);
 
   return (
-    <Stack spacing={2.5}>
+    <Stack spacing={3}>
       <Bagian id="bagian-batas" judul="Batas rentang kelas ini">
-        <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+        <Stack direction="row" columnGap={3} rowGap={1.25} flexWrap="wrap" useFlexGap>
           {legenda.map((l) => (
             <Stack key={l.rentang} direction="row" spacing={1} alignItems="center">
-              <IkonRentang rentang={l.rentang} teksBaca={false} />
+              <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
               <Typography variant="body2">{`${l.batas}: ${l.teks}`}</Typography>
             </Stack>
           ))}
@@ -74,12 +77,12 @@ export default function ProfilSiswa({
             {capaian.map((g) => (
               <Box key={g.lmId}>
                 <Stack direction="row" justifyContent="space-between" alignItems="baseline" flexWrap="wrap" useFlexGap>
-                  <Typography variant="subtitle1" fontWeight={600}>{g.judul}</Typography>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '1.0625rem' }}>{g.judul}</Typography>
                   <Typography variant="body2" color="text.secondary">
                     {g.rata === null ? 'Nilai rata-rata: belum ada nilai' : `Nilai rata-rata ${tampilAngka(g.rata)}`}
                   </Typography>
                 </Stack>
-                <Box sx={{ overflowX: 'auto' }}>{/* Lebar kolom tetap dan sama di semua LM, supaya kolom Nilai, Rentang, dan Status lurus dari satu LM ke LM berikutnya. */}
+                <Box sx={{ overflowX: 'auto', display: { xs: 'none', md: 'block' } }}>{/* Lebar kolom tetap dan sama di semua LM, supaya kolom Nilai, Rentang, dan Status lurus dari satu LM ke LM berikutnya. */}
                 <Table size="small" aria-label={`Capaian ${g.judul}`} sx={{ tableLayout: 'fixed', minWidth: 640 }}>
                   <TableHead>
                     <TableRow>
@@ -95,7 +98,7 @@ export default function ProfilSiswa({
                       <TableRow key={t.tpId} selected={t.ditandaiP1}>
                         <TableCell sx={{ maxWidth: 320 }}>
                           <Typography variant="body2" fontWeight={600}>{t.label}</Typography>
-                          {t.rumusan && <Typography variant="caption" color="text.secondary">{t.rumusan}</Typography>}
+                          {t.rumusan && <Typography variant="body2" color="text.secondary">{t.rumusan}</Typography>}
                           {t.ditandaiP1 && <Chip size="small" variant="outlined" label="Bukti penanda P1" sx={{ ml: 0.5 }} />}
                         </TableCell>
                         <TableCell align="right">{t.nilai === null ? <span aria-label="belum dinilai">-</span> : tampilAngka(t.nilai)}</TableCell>
@@ -115,6 +118,36 @@ export default function ProfilSiswa({
                     ))}
                   </TableBody>
                 </Table></Box>
+
+                {/* Ponsel: satu kartu per TP. Tabel lima kolom terpotong dan memaksa guru menggeser ke samping. */}
+                <Box component="ul" sx={{ display: { xs: 'block', md: 'none' }, listStyle: 'none', m: 0, mt: 1, p: 0, borderRadius: 0, borderTop: 1, borderColor: 'divider' }}>
+                  {g.tp.map((t) => (
+                    <Box
+                      component="li"
+                      key={t.tpId}
+                      sx={{
+                        borderRadius: 0, borderBottom: 1, borderColor: 'divider', py: 1.75, px: 0.5, display: 'flex', flexDirection: 'column', gap: 1, bgcolor: t.ditandaiP1 ? 'action.selected' : 'transparent',
+                      }}
+                    >
+                      <Box sx={{ borderRadius: 0 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: '1rem', lineHeight: '1.5rem' }}>{t.label}</Typography>
+                        {t.rumusan && <Typography variant="body2" color="text.secondary">{t.rumusan}</Typography>}
+                      </Box>
+                      <Stack direction="row" spacing={1.25} alignItems="center">
+                        <IkonRentang rentang={t.rentang} teksBaca={false} ukuran={22} />
+                        <Typography sx={{ fontSize: '1.25rem', fontWeight: 700, lineHeight: '1.75rem' }}>{t.nilai === null ? '-' : tampilAngka(t.nilai)}</Typography>
+                        <Typography variant="body2">{t.nilai === null ? 'Belum dinilai' : KETERANGAN_RENTANG[t.rentang]}</Typography>
+                      </Stack>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center', borderRadius: 0 }}>
+                        <StatusTp tp={t} />
+                        {t.ditandaiP1 && <Chip size="small" variant="outlined" label="Bukti penanda P1" />}
+                      </Box>
+                      <Typography variant="body2" color="text.secondary">
+                        {t.remedial.length === 0 ? 'Remedial: belum ada' : `Remedial: ${t.remedial.length}×, terbaru ${tampilAngka(t.remedialTerbaru)}`}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
               </Box>
             ))}
           </Stack>

@@ -4,8 +4,8 @@ import { useTheme } from '@mui/material/styles';
 import { CETAK, warnaRingkasan } from './gayaRingkasan';
 import useLebar from './useLebar';
 
-// Lebar minimum (piksel) agar angka muat di dalam segmen: satu angka 12px tebal plus bantalan.
-const lebarAngka = (n) => String(n).length * 8 + 10;
+// Lebar minimum (piksel) agar angka muat di dalam segmen: satu angka 13px tebal plus bantalan.
+const lebarAngka = (n) => String(n).length * 9 + 10;
 
 /**
  * Batang bersegmen 100%. Panjang segmen SELALU sebanding dengan jumlahnya. Angka ditulis di dalam segmen hanya
@@ -48,7 +48,7 @@ export default function BatangSegmen({
             component="span"
             aria-hidden="true"
             sx={{
-              bgcolor: w.putih, color: w.tulisanDiPutih, fontSize: 12, fontWeight: 700, lineHeight: '16px', px: '4px',
+              bgcolor: w.putih, color: w.tulisanDiPutih, fontSize: 13, fontWeight: 700, lineHeight: '16px', px: '4px',
               borderRadius: '3px', minWidth: 8, textAlign: 'center', ...CETAK,
             }}
           >

@@ -2,8 +2,9 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
-  Alert, Box, Button, CircularProgress, Link, Paper, Stack, Typography,
+  Alert, Box, Button, CircularProgress, Link, Stack, Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { IconArrowLeft } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
@@ -16,6 +17,8 @@ import { URUTAN_PRIORITAS } from 'src/apps/guru-lad/evaluasi/penjelasan';
 import ProfilSiswa from 'src/apps/guru-lad/profil/ProfilSiswa';
 import SaranTindakLanjut from 'src/apps/guru-lad/saran/SaranTindakLanjut';
 import RemedialDialog from 'src/apps/guru-lad/remedial/RemedialDialog';
+import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
+import { gayaKartu, warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
 
 /**
  * Profil satu siswa di satu kelas LAD: bukti dari data kelas, lalu saran tindak lanjut per penanda.
@@ -27,6 +30,7 @@ export default function LadSiswa() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const akses = useAksesLad();
+  const w = warnaRingkasan(useTheme());
   const [remedialAwal, setRemedialAwal] = useState(null);
   const lokasi = useLocation();
   // Dari Ringkasan, kembali ke Ringkasan; dari tab Perlu Perhatian (atau tanpa keterangan), kembali ke tab itu.
@@ -100,17 +104,18 @@ export default function LadSiswa() {
   const penanda = hasil ? [...hasil.penanda].sort((x, y) => URUTAN_PRIORITAS.indexOf(x) - URUTAN_PRIORITAS.indexOf(y)) : [];
 
   return (
+    <TemaLad>
     <PageContainer title={`${siswa.nama} | Analitik Pembelajaran`} description="Profil siswa dan saran tindak lanjut">
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2 }}>
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 2.5, maxWidth: 1180, mx: 'auto' }}>
         <Button startIcon={<IconArrowLeft size={18} />} onClick={balik}>{`${asal === 'ringkasan' ? 'Ringkasan' : 'Perlu Perhatian'}, ${kelas.nama_kelas} · ${kelas.mapel}`}</Button>
       </Stack>
 
-      <Stack spacing={2.5}>
-        <Paper variant="outlined" sx={{ p: 2.5 }}>
-          <Typography variant="caption" color="text.secondary">{`No absen ${siswa.urutan} · ${kelas.nama_kelas} · ${kelas.mapel} · ${kelas.semester} ${kelas.tahun_ajaran}`}</Typography>
-          <Typography variant="h4" component="h1" sx={{ mb: 1 }}>{siswa.nama}</Typography>
+      <Stack spacing={3} sx={{ maxWidth: 1180, mx: 'auto', minWidth: 0, width: '100%' }}>
+        <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 } }}>
+          <Typography sx={{ fontSize: '0.9375rem', color: w.sekunder }}>{`No absen ${siswa.urutan} · ${kelas.nama_kelas} · ${kelas.mapel} · ${kelas.semester} ${kelas.tahun_ajaran}`}</Typography>
+          <Typography component="h1" sx={{ fontSize: { xs: '1.625rem', md: '1.875rem' }, lineHeight: 1.3, fontWeight: 700, color: w.ink, mb: 1.5 }}>{siswa.nama}</Typography>
           {penanda.length > 0 ? (
-            <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} sx={{ mb: 1 }}>
+            <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} sx={{ mb: 1.5 }}>
               {penanda.map((k) => <PilKode key={k} kode={k} panjang />)}
             </Stack>
           ) : (
@@ -134,8 +139,8 @@ export default function LadSiswa() {
             </Alert>
           )}
           {readOnly && <Alert severity="info" sx={{ mt: 1.5 }}>Kelas kasus hanya dapat dilihat, tidak dapat diubah.</Alert>}
-          <Link href="#bagian-saran" underline="hover" variant="body2" sx={{ display: 'inline-block', mt: 1.5 }}>Lompat ke saran tindak lanjut</Link>
-        </Paper>
+          <Link href="#bagian-saran" underline="always" sx={{ display: 'inline-block', mt: 2, fontSize: '1rem', color: w.tautan, py: 0.75 }}>Lompat ke saran tindak lanjut</Link>
+        </Box>
 
         <ProfilSiswa
           kelas={kelas}
@@ -149,9 +154,9 @@ export default function LadSiswa() {
           parameter={evaluasi.data?.parameter}
         />
 
-        <Paper variant="outlined" component="section" aria-labelledby="bagian-saran-judul" id="bagian-saran" sx={{ p: 2.5 }}>
-          <Typography id="bagian-saran-judul" variant="h6" component="h2" sx={{ mb: 0.5 }}>Saran tindak lanjut</Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+        <Box component="section" aria-labelledby="bagian-saran-judul" id="bagian-saran" sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 } }}>
+          <Typography id="bagian-saran-judul" component="h2" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 0.5 }}>Saran tindak lanjut</Typography>
+          <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, mb: 2.5 }}>
             Draf disusun dari bukti di atas. Guru yang memutuskan: pakai, ubah, atau abaikan.
           </Typography>
           {saran.isLoading && <Box sx={{ p: 3, textAlign: 'center' }}><CircularProgress size={24} /></Box>}
@@ -171,7 +176,7 @@ export default function LadSiswa() {
               onCatatRemedial={readOnly ? undefined : setRemedialAwal}
             />
           )}
-        </Paper>
+        </Box>
       </Stack>
 
       {!readOnly && (
@@ -190,5 +195,6 @@ export default function LadSiswa() {
         />
       )}
     </PageContainer>
+    </TemaLad>
   );
 }

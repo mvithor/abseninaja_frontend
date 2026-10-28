@@ -13,6 +13,10 @@ import {
 import { uraiTempel, terapkanTempel } from '../nilai/tempel';
 import { gayaGrid } from '../nilai/gayaGrid';
 import HapusDialog from '../komponen/HapusDialog';
+import JudulTab from '../komponen/JudulTab';
+import PetunjukTab from '../komponen/PetunjukTab';
+import BilahSimpan from '../komponen/BilahSimpan';
+import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import PertemuanFormDialog from './PertemuanFormDialog';
 import {
   KODE_HADIR, TEKS_KODE, bacaKodeSel, kunciSel, petaKehadiran, kodeEfektif, rekapSiswa, rekapPertemuan,
@@ -23,13 +27,16 @@ import {
 // Tambahan gaya khusus tab ini di atas gayaGrid: sel satu huruf dan kolom rekap.
 const gayaKehadiran = [
   gayaGrid,
-  (theme) => ({
-    '& .sel': { minWidth: 56 },
-    '& .sel input': { width: 36, textAlign: 'center', fontWeight: 600, textTransform: 'uppercase' },
-    '& .sel.alpa input': { color: theme.palette.error.main },
-    '& .rekap': { minWidth: 34, textAlign: 'center', color: theme.palette.text.secondary },
-    '& .rekap.alpa': { color: theme.palette.error.main, fontWeight: 700 },
-  }),
+  (theme) => {
+    const w = warnaRingkasan(theme);
+    return {
+      '& .sel': { minWidth: 112 },
+      '& .sel input': { width: 52, textAlign: 'center', fontWeight: 600, textTransform: 'uppercase' },
+      '& .sel.alpa input': { color: theme.palette.error.main },
+      '& .rekap': { minWidth: 48, textAlign: 'center', color: w.sekunder },
+      '& .rekap.alpa': { color: theme.palette.error.main, fontWeight: 700 },
+    };
+  },
 ];
 
 export default function KehadiranPanel({
@@ -224,9 +231,7 @@ export default function KehadiranPanel({
   );
 
   const infoWaktu = hariIni && (
-    <Typography variant="body2" color="text.secondary">
-      Tanggal pertemuan mengikuti zona waktu sekolah{zona ? ` (${namaZona(zona)})` : ''}. Hari ini: <b>{tanggalPanjang(hariIni)}</b>.
-    </Typography>
+    <>Tanggal pertemuan mengikuti zona waktu sekolah{zona ? ` (${namaZona(zona)})` : ''}. Hari ini: <b>{tanggalPanjang(hariIni)}</b>.</>
   );
   const peringatanZona = waktuSekolah?.zona_bawaan && (
     <Alert severity="warning">
@@ -237,8 +242,8 @@ export default function KehadiranPanel({
 
   if (siswa.length === 0 || pertemuan.length === 0) {
     return (
-      <Stack spacing={2} alignItems="flex-start">
-        {infoWaktu}
+      <Stack spacing={2.5} alignItems="flex-start">
+        <JudulTab judul="Kehadiran siswa" keterangan={infoWaktu} />
         {peringatanZona}
         <Alert severity="info" sx={{ alignSelf: 'stretch' }}>
           {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
@@ -247,7 +252,7 @@ export default function KehadiranPanel({
             : ''}
         </Alert>
         {!readOnly && (
-          <Button variant="contained" startIcon={<IconPlus size={18} />} onClick={() => setForm({ baru: true })}>
+          <Button variant="contained" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
             Tambah pertemuan
           </Button>
         )}
@@ -257,38 +262,38 @@ export default function KehadiranPanel({
   }
 
   return (
-    <Stack spacing={2}>
-      {infoWaktu}
+    <Stack spacing={3}>
+      <JudulTab judul="Kehadiran siswa" keterangan={infoWaktu} />
       {peringatanZona}
-      <Typography variant="body2" color="text.secondary">
-        Ketik <b>H</b> (hadir), <b>S</b> (sakit), <b>I</b> (izin), atau <b>A</b> (alpa, tanpa keterangan); kursor turun
-        sendiri. Sel <b>kosong berarti belum dicatat</b>, bukan alpa, dan tidak dihitung. Tombol &quot;Semua hadir&quot;
-        di kepala kolom hanya mengisi sel yang kosong. Kolom H S I A di kiri menghitung dari isian yang tampil.
-      </Typography>
+      <PetunjukTab
+        butir={[
+          <>Ketik <b>H</b> (hadir), <b>S</b> (sakit), <b>I</b> (izin), atau <b>A</b> (alpa, tanpa keterangan); kursor turun sendiri.</>,
+          <>Sel <b>kosong berarti belum dicatat</b>, bukan alpa, dan tidak dihitung.</>,
+          'Tombol "Semua hadir" di kepala kolom hanya mengisi sel yang kosong.',
+          'Kolom H S I A di kiri menghitung dari isian yang tampil.',
+        ]}
+      />
       {!readOnly && (
-        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" flexWrap="wrap" useFlexGap>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-            <Button variant="outlined" startIcon={<IconPlus size={18} />} onClick={() => setForm({ baru: true })}>
-              Tambah pertemuan
-            </Button>
-            {perluUrut && (
-              <Button variant="outlined" startIcon={<IconSortAscending size={18} />} onClick={urutkan} disabled={sibuk}>
-                Urutkan menurut tanggal
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan kehadiran"
+          kiri={(
+            <>
+              <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
+                Tambah pertemuan
               </Button>
-            )}
-          </Stack>
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
-            <Typography variant="body2" aria-live="polite" sx={{ whiteSpace: 'nowrap' }}>
-              {jumlahKotor > 0 ? `${jumlahKotor} sel belum disimpan` : 'Semua tersimpan'}
-            </Typography>
-            <Button variant="outlined" onClick={buang} disabled={jumlahKotor === 0 || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-              Batalkan
-            </Button>
-            <Button variant="contained" onClick={mintaSimpan} disabled={jumlahKotor === 0 || adaGalatLokal || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-              {sibuk ? 'Menyimpan...' : 'Simpan kehadiran'}
-            </Button>
-          </Stack>
-        </Stack>
+              {perluUrut && (
+                <Button variant="outlined" startIcon={<IconSortAscending size={20} />} onClick={urutkan} disabled={sibuk}>
+                  Urutkan menurut tanggal
+                </Button>
+              )}
+            </>
+          )}
+        />
       )}
 
       {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
@@ -309,19 +314,19 @@ export default function KehadiranPanel({
                 const rp = rekapPertemuan(p.id, siswa, edit, server);
                 const lmLabel = labelLm(lm, p.lingkup_materi_id);
                 return (
-                  <th key={p.id} style={{ minWidth: 64, height: 'auto', padding: '4px 4px' }}>
-                    <Stack alignItems="center" spacing={0.25}>
+                  <th key={p.id} style={{ minWidth: 112, height: 'auto', padding: '10px 6px' }}>
+                    <Stack alignItems="center" spacing={0.5}>
                       <span title={`Pertemuan ke-${p.nomor}, ${tanggalPanjang(p.tanggal)}`}>{`P${p.nomor}`}</span>
-                      <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.1 }}>{tanggalPendek(p.tanggal)}</Typography>
-                      {lmLabel && <Chip size="small" variant="outlined" label={lmLabel} sx={{ height: 18, '& .MuiChip-label': { px: 0.75, fontSize: 11 } }} />}
-                      <Typography variant="caption" color={rp.belum > 0 ? 'text.primary' : 'text.secondary'} sx={{ lineHeight: 1.1, whiteSpace: 'nowrap' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>{tanggalPendek(p.tanggal)}</Typography>
+                      {lmLabel && <Chip size="small" variant="outlined" label={lmLabel} />}
+                      <Typography variant="caption" color={rp.belum > 0 ? 'text.primary' : 'text.secondary'} sx={{ lineHeight: 1.2, whiteSpace: 'nowrap', fontWeight: rp.belum > 0 ? 700 : 400 }}>
                         {rp.belum > 0 ? `${rp.belum} kosong` : 'lengkap'}
                       </Typography>
                       {!readOnly && (
                         <Stack direction="row">
-                          <Tooltip title="Semua hadir (hanya sel kosong)"><IconButton size="small" aria-label={`Semua hadir pada pertemuan ${p.nomor}`} onClick={() => semuaHadir(p.id)}><IconChecks size={16} /></IconButton></Tooltip>
-                          <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah pertemuan ${p.nomor}`} onClick={() => setForm({ pertemuan: p })}><IconPencil size={16} /></IconButton></Tooltip>
-                          <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus pertemuan ${p.nomor}`} onClick={() => setHapus(p)}><IconTrash size={16} /></IconButton></Tooltip>
+                          <Tooltip title="Semua hadir (hanya sel kosong)"><IconButton size="small" sx={{ p: 1 }} aria-label={`Semua hadir pada pertemuan ${p.nomor}`} onClick={() => semuaHadir(p.id)}><IconChecks size={18} /></IconButton></Tooltip>
+                          <Tooltip title="Ubah"><IconButton size="small" sx={{ p: 1 }} aria-label={`Ubah pertemuan ${p.nomor}`} onClick={() => setForm({ pertemuan: p })}><IconPencil size={18} /></IconButton></Tooltip>
+                          <Tooltip title="Hapus"><IconButton size="small" sx={{ p: 1 }} aria-label={`Hapus pertemuan ${p.nomor}`} onClick={() => setHapus(p)}><IconTrash size={18} /></IconButton></Tooltip>
                         </Stack>
                       )}
                     </Stack>

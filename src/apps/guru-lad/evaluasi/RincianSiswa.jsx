@@ -9,12 +9,12 @@ import PilKode from './PilKode';
 import DeretKehadiran from '../komponen/DeretKehadiran';
 import GrafikTren from '../komponen/GrafikTren';
 
-const LEBAR_PANEL = 440;
+const LEBAR_PANEL = 520;
 
 function Kalimat({ baris }) {
   return (
-    <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
-      {baris.map((b) => <Typography key={b} component="li" variant="body2" sx={{ mb: 0.25 }}>{b}</Typography>)}
+    <Box component="ul" sx={{ m: 0, pl: 2.5, borderRadius: 0 }}>
+      {baris.map((b) => <Typography key={b} component="li" variant="body1" sx={{ mb: 0.75 }}>{b}</Typography>)}
     </Box>
   );
 }
@@ -30,15 +30,14 @@ function BagianP1({ b, namaSiswa, onCatatRemedial }) {
           spacing={1}
           alignItems="center"
           justifyContent="space-between"
-          sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1 }}
+          sx={{ border: 1, borderColor: 'divider', borderRadius: 1, p: 1.5 }}
         >
           <Box sx={{ minWidth: 0 }}>
-            <Typography variant="body2">{b.kalimat[i]}</Typography>
+            <Typography variant="body1">{b.kalimat[i]}</Typography>
             {r.tersembunyi && <Chip size="small" variant="outlined" label="Tidak terlihat dari rata-rata" sx={{ mt: 0.5 }} />}
           </Box>
           {onCatatRemedial && r.tpId !== null && (
             <Button
-              size="small"
               variant="outlined"
               sx={{ flex: 'none' }}
               onClick={() => onCatatRemedial({ siswaId: b.siswaId, tpId: r.tpId })}
@@ -103,22 +102,22 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial, onBuka
     >
       {rincian && (
         <Box sx={{ overflowY: 'auto', height: '100%' }}>
-          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1} sx={{ p: 2.5, pb: 1.5 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1} sx={{ p: 3, pb: 1.5 }}>
             <Box>
               <Typography variant="caption" color="text.secondary">{`No absen ${rincian.urutan}`}</Typography>
-              <Typography variant="h5" component="h2" ref={judulRef} tabIndex={-1} sx={{ outline: 'none' }}>{rincian.nama}</Typography>
+              <Typography variant="h5" component="h2" ref={judulRef} tabIndex={-1} sx={{ outline: 'none', fontSize: '1.375rem', lineHeight: '1.875rem', fontWeight: 700 }}>{rincian.nama}</Typography>
             </Box>
-            <IconButton aria-label="Tutup rincian" onClick={tutup} size="small"><IconX size={18} /></IconButton>
+            <IconButton aria-label="Tutup rincian" onClick={tutup}><IconX size={22} /></IconButton>
           </Stack>
 
-          <Box sx={{ px: 2.5, pb: 2 }}>
+          <Box sx={{ px: 3, pb: 2.5 }}>
             {onBukaProfil && (
-              <Button variant="contained" size="small" sx={{ mb: 1.5 }} onClick={() => onBukaProfil(rincian.siswaId)}>
+              <Button variant="contained" sx={{ mb: 2 }} onClick={() => onBukaProfil(rincian.siswaId)}>
                 Buka profil dan saran tindak lanjut
               </Button>
             )}
             {rincian.bagian.length > 0 && (
-              <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} sx={{ mb: 1 }}>
+              <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1} sx={{ mb: 1.5 }}>
                 {rincian.bagian.map((b) => <PilKode key={b.kode} kode={b.kode} panjang />)}
               </Stack>
             )}
@@ -137,8 +136,8 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial, onBuka
           {rincian.bagian.map((b) => (
             <Box key={b.kode}>
               <Divider />
-              <Stack spacing={1.25} sx={{ p: 2.5 }}>
-                <Typography variant="subtitle1" fontWeight={600}>{`${b.kode} ${b.judul}`}</Typography>
+              <Stack spacing={1.5} sx={{ p: 3 }}>
+                <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '1.0625rem' }}>{`${b.kode} ${b.judul}`}</Typography>
                 {b.kode === 'P2' && <DeretKehadiran deret={b.deret} />}
                 {b.kode === 'P1'
                   ? <BagianP1 b={{ ...b, siswaId: rincian.siswaId }} namaSiswa={rincian.nama} onCatatRemedial={onCatatRemedial} />
@@ -151,7 +150,7 @@ export default function RincianSiswa({ rincian, onTutup, onCatatRemedial, onBuka
           {rincian.belumCukup.length > 0 && (
             <>
               <Divider />
-              <Box sx={{ p: 2.5 }}>
+              <Box sx={{ p: 3 }}>
                 <Alert severity="info" icon={false}>
                   <Typography variant="body2" fontWeight={600} gutterBottom>Belum dapat dinilai. Ini bukan berarti siswa aman.</Typography>
                   <Kalimat baris={rincian.belumCukup.map((x) => `${x.kode} ${x.judul}: ${x.alasan || `butuh ${x.butuh}`}`)} />

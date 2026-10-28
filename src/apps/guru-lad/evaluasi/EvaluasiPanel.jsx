@@ -4,12 +4,15 @@ import { useNavigate } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, CircularProgress, Collapse,
-  FormControlLabel, Paper, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography,
+  FormControlLabel, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { IconChevronDown } from '@tabler/icons-react';
 import { bacaEvaluasi, bacaSaranKelas, kunciLad, pesanGalat } from '../api';
 import { ringkasKeputusan } from '../saran/saran';
 import IkonRentang from '../komponen/IkonRentang';
+import JudulTab from '../komponen/JudulTab';
+import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { legendaRentang } from '../rentang';
 import {
   KODE_POLA, POLA_INFO, alasanBelumCukup, barisKonteks, dataDibutuhkan, definisiPola, hitungGolongan, hitungRingkasan,
@@ -35,6 +38,7 @@ export default function EvaluasiPanel({
   const [terpilihId, setTerpilihId] = useState(null);
   const [legenda, setLegenda] = useState(false);
   const navigate = useNavigate();
+  const w = warnaRingkasan(useTheme());
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: kunciLad.evaluasi(kelasId),
@@ -95,11 +99,16 @@ export default function EvaluasiPanel({
   const ambang = { ambang_bagian: kelas.ambang_bagian, kktp: kelas.kktp, ambang_pengayaan: kelas.ambang_pengayaan };
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="body2" color="text.secondary">
-        Penanda adalah peringatan dini dari data kelas ini, bukan diagnosis; keputusan tetap pada guru.
-        Klik nama siswa untuk melihat alasan dan buktinya. Aturan versi {data.aturan_versi}, dihitung ulang setiap data berubah.
-      </Typography>
+    <Stack spacing={3}>
+      <JudulTab
+        judul="Siswa perlu perhatian"
+        keterangan={(
+          <>
+            Penanda adalah peringatan dini dari data kelas ini, bukan diagnosis; keputusan tetap pada guru.
+            Klik nama siswa untuk melihat alasan dan buktinya. Aturan versi {data.aturan_versi}, dihitung ulang setiap data berubah.
+          </>
+        )}
+      />
 
       {data.struktur_kosong && (
         <Alert severity="info">Kelas ini belum memiliki lingkup materi dan TP, jadi belum ada yang dapat dievaluasi.</Alert>
@@ -112,17 +121,17 @@ export default function EvaluasiPanel({
         </Alert>
       )}
 
-      <Paper variant="outlined" sx={{ p: 2 }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} justifyContent="space-between" alignItems={{ md: 'center' }}>
-          <Box>
-            <Typography fontWeight={600}>
+      <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 2.5 } }}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} justifyContent="space-between" alignItems={{ md: 'center' }}>
+          <Box sx={{ borderRadius: 0 }}>
+            <Typography sx={{ fontSize: '1.125rem', fontWeight: 700, lineHeight: '1.625rem', color: w.ink }}>
               {`${ringkasan.ditandai} dari ${ringkasan.jumlahSiswa} siswa memiliki penanda`}
             </Typography>
-            <Typography variant="body2" color="text.secondary">
+            <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder }}>
               {`${golongan.perhatian} perlu perhatian · ${golongan.pengayaan} peluang pengayaan · ${golongan.tanpa} tanpa penanda`}
             </Typography>
           </Box>
-          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap role="group" aria-label="Saring menurut penanda">
+          <Stack direction="row" spacing={1.25} flexWrap="wrap" useFlexGap role="group" aria-label="Saring menurut penanda">
             {KODE_POLA.map((k) => (
               <PilKode
                 key={k}
@@ -137,7 +146,7 @@ export default function EvaluasiPanel({
             {pola.length > 0 && <Button size="small" onClick={() => setPola([])}>Hapus saringan</Button>}
           </Stack>
         </Stack>
-      </Paper>
+      </Box>
 
       {belumCukup.length > 0 && (
         <Alert severity="info">
@@ -155,30 +164,30 @@ export default function EvaluasiPanel({
         </Alert>
       )}
 
-      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap spacing={1}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap spacing={1.5}>
         <FormControlLabel
           control={<Switch checked={tampilTanpa} onChange={(e) => setTampilTanpa(e.target.checked)} />}
           label={`Tampilkan juga ${golongan.tanpa} siswa tanpa penanda`}
         />
-        <Button size="small" onClick={() => setLegenda((v) => !v)} aria-expanded={legenda} aria-controls="legenda-rentang">
+        <Button variant="outlined" onClick={() => setLegenda((v) => !v)} aria-expanded={legenda} aria-controls="legenda-rentang">
           Arti ikon dan warna sel
         </Button>
       </Stack>
       <Collapse in={legenda} unmountOnExit>
-        <Paper variant="outlined" sx={{ p: 2 }} id="legenda-rentang">
-          <Stack direction="row" spacing={3} flexWrap="wrap" useFlexGap>
+        <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 2.5 } }} id="legenda-rentang">
+          <Stack direction="row" columnGap={3} rowGap={1} flexWrap="wrap" useFlexGap>
             {legendaBaris.map((l) => (
               <Stack key={l.rentang} direction="row" spacing={1} alignItems="center">
-                <IkonRentang rentang={l.rentang} teksBaca={false} />
+                <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
                 <Typography variant="body2">{`${l.batas}: ${l.teks}`}</Typography>
               </Stack>
             ))}
           </Stack>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body2" sx={{ mt: 1.5, color: w.sekunder }}>
             Setiap sel adalah nilai TP yang sebenarnya, bukan nilai remedial; tanda R menunjukkan ada remedial.
             Titik tengah (·) berarti belum dinilai, bukan nol. Sel berbingkai tebal adalah TP yang menjadi bukti Kesulitan pada TP.
           </Typography>
-        </Paper>
+        </Box>
       </Collapse>
 
       {!adaBaris ? (
@@ -204,9 +213,9 @@ export default function EvaluasiPanel({
         />
       )}
 
-      <Accordion disableGutters variant="outlined">
-        <AccordionSummary expandIcon={<IconChevronDown size={18} />}>
-          <Typography fontWeight={600}>Pembanding kelas (dipakai oleh penanda Capaian menurun)</Typography>
+      <Accordion disableGutters variant="outlined" sx={{ ...gayaKartu(w), '&:before': { display: 'none' } }}>
+        <AccordionSummary expandIcon={<IconChevronDown size={20} />}>
+          <Typography sx={{ fontWeight: 700, fontSize: '1.0625rem' }}>Pembanding kelas (dipakai oleh penanda Capaian menurun)</Typography>
         </AccordionSummary>
         <AccordionDetails>
           {konteksKelas.length === 0 ? (
@@ -236,15 +245,15 @@ export default function EvaluasiPanel({
         </AccordionDetails>
       </Accordion>
 
-      <Accordion disableGutters variant="outlined">
-        <AccordionSummary expandIcon={<IconChevronDown size={18} />}>
-          <Typography fontWeight={600}>Aturan yang dipakai</Typography>
+      <Accordion disableGutters variant="outlined" sx={{ ...gayaKartu(w), '&:before': { display: 'none' } }}>
+        <AccordionSummary expandIcon={<IconChevronDown size={20} />}>
+          <Typography sx={{ fontWeight: 700, fontSize: '1.0625rem' }}>Aturan yang dipakai</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <Stack spacing={1.5}>
             {KODE_POLA.map((k) => (
               <Box key={k}>
-                <Typography variant="subtitle2">{`${k} ${POLA_INFO[k].judul}`}</Typography>
+                <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>{`${k} ${POLA_INFO[k].judul}`}</Typography>
                 <Typography variant="body2" color="text.secondary">{definisiPola(k, data.parameter)}</Typography>
               </Box>
             ))}

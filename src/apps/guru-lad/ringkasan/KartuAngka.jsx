@@ -29,7 +29,7 @@ function Tile({
         {satuan && <Typography component="span" sx={{ fontSize: { xs: 13, md: 16 }, color: w.sekunder }}>{satuan}</Typography>}
       </Box>
       {children}
-      {rinci && <Typography sx={{ fontSize: { xs: 12, md: 13 }, lineHeight: { xs: '17px', md: '19px' }, color: w.sekunder }}>{rinci}</Typography>}
+      {rinci && <Typography sx={{ fontSize: 13, lineHeight: { xs: '18px', md: '19px' }, color: w.sekunder }}>{rinci}</Typography>}
       {aksi && (
         <Box component="button" type="button" onClick={onAksi} sx={{ ...gayaTautan(w), mt: 0.5, fontSize: { xs: 13, md: 14 } }}>
           {aksi}

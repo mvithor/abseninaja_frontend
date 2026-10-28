@@ -21,7 +21,7 @@ export default function BannerTertinggal({ daftar, onBuka }) {
       <Box
         component="span"
         sx={{
-          display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 12, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
+          display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 13, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
         }}
       >
         Data tertinggal

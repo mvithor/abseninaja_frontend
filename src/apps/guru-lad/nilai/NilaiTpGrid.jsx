@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import {
   Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack, Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { simpanNilaiTp, pesanGalat } from '../api';
 import {
   bacaNilaiSel, tampilNilai, uraiTempel, terapkanTempel, hitungPengosongan,
@@ -10,6 +11,10 @@ import {
 import { legendaRentang, rentangNilai, RENTANG } from '../rentang';
 import { judulLm, labelTp } from '../label';
 import IkonRentang from '../komponen/IkonRentang';
+import JudulTab from '../komponen/JudulTab';
+import PetunjukTab from '../komponen/PetunjukTab';
+import BilahSimpan from '../komponen/BilahSimpan';
+import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { gayaGrid } from './gayaGrid';
 import { cariTpId, labelTpRingkas } from '../ringkasan/ringkasan';
 
@@ -35,6 +40,7 @@ export default function NilaiTpGrid({
   const [sibuk, setSibuk] = useState(false);
   const [konfirmasiKosong, setKonfirmasiKosong] = useState(0);
   const wadah = useRef(null);
+  const w = warnaRingkasan(useTheme());
 
   const jumlahKotor = Object.keys(edit).length;
 
@@ -162,44 +168,46 @@ export default function NilaiTpGrid({
   }
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="body2" color="text.secondary">
-        Ketik langsung, atau salin blok nilai dari Excel lalu tempel (Ctrl+V) di sel awal.
-        Sel kosong berarti belum dinilai; <b>0</b> adalah nilai nol. Ikon di samping nilai menunjukkan rentang
-        pencapaian menurut batas kelas ini.
-      </Typography>
-      <Stack
-        direction="row"
-        spacing={2.5}
-        flexWrap="wrap"
-        useFlexGap
-        component="ul"
-        aria-label="Keterangan ikon rentang nilai"
-        sx={{ listStyle: 'none', m: 0, p: 0, rowGap: 0.5 }}
+    <Stack spacing={3}>
+      <JudulTab
+        judul="Nilai tujuan pembelajaran"
+        keterangan="Isi nilai tiap siswa per TP. Perubahan baru tersimpan setelah Anda menekan Simpan nilai."
+      />
+      <PetunjukTab
+        butir={[
+          'Ketik langsung, atau salin blok nilai dari Excel lalu tempel (Ctrl+V) di sel awal.',
+          <>Sel kosong berarti belum dinilai; <b>0</b> adalah nilai nol.</>,
+          'Ikon di samping nilai menunjukkan rentang pencapaian menurut batas kelas ini.',
+        ]}
       >
-        {legenda.map((l) => (
-          <Stack key={l.rentang} component="li" direction="row" spacing={0.75} alignItems="center">
-            <IkonRentang rentang={l.rentang} teksBaca={false} />
-            <Typography variant="caption" color="text.secondary">
-              <b>{l.batas}</b>
-              {': '}
-              {l.teks}
-            </Typography>
-          </Stack>
-        ))}
-      </Stack>
+        <Box
+          component="ul"
+          aria-label="Keterangan ikon rentang nilai"
+          sx={{
+            listStyle: 'none', m: 0, p: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, columnGap: 3, rowGap: 1.25, borderRadius: 0,
+          }}
+        >
+          {legenda.map((l) => (
+            <Box key={l.rentang} component="li" sx={{ display: 'flex', alignItems: 'center', gap: 1, borderRadius: 0 }}>
+              <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
+              <Typography sx={{ fontSize: '0.9375rem', lineHeight: '1.375rem', color: w.ink }}>
+                <b>{l.batas}</b>
+                {': '}
+                {l.teks}
+              </Typography>
+            </Box>
+          ))}
+        </Box>
+      </PetunjukTab>
       {!readOnly && (
-        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end" flexWrap="wrap" useFlexGap>
-          <Typography variant="body2" aria-live="polite" sx={{ whiteSpace: 'nowrap' }}>
-            {jumlahKotor > 0 ? `${jumlahKotor} sel belum disimpan` : 'Semua tersimpan'}
-          </Typography>
-          <Button variant="outlined" onClick={buang} disabled={jumlahKotor === 0 || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-            Batalkan
-          </Button>
-          <Button variant="contained" onClick={mintaSimpan} disabled={jumlahKotor === 0 || adaGalatLokal || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-            {sibuk ? 'Menyimpan...' : 'Simpan nilai'}
-          </Button>
-        </Stack>
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan nilai"
+        />
       )}
 
       {sorot && (

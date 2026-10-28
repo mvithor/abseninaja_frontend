@@ -45,7 +45,7 @@ export default function GrafikTren({ deret, kktp, ringkasan }) {
             {[g.min, (g.min + g.maks) / 2, g.maks].map((v) => (
               <g key={v}>
                 <line x1={g.kiri} x2={g.lebar - g.kanan} y1={g.petakY(v)} y2={g.petakY(v)} stroke={theme.palette.divider} />
-                <text x={g.kiri - 8} y={g.petakY(v) + 4} textAnchor="end" fontSize="12" fill={theme.palette.text.secondary}>{bulat1(v)}</text>
+                <text x={g.kiri - 8} y={g.petakY(v) + 4} textAnchor="end" fontSize="13" fill={theme.palette.text.secondary}>{bulat1(v)}</text>
               </g>
             ))}
             {g.yKktp !== null && (
@@ -56,13 +56,13 @@ export default function GrafikTren({ deret, kktp, ringkasan }) {
             {g.siswa.map((t) => (
               <g key={t.lm}>
                 <circle cx={t.x} cy={t.y} r="4.5" fill={theme.palette.primary.main} />
-                <text x={t.x} y={t.y - 10} textAnchor="middle" fontSize="12" fontWeight="700" fill={theme.palette.text.primary} stroke={theme.palette.background.paper} strokeWidth="3" paintOrder="stroke">{bulat1(t.nilai)}</text>
-                <text x={t.x} y={g.tinggi - 8} textAnchor="middle" fontSize="12" fill={theme.palette.text.secondary}>{`LM ${t.lm}`}</text>
+                <text x={t.x} y={t.y - 10} textAnchor="middle" fontSize="13" fontWeight="700" fill={theme.palette.text.primary} stroke={theme.palette.background.paper} strokeWidth="3" paintOrder="stroke">{bulat1(t.nilai)}</text>
+                <text x={t.x} y={g.tinggi - 8} textAnchor="middle" fontSize="13" fill={theme.palette.text.secondary}>{`LM ${t.lm}`}</text>
               </g>
             ))}
           </svg>
           {ringkasan && <Box component="span" sx={sembunyi}>{ringkasan}</Box>}
-          <Stack direction="row" spacing={2} sx={{ mt: 0.5, fontSize: 12 }} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={2} sx={{ mt: 0.5, fontSize: 13 }} flexWrap="wrap" useFlexGap>
             <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'primary.main', verticalAlign: 'middle', mr: 0.75 }} />Siswa</Box>
             {g.kelas && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'grey.600', verticalAlign: 'middle', mr: 0.75 }} />Rata-rata kelas</Box>}
             {g.yKktp !== null && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, borderTop: '2px dashed', borderColor: 'error.main', verticalAlign: 'middle', mr: 0.75 }} />KKTP</Box>}

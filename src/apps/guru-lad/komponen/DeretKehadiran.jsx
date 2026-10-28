@@ -17,15 +17,15 @@ export default function DeretKehadiran({ deret }) {
     return { border: `1px solid ${theme.palette.warning.main}`, bgcolor: alpha(theme.palette.warning.main, 0.2) };
   };
   return (
-    <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.5} role="list" aria-label="Kehadiran per pertemuan">
+    <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} role="list" aria-label="Kehadiran per pertemuan">
       {deret.map((d) => (
         <Box
           key={d.nomor}
           role="listitem"
           title={`Pertemuan ${d.nomor}: ${d.kode ? TEKS_KODE[d.kode] : 'belum dicatat'}`}
           sx={{
-            width: 28, height: 28, borderRadius: 0.75, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 12, fontWeight: 700, ...gaya(d.kode),
+            width: 38, height: 38, borderRadius: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 15, fontWeight: 700, ...gaya(d.kode),
           }}
         >
           <span aria-hidden="true">{d.kode ?? '-'}</span>

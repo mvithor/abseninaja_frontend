@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Button, Divider, IconButton, Paper, Stack, TextField, Tooltip, Typography,
+  Alert, Box, Button, IconButton, Stack, TextField, Tooltip, Typography,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import {
   IconArrowDown, IconArrowUp, IconPencil, IconPlus, IconTrash,
 } from '@tabler/icons-react';
@@ -11,6 +12,8 @@ import {
 } from '../api';
 import FormDialog from '../komponen/FormDialog';
 import HapusDialog from '../komponen/HapusDialog';
+import JudulTab from '../komponen/JudulTab';
+import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { galatPerKolom } from '../galat';
 import { BAWAAN_AMBANG, periksaAmbang, tampilAngka } from '../rentang';
 import { judulLm, labelTp } from '../label';
@@ -18,6 +21,7 @@ import { judulLm, labelTp } from '../label';
 const tampil = (x) => String(x ?? '').replace('.', ',');
 
 function ParameterKelas({ kelas, readOnly, onBerubah }) {
+  const w = warnaRingkasan(useTheme());
   const [f, setF] = useState({
     ambang_bagian: tampil(kelas.ambang_bagian),
     kktp: tampil(kelas.kktp),
@@ -75,42 +79,43 @@ function ParameterKelas({ kelas, readOnly, onBerubah }) {
       value={f[kunci]}
       onChange={ubah(kunci)}
       disabled={readOnly}
-      size="small"
       error={Boolean(galatAmbang(kunci))}
       helperText={galatAmbang(kunci) ?? bantu}
       inputProps={{ inputMode: 'decimal' }}
-      sx={{ minWidth: 190 }}
+      sx={{ flex: { sm: '1 1 220px' }, minWidth: { sm: 220 } }}
     />
   );
 
   return (
-    <Box>
-      <Typography variant="subtitle1" fontWeight={600} gutterBottom>Parameter kelas</Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-        {readOnly
-          ? 'Batas nilai TP kelas ini. Nilai tepat di batas masuk ke rentang di atasnya.'
-          : 'Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas mengubah ikon di tabel nilai dan hasil peringatan kelas ini.'}
-      </Typography>
+    <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box sx={{ borderRadius: 0 }}>
+        <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink }}>Parameter kelas</Typography>
+        <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, mt: 0.5, maxWidth: '75ch' }}>
+          {readOnly
+            ? 'Batas nilai TP kelas ini. Nilai tepat di batas masuk ke rentang di atasnya.'
+            : 'Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas mengubah ikon di tabel nilai dan hasil peringatan kelas ini.'}
+        </Typography>
+      </Box>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
         {bidangAmbang('ambang_bagian', 'Remedial bagian tertentu mulai dari', 'Di bawah ini: remedial seluruh bagian')}
         {bidangAmbang('kktp', 'Sudah mencapai (KKTP) mulai dari', 'Di bawah ini: belum mencapai')}
         {bidangAmbang('ambang_pengayaan', 'Perlu pengayaan mulai dari', 'Di atas ini: pengayaan')}
       </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} sx={{ mt: 2 }}>
-        <TextField label="Bobot nilai akhir (%)" value={f.nilai} onChange={ubah('nilai')} disabled={readOnly} size="small" helperText="Bobot nilai akhir + SAS = 100" />
-        <TextField label="Bobot SAS (%)" value={f.sas} onChange={ubah('sas')} disabled={readOnly} size="small" />
-        {!readOnly && (
-          <>
-            <Button variant="outlined" onClick={simpan} disabled={sibuk || adaGalat} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              {sibuk ? 'Menyimpan...' : 'Simpan parameter'}
-            </Button>
-            <Button variant="text" onClick={usulanAwal} disabled={sibuk} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
-              Kembalikan ke usulan awal ({tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, {tampilAngka(BAWAAN_AMBANG.kktp)}, {tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)})
-            </Button>
-          </>
-        )}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
+        <TextField label="Bobot nilai akhir (%)" value={f.nilai} onChange={ubah('nilai')} disabled={readOnly} helperText="Bobot nilai akhir + SAS = 100" sx={{ flex: { sm: '0 1 240px' } }} />
+        <TextField label="Bobot SAS (%)" value={f.sas} onChange={ubah('sas')} disabled={readOnly} sx={{ flex: { sm: '0 1 240px' } }} />
       </Stack>
-      {pesan && <Alert severity={pesan.jenis} sx={{ mt: 1 }}>{pesan.teks}</Alert>}
+      {!readOnly && (
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }}>
+          <Button variant="contained" onClick={simpan} disabled={sibuk || adaGalat} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+            {sibuk ? 'Menyimpan...' : 'Simpan parameter'}
+          </Button>
+          <Button variant="outlined" onClick={usulanAwal} disabled={sibuk} sx={{ whiteSpace: 'normal', textAlign: 'left' }}>
+            Kembalikan ke usulan awal ({tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, {tampilAngka(BAWAAN_AMBANG.kktp)}, {tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)})
+          </Button>
+        </Stack>
+      )}
+      {pesan && <Alert severity={pesan.jenis}>{pesan.teks}</Alert>}
     </Box>
   );
 }
@@ -124,6 +129,7 @@ ParameterKelas.propTypes = {
 export default function StrukturPanel({
   kelas, lm, readOnly, onBerubah,
 }) {
+  const w = warnaRingkasan(useTheme());
   const kelasId = kelas.id;
   // form: { jenis: 'lm-baru' | 'lm-ubah' | 'tp-baru' | 'tp-ubah', lm?, tp? }
   const [form, setForm] = useState(null);
@@ -168,60 +174,99 @@ export default function StrukturPanel({
 
   return (
     <Stack spacing={3}>
+      <JudulTab
+        judul="Struktur kelas"
+        keterangan="Batas nilai, lingkup materi, dan tujuan pembelajaran (TP) kelas ini. Nilai dan penanda dihitung dari struktur ini."
+      />
       <ParameterKelas key={`${kelas.ambang_bagian}-${kelas.kktp}-${kelas.ambang_pengayaan}-${kelas.bobot_sas}`} kelas={kelas} readOnly={readOnly} onBerubah={onBerubah} />
-      <Divider />
-      <Box>
-        <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
-          <Typography variant="subtitle1" fontWeight={600}>Lingkup materi dan tujuan pembelajaran</Typography>
+
+      <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1.5}>
+          <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink }}>Lingkup materi dan tujuan pembelajaran</Typography>
           {!readOnly && (
-            <Button startIcon={<IconPlus size={18} />} variant="contained" size="small" onClick={() => setForm({ jenis: 'lm-baru' })}>
+            <Button startIcon={<IconPlus size={20} />} variant="contained" onClick={() => setForm({ jenis: 'lm-baru' })}>
               Tambah lingkup materi
             </Button>
           )}
         </Stack>
-        {galat && <Alert severity="error" sx={{ mb: 1 }}>{galat}</Alert>}
+        {galat && <Alert severity="error">{galat}</Alert>}
         {lm.length === 0 && <Alert severity="info">Belum ada lingkup materi. Tambahkan dulu, lalu isi TP-nya.</Alert>}
 
-        <Stack spacing={2}>
+        <Stack spacing={2.5}>
           {lm.map((m, i) => (
-            <Paper key={m.id} variant="outlined" sx={{ p: 2 }}>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography fontWeight={700} sx={{ flexGrow: 1 }}>
+            <Box key={m.id} sx={{ border: `1px solid ${w.garis}`, borderRadius: '8px', overflow: 'hidden', boxShadow: 'none' }}>
+              <Stack
+                direction="row"
+                alignItems="center"
+                spacing={0.5}
+                sx={{ bgcolor: w.latar, borderBottom: `1px solid ${w.ink}`, borderRadius: 0, px: { xs: 1.5, md: 2 }, py: 0.75, minHeight: 56 }}
+              >
+                <Typography sx={{ flexGrow: 1, fontSize: '1.0625rem', fontWeight: 700, lineHeight: '1.5rem', color: w.ink }}>
                   {judulLm(m)}
                 </Typography>
                 {!readOnly && (
                   <>
-                    <Tooltip title="Naikkan"><span><IconButton size="small" aria-label={`Naikkan LM ${m.urutan}`} disabled={i === 0} onClick={() => geser(lm, i, -1, (ids) => urutLm(kelasId, ids))}><IconArrowUp size={18} /></IconButton></span></Tooltip>
-                    <Tooltip title="Turunkan"><span><IconButton size="small" aria-label={`Turunkan LM ${m.urutan}`} disabled={i === lm.length - 1} onClick={() => geser(lm, i, 1, (ids) => urutLm(kelasId, ids))}><IconArrowDown size={18} /></IconButton></span></Tooltip>
-                    <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah LM ${m.urutan}`} onClick={() => setForm({ jenis: 'lm-ubah', lm: m })}><IconPencil size={18} /></IconButton></Tooltip>
-                    <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus LM ${m.urutan}`} onClick={() => setHapus({ jenis: 'lm', lm: m })}><IconTrash size={18} /></IconButton></Tooltip>
+                    <Tooltip title="Naikkan"><span><IconButton size="small" aria-label={`Naikkan LM ${m.urutan}`} disabled={i === 0} onClick={() => geser(lm, i, -1, (ids) => urutLm(kelasId, ids))}><IconArrowUp size={20} /></IconButton></span></Tooltip>
+                    <Tooltip title="Turunkan"><span><IconButton size="small" aria-label={`Turunkan LM ${m.urutan}`} disabled={i === lm.length - 1} onClick={() => geser(lm, i, 1, (ids) => urutLm(kelasId, ids))}><IconArrowDown size={20} /></IconButton></span></Tooltip>
+                    <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah LM ${m.urutan}`} onClick={() => setForm({ jenis: 'lm-ubah', lm: m })}><IconPencil size={20} /></IconButton></Tooltip>
+                    <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus LM ${m.urutan}`} onClick={() => setHapus({ jenis: 'lm', lm: m })}><IconTrash size={20} /></IconButton></Tooltip>
                   </>
                 )}
               </Stack>
 
-              <Box sx={{ mt: 1 }}>
-                {m.tp.length === 0 && <Typography variant="body2" color="text.secondary">Belum ada TP.</Typography>}
+              <Box sx={{ borderRadius: 0 }}>
+                {m.tp.length === 0 && (
+                  <Typography sx={{ fontSize: '1rem', color: w.sekunder, px: { xs: 1.5, md: 2 }, py: 1.5 }}>Belum ada TP.</Typography>
+                )}
                 {m.tp.map((t) => (
-                  <Stack key={t.id} direction="row" alignItems="flex-start" spacing={1} sx={{ py: 0.5 }}>
-                    <Typography variant="body2" fontWeight={600} sx={{ minWidth: 64 }}>
+                  <Box
+                    key={t.id}
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: { xs: 'minmax(0, 1fr) auto', md: '80px minmax(0, 1fr) auto' },
+                      columnGap: { xs: 1, md: 2 },
+                      alignItems: 'start',
+                      px: { xs: 1.5, md: 2 },
+                      py: 1.25,
+                      borderBottom: `1px solid ${w.garisLembut}`,
+                      borderRadius: 0,
+                    }}
+                  >
+                    <Typography sx={{ fontSize: '1rem', fontWeight: 700, lineHeight: '1.5rem', pt: { xs: 0.5, md: 0.25 }, color: w.ink }}>
                       {labelTp(t)}
                     </Typography>
-                    <Typography variant="body2" sx={{ flexGrow: 1 }}>{t.rumusan || (readOnly ? null : <i>tanpa rumusan</i>)}</Typography>
                     {!readOnly && (
-                      <>
-                        <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah TP ${t.kode || t.urutan}`} onClick={() => setForm({ jenis: 'tp-ubah', lm: m, tp: t })}><IconPencil size={16} /></IconButton></Tooltip>
-                        <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus TP ${t.kode || t.urutan}`} onClick={() => setHapus({ jenis: 'tp', lm: m, tp: t })}><IconTrash size={16} /></IconButton></Tooltip>
-                      </>
+                      <Box sx={{ display: 'flex', borderRadius: 0, gridColumn: { xs: 2, md: 3 }, gridRow: 1 }}>
+                        <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah TP ${t.kode || t.urutan}`} onClick={() => setForm({ jenis: 'tp-ubah', lm: m, tp: t })}><IconPencil size={18} /></IconButton></Tooltip>
+                        <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus TP ${t.kode || t.urutan}`} onClick={() => setHapus({ jenis: 'tp', lm: m, tp: t })}><IconTrash size={18} /></IconButton></Tooltip>
+                      </Box>
                     )}
-                  </Stack>
+                    {/* Di ponsel rumusan turun ke baris sendiri selebar kartu; di layar lebar duduk di kolom tengah. */}
+                    <Typography
+                      sx={{
+                        gridColumn: { xs: '1 / -1', md: 2 },
+                        gridRow: { xs: 2, md: 1 },
+                        fontSize: '1rem',
+                        lineHeight: '1.5rem',
+                        color: w.ink,
+                        minWidth: 0,
+                        overflowWrap: 'anywhere',
+                        pt: { md: 0.25 },
+                      }}
+                    >
+                      {t.rumusan || (readOnly ? null : <i>tanpa rumusan</i>)}
+                    </Typography>
+                  </Box>
                 ))}
                 {!readOnly && (
-                  <Button size="small" startIcon={<IconPlus size={16} />} sx={{ mt: 0.5 }} onClick={() => setForm({ jenis: 'tp-baru', lm: m })}>
-                    Tambah TP
-                  </Button>
+                  <Box sx={{ px: { xs: 1, md: 1.5 }, py: 1, borderRadius: 0 }}>
+                    <Button startIcon={<IconPlus size={18} />} onClick={() => setForm({ jenis: 'tp-baru', lm: m })}>
+                      Tambah TP
+                    </Button>
+                  </Box>
                 )}
               </Box>
-            </Paper>
+            </Box>
           ))}
         </Stack>
       </Box>
