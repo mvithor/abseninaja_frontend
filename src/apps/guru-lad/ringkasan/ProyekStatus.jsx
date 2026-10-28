@@ -10,7 +10,7 @@ import { statusProyek } from './ringkasan';
 function Legenda() {
   const w = warnaRingkasan(useTheme());
   return (
-    <Box component="ul" aria-label="Keterangan pola batang proyek" sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '6px 16px', fontSize: 12 }}>
+    <Box component="ul" aria-label="Keterangan pola batang proyek" sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '6px 16px', fontSize: 13 }}>
       {[['dinilai', 'Dinilai'], ['nol', 'Bernilai 0'], ['kosong', 'Belum diisi']].map(([kunci, nama]) => (
         <Box component="li" key={kunci} sx={{ display: 'flex', alignItems: 'center', gap: 0.75, color: w.ink }}>
           <Box component="span" aria-hidden="true" sx={{ width: 22, height: 12, borderRadius: '2px', ...isianProyek(w, kunci) }} />

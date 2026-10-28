@@ -27,7 +27,7 @@ function Legenda({ ambang }) {
       }}
     >
       {baris.map((l) => (
-        <Box component="li" key={l.rentang} sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: { xs: 12, md: 13 }, lineHeight: '16px', color: w.ink }}>
+        <Box component="li" key={l.rentang} sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: 13, lineHeight: '18px', color: w.ink }}>
           <Box
             component="span"
             aria-hidden="true"
@@ -188,7 +188,7 @@ export default function SebaranTp({
       ) : (
         <>
           <Legenda ambang={ambang} />
-          <Box sx={{ display: { xs: 'none', md: 'grid' }, gridTemplateColumns: '56px minmax(0, 1fr) 220px', columnGap: 1.5, fontSize: 12, fontWeight: 600, color: w.sekunder, pt: 0.5 }}>
+          <Box sx={{ display: { xs: 'none', md: 'grid' }, gridTemplateColumns: '56px minmax(0, 1fr) 220px', columnGap: 1.5, fontSize: 13, fontWeight: 600, color: w.sekunder, pt: 0.5 }}>
             <span>TP</span>
             <span>{`Jumlah siswa (${data.kartu.jumlah_siswa})`}</span>
             <Box component="span" sx={{ textAlign: 'right' }}>Di bawah KKTP</Box>

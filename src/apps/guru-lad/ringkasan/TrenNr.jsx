@@ -54,13 +54,13 @@ export default function TrenNr({ data }) {
             {g.ticks.map((t) => (
               <g key={t.nilai}>
                 <line x1={g.kiri} x2={g.lebar - g.kanan} y1={t.y} y2={t.y} stroke={w.garis} />
-                <text x={g.kiri - 8} y={t.y + 4} textAnchor="end" fontSize="12" fill={w.sekunder}>{t.nilai}</text>
+                <text x={g.kiri - 8} y={t.y + 4} textAnchor="end" fontSize="13" fill={w.sekunder}>{t.nilai}</text>
               </g>
             ))}
             {g.yKktp !== null && (
               <g>
                 <line x1={g.kiri} x2={g.lebar - g.kanan} y1={g.yKktp} y2={g.yKktp} stroke={w.ink} strokeWidth="1.5" strokeDasharray="6 5" />
-                <text x={g.lebar - g.kanan} y={g.yKktp + 16} textAnchor="end" fontSize="12" fontWeight="700" fill={w.ink} {...halo}>{`KKTP ${tampilAngka(g.kktp)}`}</text>
+                <text x={g.lebar - g.kanan} y={g.yKktp + 16} textAnchor="end" fontSize="13" fontWeight="700" fill={w.ink} {...halo}>{`KKTP ${tampilAngka(g.kktp)}`}</text>
               </g>
             )}
             {g.titik.length > 1 && (
@@ -107,7 +107,7 @@ export default function TrenNr({ data }) {
         </Box>
       )}
       {adaKosong && (
-        <Typography sx={{ fontSize: 12, color: w.sekunder, lineHeight: 1.5 }}>
+        <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: 1.5 }}>
           Titik berlubang: siswa yang dihitung masih sedikit, jadi rata-rata itu kurang kuat sebagai pembanding.
         </Typography>
       )}

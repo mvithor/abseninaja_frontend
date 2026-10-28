@@ -115,7 +115,7 @@ export function gayaChip(w, utama) {
     minHeight: 28,
     px: '10px',
     borderRadius: '14px',
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 600,
     border: `1px solid ${w.ink}`,
     bgcolor: utama ? w.ink : w.kartu,
@@ -129,13 +129,16 @@ export function gayaChip(w, utama) {
 export function gayaTautan(w) {
   return {
     font: 'inherit',
-    fontSize: 14,
+    fontSize: 15,
     color: w.tautan,
     textDecoration: 'underline',
     bgcolor: 'transparent',
     border: 0,
+    // Tautan yang berdiri sendiri (bukan di dalam kalimat) diberi tinggi 40px agar mudah diketuk.
+    display: 'inline-flex',
+    alignItems: 'center',
     p: 0,
-    minHeight: 24,
+    minHeight: 40,
     cursor: 'pointer',
     textAlign: 'left',
     '&:hover': { opacity: 0.8 },

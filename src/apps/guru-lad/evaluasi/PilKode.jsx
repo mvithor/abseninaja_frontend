@@ -18,6 +18,8 @@ export default function PilKode({ kode, panjang = false, jumlah, ...sisa }) {
       title={judul}
       label={panjang ? isi : (<>{kode}<Box component="span" sx={sembunyi}>{` ${judul}`}</Box></>)}
       sx={(theme) => ({
+        // Chip panjang boleh turun baris di layar sempit, supaya tidak terpotong di tepi kartu.
+        ...(panjang ? { height: 'auto', maxWidth: '100%', minHeight: 28, '& .MuiChip-label': { whiteSpace: 'normal', py: '4px' } } : {}),
         fontWeight: 600,
         color: theme.palette.text.primary,
         border: `1px solid ${theme.palette[warna].main}`,

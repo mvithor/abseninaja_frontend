@@ -14,6 +14,7 @@ import BuatKelasDialog from 'src/apps/guru-lad/beranda/BuatKelasDialog';
 import KelasTable from 'src/apps/guru-lad/beranda/KelasTable';
 import KelasLatihan from 'src/apps/guru-lad/beranda/KelasLatihan';
 import BannerTertinggal from 'src/apps/guru-lad/beranda/BannerTertinggal';
+import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
 import ImporBlankoDialog from 'src/apps/guru-lad/impor/ImporBlankoDialog';
 import { ringkasHasilSimpan } from 'src/apps/guru-lad/impor/impor';
 import { warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
@@ -97,8 +98,9 @@ export default function LadBeranda() {
   const ringkas = ringkasBeranda(semuaNyata);
 
   return (
+    <TemaLad>
     <PageContainer title="Kelas Saya | Analitik Pembelajaran" description="Daftar kelas dan mata pelajaran yang Anda ampu">
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 2, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
             <Typography component="h1" sx={{ fontSize: { xs: 24, md: 28 }, lineHeight: { xs: '30px', md: '34px' }, fontWeight: 700, color: w.ink }}>
@@ -184,5 +186,6 @@ export default function LadBeranda() {
         }}
       />
     </PageContainer>
+    </TemaLad>
   );
 }

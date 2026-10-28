@@ -2,9 +2,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton,
-  Stack, Tooltip, Typography,
+  Stack, Tooltip,
 } from '@mui/material';
 import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
+import JudulTab from '../komponen/JudulTab';
+import PetunjukTab from '../komponen/PetunjukTab';
+import BilahSimpan from '../komponen/BilahSimpan';
 import {
   simpanNilaiProyek, tambahProyek, ubahProyek, hapusProyek, pesanGalat,
 } from '../api';
@@ -168,7 +171,7 @@ export default function ProyekPanel({
 
   if (siswa.length === 0 || proyek.length === 0) {
     return (
-      <Stack spacing={2} alignItems="flex-start">
+      <Stack spacing={2.5} alignItems="flex-start">
         <Alert severity="info" sx={{ alignSelf: 'stretch' }}>
           {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
           {proyek.length === 0
@@ -176,7 +179,7 @@ export default function ProyekPanel({
             : ''}
         </Alert>
         {!readOnly && (
-          <Button variant="contained" startIcon={<IconPlus size={18} />} onClick={() => setForm({ baru: true })}>
+          <Button variant="contained" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
             Tambah proyek
           </Button>
         )}
@@ -186,29 +189,32 @@ export default function ProyekPanel({
   }
 
   return (
-    <Stack spacing={2}>
-      <Typography variant="body2" color="text.secondary">
-        Nilai proyek (Latihan Materi): {jenisProyek.individu} individu, {jenisProyek.kelompok} kelompok.
-        Sel kosong berarti belum dinilai. Pada proyek <b>individu</b>, nilai <b>0</b> berarti tidak dikumpulkan dan
-        menjadi dasar penanda &quot;Proyek individu tidak dikumpulkan&quot;. Proyek kelompok tidak dipakai penanda.
-      </Typography>
+    <Stack spacing={3}>
+      <JudulTab
+        judul="Nilai proyek"
+        keterangan="Nilai tiap siswa untuk proyek (Latihan Materi). Perubahan baru tersimpan setelah Anda menekan Simpan nilai."
+      />
+      <PetunjukTab
+        butir={[
+          `Nilai proyek (Latihan Materi): ${jenisProyek.individu} individu, ${jenisProyek.kelompok} kelompok. Sel kosong berarti belum dinilai.`,
+          <>Pada proyek <b>individu</b>, nilai <b>0</b> berarti tidak dikumpulkan dan menjadi dasar penanda &quot;Proyek individu tidak dikumpulkan&quot;.</>,
+          'Proyek kelompok tidak dipakai penanda.',
+        ]}
+      />
       {!readOnly && (
-        <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" flexWrap="wrap" useFlexGap>
-          <Button variant="outlined" startIcon={<IconPlus size={18} />} onClick={() => setForm({ baru: true })}>
-            Tambah proyek
-          </Button>
-          <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap" useFlexGap>
-            <Typography variant="body2" aria-live="polite" sx={{ whiteSpace: 'nowrap' }}>
-              {jumlahKotor > 0 ? `${jumlahKotor} sel belum disimpan` : 'Semua tersimpan'}
-            </Typography>
-            <Button variant="outlined" onClick={buang} disabled={jumlahKotor === 0 || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-              Batalkan
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan nilai"
+          kiri={(
+            <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
+              Tambah proyek
             </Button>
-            <Button variant="contained" onClick={mintaSimpan} disabled={jumlahKotor === 0 || adaGalatLokal || sibuk} sx={{ whiteSpace: 'nowrap' }}>
-              {sibuk ? 'Menyimpan...' : 'Simpan nilai'}
-            </Button>
-          </Stack>
-        </Stack>
+          )}
+        />
       )}
 
       {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
@@ -223,14 +229,14 @@ export default function ProyekPanel({
               <th className="no">No</th>
               <th className="nama">Nama siswa</th>
               {proyek.map((p) => (
-                <th key={p.id} style={{ minWidth: 120, height: 'auto', padding: '4px 6px' }}>
-                  <Stack alignItems="center" spacing={0.25}>
+                <th key={p.id} style={{ minWidth: 168, height: 'auto', padding: '10px 10px' }}>
+                  <Stack alignItems="center" spacing={0.75}>
                     <span title={labelProyek(p)}>{labelProyek(p).length > 22 ? `${labelProyek(p).slice(0, 21)}…` : labelProyek(p)}</span>
                     <Chip size="small" variant="outlined" label={TEKS_JENIS[p.jenis] ?? p.jenis} />
                     {!readOnly && (
                       <Stack direction="row">
-                        <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah proyek ${labelProyek(p)}`} onClick={() => setForm({ proyek: p })}><IconPencil size={16} /></IconButton></Tooltip>
-                        <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus proyek ${labelProyek(p)}`} onClick={() => setHapus(p)}><IconTrash size={16} /></IconButton></Tooltip>
+                        <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah proyek ${labelProyek(p)}`} onClick={() => setForm({ proyek: p })}><IconPencil size={18} /></IconButton></Tooltip>
+                        <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus proyek ${labelProyek(p)}`} onClick={() => setHapus(p)}><IconTrash size={18} /></IconButton></Tooltip>
                       </Stack>
                     )}
                   </Stack>

@@ -39,7 +39,7 @@ const TagKasus = ({ kelas }) => {
     <Box
       component="span"
       sx={{
-        display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 12, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
+        display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 13, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
       }}
     >
       {`Kasus ${kelas.kasus_kode ?? ''}`.trim()}
@@ -77,7 +77,7 @@ function SelPerhatian({ k, w }) {
         <Typography component="span" sx={{ fontSize: 13, color: w.sekunder }}>{`${persen}% dari kelas`}</Typography>
       </Box>
       <BatangTipis persen={persen} label={`Siswa perlu perhatian di ${k.nama_kelas}`} />
-      <Typography sx={{ fontSize: 12, color: w.sekunder, lineHeight: '17px' }}>
+      <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: '17px' }}>
         {rincian || 'Tidak ada yang ditandai'}
       </Typography>
     </Box>
@@ -213,11 +213,11 @@ const KelasTable = ({
                   </Box>
                   <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
                     <Box>
-                      <Typography sx={{ fontSize: 12, color: w.sekunder }}>Pengayaan</Typography>
+                      <Typography sx={{ fontSize: 13, color: w.sekunder }}>Pengayaan</Typography>
                       <Typography sx={{ fontSize: '1.125rem', fontWeight: 700 }}>{kartu.pengayaan}</Typography>
                     </Box>
                     <Box sx={{ border: `1px dashed ${w.ink}`, borderRadius: '6px', px: 1, py: 0.5 }}>
-                      <Typography sx={{ fontSize: 12, color: w.sekunder }}>Data belum cukup</Typography>
+                      <Typography sx={{ fontSize: 13, color: w.sekunder }}>Data belum cukup</Typography>
                       <Typography sx={{ fontSize: '1.125rem', fontWeight: 700 }}>{kartu.belum_cukup}</Typography>
                     </Box>
                   </Box>

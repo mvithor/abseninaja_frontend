@@ -34,7 +34,7 @@ function SelTp({ s, k, pisah }) {
   return (
     <td className={kelas} data-kunci={k.kunci} data-nilai={s.nilai}>
       <span className="isi">
-        <IkonRentang rentang={s.rentang} ukuran={12} />
+        <IkonRentang rentang={s.rentang} ukuran={16} />
         <span>{tampilAngka(s.nilai)}</span>
         {s.remedial !== null && <sup title={`Remedial terbaru ${tampilAngka(s.remedial)}`}>R</sup>}
       </span>
@@ -130,7 +130,7 @@ function TombolUrut({ mode, aktif, onUrut, children, label }) {
   return (
     <button type="button" className="urut" onClick={() => onUrut(mode)} aria-label={label}>
       {children}
-      {aktif && <IconChevronDown size={12} aria-hidden="true" />}
+      {aktif && <IconChevronDown size={14} aria-hidden="true" />}
     </button>
   );
 }
@@ -198,7 +198,7 @@ export default function MatriksPerhatian({
           <tr className="rata">
             <td className="k-no" />
             <td className="k-nama" style={{ fontWeight: 600 }}>Rata-rata kelas</td>
-            <td className="k-pen" style={{ fontSize: 11 }}>
+            <td className="k-pen" style={{ fontSize: 13 }}>
               <span>di bawah KKTP</span>
               <span aria-hidden="true"> &darr;</span>
             </td>

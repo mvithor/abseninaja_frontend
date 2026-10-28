@@ -17,6 +17,7 @@ import RemedialPanel from 'src/apps/guru-lad/remedial/RemedialPanel';
 import RemedialDialog from 'src/apps/guru-lad/remedial/RemedialDialog';
 import KehadiranPanel from 'src/apps/guru-lad/kehadiran/KehadiranPanel';
 import RingkasanPanel from 'src/apps/guru-lad/ringkasan/RingkasanPanel';
+import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
 import { gayaKartu, gayaTautan, warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
 import { lencanaPerhatian } from 'src/apps/guru-lad/ringkasan/ringkasan';
 import {
@@ -48,7 +49,7 @@ function LabelPerhatian({ n }) {
         aria-label={`${n} siswa perlu perhatian`}
         sx={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 22, height: 22, px: '6px', borderRadius: '11px',
-          bgcolor: w.ink, color: w.kartu, fontSize: 12, fontWeight: 700, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
+          bgcolor: w.ink, color: w.kartu, fontSize: 13, fontWeight: 700, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
         }}
       >
         {n}
@@ -144,8 +145,10 @@ export default function LadKelas() {
   ].filter(Boolean).join(' · ');
 
   return (
+    <TemaLad>
     <PageContainer title={`${kelas.nama_kelas} ${kelas.mapel} | Analitik Pembelajaran`} description="Ringkasan dan data kelas">
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
+      {/* Satu kolom minmax(0, 1fr): tabel lebar bergulir di dalam kartunya, bukan melebarkan seluruh halaman. */}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Box>
             <Button
@@ -168,7 +171,7 @@ export default function LadKelas() {
                 <Box
                   component="span"
                   sx={{
-                    display: 'inline-flex', alignItems: 'center', minHeight: 24, px: 1, borderRadius: '4px', bgcolor: w.ink, color: w.kartu, fontSize: 12, fontWeight: 600,
+                    display: 'inline-flex', alignItems: 'center', minHeight: 24, px: 1, borderRadius: '4px', bgcolor: w.ink, color: w.kartu, fontSize: 13, fontWeight: 600,
                   }}
                 >
                   {`Kelas kasus ${kelas.kasus_kode ?? ''}`.trim()}
@@ -229,7 +232,7 @@ export default function LadKelas() {
         )}
 
         {tab !== 'ringkasan' && (
-          <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, minWidth: 0 }}>
+          <Box sx={{ ...gayaKartu(w), p: { xs: 2, sm: 3, md: 4 }, minWidth: 0 }}>
             {tab === 'nilai' && (
               <NilaiTpGrid
                 kelasId={kelasId}
@@ -305,5 +308,6 @@ export default function LadKelas() {
         )}
       </Box>
     </PageContainer>
+    </TemaLad>
   );
 }
