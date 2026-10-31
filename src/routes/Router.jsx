@@ -169,6 +169,8 @@ const UserSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/us
 const UserGuruList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-guru/UserGuruList')));
 // User Wali Siswa
 const UserWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-wali-siswa/UserWaliSiswaList')));
+const PersonaPenugasanList = Loadable(lazy(() => import('../views/apps/admin-sekolah/persona-penugasan/PersonaPenugasanList')));
+const PersonaPenugasanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/persona-penugasan/PersonaPenugasanAdd')));
 // Download Data Siswa
 const DownloadDataSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-siswa/DownloadDataSiswaList')));
 const DownloadDataWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-wali-siswa/DownloadDataWaliSiswaList')));
@@ -493,6 +495,8 @@ const Router = [
                     { path: 'user-guru', element: <UserGuruList/> },
                     // User Wali Siswa
                     { path: 'user-wali-siswa', element: <UserWaliSiswaList/> },
+                    { path: 'persona-penugasan', element: <PersonaPenugasanList/> },
+                    { path: 'persona-penugasan/tambah', element: <PersonaPenugasanAdd/> },
                      // Download
                      { path: 'download/data-siswa-kelas', element: <DownloadDataSiswaList/> },
                      { path: 'download/data-wali-siswa', element: <DownloadDataWaliSiswaList/> },

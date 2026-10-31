@@ -525,6 +525,12 @@ import {
                 icon: IconUser,
                 href: '/dashboard/admin-sekolah/user-wali-siswa',
             },
+            {
+                id: uniqueId(),
+                title: 'Penugasan Persona',
+                icon: IconUser,
+                href: '/dashboard/admin-sekolah/persona-penugasan',
+            },
         ],
     },
     {
