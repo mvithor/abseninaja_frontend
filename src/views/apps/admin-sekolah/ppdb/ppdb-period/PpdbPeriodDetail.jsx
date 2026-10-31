@@ -100,7 +100,7 @@ const PpdbPeriodDetail = () => {
             onOpen={handleOpen}
             onClose={handleClose}
             onArchive={handleArchive}
-            isActionLoading={actionMutation.isLoading}
+            isActionLoading={actionMutation.isPending}
           />
         )}
       </ParentCard>

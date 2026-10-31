@@ -415,7 +415,7 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
       (await axiosInstance.post("/api/v1/admin-sekolah/jadwal-mapel", newJadwal)).data,
     onSuccess: (res) => {
       setSuccess(res.msg);
-      queryClient.invalidateQueries(["jadwalMapel"]);
+      queryClient.invalidateQueries({ queryKey: ["jadwalMapel"] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/jadwal-mapel"), 2500);
     },
     onError: (err) => {
@@ -603,7 +603,7 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
         })}
 
         <Grid size={{ xs: 12 }} sx={{ display: "flex", gap: 2 }}>
-          <SubmitButton isLoading={mutation.isLoading}>Simpan</SubmitButton>
+          <SubmitButton isLoading={mutation.isPending}>Simpan</SubmitButton>
           <CancelButton onClick={() => navigate(-1)}>Batal</CancelButton>
         </Grid>
       </Grid>

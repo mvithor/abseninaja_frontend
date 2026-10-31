@@ -16,7 +16,7 @@ import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import UserWaliSiswaTable from "src/apps/admin-sekolah/user-wali-siswa/list/UserWaliSiswaTable";
 import NotificationPrefsDrawer from "src/apps/admin-sekolah/user-wali-siswa/prefs/NotificationPrefsDrawer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -120,7 +120,7 @@ const UserWaliSiswaList = () => {
       const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
       setError(msg);
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 

@@ -85,7 +85,7 @@ const MataPelajaranEdit = () => {
         onSuccess: (response) => {
             setSuccess(response.data.msg);
             setMapelData(response.data);
-            queryClient.invalidateQueries(['mataPelajaran', id]);
+            queryClient.invalidateQueries({ queryKey: ['mataPelajaran', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/mata-pelajaran')
             }, 3000);
@@ -138,7 +138,7 @@ const MataPelajaranEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading || isKelasLoading}
+                    isLoading={isFetching || mutation.isPending || isKelasLoading}
                     kelasOptions={kelasOptions}
                     selectedKelas={selectedKelas}
                     onKelasChange={handleKelasChange}

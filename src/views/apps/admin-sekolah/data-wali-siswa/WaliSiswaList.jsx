@@ -19,7 +19,7 @@ import DeleteButton from "src/components/button-group/DeleteButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import WaliSiswaTable from "src/apps/admin-sekolah/data-wali-siswa/List/WaliSiswaTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -133,7 +133,7 @@ const WaliSiswaList = () => {
       setError(errorMessage);
     },
     refetchOnWindowFocus: false,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const rows = data?.rows ?? [];
@@ -147,7 +147,7 @@ const WaliSiswaList = () => {
       return response.data;
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["waliSiswa-filter"]);
+      queryClient.invalidateQueries({ queryKey: ["waliSiswa-filter"] });
       setSuccess(res?.msg || "Wali siswa berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -457,7 +457,7 @@ const WaliSiswaList = () => {
           >
             Batal
           </Button>
-          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isLoading}>
+          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isPending}>
             Hapus
           </DeleteButton>
         </DialogActions>

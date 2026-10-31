@@ -64,7 +64,7 @@ const HariEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['hari']);
+            queryClient.invalidateQueries({ queryKey: ['hari'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/hari');
             }, 3000);
@@ -136,7 +136,7 @@ const HariEdit = () => {
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
                     handleDateChange={handleDateChange}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

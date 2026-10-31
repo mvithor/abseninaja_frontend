@@ -53,7 +53,7 @@ const KategoriWaktuEdit = () => {
         onSuccess: (data) => {
             setSuccess(data.msg);
             setKategoriWaktuData(data)
-            queryClient.invalidateQueries(['kategoriWaktu', id]);
+            queryClient.invalidateQueries({ queryKey: ['kategoriWaktu', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/kategori-waktu');
             }, 3000);
@@ -98,7 +98,7 @@ const KategoriWaktuEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

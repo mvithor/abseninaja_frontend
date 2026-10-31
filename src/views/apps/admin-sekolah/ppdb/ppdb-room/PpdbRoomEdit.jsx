@@ -155,7 +155,7 @@ const PpdbRoomEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           setError={setError}
           setSuccess={setSuccess}
           usageMeta={usageMeta}

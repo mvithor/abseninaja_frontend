@@ -65,7 +65,7 @@ const JadwalEkskulEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jadwalEkskul']);
+            queryClient.invalidateQueries({ queryKey: ['jadwalEkskul'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/jadwal-ekskul');
             }, 3000);
@@ -126,7 +126,7 @@ const JadwalEkskulEdit = () => {
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
                         handleTimeChange={handleTimeChange}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

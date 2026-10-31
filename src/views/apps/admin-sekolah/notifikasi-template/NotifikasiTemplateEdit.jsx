@@ -64,7 +64,7 @@ const NotifikasiTemplateEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.msg);
-            queryClient.invalidateQueries(["notifikasiTemplate", id]);
+            queryClient.invalidateQueries({ queryKey: ["notifikasiTemplate", id] });
             setTimeout(() => navigate("/dashboard/admin-sekolah/notifikasi-template"), 3000);
         },
         onError: (error) => {
@@ -107,7 +107,7 @@ const NotifikasiTemplateEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

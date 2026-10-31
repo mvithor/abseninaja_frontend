@@ -56,7 +56,7 @@ const KategoriTemplateEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.msg);
-            queryClient.invalidateQueries(["kategoriTemplate", id]);
+            queryClient.invalidateQueries({ queryKey: ["kategoriTemplate", id] });
             setTimeout(() => navigate("/dashboard/admin-sekolah/kategori-template"), 3000);
         },
         onError: (error) => {
@@ -99,7 +99,7 @@ const KategoriTemplateEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

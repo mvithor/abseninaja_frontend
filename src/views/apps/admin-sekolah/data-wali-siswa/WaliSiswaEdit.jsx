@@ -78,7 +78,7 @@ const WaliSiswaEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(['wali-siswa']);
+      queryClient.invalidateQueries({ queryKey: ['wali-siswa'] });
       setTimeout(() => navigate('/dashboard/admin-sekolah/wali-siswa'), 1500);
     },
     onError: (error) => {
@@ -130,7 +130,7 @@ const WaliSiswaEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           setWaliSiswaData={setWaliData}   // ⬅️ penting untuk onChange khusus
         />
       </ParentCard>

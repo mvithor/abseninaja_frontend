@@ -237,7 +237,7 @@ const PpdbSesiRoomEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={() => navigate(-1)}
-          isLoading={isLoadingDetail || mutation.isLoading}
+          isLoading={isLoadingDetail || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

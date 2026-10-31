@@ -104,7 +104,7 @@ const PpdbWaveDetail = () => {
     }
   });
 
-  const isActionLoading = openMutation.isLoading || closeMutation.isLoading;
+  const isActionLoading = openMutation.isPending || closeMutation.isPending;
 
   const handleAskOpen = () => {
     if (!canOpen) {

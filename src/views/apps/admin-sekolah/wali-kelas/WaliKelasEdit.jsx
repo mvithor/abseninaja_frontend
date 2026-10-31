@@ -57,7 +57,7 @@ const WaliKelasEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['waliKelas']);
+            queryClient.invalidateQueries({ queryKey: ['waliKelas'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/wali-kelas');
             }, 3000);
@@ -104,7 +104,7 @@ const WaliKelasEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

@@ -102,7 +102,7 @@ const PpdbPendaftarDetail = () => {
             detail={data}
             onBack={() => navigate(-1)}
             onPromote={(applicantId) => promoteMutation.mutate(applicantId)}
-            isActionLoading={promoteMutation.isLoading}
+            isActionLoading={promoteMutation.isPending}
           />
         )}
       </ParentCard>

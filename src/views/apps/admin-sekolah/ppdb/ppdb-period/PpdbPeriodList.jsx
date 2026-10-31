@@ -48,7 +48,7 @@ const PpdbPeriodList = () => {
     mutationFn: (id) =>
       axiosInstance.delete(`/api/v1/admin-sekolah/ppdb-period/${id}`),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["ppdb-period"]);
+      queryClient.invalidateQueries({ queryKey: ["ppdb-period"] });
       setSuccess(res.data?.msg || "Periode PPDB berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -159,9 +159,9 @@ const PpdbPeriodList = () => {
             variant="contained"
             color="warning"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? (
+            {deleteMutation.isPending ? (
               <CircularProgress size={22} />
             ) : (
               "Hapus"

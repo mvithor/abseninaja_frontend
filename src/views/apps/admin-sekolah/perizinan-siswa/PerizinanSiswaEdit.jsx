@@ -78,8 +78,8 @@ const PerizinanSiswaEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg || 'Perizinan berhasil diperbarui');
-      queryClient.invalidateQueries(['perizinanSiswa']);
-      queryClient.invalidateQueries(['perizinanSiswa', id]);
+      queryClient.invalidateQueries({ queryKey: ['perizinanSiswa'] });
+      queryClient.invalidateQueries({ queryKey: ['perizinanSiswa', id] });
       setTimeout(() => {
         navigate('/dashboard/admin-sekolah/perizinan-siswa');
       }, 3000);
@@ -126,7 +126,7 @@ const PerizinanSiswaEdit = () => {
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
                 handleCancel={handleCancel}
-                isLoading={isFetching || mutation.isLoading}
+                isLoading={isFetching || mutation.isPending}
                 perizinanId={id} 
             />
         </ParentCard>

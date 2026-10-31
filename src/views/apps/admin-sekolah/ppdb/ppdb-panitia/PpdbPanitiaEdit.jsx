@@ -133,7 +133,7 @@ const PpdbPanitiaEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           error={error}
           setError={setError}
           success={success}

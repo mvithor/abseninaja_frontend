@@ -53,7 +53,7 @@ const KategoriPegawaiDetailEdit = () => {
         onSuccess: (response) => {
             setSuccess(response.data.msg);
             setKategoriData(response.data)
-            queryClient.invalidateQueries(['subKategoriPegawai', id]);
+            queryClient.invalidateQueries({ queryKey: ['subKategoriPegawai', id] });
             setTimeout(() => {
                 navigate(`/dashboard/admin-sekolah/kategori-pegawai/detail/${id}`);
             }, 3000);
@@ -98,7 +98,7 @@ const KategoriPegawaiDetailEdit = () => {
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
                 handleCancel={handleCancel}
-                isLoading={isFetching || mutation.isLoading}
+                isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

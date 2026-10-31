@@ -621,7 +621,7 @@ const AssignPpdbTestParticipantForm = ({ setSuccess, setError }) => {
                 startIcon={<IconRefresh />}
                 disabled={
                   loading ||
-                  mutation.isLoading ||
+                  mutation.isPending ||
                   isFetchingContext ||
                   isFetchingEligible
                 }
@@ -799,7 +799,7 @@ const AssignPpdbTestParticipantForm = ({ setSuccess, setError }) => {
       </Grid>
 
       <Box sx={{ display: "flex", gap: 2, mt: 4 }}>
-        <SubmitButton isLoading={loading || mutation.isLoading} disabled={!canSubmit}>
+        <SubmitButton isLoading={loading || mutation.isPending} disabled={!canSubmit}>
           Simpan
         </SubmitButton>
         <CancelButton onClick={handleCancel}>Batal</CancelButton>

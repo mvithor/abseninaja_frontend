@@ -72,7 +72,7 @@ const AbsensiEdit = () => {
         onSuccess: (response) => {
             setAbsensiData(response.data.data);
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['absensi']);
+            queryClient.invalidateQueries({ queryKey: ['absensi'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/absensi-siswa');
             }, 3000);
@@ -151,7 +151,7 @@ const AbsensiEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

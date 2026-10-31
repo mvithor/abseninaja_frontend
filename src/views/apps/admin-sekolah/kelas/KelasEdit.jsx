@@ -53,7 +53,7 @@ const KelasEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.msg);
-            queryClient.invalidateQueries(["kelas", id]);
+            queryClient.invalidateQueries({ queryKey: ["kelas", id] });
             setTimeout(() => navigate("/dashboard/admin-sekolah/kelas"), 3000);
         },
         onError: (error) => {

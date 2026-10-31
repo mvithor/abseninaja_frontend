@@ -58,7 +58,7 @@ const EkskulList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['ekskul']);
+            queryClient.invalidateQueries({ queryKey: ['ekskul'] });
             setSuccess(data.msg || "Ekstrakurikuler berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -184,7 +184,7 @@ const EkskulList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

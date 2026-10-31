@@ -81,7 +81,7 @@ const EkskulEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(["ekskul"]);
+      queryClient.invalidateQueries({ queryKey: ["ekskul"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/ekskul");
       }, 3000);
@@ -144,7 +144,7 @@ const EkskulEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           isPegawaiLoading={isPegawaiLoading}
           onPembinaChange={handlePembinaChange}
           onLogoChange={handleLogoChange}

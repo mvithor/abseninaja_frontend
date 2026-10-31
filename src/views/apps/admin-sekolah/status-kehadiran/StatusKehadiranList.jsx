@@ -58,7 +58,7 @@ const StatusKehadiranList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['statusKehadiran']);
+            queryClient.invalidateQueries({ queryKey: ['statusKehadiran'] });
             setSuccess(data.msg || "Status kehadiran berhasil dihapus");
             setTimeout(() => {
               setSuccess("");
@@ -199,9 +199,9 @@ const StatusKehadiranList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
                 </DialogActions>
             </Dialog>

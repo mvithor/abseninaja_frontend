@@ -58,7 +58,7 @@ const PrestasiMadrasahList = () => {
             return response.data; 
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['prestasiMadrasah']); 
+            queryClient.invalidateQueries({ queryKey: ['prestasiMadrasah'] }); 
             setSuccess(data.msg || "Prestasi madrasah berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -192,9 +192,9 @@ const PrestasiMadrasahList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
             </DialogActions>
         </Dialog>

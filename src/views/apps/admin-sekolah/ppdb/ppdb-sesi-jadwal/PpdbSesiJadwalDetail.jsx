@@ -118,7 +118,7 @@ const PpdbSesiJadwalDetail = () => {
             onPublish={() => handlePublish()}
             onUnpublish={() => handleUnpublish()}
             onCancel={(_, reason) => handleCancel(reason)}
-            isActionLoading={actionMutation.isLoading}
+            isActionLoading={actionMutation.isPending}
           />
         )}
       </ParentCard>

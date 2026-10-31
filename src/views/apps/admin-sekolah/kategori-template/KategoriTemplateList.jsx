@@ -58,7 +58,7 @@ const KategoriTemplateList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['kategoriTemplate']);
+            queryClient.invalidateQueries({ queryKey: ['kategoriTemplate'] });
             setSuccess(data.msg || "Kategori template berhasil dihapus");
             setTimeout(() => {
               setSuccess("");
@@ -193,9 +193,9 @@ const KategoriTemplateList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
                 </DialogActions>
             </Dialog>

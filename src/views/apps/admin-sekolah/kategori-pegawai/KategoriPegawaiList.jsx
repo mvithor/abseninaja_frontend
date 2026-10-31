@@ -59,7 +59,7 @@ const KategoriPegawaiList = () => {
       return response.data
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['kategoriPegawai']);
+      queryClient.invalidateQueries({ queryKey: ['kategoriPegawai'] });
       setSuccess(data.msg || "Kategori pegawai berhasil dihapus");
       setTimeout(() => {
         setSuccess("");
@@ -199,9 +199,9 @@ const KategoriPegawaiList = () => {
             }}
             variant="contained"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

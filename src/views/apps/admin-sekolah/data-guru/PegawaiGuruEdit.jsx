@@ -105,8 +105,8 @@ const PegawaiGuruEdit = () => {
     },
     onSuccess: (res) => {
       setSuccess(res.msg || "Data pegawai berhasil diperbarui");
-      queryClient.invalidateQueries(["PegawaiGuru", id]);
-      queryClient.invalidateQueries(["pegawaiGuru"]);
+      queryClient.invalidateQueries({ queryKey: ["PegawaiGuru", id] });
+      queryClient.invalidateQueries({ queryKey: ["pegawaiGuru"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/pegawai/guru");
       }, 1500);
@@ -177,7 +177,7 @@ const PegawaiGuruEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           originalEmail={originalData?.email || ""}
         />
       </ParentCard>

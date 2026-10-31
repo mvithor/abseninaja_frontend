@@ -209,7 +209,7 @@ const HariForm = ({ setSuccess, setError }) => {
                     />
                 </Grid>
                 <Grid item xs={12} display='flex' gap={2}>
-                    <SubmitButton isLoading={mutation.isLoading}>Simpan</SubmitButton>
+                    <SubmitButton isLoading={mutation.isPending}>Simpan</SubmitButton>
                     <CancelButton onClick={handleCancel}>Batal</CancelButton>
                 </Grid>
             </Grid>

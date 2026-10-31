@@ -65,7 +65,7 @@ const UserAdminList = () => {
         },
         onSuccess: (data) => {
             console.log('Penghapusan berhasil dengan respons:', data);
-            queryClient.invalidateQueries(['userAdmin']);
+            queryClient.invalidateQueries({ queryKey: ['userAdmin'] });
             setSuccess(data.msg || 'Pengguna berhasil dihapus');
             setTimeout(() => setSuccess(''), 3000);
         },
@@ -203,9 +203,9 @@ const UserAdminList = () => {
                         }}
                         variant="contained"
                         onClick={() => handleDelete(deleteUserAdmin, 'admin sekolah')}
-                        disabled={deleteMutation.isLoading}
+                        disabled={deleteMutation.isPending}
                     >
-                        {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                        {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                     </Button>
                 </DialogActions>
             </Dialog>

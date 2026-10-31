@@ -57,7 +57,7 @@ const StatusKehadiranEdit = () => {
         onSuccess: (data) => {
             setSuccess(data.msg);
             setStatusKehadiranData(data)
-            queryClient.invalidateQueries(['statusKehadiran', id]);
+            queryClient.invalidateQueries({ queryKey: ['statusKehadiran', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/status-kehadiran');
             }, 3000);
@@ -102,7 +102,7 @@ const StatusKehadiranEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

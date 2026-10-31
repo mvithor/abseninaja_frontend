@@ -53,7 +53,7 @@ const TingkatEdit = () => {
         onSuccess: (data) => {
             setSuccess(data.msg);
             setTingkatData(data)
-            queryClient.invalidateQueries(['tingkatKelas', id]);
+            queryClient.invalidateQueries({ queryKey: ['tingkatKelas', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/tingkat');
             }, 3000);
@@ -97,7 +97,7 @@ const TingkatEdit = () => {
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
                 handleCancel={handleCancel}
-                isLoading={isFetching || mutation.isLoading}
+                isLoading={isFetching || mutation.isPending}
             />
             </ParentCard>
         </PageContainer>

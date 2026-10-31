@@ -73,7 +73,7 @@ const WaTemplateList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['template']); 
+            queryClient.invalidateQueries({ queryKey: ['template'] }); 
             setSuccess(data.msg || "Template WhatsApp berhasil dihapus"); 
             setTimeout(() => setSuccess(""), 3000);
         },
@@ -208,7 +208,7 @@ const WaTemplateList = () => {
                     </Button>
                     <DeleteButton
                         onClick={handleDelete}
-                        isLoading={deleteMutation.isLoading}
+                        isLoading={deleteMutation.isPending}
                     >
                         Hapus
                     </DeleteButton>

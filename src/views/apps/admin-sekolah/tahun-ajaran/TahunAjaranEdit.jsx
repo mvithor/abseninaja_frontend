@@ -56,7 +56,7 @@ const TahunAjaranEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.msg);
-      queryClient.invalidateQueries(["tahun-ajaran"]);
+      queryClient.invalidateQueries({ queryKey: ["tahun-ajaran"] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/tahun-ajaran"), 3000);
     },
     onError: (error) => {

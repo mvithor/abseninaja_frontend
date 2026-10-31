@@ -216,7 +216,7 @@ const PpdbJadwalTahapanEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

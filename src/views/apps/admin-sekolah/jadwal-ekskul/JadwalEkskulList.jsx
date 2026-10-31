@@ -58,7 +58,7 @@ const JadawalEkskulList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['jadwalEkskul']);
+            queryClient.invalidateQueries({ queryKey: ['jadwalEkskul'] });
             setSuccess(data.msg || "Jadwal ekstrakurikuler berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -185,7 +185,7 @@ const JadawalEkskulList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

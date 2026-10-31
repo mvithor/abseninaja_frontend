@@ -61,7 +61,7 @@ const PengaturanJamEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(["jam"]);
+            queryClient.invalidateQueries({ queryKey: ["jam"] });
             setTimeout(() => {
                 navigate("/dashboard/admin-sekolah/pengaturan-jam");
             }, 3000);
@@ -108,7 +108,7 @@ const PengaturanJamEdit = () => {
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
                     handleTimeChange={handleTimeChange}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

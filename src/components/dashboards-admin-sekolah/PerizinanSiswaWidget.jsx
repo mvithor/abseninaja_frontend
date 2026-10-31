@@ -46,7 +46,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
   const mutation = useMutation({
     mutationFn: updateStatus,
     onSuccess: () => {
-      qc.invalidateQueries(['perizinanSiswa']);
+      qc.invalidateQueries({ queryKey: ['perizinanSiswa'] });
     },
   });
 
@@ -121,7 +121,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
                   <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Disetujui' })}
                       sx={{
                         backgroundColor: '#D1FAE5', color: '#065F46', borderRadius: '6px',
@@ -135,7 +135,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Ditolak' })}
                       sx={{
                         backgroundColor: '#FEE2E2', color: '#991B1B', borderRadius: '6px',

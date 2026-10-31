@@ -64,7 +64,7 @@ const WaTemplateEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(["waTemplate"]);
+            queryClient.invalidateQueries({ queryKey: ["waTemplate"] });
             setTimeout(() => {
                 navigate("/dashboard/admin-sekolah/wa-template");
             }, 3000);
@@ -101,7 +101,7 @@ const WaTemplateEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
 
             </ParentCard>

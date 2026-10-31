@@ -230,7 +230,7 @@ const PpdbTestComponentEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={() => navigate(-1)}
-          isLoading={isLoading || mutation.isLoading}
+          isLoading={isLoading || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

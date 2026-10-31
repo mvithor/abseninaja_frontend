@@ -90,7 +90,7 @@ const PegawaiStafEdit = () => {
       });
 
       setSuccess(response.data.msg || 'Pegawai staf berhasil diperbarui.');
-      queryClient.invalidateQueries(['PegawaiStaf']);
+      queryClient.invalidateQueries({ queryKey: ['PegawaiStaf'] });
       setTimeout(() => {
         navigate('/dashboard/admin-sekolah/pegawai/staf');
       }, 3000);
@@ -164,7 +164,7 @@ const PegawaiStafEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

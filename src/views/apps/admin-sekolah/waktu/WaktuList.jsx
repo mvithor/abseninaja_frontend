@@ -18,7 +18,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import WaktuTable from "src/apps/admin-sekolah/waktu/List/WaktuTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -109,7 +109,7 @@ const WaktuList = () => {
       const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
       setError(msg);
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -146,7 +146,7 @@ const WaktuList = () => {
       return response.data;
     },
     onSuccess: (resp) => {
-      queryClient.invalidateQueries(['waktu-paged']);
+      queryClient.invalidateQueries({ queryKey: ['waktu-paged'] });
       setSuccess(resp?.msg || "Waktu berhasil dihapus");
       setTimeout(() => setSuccess(""), 2500);
     },
@@ -325,7 +325,7 @@ const WaktuList = () => {
       >
         <DialogContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
-            {deleteMutation.isLoading ? <CircularProgress size={28} /> : null}
+            {deleteMutation.isPending ? <CircularProgress size={28} /> : null}
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             Apakah Anda yakin ingin menghapus data jam ?
@@ -337,7 +337,7 @@ const WaktuList = () => {
             variant="outlined"
             color="secondary"
             onClick={handleCloseConfirmDialog}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
             Batal
           </Button>
@@ -345,9 +345,9 @@ const WaktuList = () => {
             sx={{ mr: 3, backgroundColor: "#F48C06", '&:hover': { backgroundColor: "#f7a944" } }}
             variant="contained"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

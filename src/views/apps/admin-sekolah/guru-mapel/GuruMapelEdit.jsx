@@ -56,7 +56,7 @@ const GuruMapelEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(["guruMapel"]);
+      queryClient.invalidateQueries({ queryKey: ["guruMapel"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/guru-mapel");
       }, 3000);
@@ -100,7 +100,7 @@ const GuruMapelEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

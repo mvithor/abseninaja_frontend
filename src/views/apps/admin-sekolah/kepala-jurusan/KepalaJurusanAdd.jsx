@@ -52,8 +52,8 @@ const KepalaJurusanAdd = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jurusan', id]);
-            queryClient.invalidateQueries(['jurusan-list']);
+            queryClient.invalidateQueries({ queryKey: ['jurusan', id] });
+            queryClient.invalidateQueries({ queryKey: ['jurusan-list'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/jurusan');
             }, 1500);
@@ -72,8 +72,8 @@ const KepalaJurusanAdd = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jurusan', id]);
-            queryClient.invalidateQueries(['jurusan-list']);
+            queryClient.invalidateQueries({ queryKey: ['jurusan', id] });
+            queryClient.invalidateQueries({ queryKey: ['jurusan-list'] });
             setTimeout(() => setSuccess(''), 3000);
         },
         onError: (error) => {

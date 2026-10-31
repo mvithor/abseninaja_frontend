@@ -76,8 +76,8 @@ const PerizinanPegawaiEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg || 'Perizinan berhasil diperbarui');
-      queryClient.invalidateQueries(['perizinanPegawai']);
-      queryClient.invalidateQueries(['perizinanPegawai', id]);
+      queryClient.invalidateQueries({ queryKey: ['perizinanPegawai'] });
+      queryClient.invalidateQueries({ queryKey: ['perizinanPegawai', id] });
       setTimeout(() => {
         navigate('/dashboard/admin-sekolah/perizinan-pegawai');
       }, 3000);
@@ -124,7 +124,7 @@ const PerizinanPegawaiEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

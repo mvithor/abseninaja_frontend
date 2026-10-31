@@ -68,7 +68,7 @@ const MataPelajaranDetail = () => {
       return res.data;
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["mapelDetail", String(mapelId)]);
+      queryClient.invalidateQueries({ queryKey: ["mapelDetail", String(mapelId)] });
       setSuccess(res?.msg || "Offering berhasil dihapus");
       setTimeout(() => setSuccess(""), 2500);
     },
@@ -89,7 +89,7 @@ const MataPelajaranDetail = () => {
       return res.data;
     },
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["mapelDetail", String(mapelId)]);
+      queryClient.invalidateQueries({ queryKey: ["mapelDetail", String(mapelId)] });
       setSuccess(res?.msg || "Offering berhasil diperbarui");
       setTimeout(() => setSuccess(""), 2500);
     },
@@ -243,10 +243,10 @@ const MataPelajaranDetail = () => {
           <Button
             variant="contained"
             onClick={handleEditSave}
-            disabled={editMutation.isLoading}
+            disabled={editMutation.isPending}
             sx={{ ml: 1 }}
           >
-            {editMutation.isLoading ? <CircularProgress size={24} /> : "Simpan"}
+            {editMutation.isPending ? <CircularProgress size={24} /> : "Simpan"}
           </Button>
         </DialogActions>
       </Dialog>
@@ -263,10 +263,10 @@ const MataPelajaranDetail = () => {
           <Button
             variant="contained"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
             sx={{ backgroundColor: "#F48C06", "&:hover": { backgroundColor: "#f7a944" } }}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : "Hapus"}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : "Hapus"}
           </Button>
         </DialogActions>
       </Dialog>

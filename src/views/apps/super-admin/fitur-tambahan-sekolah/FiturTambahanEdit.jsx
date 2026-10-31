@@ -101,7 +101,7 @@ const FiturTambahanEdit = () => {
       setConfirmDialog(null);
       setSuccess(response.msg || "Fitur berhasil diperbarui");
       setTimeout(() => setSuccess(""), 3000);
-      queryClient.invalidateQueries(["fitur-sekolah", safeId]);
+      queryClient.invalidateQueries({ queryKey: ["fitur-sekolah", safeId] });
     },
     onError: (err) => {
       setTogglingKey(null);

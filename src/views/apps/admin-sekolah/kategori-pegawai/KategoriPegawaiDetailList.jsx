@@ -60,7 +60,7 @@ const KategoriPegawaiDetailList = () => {
       return await axiosInstance.delete(`/api/v1/admin-sekolah/kategori-pegawai/${id}/subkategori/${subKategoriId}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['subKategoriPegawai', id]);
+      queryClient.invalidateQueries({ queryKey: ['subKategoriPegawai', id] });
       setSuccess("Subkategori pegawai berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -153,7 +153,7 @@ const KategoriPegawaiDetailList = () => {
           handleEdit={handleEdit}
           handleDelete={handleOpenConfirmDialog}
           isError={isError}
-          isLoading={deleteMutation.isLoading || isError}
+          isLoading={deleteMutation.isPending || isError}
           errorMessage={queryError?.message}
         />
 
@@ -202,9 +202,9 @@ const KategoriPegawaiDetailList = () => {
             }}
             variant="contained"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

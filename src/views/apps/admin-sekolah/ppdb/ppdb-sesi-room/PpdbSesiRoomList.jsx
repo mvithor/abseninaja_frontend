@@ -253,9 +253,9 @@ const PpdbSesiRoomList = () => {
             variant="contained"
             color="warning"
             onClick={handleDeleteConfirm}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={22} /> : "Hapus"}
+            {deleteMutation.isPending ? <CircularProgress size={22} /> : "Hapus"}
           </Button>
         </DialogActions>
       </Dialog>

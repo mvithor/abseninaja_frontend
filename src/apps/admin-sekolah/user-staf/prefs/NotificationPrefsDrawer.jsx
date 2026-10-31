@@ -44,7 +44,7 @@ export default function NotificationPrefsDrawer({ open, onClose, userId, userNam
     mutationFn: async (payload) =>
       (await axiosInstance.put(`/api/v1/admin-sekolah/users/${userId}/prefs`, payload)).data,
     onSuccess: () => {
-      qc.invalidateQueries(['userPrefs', userId]);
+      qc.invalidateQueries({ queryKey: ['userPrefs', userId] });
       onSaved?.();
       onClose();
     }
@@ -128,8 +128,8 @@ export default function NotificationPrefsDrawer({ open, onClose, userId, userNam
 
             <Stack direction="row" spacing={1} justifyContent="flex-end">
               <Button onClick={onClose} variant="outlined">Batal</Button>
-              <Button onClick={handleSave} variant="contained" disabled={mutation.isLoading}>
-                {mutation.isLoading ? 'Menyimpan…' : 'Simpan'}
+              <Button onClick={handleSave} variant="contained" disabled={mutation.isPending}>
+                {mutation.isPending ? 'Menyimpan…' : 'Simpan'}
               </Button>
             </Stack>
           </>

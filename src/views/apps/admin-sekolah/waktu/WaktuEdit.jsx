@@ -60,7 +60,7 @@ const WaktuEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['waktu']);
+            queryClient.invalidateQueries({ queryKey: ['waktu'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/waktu');
             }, 3000);
@@ -110,7 +110,7 @@ const WaktuEdit = () => {
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
                         handleTimeChange={handleTimeChange}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

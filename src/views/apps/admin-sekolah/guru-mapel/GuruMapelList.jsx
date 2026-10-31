@@ -19,7 +19,7 @@ import DeleteButton from "src/components/button-group/DeleteButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import GuruMapelTable from "src/apps/admin-sekolah/guru-mapel/List/GuruMapelTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -137,7 +137,7 @@ const GuruMapelList = () => {
       const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
       setError(msg);
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -171,7 +171,7 @@ const GuruMapelList = () => {
       return response.data;
     },
     onSuccess: (resp) => {
-      queryClient.invalidateQueries(['guru-mapel-paged']);
+      queryClient.invalidateQueries({ queryKey: ['guru-mapel-paged'] });
       setSuccess(resp?.msg || "Guru mata pelajaran berhasil dihapus");
       setTimeout(() => setSuccess(""), 2500);
     },
@@ -351,7 +351,7 @@ const GuruMapelList = () => {
       >
         <DialogContent>
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 1 }}>
-            {deleteMutation.isLoading ? <CircularProgress size={28} /> : null}
+            {deleteMutation.isPending ? <CircularProgress size={28} /> : null}
           </Box>
           <Box sx={{ textAlign: 'center' }}>
             Apakah Anda yakin ingin menghapus guru mata pelajaran ?
@@ -363,11 +363,11 @@ const GuruMapelList = () => {
             variant="outlined"
             color="secondary"
             onClick={handleCloseConfirmDialog}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
             Batal
           </Button>
-          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isLoading}>
+          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isPending}>
             Hapus
           </DeleteButton>
         </DialogActions>

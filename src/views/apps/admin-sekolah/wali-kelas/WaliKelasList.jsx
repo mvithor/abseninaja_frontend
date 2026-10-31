@@ -62,7 +62,7 @@ const WaliKelasList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['waliKelas']); 
+            queryClient.invalidateQueries({ queryKey: ['waliKelas'] }); 
             setSuccess(data.msg || "Wali kelas berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -189,7 +189,7 @@ const WaliKelasList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

@@ -97,7 +97,7 @@ const SemesterAjaranEdit = () => {
       setSuccess(response.msg);
       setError("");
       setLocalError("");
-      queryClient.invalidateQueries(["semester"]);
+      queryClient.invalidateQueries({ queryKey: ["semester"] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/semester-ajaran"), 3000);
     },
     onError: (error) => {

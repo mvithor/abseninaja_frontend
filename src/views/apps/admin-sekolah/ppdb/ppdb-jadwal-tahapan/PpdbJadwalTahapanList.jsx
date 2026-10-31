@@ -20,7 +20,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import PpdbJadwalTahapanTable from "src/apps/admin-sekolah/ppdb/ppdb-jadwal-tahapan/PpdbJadwalTahapanTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -103,7 +103,7 @@ const PpdbJadwalTahapanList = () => {
       setError(msg);
       setTimeout(() => setError(""), 3500);
     },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -115,7 +115,7 @@ const PpdbJadwalTahapanList = () => {
     mutationFn: ({ id, is_active }) =>
       axiosInstance.patch(`/api/v1/admin-sekolah/ppdb/jadwal-tahapan/${id}/toggle-active`, { is_active }),
     onSuccess: (res) => {
-      qc.invalidateQueries(["ppdb-jadwal-paged"]);
+      qc.invalidateQueries({ queryKey: ["ppdb-jadwal-paged"] });
       setSuccess(res.data?.msg || "Status jadwal berhasil diubah");
       setTimeout(() => setSuccess(""), 2500);
     },
@@ -128,7 +128,7 @@ const PpdbJadwalTahapanList = () => {
   const deleteMutation = useMutation({
     mutationFn: (id) => axiosInstance.delete(`/api/v1/admin-sekolah/ppdb/jadwal-tahapan/${id}`),
     onSuccess: (res) => {
-      qc.invalidateQueries(["ppdb-jadwal-paged"]);
+      qc.invalidateQueries({ queryKey: ["ppdb-jadwal-paged"] });
       setSuccess(res.data?.msg || "Jadwal Tahapan berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -242,7 +242,7 @@ const PpdbJadwalTahapanList = () => {
           handleEdit={handleEdit}
           handleDelete={openDeleteConfirm}
           handleToggle={handleToggle}
-          isLoading={isLoading || toggleMutation.isLoading || deleteMutation.isLoading}
+          isLoading={isLoading || toggleMutation.isPending || deleteMutation.isPending}
           isError={isError}
           errorMessage={toErrorMessage(queryError, "Terjadi kesalahan saat memuat data")}
         />
@@ -358,9 +358,9 @@ const PpdbJadwalTahapanList = () => {
             variant="contained"
             color="warning"
             onClick={handleDeleteConfirmed}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? (
+            {deleteMutation.isPending ? (
               <CircularProgress size={22} />
             ) : (
               "Hapus"
@@ -369,7 +369,7 @@ const PpdbJadwalTahapanList = () => {
         </DialogActions>
       </Dialog>
 
-      {(toggleMutation.isLoading || deleteMutation.isLoading) ? (
+      {(toggleMutation.isPending || deleteMutation.isPending) ? (
         <Box sx={{ position: "fixed", right: 22, bottom: 22 }}>
           <CircularProgress size={26} />
         </Box>

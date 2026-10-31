@@ -58,7 +58,7 @@ const HariList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['hari']);
+            queryClient.invalidateQueries({ queryKey: ['hari'] });
             setSuccess(data.msg || "Hari berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -191,9 +191,9 @@ const HariList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
                 </DialogActions>
             </Dialog>
