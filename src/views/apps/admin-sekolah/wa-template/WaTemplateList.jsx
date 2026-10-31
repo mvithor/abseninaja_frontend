@@ -60,11 +60,7 @@ const WaTemplateList = () => {
 
     const { data: template = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['template'],
-        queryFn: fetchWaTemplate,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        }
+        queryFn: fetchWaTemplate
     });
 
     const deleteMutation = useMutation({
@@ -73,7 +69,7 @@ const WaTemplateList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['template']); 
+            queryClient.invalidateQueries({ queryKey: ['template'] }); 
             setSuccess(data.msg || "Template WhatsApp berhasil dihapus"); 
             setTimeout(() => setSuccess(""), 3000);
         },
@@ -208,7 +204,7 @@ const WaTemplateList = () => {
                     </Button>
                     <DeleteButton
                         onClick={handleDelete}
-                        isLoading={deleteMutation.isLoading}
+                        isLoading={deleteMutation.isPending}
                     >
                         Hapus
                     </DeleteButton>

@@ -56,10 +56,6 @@ const NotificationTemplateList = () => {
   } = useQuery({
     queryKey: ["notificationTemplate"],
     queryFn: fetchNotificationTemplate,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
   });
 
   // Client-side filter + sort
@@ -83,7 +79,7 @@ const NotificationTemplateList = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(["notificationTemplate"]);
+      queryClient.invalidateQueries({ queryKey: ["notificationTemplate"] });
       setSuccess(data?.msg || "Template Notifikasi berhasil dihapus");
       setError("");
       setTimeout(() => setSuccess(""), 2500);
@@ -205,7 +201,7 @@ const NotificationTemplateList = () => {
           <Button sx={{ mr: 3 }} variant="outlined" color="secondary" onClick={handleCloseConfirmDialog}>
             Batal
           </Button>
-          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isLoading}>
+          <DeleteButton onClick={handleDelete} isLoading={deleteMutation.isPending}>
             Hapus
           </DeleteButton>
         </DialogActions>

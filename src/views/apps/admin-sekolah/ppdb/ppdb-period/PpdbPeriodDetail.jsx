@@ -28,11 +28,6 @@ const PpdbPeriodDetail = () => {
     queryKey: ["ppdbPeriodDetail", id],
     queryFn: () => fetchPpdbPeriodDetail(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || err?.message || "Gagal memuat detail PPDB Period";
-      setError(String(msg));
-      setTimeout(() => setError(""), 3500);
-    },
   });
 
   const status = useMemo(() => String(data?.status || "").toUpperCase(), [data?.status]);
@@ -46,7 +41,7 @@ const PpdbPeriodDetail = () => {
     onSuccess: (res) => {
       setSuccess(res?.msg || "Aksi berhasil");
       queryClient.invalidateQueries({ queryKey: ["ppdbPeriodDetail", id] });
-      queryClient.invalidateQueries({ queryKey: ["periods"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-period"] });
       setTimeout(() => setSuccess(""), 2500);
     },
     onError: (err) => {
@@ -100,7 +95,7 @@ const PpdbPeriodDetail = () => {
             onOpen={handleOpen}
             onClose={handleClose}
             onArchive={handleArchive}
-            isActionLoading={actionMutation.isLoading}
+            isActionLoading={actionMutation.isPending}
           />
         )}
       </ParentCard>

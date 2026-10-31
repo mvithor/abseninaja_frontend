@@ -52,13 +52,6 @@ const PpdbInputNilaiDetail = () => {
     queryFn: () => fetchInputNilaiDetail(participant_id),
     enabled: Boolean(participant_id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Gagal memuat detail input nilai";
-      showError(msg);
-    },
   });
 
   const isResultFinal = useMemo(() => {

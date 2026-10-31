@@ -34,11 +34,7 @@ const JadwalEkskulEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['jadwalEkskul', id],
-        queryFn: () => fetchJadwalEkskulById(id),
-        onError: (error) => {
-            setError(error.response?.data?.msg || 'Terjadi kesalahan saat memuat data');
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchJadwalEkskulById(id)
     });
 
     useEffect(() => {
@@ -65,7 +61,7 @@ const JadwalEkskulEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jadwalEkskul']);
+            queryClient.invalidateQueries({ queryKey: ['jadwalEkskul'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/jadwal-ekskul');
             }, 3000);
@@ -126,7 +122,7 @@ const JadwalEkskulEdit = () => {
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
                         handleTimeChange={handleTimeChange}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

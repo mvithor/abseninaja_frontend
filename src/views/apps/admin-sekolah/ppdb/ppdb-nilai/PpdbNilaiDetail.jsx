@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Box, CircularProgress, Button, Stack } from "@mui/material";
@@ -20,20 +19,11 @@ const PpdbNilaiDetail = () => {
   const { id } = useParams(); // id = ppdb_application_id
   const navigate = useNavigate();
 
-  const [error, setError] = useState("");
 
   const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdbNilaiMonitorDetail", id],
     queryFn: () => fetchNilaiMonitorDetail(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Gagal memuat detail monitoring nilai";
-      setError(String(msg));
-      setTimeout(() => setError(""), 3500);
-    },
   });
 
   return (
@@ -52,7 +42,7 @@ const PpdbNilaiDetail = () => {
         }
       >
         <Alerts
-          error={error || (isError && (queryError?.message || "Gagal memuat data"))}
+          error={isError && (queryError?.message || "Gagal memuat data")}
           success=""
         />
 

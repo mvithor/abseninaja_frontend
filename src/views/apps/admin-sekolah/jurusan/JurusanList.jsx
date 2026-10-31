@@ -20,17 +20,12 @@ const JurusanList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
   const { data: jurusanList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["jurusan-list"],
     queryFn: fetchJurusanList,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data jurusan";
-      setError(msg);
-    },
     refetchOnWindowFocus: false,
   });
 
@@ -66,7 +61,6 @@ const JurusanList = () => {
   return (
     <PageContainer title="Jurusan" description="Kelola Jurusan">
       <ParentCard title="Daftar Jurusan">
-        <Alerts error={error} />
         <Box
           sx={{
             display: "flex",

@@ -34,11 +34,6 @@ const GuruMapelEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["guruMapelById", id],
     queryFn: () => fetchGuruMapelById(id),
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -56,7 +51,7 @@ const GuruMapelEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(["guruMapel"]);
+      queryClient.invalidateQueries({ queryKey: ["guru-mapel-paged"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/guru-mapel");
       }, 3000);
@@ -100,7 +95,7 @@ const GuruMapelEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

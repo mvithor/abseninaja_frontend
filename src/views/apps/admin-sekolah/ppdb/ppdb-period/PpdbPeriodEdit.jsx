@@ -64,11 +64,6 @@ const PpdbPeriodEdit = () => {
     queryKey: ["period", id],
     queryFn: () => fetchPpdbPeriodById(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(String(errorMessage));
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -200,7 +195,7 @@ const PpdbPeriodEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

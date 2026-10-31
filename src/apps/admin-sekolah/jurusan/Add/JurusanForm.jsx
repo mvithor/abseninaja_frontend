@@ -32,7 +32,7 @@ const TambahJurusanForm = ({ setSuccess, setError }) => {
     onSuccess: (response) => {
       setSuccess(response.msg);
       setError('');
-      queryClient.invalidateQueries(['jurusan-list']);
+      queryClient.invalidateQueries({ queryKey: ['jurusan-list'] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/jurusan"), 2000);
     },
     onError: (error) => {

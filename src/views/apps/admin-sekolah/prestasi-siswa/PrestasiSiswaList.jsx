@@ -45,11 +45,7 @@ const PrestasiSiswaList = () => {
 
     const { data: prestasi = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['prestasiSiswa'],
-        queryFn: fetchPrestasiSiswa,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-            }
+        queryFn: fetchPrestasiSiswa
     });
 
     const deleteMutation = useMutation({
@@ -58,7 +54,7 @@ const PrestasiSiswaList = () => {
             return response.data; 
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['prestasiSiswa']); 
+            queryClient.invalidateQueries({ queryKey: ['prestasiSiswa'] }); 
             setSuccess(data.msg || "Prestasi siswa berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -192,9 +188,9 @@ const PrestasiSiswaList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
             </DialogActions>
         </Dialog>

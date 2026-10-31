@@ -32,12 +32,7 @@ const KategoriPegawaiDetailEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['subKategoriPegawai', id, subKategoriId],
-        queryFn: () => fetchSubKategoriById(id, subKategoriId),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchSubKategoriById(id, subKategoriId)
     });
 
     useEffect(() => {
@@ -53,7 +48,7 @@ const KategoriPegawaiDetailEdit = () => {
         onSuccess: (response) => {
             setSuccess(response.data.msg);
             setKategoriData(response.data)
-            queryClient.invalidateQueries(['subKategoriPegawai', id]);
+            queryClient.invalidateQueries({ queryKey: ['subKategoriPegawai', id] });
             setTimeout(() => {
                 navigate(`/dashboard/admin-sekolah/kategori-pegawai/detail/${id}`);
             }, 3000);
@@ -98,7 +93,7 @@ const KategoriPegawaiDetailEdit = () => {
                 handleChange={handleChange}
                 handleSubmit={handleSubmit}
                 handleCancel={handleCancel}
-                isLoading={isFetching || mutation.isLoading}
+                isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

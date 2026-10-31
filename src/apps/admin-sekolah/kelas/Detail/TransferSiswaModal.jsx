@@ -62,7 +62,7 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
       });
     },
     onSuccess: async (res) => {
-      await queryClient.invalidateQueries(['dataKelasDetail', String(fromKelasId)]);
+      await queryClient.invalidateQueries({ queryKey: ['dataKelasDetail', String(fromKelasId)] });
       onSuccess?.(res?.data?.msg || 'Transfer berhasil');
       onClose();
       setKelasTujuan(null);
@@ -94,7 +94,7 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
   };
 
   return (
-    <Dialog open={open} onClose={mutation.isLoading ? undefined : onClose} fullWidth maxWidth="sm" keepMounted>
+    <Dialog open={open} onClose={mutation.isPending ? undefined : onClose} fullWidth maxWidth="sm" keepMounted>
       <DialogTitle>Transfer Siswa</DialogTitle>
       <DialogContent dividers>
         <Box display="flex" flexDirection="column" gap={2}>
@@ -114,7 +114,7 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
               loading={isKelasLoading}
               value={kelasTujuan}
               onChange={(_, val) => setKelasTujuan(val)}
-              disabled={mutation.isLoading}
+              disabled={mutation.isPending}
               renderOption={(props, option) => (
                 <li {...props} key={option.id}>
                   {option.nama_kelas}
@@ -148,15 +148,15 @@ const TransferSiswaModal = ({ open, onClose, fromKelasId, selectedIds, onSuccess
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="outlined" disabled={mutation.isLoading}>Batal</Button>
+        <Button onClick={onClose} variant="outlined" disabled={mutation.isPending}>Batal</Button>
         <Button
           onClick={handleSubmit}
           variant="contained"
-          disabled={!kelasTujuan?.id || !selectedIds?.length || mutation.isLoading || isKelasLoading}
+          disabled={!kelasTujuan?.id || !selectedIds?.length || mutation.isPending || isKelasLoading}
           sx={{ backgroundColor: '#2F327D', '&:hover': { backgroundColor: '#280274' } }}
-          startIcon={mutation.isLoading ? <CircularProgress size={16} /> : null}
+          startIcon={mutation.isPending ? <CircularProgress size={16} /> : null}
         >
-          {mutation.isLoading ? 'Memproses…' : 'Transfer'}
+          {mutation.isPending ? 'Memproses…' : 'Transfer'}
         </Button>
       </DialogActions>
     </Dialog>

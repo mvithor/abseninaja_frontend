@@ -32,12 +32,7 @@ const KepalaJurusanAdd = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['jurusan', id],
-        queryFn: () => fetchJurusanById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchJurusanById(id)
     });
 
     useEffect(() => {
@@ -52,8 +47,8 @@ const KepalaJurusanAdd = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jurusan', id]);
-            queryClient.invalidateQueries(['jurusan-list']);
+            queryClient.invalidateQueries({ queryKey: ['jurusan', id] });
+            queryClient.invalidateQueries({ queryKey: ['jurusan-list'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/jurusan');
             }, 1500);
@@ -72,8 +67,8 @@ const KepalaJurusanAdd = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['jurusan', id]);
-            queryClient.invalidateQueries(['jurusan-list']);
+            queryClient.invalidateQueries({ queryKey: ['jurusan', id] });
+            queryClient.invalidateQueries({ queryKey: ['jurusan-list'] });
             setTimeout(() => setSuccess(''), 3000);
         },
         onError: (error) => {

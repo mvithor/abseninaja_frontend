@@ -35,15 +35,6 @@ const WaTemplateEdit = () => {
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["waTemplate", id],
         queryFn: () => fetchWaTemplateById(id),
-        onSuccess: (fetchedData) => {
-            setWaTemplateData({
-                title: fetchedData.title || "",
-                body: fetchedData.body || "",
-                wa_template_category_id: fetchedData.wa_template_category_id || "",
-                description: fetchedData.description || "",
-                is_system_template: fetchedData.is_system_template || ""
-            });
-        },
     });
 
     useEffect(() => {
@@ -64,7 +55,7 @@ const WaTemplateEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(["waTemplate"]);
+            queryClient.invalidateQueries({ queryKey: ["waTemplate"] });
             setTimeout(() => {
                 navigate("/dashboard/admin-sekolah/wa-template");
             }, 3000);
@@ -101,7 +92,7 @@ const WaTemplateEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
 
             </ParentCard>

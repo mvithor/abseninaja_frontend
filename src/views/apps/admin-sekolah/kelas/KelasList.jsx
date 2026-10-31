@@ -46,11 +46,7 @@ const KelasList = () => {
 
     const { data: kelas = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['kelas'],
-        queryFn: fetchKelas,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchKelas
       });
       const queryClient = useQueryClient();
 
@@ -60,7 +56,7 @@ const KelasList = () => {
           return response.data;
         },
         onSuccess: (data) => {
-          queryClient.invalidateQueries(['kelas']);
+          queryClient.invalidateQueries({ queryKey: ['kelas'] });
           setSuccess(data.msg || 'Kelas berhasil ditandai lulus. Seluruh siswa dipindahkan ke data alumni.');
           setTimeout(() => setSuccess(''), 4000);
         },
@@ -77,7 +73,7 @@ const KelasList = () => {
             return response.data
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['kelas']);
+            queryClient.invalidateQueries({ queryKey: ['kelas'] });
             setSuccess(data.msg || "Kelas berhasil dihapus");
             setTimeout(() => {
               setSuccess("");
@@ -269,10 +265,10 @@ const KelasList = () => {
                     <Button
                         variant="contained"
                         onClick={handleConfirmLulus}
-                        disabled={kelulusanMutation.isLoading}
+                        disabled={kelulusanMutation.isPending}
                         sx={{ backgroundColor: '#973BE0', '&:hover': { backgroundColor: '#7d2dbd' } }}
                     >
-                        {kelulusanMutation.isLoading ? <CircularProgress size={24} /> : 'Ya, Tandai Lulus'}
+                        {kelulusanMutation.isPending ? <CircularProgress size={24} /> : 'Ya, Tandai Lulus'}
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -306,9 +302,9 @@ const KelasList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
                 </DialogActions>
             </Dialog>

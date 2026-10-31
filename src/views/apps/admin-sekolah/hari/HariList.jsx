@@ -45,11 +45,7 @@ const HariList = () => {
 
     const { data: hari = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['hari'],
-        queryFn: fetchHari,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchHari
     });
 
     const deleteMutation = useMutation({
@@ -58,7 +54,7 @@ const HariList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['hari']);
+            queryClient.invalidateQueries({ queryKey: ['hari'] });
             setSuccess(data.msg || "Hari berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -191,9 +187,9 @@ const HariList = () => {
                     }}
                     variant="contained"
                     onClick={handleDelete}
-                    disabled={deleteMutation.isLoading}
+                    disabled={deleteMutation.isPending}
                 >
-                    {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+                    {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
                 </Button>
                 </DialogActions>
             </Dialog>

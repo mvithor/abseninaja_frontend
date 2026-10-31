@@ -45,11 +45,7 @@ const JadawalEkskulList = () => {
 
     const { data: jadwaEkskul = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['jadwalEkskul'],
-        queryFn: fetchJadwalEkskul,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchJadwalEkskul
     });
 
     const deleteMutation = useMutation({
@@ -58,7 +54,7 @@ const JadawalEkskulList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['jadwalEkskul']);
+            queryClient.invalidateQueries({ queryKey: ['jadwalEkskul'] });
             setSuccess(data.msg || "Jadwal ekstrakurikuler berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -185,7 +181,7 @@ const JadawalEkskulList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

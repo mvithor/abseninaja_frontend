@@ -25,7 +25,7 @@ const JENIS_COLOR = {
   Alpha: { bg: '#FEF3C7', color: '#92400E' },
 };
 
-const PerizinanSiswaWidget = ({ onCountChange }) => {
+const PerizinanSiswaWidget = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const qc = useQueryClient();
@@ -34,10 +34,6 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
     queryKey: ['perizinanSiswa'],
     queryFn: fetchPerizinanSiswa,
     staleTime: 30000,
-    onSuccess: (data) => {
-      const pending = data.filter((d) => d.status === 'Menunggu');
-      if (onCountChange) onCountChange(pending.length);
-    },
   });
 
   const pending = all.filter((d) => d.status === 'Menunggu').slice(0, 4);
@@ -46,7 +42,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
   const mutation = useMutation({
     mutationFn: updateStatus,
     onSuccess: () => {
-      qc.invalidateQueries(['perizinanSiswa']);
+      qc.invalidateQueries({ queryKey: ['perizinanSiswa'] });
     },
   });
 
@@ -121,7 +117,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
                   <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Disetujui' })}
                       sx={{
                         backgroundColor: '#D1FAE5', color: '#065F46', borderRadius: '6px',
@@ -135,7 +131,7 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Ditolak' })}
                       sx={{
                         backgroundColor: '#FEE2E2', color: '#991B1B', borderRadius: '6px',

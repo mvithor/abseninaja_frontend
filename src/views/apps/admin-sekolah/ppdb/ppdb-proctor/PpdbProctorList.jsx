@@ -64,17 +64,13 @@ const PpdbProctorList = () => {
 
   const { data: proctorList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey,
-    queryFn: () => fetchPpdbProctors(filters),
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Pengawas");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPpdbProctors(filters)
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) => axiosInstance.delete(`/api/v1/admin-sekolah/ppdb-proctor/${id}`),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(queryKey);
+      queryClient.invalidateQueries({ queryKey });
       setSuccess(res.data?.msg || "Pengawas berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -204,9 +200,9 @@ const PpdbProctorList = () => {
             variant="contained"
             color="warning"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={22} /> : "Hapus"}
+            {deleteMutation.isPending ? <CircularProgress size={22} /> : "Hapus"}
           </Button>
         </DialogActions>
       </Dialog>

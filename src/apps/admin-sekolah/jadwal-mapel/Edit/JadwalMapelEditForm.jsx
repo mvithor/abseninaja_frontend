@@ -13,7 +13,7 @@ import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel
 import CustomOutlinedInput from "src/components/forms/theme-elements/CustomOutlinedInput";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
 import { useEffect, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 
 const fetcher = async (url) => (await axiosInstance.get(url)).data.data;
@@ -64,7 +64,7 @@ const JadwalMapelEditForm = ({
   const { data: offeringOptions = [], isLoading: isOfferingLoading } = useQuery({
     queryKey: ["offeringOptions", jadwalData?.kelas_id || ""],
     enabled: !!jadwalData?.kelas_id,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     queryFn: () =>
       fetcher(
         `/api/v1/admin-sekolah/dropdown/offering?kelas_id=${jadwalData.kelas_id}`
@@ -74,7 +74,7 @@ const JadwalMapelEditForm = ({
   const { data: guruOptions = [], isLoading: isGuruLoading } = useQuery({
     queryKey: ["guruOptions"],
     queryFn: () => fetcher("/api/v1/admin-sekolah/dropdown/guru-mapel"),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   // 🔎 Filter waktu berdasarkan hari yang sedang diedit (jadwalData.hari_id)

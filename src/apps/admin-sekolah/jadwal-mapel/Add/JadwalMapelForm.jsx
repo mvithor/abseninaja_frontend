@@ -177,7 +177,7 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
     queryFn: () => fetchData(`/api/v1/admin-sekolah/dropdown/hari?kelas_id=${selectedClass}`),
   });
 
-  const { data: hariTersedia = [] } = useQuery({
+  const { data: hariTersediaData } = useQuery({
     queryKey: ["hariTersedia", selectedClass],
     enabled: !!selectedClass,
     queryFn: async () => {
@@ -186,12 +186,18 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
       );
       return res.data.data.map((h) => h.nama_hari);
     },
-    onSuccess: (data) => {
-      const initial = {};
-      data.forEach((h) => (initial[h] = []));
-      setFormState(initial);
-    },
   });
+  const hariTersedia = useMemo(() => hariTersediaData ?? [], [hariTersediaData]);
+
+  // v5: onSuccess pada useQuery dihapus. Form direset saat daftar hari tersedia berganti
+  // (ganti kelas). Referensi data stabil selama isinya sama, jadi refetch saat jendela
+  // kembali fokus tidak lagi menghapus isian yang sedang dikerjakan (di v4 onSuccess ikut jalan).
+  useEffect(() => {
+    if (!hariTersediaData) return;
+    const initial = {};
+    hariTersediaData.forEach((h) => (initial[h] = []));
+    setFormState(initial);
+  }, [hariTersediaData]);
 
   // === Ambil "terpakai" per-hari (KBM+Non-KBM) dalam SATU query supaya hooks tidak dinamis ===
   const { data: takenPerDay = {} } = useQuery({
@@ -415,7 +421,7 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
       (await axiosInstance.post("/api/v1/admin-sekolah/jadwal-mapel", newJadwal)).data,
     onSuccess: (res) => {
       setSuccess(res.msg);
-      queryClient.invalidateQueries(["jadwalMapel"]);
+      queryClient.invalidateQueries({ queryKey: ["jadwal-mapel-paged"] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/jadwal-mapel"), 2500);
     },
     onError: (err) => {
@@ -603,7 +609,7 @@ const JadwalMapelForm = ({ setSuccess, setError }) => {
         })}
 
         <Grid size={{ xs: 12 }} sx={{ display: "flex", gap: 2 }}>
-          <SubmitButton isLoading={mutation.isLoading}>Simpan</SubmitButton>
+          <SubmitButton isLoading={mutation.isPending}>Simpan</SubmitButton>
           <CancelButton onClick={() => navigate(-1)}>Batal</CancelButton>
         </Grid>
       </Grid>

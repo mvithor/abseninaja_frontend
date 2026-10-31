@@ -39,12 +39,7 @@ const MataPelajaranEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['mataPelajaran', id],
-        queryFn: () => fetchMataPelajaranById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchMataPelajaranById(id)
     });
 
     const { data: kelasOptions = [], isLoading: isKelasLoading } = useQuery({
@@ -85,7 +80,7 @@ const MataPelajaranEdit = () => {
         onSuccess: (response) => {
             setSuccess(response.data.msg);
             setMapelData(response.data);
-            queryClient.invalidateQueries(['mataPelajaran', id]);
+            queryClient.invalidateQueries({ queryKey: ['mataPelajaran', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/mata-pelajaran')
             }, 3000);
@@ -138,7 +133,7 @@ const MataPelajaranEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading || isKelasLoading}
+                    isLoading={isFetching || mutation.isPending || isKelasLoading}
                     kelasOptions={kelasOptions}
                     selectedKelas={selectedKelas}
                     onKelasChange={handleKelasChange}

@@ -91,11 +91,7 @@ const PrestasiSiswaEdit = () => {
     error: queryError
   } = useQuery({
     queryKey: ["PrestasiSiswa", id],
-    queryFn: () => fetchPrestasiSiswaById(id),
-    onError: (err) => {
-      setError(err.message || "Terjadi kesalahan saat memuat data");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPrestasiSiswaById(id)
   });
 
   useEffect(() => {
@@ -128,8 +124,8 @@ const PrestasiSiswaEdit = () => {
         ...updated,
       }));
       setSuccess(response.data.msg || "Prestasi siswa berhasil diperbarui");
-      queryClient.invalidateQueries(["PrestasiSiswa"]);
-      queryClient.invalidateQueries(["PrestasiSiswaList"]);
+      queryClient.invalidateQueries({ queryKey: ["PrestasiSiswa"] });
+      queryClient.invalidateQueries({ queryKey: ["prestasiSiswa"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/prestasi-siswa");
       }, 3000);
@@ -279,7 +275,7 @@ const PrestasiSiswaEdit = () => {
           handleDateChange={handleDateChange}
           handleFileChange={handleFileChange}
           filesState={filesState}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

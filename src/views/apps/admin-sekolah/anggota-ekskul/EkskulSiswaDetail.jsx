@@ -24,16 +24,10 @@ const EkskulSiswaDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState("");
 
   const { data, isError, error: queryError, isLoading } = useQuery({
     queryKey: ["ekskulSiswaDetail", String(id)],
     queryFn: () => fetchEkskulBySiswa(id),
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const namaEkskul = data?.nama_ekskul ?? "Tidak Diketahui";
@@ -59,7 +53,6 @@ const EkskulSiswaDetail = () => {
   return (
     <PageContainer title="Anggota Ekskul" description="Anggota Ekskul">
       <ParentCard title={`Anggota Ekstrakurikuler: ${namaEkskul}`}>
-        <Alerts error={error} />
         <Box
           sx={{
             display: "flex",

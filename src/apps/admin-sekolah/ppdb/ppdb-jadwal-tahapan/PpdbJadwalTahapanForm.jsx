@@ -264,7 +264,6 @@ const TambahPpdbJadwalTahapanForm = ({ setSuccess, setError }) => {
       setSuccess(data?.msg || "Jadwal tahapan PMB berhasil dibuat");
       setError("");
       await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-paged"] });
-      await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-tahapan"] });
 
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/ppdb-jadwal-tahapan");
@@ -767,7 +766,7 @@ const TambahPpdbJadwalTahapanForm = ({ setSuccess, setError }) => {
         </Grid>
 
         <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 4 }}>
-          <SubmitButton isLoading={loading || mutation.isLoading} disabled={!canSubmit}>
+          <SubmitButton isLoading={loading || mutation.isPending} disabled={!canSubmit}>
             Simpan
           </SubmitButton>
           <CancelButton onClick={handleCancel}>Batal</CancelButton>

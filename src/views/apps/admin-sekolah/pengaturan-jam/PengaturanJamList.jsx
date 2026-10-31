@@ -35,15 +35,11 @@ const PengaturanJamList = () => {
   const [page, setPage]               = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError]             = useState("");
   const navigate = useNavigate();
 
   const { data: jam = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['jam'],
     queryFn: fetchJam,
-    onError: (err) => {
-      setError(err.response?.data?.msg || "Terjadi kesalahan saat memuat data");
-    },
   });
 
   const lowerSearch  = searchQuery.toLowerCase();
@@ -64,7 +60,6 @@ const PengaturanJamList = () => {
   return (
     <PageContainer title="Pengaturan Jam" description="Pengaturan Jam">
       <ParentCard title="Pengaturan Jam">
-        <Alerts error={error} />
         <Box
           sx={{
             display: 'flex',

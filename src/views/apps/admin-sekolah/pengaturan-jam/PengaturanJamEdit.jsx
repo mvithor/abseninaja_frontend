@@ -34,14 +34,6 @@ const PengaturanJamEdit = () => {
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["jam", id],
         queryFn: () => fetchJamById(id),
-        onSuccess: (fetchedData) => {
-            setJamData({
-                jam_masuk: fetchedData.jam_masuk || "",
-                jam_terlambat: fetchedData.jam_terlambat || "",
-                jam_alpa: fetchedData.jam_alpa || "",
-                jam_pulang: fetchedData.jam_pulang || "",
-            });
-        },
     });
 
     useEffect(() => {
@@ -61,7 +53,7 @@ const PengaturanJamEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(["jam"]);
+            queryClient.invalidateQueries({ queryKey: ["jam"] });
             setTimeout(() => {
                 navigate("/dashboard/admin-sekolah/pengaturan-jam");
             }, 3000);
@@ -108,7 +100,7 @@ const PengaturanJamEdit = () => {
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
                     handleTimeChange={handleTimeChange}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

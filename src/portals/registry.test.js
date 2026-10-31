@@ -8,6 +8,7 @@ import {
   getUserPortals,
   getDefaultPortal,
   canAccessPortal,
+  tujuanSaatDitolak,
 } from './registry.js';
 
 const daftar = (...kode) => kode.map((k) => ({ kode: k, label: k, portal: null, tahun_ajaran_id: null }));
@@ -118,4 +119,25 @@ test('tidak ada path portal yang menjadi awalan path portal lain (ProfileMenu me
       if (a !== b) assert.equal(b.path.startsWith(`${a.path}/`), false, `${b.path} berawalan ${a.path}`);
     }
   }
+});
+
+test('tujuanSaatDitolak: kehilangan satu persona, masih punya portal lain, diarahkan ke portal utama', () => {
+  const guruSaja = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) });
+  assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/kepala-sekolah'), '/dashboard/guru-sekolah');
+  const guruBk = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL, PERSONA.GURU_BK) });
+  assert.equal(tujuanSaatDitolak(guruBk, '/dashboard/waka-kurikulum'), '/dashboard/guru-bk');
+});
+
+test('tujuanSaatDitolak: tanpa portal sama sekali tetap /forbidden', () => {
+  assert.equal(tujuanSaatDitolak(pegawai({ daftarPersona: [] }), '/dashboard/guru-bk'), '/forbidden');
+  assert.equal(tujuanSaatDitolak({ role: 'siswa' }, '/dashboard/guru-bk'), '/forbidden');
+  assert.equal(tujuanSaatDitolak(null, '/x'), '/forbidden');
+});
+
+test('tujuanSaatDitolak: sudah berada di bawah portal utama tidak dialihkan lagi (cegah putaran)', () => {
+  const guruSaja = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) });
+  assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/guru-sekolah'), '/forbidden');
+  assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/guru-sekolah/apa-saja'), '/forbidden');
+  // awalan yang mirip tetapi bukan sub-rute tidak dianggap berada di bawahnya
+  assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/guru-sekolah-lain'), '/dashboard/guru-sekolah');
 });

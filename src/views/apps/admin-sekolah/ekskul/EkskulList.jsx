@@ -45,11 +45,7 @@ const EkskulList = () => {
 
     const { data: ekskul = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['ekskul'],
-        queryFn: fetchEkskul,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchEkskul
     });
 
     const deleteMutation = useMutation({
@@ -58,7 +54,7 @@ const EkskulList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['ekskul']);
+            queryClient.invalidateQueries({ queryKey: ['ekskul'] });
             setSuccess(data.msg || "Ekstrakurikuler berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -184,7 +180,7 @@ const EkskulList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

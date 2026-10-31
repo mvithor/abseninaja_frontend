@@ -18,7 +18,7 @@ import SearchButton from 'src/components/button-group/SearchButton';
 import FilterButton from 'src/components/button-group/FilterButton';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import PpdbBerkasTable from 'src/apps/admin-sekolah/ppdb/ppdb-berkas/PpdbBerkasTable';
 
@@ -113,7 +113,7 @@ const PpdbBerkasList = () => {
         status: status || null,
         verification_state: verification_state || null
       }),
-    keepPreviousData: true
+    placeholderData: keepPreviousData
   });
 
   const rows = data?.data || [];

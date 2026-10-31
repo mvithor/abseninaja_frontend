@@ -42,11 +42,7 @@ const UserGuruList = () => {
 
   const { data: userGuru = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['userGuru'],
-    queryFn: fetchUserGuru,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchUserGuru
   });
 
   const deleteMutation = useMutation({
@@ -57,7 +53,7 @@ const UserGuruList = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['userGuru']);
+      queryClient.invalidateQueries({ queryKey: ['userGuru'] });
       setSuccess(data.msg || "Pengguna guru berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -170,9 +166,9 @@ const UserGuruList = () => {
             sx={{ mr: 3, backgroundColor: "#F48C06", '&:hover': { backgroundColor: "#f7a944" } }}
             variant="contained"
             onClick={() => handleDelete(deleteUserGuru, 'pegawai')}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

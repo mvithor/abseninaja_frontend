@@ -34,11 +34,7 @@ const WhatsAppList = () => {
 
   const { data: whatsApp = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['whatsApp'],
-    queryFn: fetchWhatsApp,
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchWhatsApp
   });
 
   useEffect(() => {

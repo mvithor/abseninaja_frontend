@@ -12,7 +12,7 @@ import {
 import Alerts from 'src/components/alerts/Alerts';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 
 import PpdbOverviewKpiCards from 'src/apps/admin-sekolah/ppdb/ppdb-overview/PpdbOverviewKpiCards';
@@ -184,7 +184,7 @@ const PpdbOverviewDashboard = () => {
   } = useQuery({
     queryKey: summaryQueryKey,
     queryFn: () => fetchOverviewSummary({ ppdbPeriodId: ppdbPeriodId || null }),
-    keepPreviousData: true
+    placeholderData: keepPreviousData
   });
 
   const {
@@ -195,7 +195,7 @@ const PpdbOverviewDashboard = () => {
   } = useQuery({
     queryKey: breakdownQueryKey,
     queryFn: () => fetchOverviewBreakdownV2({ ppdbPeriodId: ppdbPeriodId || null, waveTrackId: waveTrackId || null }),
-    keepPreviousData: true
+    placeholderData: keepPreviousData
   });
 
   const {
@@ -206,7 +206,7 @@ const PpdbOverviewDashboard = () => {
   } = useQuery({
     queryKey: todayQueryKey,
     queryFn: () => fetchOverviewToday({ ppdbPeriodId: ppdbPeriodId || null, ongoingLimit: 20, nextLimit: 20 }),
-    keepPreviousData: true
+    placeholderData: keepPreviousData
   });
 
   const {
@@ -223,7 +223,7 @@ const PpdbOverviewDashboard = () => {
         page: qPage + 1,
         limit: qLimit
       }),
-    keepPreviousData: true
+    placeholderData: keepPreviousData
   });
 
   // ✅ FIX lint: breakdownItemsAll dibuat stabil pakai useMemo

@@ -71,14 +71,6 @@ const SiswaEdit = () => {
     queryKey: ["siswa", safeId],
     queryFn: () => fetchSiswaById(safeId),
     enabled: !!safeId,
-    onError: (err) => {
-      const errorMessage =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -103,8 +95,8 @@ const SiswaEdit = () => {
     onSuccess: async (response) => {
       setSuccess(response?.data?.msg || "Data siswa berhasil diperbarui");
 
-      await queryClient.invalidateQueries(["siswa", safeId]);
-      await queryClient.invalidateQueries(["siswa"]);
+      await queryClient.invalidateQueries({ queryKey: ["siswa", safeId] });
+      await queryClient.invalidateQueries({ queryKey: ["siswa"] });
 
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/siswa");
@@ -173,7 +165,7 @@ const SiswaEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

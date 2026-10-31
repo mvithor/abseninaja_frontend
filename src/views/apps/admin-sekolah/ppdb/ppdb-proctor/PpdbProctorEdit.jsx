@@ -39,7 +39,7 @@ const PpdbProctorEdit = () => {
       setSuccess(res.data.msg);
       queryClient.invalidateQueries({ queryKey: ["ppdbProctor", id] });
       // list invalidation (nama queryKey list kamu bisa beda, sesuaikan)
-      queryClient.invalidateQueries({ queryKey: ["ppdbProctors"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-proctors"] });
       setTimeout(() => navigate(-1), 1200);
     },
     onError: (err) => {
@@ -88,7 +88,7 @@ const PpdbProctorEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={() => navigate(-1)}
-          isLoading={isLoading || mutation.isLoading}
+          isLoading={isLoading || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

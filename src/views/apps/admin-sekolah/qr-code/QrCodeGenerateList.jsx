@@ -40,10 +40,6 @@ const QrCodeGenerateList = () => {
       const response = await axiosInstance.get('/api/v1/admin-sekolah/dropdown/kelas');
       return response.data.data;
     },
-    onError: (error) => {
-      setError(error.response?.data?.msg || 'Terjadi kesalahan saat memuat data kelas');
-      setTimeout(() => setError(''), 3000);
-    },
   });
 
   // Fetch siswa
@@ -61,10 +57,6 @@ const QrCodeGenerateList = () => {
       return response.data.data;
     },
     enabled: !!selectedKelas,
-    onError: (error) => {
-      setError(error.response?.data?.msg || 'Terjadi kesalahan saat memuat data siswa');
-      setTimeout(() => setError(''), 3000);
-    },
   });
 
   // Handle dropdown changes

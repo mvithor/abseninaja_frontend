@@ -31,12 +31,7 @@ const KategoriWaktuEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['kategoriWaktu', id],
-        queryFn: () => fetchKategoriWaktuById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchKategoriWaktuById(id)
     });
 
     useEffect(() => {
@@ -53,7 +48,7 @@ const KategoriWaktuEdit = () => {
         onSuccess: (data) => {
             setSuccess(data.msg);
             setKategoriWaktuData(data)
-            queryClient.invalidateQueries(['kategoriWaktu', id]);
+            queryClient.invalidateQueries({ queryKey: ['kategoriWaktu', id] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/kategori-waktu');
             }, 3000);
@@ -98,7 +93,7 @@ const KategoriWaktuEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

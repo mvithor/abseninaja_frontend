@@ -47,10 +47,6 @@ const WaliKelasList = () => {
     const { data: wali = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['waliKelas'],
         queryFn: fetchWaliKelas,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        },
         select: (data) => Array.isArray(data) ? data : [], // Validasi data sebagai array
     });
     
@@ -62,7 +58,7 @@ const WaliKelasList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            queryClient.invalidateQueries(['waliKelas']); 
+            queryClient.invalidateQueries({ queryKey: ['waliKelas'] }); 
             setSuccess(data.msg || "Wali kelas berhasil dihapus"); 
             setTimeout(() => {
                 setSuccess("");
@@ -189,7 +185,7 @@ const WaliKelasList = () => {
                 </Button>
                 <DeleteButton
                     onClick={handleDelete}
-                    isLoading={deleteMutation.isLoading}
+                    isLoading={deleteMutation.isPending}
                 >
                     Hapus
                 </DeleteButton>

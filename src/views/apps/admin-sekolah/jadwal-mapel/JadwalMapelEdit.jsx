@@ -41,11 +41,6 @@ const JadwalMapelEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["jadwal-mapel", id],
     queryFn: () => fetchJadwalById(id),
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-      setTimeout(() => setError(""), 4000);
-    },
   });
 
   useEffect(() => {
@@ -81,8 +76,8 @@ const JadwalMapelEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response?.msg || "Jadwal berhasil diperbarui");
-      queryClient.invalidateQueries(["jadwal-mapel", id]);
-      queryClient.invalidateQueries(["jadwalMapel"]);
+      queryClient.invalidateQueries({ queryKey: ["jadwal-mapel", id] });
+      queryClient.invalidateQueries({ queryKey: ["jadwal-mapel-paged"] });
       setTimeout(() => navigate("/dashboard/admin-sekolah/jadwal-mapel"), 3000);
     },
     onError: (err) => {
@@ -129,7 +124,7 @@ const JadwalMapelEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

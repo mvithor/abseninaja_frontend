@@ -51,11 +51,7 @@ const PegawaiStafEdit = () => {
 
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ['PegawaiStaf', id],
-    queryFn: () => fetchPegawaiStafById(id),
-    onError: (err) => {
-      setError(err?.message || 'Terjadi kesalahan saat memuat data');
-      setTimeout(() => setError(''), 3000);
-    }
+    queryFn: () => fetchPegawaiStafById(id)
   });
 
   useEffect(() => {
@@ -90,7 +86,7 @@ const PegawaiStafEdit = () => {
       });
 
       setSuccess(response.data.msg || 'Pegawai staf berhasil diperbarui.');
-      queryClient.invalidateQueries(['PegawaiStaf']);
+      queryClient.invalidateQueries({ queryKey: ['PegawaiStaf'] });
       setTimeout(() => {
         navigate('/dashboard/admin-sekolah/pegawai/staf');
       }, 3000);
@@ -164,7 +160,7 @@ const PegawaiStafEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
         />
       </ParentCard>
     </PageContainer>

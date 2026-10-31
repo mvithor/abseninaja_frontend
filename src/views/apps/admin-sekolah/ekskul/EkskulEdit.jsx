@@ -30,11 +30,6 @@ const EkskulEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["ekskul", id],
     queryFn: () => fetchEkskulById(id),
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Gagal memuat data ekskul";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const {
@@ -81,7 +76,7 @@ const EkskulEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(["ekskul"]);
+      queryClient.invalidateQueries({ queryKey: ["ekskul"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/ekskul");
       }, 3000);
@@ -144,7 +139,7 @@ const EkskulEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           isPegawaiLoading={isPegawaiLoading}
           onPembinaChange={handlePembinaChange}
           onLogoChange={handleLogoChange}

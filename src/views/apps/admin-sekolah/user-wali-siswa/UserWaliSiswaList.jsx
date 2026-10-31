@@ -16,7 +16,7 @@ import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import UserWaliSiswaTable from "src/apps/admin-sekolah/user-wali-siswa/list/UserWaliSiswaTable";
 import NotificationPrefsDrawer from "src/apps/admin-sekolah/user-wali-siswa/prefs/NotificationPrefsDrawer";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -71,7 +71,6 @@ const fetchUserWaliSiswa = async ({ queryKey }) => {
 const UserWaliSiswaList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [prefsUser, setPrefsUser] = useState({ id: null, name: "" });
@@ -116,11 +115,7 @@ const UserWaliSiswaList = () => {
       },
     ],
     queryFn: fetchUserWaliSiswa,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -175,7 +170,7 @@ const UserWaliSiswaList = () => {
   return (
     <PageContainer title="Pengguna Wali Siswa" description="Pengguna Wali Siswa">
       <ParentCard title="Pengguna Wali Siswa">
-        <Alerts error={error} success={success} />
+        <Alerts success={success} />
         <Box
           sx={{
             display: "flex",

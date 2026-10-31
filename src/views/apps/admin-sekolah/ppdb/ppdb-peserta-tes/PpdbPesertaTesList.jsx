@@ -30,7 +30,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
 import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import PpdbPesertaTesTable from 'src/apps/admin-sekolah/ppdb/ppdb-peserta-tes/PpdbPesertaTesTable';
 
@@ -280,7 +280,7 @@ const PpdbPesertaTesList = () => {
         sessionId: sessionId || null,
         sessionRoomId: sessionRoomId || null,
       }),
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
   });
 
   const participantList = data?.data || [];

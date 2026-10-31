@@ -44,11 +44,7 @@ const DownloadDataWaliSiswaList = () => {
 
   const { data: kelas = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['kelas-wali-siswa'],
-    queryFn: fetchKelas,
-    onError: (error) => {
-      const errorMessage = error?.message || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchKelas
   });
 
   const handleSearchChange = (event) => {

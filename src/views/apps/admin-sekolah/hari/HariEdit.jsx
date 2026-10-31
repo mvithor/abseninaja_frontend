@@ -37,12 +37,7 @@ const HariEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['hari', id],
-        queryFn: () => fetchHariById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchHariById(id)
     });
 
     useEffect(() => {
@@ -64,7 +59,7 @@ const HariEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['hari']);
+            queryClient.invalidateQueries({ queryKey: ['hari'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/hari');
             }, 3000);
@@ -136,7 +131,7 @@ const HariEdit = () => {
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
                     handleDateChange={handleDateChange}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

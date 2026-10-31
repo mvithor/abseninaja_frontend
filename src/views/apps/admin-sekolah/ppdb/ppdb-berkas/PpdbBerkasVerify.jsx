@@ -82,7 +82,7 @@ const PpdbBerkasVerify = () => {
   };
 
   const mutationLoading =
-    Boolean(mutationBulk?.isLoading) ||
+    Boolean(mutationBulk?.isPending) ||
     Boolean(mutationBulk?.isPending) ||
     Boolean(mutationBulk?.status === "pending");
 

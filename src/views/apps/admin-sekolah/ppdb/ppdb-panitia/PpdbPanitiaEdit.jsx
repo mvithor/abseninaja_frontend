@@ -50,11 +50,6 @@ const PpdbPanitiaEdit = () => {
     queryKey: ["ppdbPanitia", id],
     queryFn: () => fetchPpdbPanitiaById(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(String(errorMessage));
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -89,7 +84,7 @@ const PpdbPanitiaEdit = () => {
       setError("");
 
       queryClient.invalidateQueries({ queryKey: ["ppdbPanitia", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdbPanitiaList"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-panitia"] });
 
       setTimeout(() => navigate("/dashboard/admin-sekolah/ppdb-panitia"), 1200);
     },
@@ -133,7 +128,7 @@ const PpdbPanitiaEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           error={error}
           setError={setError}
           success={success}

@@ -56,12 +56,7 @@ const WaliSiswaEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ['wali-siswa', id],
     queryFn: () => fetchWaliSiswaById(id),
-    enabled: !!id,
-    onError: (err) => {
-      const msg = err.response?.data?.msg || err.message || 'Terjadi kesalahan saat memuat data';
-      setError(msg);
-      setTimeout(() => setError(''), 3000);
-    }
+    enabled: !!id
   });
 
   useEffect(() => {
@@ -78,7 +73,7 @@ const WaliSiswaEdit = () => {
     },
     onSuccess: (response) => {
       setSuccess(response.data.msg);
-      queryClient.invalidateQueries(['wali-siswa']);
+      queryClient.invalidateQueries({ queryKey: ['wali-siswa'] });
       setTimeout(() => navigate('/dashboard/admin-sekolah/wali-siswa'), 1500);
     },
     onError: (error) => {
@@ -130,7 +125,7 @@ const WaliSiswaEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           setWaliSiswaData={setWaliData}   // ⬅️ penting untuk onChange khusus
         />
       </ParentCard>

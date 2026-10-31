@@ -33,14 +33,6 @@ const PpdbSesiJadwalDetail = () => {
     queryKey: ["ppdbSesiJadwalDetail", id],
     queryFn: () => fetchDetail(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Gagal memuat detail sesi jadwal";
-      setError(String(msg));
-      setTimeout(() => setError(""), 3500);
-    },
   });
 
   const status = useMemo(() => safeUpper(data?.status), [data?.status]);
@@ -50,7 +42,7 @@ const PpdbSesiJadwalDetail = () => {
     onSuccess: (res) => {
       setSuccess(res?.msg || "Aksi berhasil");
       queryClient.invalidateQueries({ queryKey: ["ppdbSesiJadwalDetail", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdbSesiJadwalList"] }); // sesuaikan key list kamu
+      queryClient.invalidateQueries({ queryKey: ["ppdb-sesi-jadwal"] }); // sesuaikan key list kamu
       setTimeout(() => setSuccess(""), 2500);
     },
     onError: (err) => {
@@ -118,7 +110,7 @@ const PpdbSesiJadwalDetail = () => {
             onPublish={() => handlePublish()}
             onUnpublish={() => handleUnpublish()}
             onCancel={(_, reason) => handleCancel(reason)}
-            isActionLoading={actionMutation.isLoading}
+            isActionLoading={actionMutation.isPending}
           />
         )}
       </ParentCard>

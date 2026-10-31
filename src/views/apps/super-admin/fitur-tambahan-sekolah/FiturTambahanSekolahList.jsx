@@ -18,7 +18,6 @@ const FiturTambahanSekolahList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [search, setSearch] = useState("");
-  const [error, setError] = useState("");
   
 
   const navigate = useNavigate();
@@ -26,10 +25,6 @@ const FiturTambahanSekolahList = () => {
   const { data: sekolahList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["fitur-tambahan-sekolah-list"],
     queryFn: fetchSekolahListFitur,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data sekolah";
-      setError(msg);
-    },
     refetchOnWindowFocus: false,
   });
 
@@ -75,7 +70,6 @@ const FiturTambahanSekolahList = () => {
   return (
     <PageContainer title="Fitur Tambahan Sekolah" description="Kelola Fitur Tambahan Sekolah">
       <ParentCard title="Daftar Sekolah">
-        <Alerts error={error}/>
         <Box
           sx={{
             display: "flex",

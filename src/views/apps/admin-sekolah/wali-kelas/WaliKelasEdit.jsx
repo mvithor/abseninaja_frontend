@@ -33,12 +33,7 @@ const WaliKelasEdit = () => {
     
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['waliKelas', id],
-        queryFn: () => fetchWaliKelasById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchWaliKelasById(id)
     });
 
     useEffect(() => {
@@ -57,7 +52,7 @@ const WaliKelasEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['waliKelas']);
+            queryClient.invalidateQueries({ queryKey: ['waliKelas'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/wali-kelas');
             }, 3000);
@@ -104,7 +99,7 @@ const WaliKelasEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

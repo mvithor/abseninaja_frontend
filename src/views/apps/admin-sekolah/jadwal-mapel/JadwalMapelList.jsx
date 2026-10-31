@@ -20,7 +20,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import JadwalMapelTable from "src/apps/admin-sekolah/jadwal-mapel/List/JadwalMapelTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -153,11 +153,7 @@ const JadwalMapelList = () => {
       },
     ],
     queryFn: fetchJadwalMapelPaged,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -172,7 +168,7 @@ const JadwalMapelList = () => {
       return res.data;
     },
     onSuccess: (resp) => {
-      queryClient.invalidateQueries(["jadwal-mapel-paged"]);
+      queryClient.invalidateQueries({ queryKey: ["jadwal-mapel-paged"] });
       setSuccess(resp?.msg || "Jadwal Mapel berhasil dihapus");
       setTimeout(() => setSuccess(""), 2500);
     },

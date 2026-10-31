@@ -38,17 +38,14 @@ const PpdbPanitiaList = () => {
 
   const { data: panitiaList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-panitia"],
-    queryFn: fetchPpdbPanitia,
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Petugas PMB");
-    }
+    queryFn: fetchPpdbPanitia
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id) =>
       axiosInstance.delete(`/api/v1/admin-sekolah/ppdb-panitia/${id}`),
     onSuccess: (res) => {
-      queryClient.invalidateQueries(["ppdb-panitia"]);
+      queryClient.invalidateQueries({ queryKey: ["ppdb-panitia"] });
       setSuccess(res.data?.msg || "Petugas PMB berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -160,9 +157,9 @@ const PpdbPanitiaList = () => {
             variant="contained"
             color="warning"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? (
+            {deleteMutation.isPending ? (
               <CircularProgress size={22} />
             ) : (
               "Hapus"

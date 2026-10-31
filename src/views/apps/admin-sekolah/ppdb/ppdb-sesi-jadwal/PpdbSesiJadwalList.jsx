@@ -97,11 +97,7 @@ const PpdbSesiJadwalList = () => {
       }),
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    placeholderData: (prev) => prev ?? [],
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Sesi / Jadwal Tes");
-      setTimeout(() => setError(""), 3000);
-    }
+    placeholderData: (prev) => prev ?? []
   });
 
   useEffect(() => {
@@ -293,9 +289,9 @@ const PpdbSesiJadwalList = () => {
             variant="contained"
             color="warning"
             onClick={handleDeleteConfirm}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={22} /> : "Hapus"}
+            {deleteMutation.isPending ? <CircularProgress size={22} /> : "Hapus"}
           </Button>
         </DialogActions>
       </Dialog>

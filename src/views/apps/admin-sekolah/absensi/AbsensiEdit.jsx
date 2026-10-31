@@ -40,12 +40,7 @@ const AbsensiEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['absensi', id],
-        queryFn: () => fetchAbsensiById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchAbsensiById(id)
     });
 
     useEffect(() => {
@@ -72,7 +67,7 @@ const AbsensiEdit = () => {
         onSuccess: (response) => {
             setAbsensiData(response.data.data);
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['absensi']);
+            queryClient.invalidateQueries({ queryKey: ['absensi'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/absensi-siswa');
             }, 3000);
@@ -151,7 +146,7 @@ const AbsensiEdit = () => {
                     handleChange={handleChange}
                     handleSubmit={handleSubmit}
                     handleCancel={handleCancel}
-                    isLoading={isFetching || mutation.isLoading}
+                    isLoading={isFetching || mutation.isPending}
                 />
             </ParentCard>
         </PageContainer>

@@ -29,7 +29,6 @@ const STATUS_OPTIONS = [
 const MitraIndustriList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -45,10 +44,6 @@ const MitraIndustriList = () => {
   const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ["mitra-industri-list"],
     queryFn: fetchMitraIndustriList,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data mitra industri";
-      setError(msg);
-    },
     refetchOnWindowFocus: false,
   });
 
@@ -126,7 +121,7 @@ const MitraIndustriList = () => {
   return (
     <PageContainer title="Mitra Industri" description="Kelola Mitra Industri PKL">
       <ParentCard title="Mitra Industri">
-        <Alerts error={error || (isError && queryError?.message)} />
+        <Alerts error={isError && queryError?.message} />
         <Box
           sx={{
             display: "flex",

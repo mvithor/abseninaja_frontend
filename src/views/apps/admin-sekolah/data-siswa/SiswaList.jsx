@@ -10,7 +10,7 @@ import FilterButton from "src/components/button-group/FilterButton";
 import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import SiswaTable from "src/apps/admin-sekolah/data-siswa/List/SiswaTable";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query";
 import axiosInstance from "src/utils/axiosInstance";
 import CustomFormLabel from "src/components/forms/theme-elements/CustomFormLabel";
 import CustomSelect from "src/components/forms/theme-elements/CustomSelect";
@@ -87,11 +87,7 @@ const SiswaList = () => {
       },
     ],
     queryFn: fetchSiswaPaged,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
 
@@ -235,13 +231,13 @@ const SiswaList = () => {
           <Button
             variant="contained"
             onClick={handleConfirmDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
             sx={{
               backgroundColor: '#F48C06',
               '&:hover': { backgroundColor: '#f7a944' },
             }}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

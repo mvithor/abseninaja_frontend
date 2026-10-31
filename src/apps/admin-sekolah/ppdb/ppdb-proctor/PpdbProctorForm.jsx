@@ -599,10 +599,10 @@ const TambahPpdbProctorForm = ({ setSuccess, setError }) => {
       </Grid>
 
       <Box sx={{ display: "flex", justifyContent: "flex-start", gap: 2, mt: 4 }}>
-        <SubmitButton isLoading={loading || mutation.isLoading} disabled={!canSubmit}>
+        <SubmitButton isLoading={loading || mutation.isPending} disabled={!canSubmit}>
           Simpan
         </SubmitButton>
-        <CancelButton onClick={handleCancel} disabled={loading || mutation.isLoading}>
+        <CancelButton onClick={handleCancel} disabled={loading || mutation.isPending}>
           Batal
         </CancelButton>
       </Box>

@@ -32,7 +32,6 @@ const STATUS_OPTIONS = [
 const ProfilSiswaList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -56,10 +55,6 @@ const ProfilSiswaList = () => {
   const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ["profil-siswa-list"],
     queryFn: fetchProfilSiswaList,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data profil siswa";
-      setError(msg);
-    },
     refetchOnWindowFocus: false,
   });
 
@@ -179,7 +174,7 @@ const ProfilSiswaList = () => {
   return (
     <PageContainer title="Profil Siswa" description="Profil Kesiapan PKL Siswa">
       <ParentCard title="Profil Siswa">
-        <Alerts error={error || (isError && queryError?.message)} />
+        <Alerts error={isError && queryError?.message} />
         <Box
           sx={{
             display: "flex",

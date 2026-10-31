@@ -43,11 +43,7 @@ const PpdbTrackList = () => {
 
   const { data: tracks = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-track", ppdbPeriodId],
-    queryFn: () => fetchPpdbTrack(ppdbPeriodId),
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat jalur PMB");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPpdbTrack(ppdbPeriodId)
   });
 
   const deleteMutation = useMutation({
@@ -180,9 +176,9 @@ const PpdbTrackList = () => {
             variant="contained"
             color="warning"
             onClick={handleDeleteConfirm}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={22} /> : "Hapus"}
+            {deleteMutation.isPending ? <CircularProgress size={22} /> : "Hapus"}
           </Button>
         </DialogActions>
       </Dialog>

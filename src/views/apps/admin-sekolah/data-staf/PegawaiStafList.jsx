@@ -47,12 +47,6 @@ const PegawaiStafList = () => {
   const { data: staf = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['pegawaiStaf'],
     queryFn: fetchPegawaiStaf,
-    onError: (err) => {
-      // react-query error di sini biasanya sudah Error(message),
-      // jadi jangan berharap err.response selalu ada.
-      setError(err?.message || "Terjadi kesalahan saat memuat data");
-      setTimeout(() => setError(""), 3000);
-    }
   });
 
   const deleteMutation = useMutation({
@@ -61,7 +55,7 @@ const PegawaiStafList = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['pegawaiStaf']);
+      queryClient.invalidateQueries({ queryKey: ['pegawaiStaf'] });
       setSuccess(data?.msg || "Pegawai staf berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -204,9 +198,9 @@ const PegawaiStafList = () => {
             }}
             variant="contained"
             onClick={handleDelete}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

@@ -47,11 +47,6 @@ const PpdbTahapanEdit = () => {
     queryKey: ["ppdbEventType", id],
     queryFn: () => fetchPpdbTahapanById(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(String(errorMessage));
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -142,7 +137,7 @@ const PpdbTahapanEdit = () => {
           handleChange={handleChange}
           handleSubmit={handleSubmit}
           handleCancel={handleCancel}
-          isLoading={isFetching || mutation.isLoading}
+          isLoading={isFetching || mutation.isPending}
           error={error}
           setError={setError}
           success={success}

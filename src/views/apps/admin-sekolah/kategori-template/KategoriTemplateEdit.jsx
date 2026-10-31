@@ -32,12 +32,7 @@ const KategoriTemplateEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["kategoriTemplate", id],
-        queryFn: () => fetchKategoriTemplateById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-            setTimeout(() => setError(""), 3000);
-        }
+        queryFn: () => fetchKategoriTemplateById(id)
     });
 
     useEffect(() => {
@@ -56,7 +51,7 @@ const KategoriTemplateEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.msg);
-            queryClient.invalidateQueries(["kategoriTemplate", id]);
+            queryClient.invalidateQueries({ queryKey: ["kategoriTemplate", id] });
             setTimeout(() => navigate("/dashboard/admin-sekolah/kategori-template"), 3000);
         },
         onError: (error) => {
@@ -99,7 +94,7 @@ const KategoriTemplateEdit = () => {
                         handleChange={handleChange}
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

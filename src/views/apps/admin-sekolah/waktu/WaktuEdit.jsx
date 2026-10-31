@@ -35,11 +35,7 @@ const WaktuEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['waktu', id],
-        queryFn: () => fetchWaktuById(id),
-        onError: () => {
-            setError('Terjadi kesalahan saat memuat data');
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchWaktuById(id)
     });
 
     useEffect(() => {
@@ -60,7 +56,7 @@ const WaktuEdit = () => {
         },
         onSuccess: (response) => {
             setSuccess(response.data.msg);
-            queryClient.invalidateQueries(['waktu']);
+            queryClient.invalidateQueries({ queryKey: ['waktu'] });
             setTimeout(() => {
                 navigate('/dashboard/admin-sekolah/waktu');
             }, 3000);
@@ -86,8 +82,6 @@ const WaktuEdit = () => {
                 ...prevState,
                 [field]: formattedTime,
             }));
-        } else {
-            console.log("Invalid time input.");
         }
     };
 
@@ -110,7 +104,7 @@ const WaktuEdit = () => {
                         handleSubmit={handleSubmit}
                         handleCancel={handleCancel}
                         handleTimeChange={handleTimeChange}
-                        isLoading={isFetching || mutation.isLoading}
+                        isLoading={isFetching || mutation.isPending}
                     />
             </ParentCard>
         </PageContainer>

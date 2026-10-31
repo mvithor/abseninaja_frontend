@@ -26,16 +26,11 @@ const EkskulSiswaList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const { data: ekskulSiswa = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['ekskulSiswa'],
-        queryFn: fetchEkskulSiswa,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchEkskulSiswa
     });
 
     const handleSearchChange = (event) => {
@@ -62,7 +57,6 @@ const EkskulSiswaList = () => {
     return (
         <PageContainer title="Anggota Ekstrakurikuler" description="Anggota Ekstrakurikuler">
             <ParentCard title="Anggota Ekstrakurikuler">
-                <Alerts error={error}/>
                 <Box
                     sx={{
                         display: 'flex',

@@ -42,11 +42,7 @@ const UserStafList = () => {
 
   const { data: userStaf = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['userStaf'],
-    queryFn: fetchUserStaf,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchUserStaf
   });
 
   const deleteMutation = useMutation({
@@ -57,7 +53,7 @@ const UserStafList = () => {
       return response.data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries(['userStaf']);
+      queryClient.invalidateQueries({ queryKey: ['userStaf'] });
       setSuccess(data.msg || "Pengguna staf berhasil dihapus");
       setTimeout(() => setSuccess(""), 3000);
     },
@@ -172,9 +168,9 @@ const UserStafList = () => {
             sx={{ mr:3, backgroundColor:"#F48C06", '&:hover': { backgroundColor:"#f7a944" } }}
             variant="contained"
             onClick={() => handleDelete(deleteUserStaf, 'pegawai')}
-            disabled={deleteMutation.isLoading}
+            disabled={deleteMutation.isPending}
           >
-            {deleteMutation.isLoading ? <CircularProgress size={24} /> : 'Hapus'}
+            {deleteMutation.isPending ? <CircularProgress size={24} /> : 'Hapus'}
           </Button>
         </DialogActions>
       </Dialog>

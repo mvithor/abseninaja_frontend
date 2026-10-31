@@ -50,12 +50,7 @@ const PpdbWaveDetail = () => {
   const { data: waveData, isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-wave-detail", id],
     queryFn: () => fetchWaveById(id),
-    refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || err?.message || "Gagal memuat detail gelombang";
-      setError(String(msg));
-      setTimeout(() => setError(""), 3000);
-    }
+    refetchOnWindowFocus: false
   });
 
   const status = useMemo(() => String(waveData?.status || "").toUpperCase(), [waveData?.status]);
@@ -104,7 +99,7 @@ const PpdbWaveDetail = () => {
     }
   });
 
-  const isActionLoading = openMutation.isLoading || closeMutation.isLoading;
+  const isActionLoading = openMutation.isPending || closeMutation.isPending;
 
   const handleAskOpen = () => {
     if (!canOpen) {

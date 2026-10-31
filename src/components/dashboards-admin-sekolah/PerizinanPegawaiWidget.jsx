@@ -24,7 +24,7 @@ const JENIS_COLOR = {
   Izin: { bg: '#DBEAFE', color: '#1E40AF' },
 };
 
-const PerizinanPegawaiWidget = ({ onCountChange }) => {
+const PerizinanPegawaiWidget = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const qc = useQueryClient();
@@ -33,10 +33,6 @@ const PerizinanPegawaiWidget = ({ onCountChange }) => {
     queryKey: ['perizinanPegawai'],
     queryFn: fetchPerizinanPegawai,
     staleTime: 30000,
-    onSuccess: (data) => {
-      const pending = data.filter((d) => d.status === 'Menunggu');
-      if (onCountChange) onCountChange(pending.length);
-    },
   });
 
   const pending = all.filter((d) => d.status === 'Menunggu').slice(0, 3);
@@ -45,7 +41,7 @@ const PerizinanPegawaiWidget = ({ onCountChange }) => {
   const mutation = useMutation({
     mutationFn: updateStatus,
     onSuccess: () => {
-      qc.invalidateQueries(['perizinanPegawai']);
+      qc.invalidateQueries({ queryKey: ['perizinanPegawai'] });
     },
   });
 
@@ -119,7 +115,7 @@ const PerizinanPegawaiWidget = ({ onCountChange }) => {
                   <Box sx={{ display: 'flex', gap: 0.5, flexShrink: 0 }}>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Disetujui' })}
                       sx={{
                         backgroundColor: '#D1FAE5', color: '#065F46', borderRadius: '6px',
@@ -132,7 +128,7 @@ const PerizinanPegawaiWidget = ({ onCountChange }) => {
                     </IconButton>
                     <IconButton
                       size="small"
-                      disabled={mutation.isLoading}
+                      disabled={mutation.isPending}
                       onClick={() => mutation.mutate({ id: item.id, status: 'Ditolak' })}
                       sx={{
                         backgroundColor: '#FEE2E2', color: '#991B1B', borderRadius: '6px',
