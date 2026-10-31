@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { REHYDRATE } from 'redux-persist';
 import {jwtDecode} from 'jwt-decode';
+import { normalisasiDaftarPersona } from 'src/portals/registry';
 
 const safeDecodeTimezone = (accessToken) => {
   if (!accessToken) return 'Asia/Jakarta';
@@ -23,6 +24,8 @@ const initialState = {
   isKepalaJurusan: false,
   isGuruMapel: false,
   personas: [],
+  // Persona lengkap dari server (login dan /konteks). null = belum diketahui, [] = tidak punya.
+  daftarPersona: null,
   timezone_sekolah: 'Asia/Jakarta',
 };
 
@@ -31,7 +34,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     setUser(state, action) {
-      const { name, role, email, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas } = action.payload;
+      const { name, role, email, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas, daftarPersona } = action.payload;
       try {
         const decodedToken = jwtDecode(accessToken);
         const currentTime = Math.floor(Date.now() / 1000);
@@ -54,10 +57,18 @@ const userSlice = createSlice({
           : Array.isArray(decodedToken.personas)
             ? decodedToken.personas
             : [];
+        state.daftarPersona = normalisasiDaftarPersona(daftarPersona);
         state.timezone_sekolah = decodedToken.timezone_sekolah || 'Asia/Jakarta';
       } catch (error) {
         console.error('Error saat decode atau validasi token:', error.message);
       }
+    },
+    // Pembaruan persona dari GET /konteks tanpa login ulang. Diabaikan bila belum login atau
+    // bentuknya bukan array, supaya respons aneh tidak menghapus persona yang sudah diketahui.
+    setDaftarPersona(state, action) {
+      if (!state.isLoggedIn) return;
+      const daftar = normalisasiDaftarPersona(action.payload);
+      if (daftar) state.daftarPersona = daftar;
     },
     clearUser(state) {
       state.name = '';
@@ -70,6 +81,7 @@ const userSlice = createSlice({
       state.isKepalaJurusan = false;
       state.isGuruMapel = false;
       state.personas = [];
+      state.daftarPersona = null;
       state.timezone_sekolah = 'Asia/Jakarta';
     },
   },
@@ -86,5 +98,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, clearUser } = userSlice.actions;
+export const { setUser, setDaftarPersona, clearUser } = userSlice.actions;
 export default userSlice.reducer;

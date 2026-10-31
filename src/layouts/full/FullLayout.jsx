@@ -6,6 +6,7 @@ import HorizontalHeader from '../full/horizontal/header/Header';
 import Sidebar from './vertical/sidebar/Sidebar';
 import Customizer from './shared/customizer/Customizer';
 import Navigation from './horizontal/navbar/Navbar';
+import useKonteks from 'src/hooks/useKonteks';
 
 const MainWrapper = styled('div')(() => ({
   display: 'flex',
@@ -27,6 +28,8 @@ const PageWrapper = styled('div')(({ theme }) => ({
 const FullLayout = () => {
   const customizer = useSelector((state) => state.customizer);
   const theme = useTheme();
+  // Menyegarkan persona dari server agar pemberian/pencabutan berlaku tanpa login ulang.
+  useKonteks();
 
   return (
     <MainWrapper

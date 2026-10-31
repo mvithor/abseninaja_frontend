@@ -19,7 +19,7 @@ import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel
 import { Visibility, VisibilityOff, MailOutline, LockOutlined } from '@mui/icons-material';
 import { setUser, clearUser } from 'src/store/apps/user/userSlice';
 import { jwtDecode } from 'jwt-decode';
-import { getDefaultPortal } from 'src/portals/registry';
+import { getDefaultPortal, normalisasiDaftarPersona } from 'src/portals/registry';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [email, setEmail] = useState('');
@@ -63,11 +63,14 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
         password,
         deviceId,
       });
-      const { accessToken } = response.data;
+      const { accessToken, daftarPersona } = response.data;
       const decodedToken = jwtDecode(accessToken);
       const { userId, name, role, isKepalaJurusan, isGuruMapel, personas } = decodedToken;
       
-      const portal = getDefaultPortal({ role, personas, isKepalaJurusan, isGuruMapel });
+      // daftarPersona (dari server) memuat persona yang tidak ada di klaim token, mis. kepala
+      // sekolah, waka kurikulum, guru BK. Bila server lama tidak mengirimnya, jatuh ke klaim token.
+      const daftar = normalisasiDaftarPersona(daftarPersona);
+      const portal = getDefaultPortal({ role, personas, isKepalaJurusan, isGuruMapel, daftarPersona: daftar });
       if (!portal) {
         setError(
           role === 'pegawai'
@@ -80,7 +83,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       }
 
       dispatch(
-        setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas }),
+        setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas, daftarPersona: daftar }),
       );
 
       setSuccess('Login berhasil! Mengarahkan...');
