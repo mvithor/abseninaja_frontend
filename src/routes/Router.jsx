@@ -306,6 +306,10 @@ const DashboardAdminMitraIndustri = Loadable(lazy(() => import('../views/dashboa
 // DASHBOARD GURU SEKOLAH
 /* ****Dashboard Guru Sekolah***** */
 const DashboardGuruSekolah = Loadable(lazy(() => import('../views/dashboard/GuruSekolah')));
+const DashboardKepalaSekolah = Loadable(lazy(() => import('../views/dashboard/KepalaSekolah')));
+const DashboardWakaKurikulum = Loadable(lazy(() => import('../views/dashboard/WakaKurikulum')));
+const DashboardGuruBk = Loadable(lazy(() => import('../views/dashboard/GuruBk')));
+const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/AdminKantin')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
@@ -641,6 +645,34 @@ const Router = [
                     { path: '', element: <LadBeranda /> },
                     { path: 'kelas/:kelasId', element: <LadKelas /> },
                     { path: 'kelas/:kelasId/siswa/:siswaId', element: <LadSiswa /> },
+                ]
+            },
+            {
+                path: 'dashboard/kepala-sekolah',
+                element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="kepala-sekolah" />,
+                children: [
+                    { path: '', element: <DashboardKepalaSekolah /> },
+                ]
+            },
+            {
+                path: 'dashboard/waka-kurikulum',
+                element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="waka-kurikulum" />,
+                children: [
+                    { path: '', element: <DashboardWakaKurikulum /> },
+                ]
+            },
+            {
+                path: 'dashboard/guru-bk',
+                element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="guru-bk" />,
+                children: [
+                    { path: '', element: <DashboardGuruBk /> },
+                ]
+            },
+            {
+                path: 'dashboard/admin-kantin',
+                element: <ProtectedRoute allowedRoles={['admin kantin']} requirePortal="admin-kantin" />,
+                children: [
+                    { path: '', element: <DashboardAdminKantin /> },
                 ]
             },
         ]

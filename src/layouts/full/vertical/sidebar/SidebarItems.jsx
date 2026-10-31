@@ -11,6 +11,10 @@ import MenuitemsKepalaJurusan from './MenuItemsKepalaJurusan';
 import MenuitemsAdminMitraIndustri from './MenuItemsAdminMitraIndustri';
 import MenuitemsGuruSekolah from './MenuItemsGuruSekolah';
 import MenuitemsGuruLad from './MenuItemsGuruLad';
+import MenuitemsKepalaSekolah from './MenuItemsKepalaSekolah';
+import MenuitemsWakaKurikulum from './MenuItemsWakaKurikulum';
+import MenuitemsGuruBk from './MenuItemsGuruBk';
+import MenuitemsAdminKantin from './MenuItemsAdminKantin';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import NavItem from './NavItem';
 import NavCollapse from './NavCollapse';
@@ -24,6 +28,10 @@ const MENU_BY_PORTAL = {
   'kepala-jurusan': MenuitemsKepalaJurusan,
   'guru': MenuitemsGuruSekolah,
   'admin-mitra-industri': MenuitemsAdminMitraIndustri,
+  'kepala-sekolah': MenuitemsKepalaSekolah,
+  'waka-kurikulum': MenuitemsWakaKurikulum,
+  'guru-bk': MenuitemsGuruBk,
+  'admin-kantin': MenuitemsAdminKantin,
 };
 
 const SidebarItems = () => {
