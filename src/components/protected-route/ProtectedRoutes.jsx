@@ -1,13 +1,14 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
 import { Box, CircularProgress } from '@mui/material';
 import axiosInstance from 'src/utils/axiosInstance';
 import isTokenExpired from 'src/utils/isTokenExpired';
-import { canAccessPortal, hasPersona, PERSONA } from 'src/portals/registry';
+import { canAccessPortal, hasPersona, PERSONA, tujuanSaatDitolak } from 'src/portals/registry';
 
 const ProtectedRoute = ({ allowedRoles, requireKepalaJurusan = false, requireGuruMapel = false, requirePortal = null, requireJurusanFiturAktif = false }) => {
   const user = useSelector((state) => state.user);
+  const { pathname } = useLocation();
   const { role, accessToken } = user;
   const tokenExpired = isTokenExpired(accessToken);
 
@@ -39,16 +40,18 @@ const ProtectedRoute = ({ allowedRoles, requireKepalaJurusan = false, requireGur
 
   // Prop lama dipertahankan agar rute yang belum dimigrasi tetap berfungsi,
   // tapi kini membaca sumber yang sama dengan requirePortal (registri persona).
+  // Kehilangan persona tertentu (mis. dicabut admin sekolah) tidak berarti akun rusak: bila masih
+  // punya portal lain, arahkan ke sana. Hanya tanpa portal sama sekali yang berakhir di /forbidden.
   if (requireKepalaJurusan && !hasPersona(user, PERSONA.KEPALA_JURUSAN)) {
-    return <Navigate to="/forbidden" replace />;
+    return <Navigate to={tujuanSaatDitolak(user, pathname)} replace />;
   }
 
   if (requireGuruMapel && !hasPersona(user, PERSONA.GURU_MAPEL)) {
-    return <Navigate to="/forbidden" replace />;
+    return <Navigate to={tujuanSaatDitolak(user, pathname)} replace />;
   }
 
   if (requirePortal && !canAccessPortal(user, requirePortal)) {
-    return <Navigate to="/forbidden" replace />;
+    return <Navigate to={tujuanSaatDitolak(user, pathname)} replace />;
   }
 
   if (requireJurusanFiturAktif) {

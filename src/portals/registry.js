@@ -137,3 +137,15 @@ export const getDefaultPortal = (user) => getUserPortals(user)[0] || null;
 
 export const canAccessPortal = (user, key) =>
   getUserPortals(user).some((portal) => portal.key === key);
+
+/**
+ * Tujuan saat akses ke sebuah portal ditolak. Pegawai yang kehilangan satu persona tetapi masih punya
+ * portal lain diarahkan ke portal utamanya, bukan ke halaman 403. Tanpa portal sama sekali, atau bila
+ * sudah berada di bawah portal utama itu (mencegah putaran redirect), hasilnya /forbidden.
+ */
+export const tujuanSaatDitolak = (user, pathname = '') => {
+  const portal = getDefaultPortal(user);
+  if (!portal) return '/forbidden';
+  if (pathname === portal.path || pathname.startsWith(`${portal.path}/`)) return '/forbidden';
+  return portal.path;
+};
