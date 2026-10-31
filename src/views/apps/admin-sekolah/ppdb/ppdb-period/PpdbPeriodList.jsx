@@ -38,10 +38,7 @@ const PpdbPeriodList = () => {
 
   const { data: periods = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-period"],
-    queryFn: fetchPpdbPeriod,
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat PPDB Period");
-    }
+    queryFn: fetchPpdbPeriod
   });
 
   const deleteMutation = useMutation({

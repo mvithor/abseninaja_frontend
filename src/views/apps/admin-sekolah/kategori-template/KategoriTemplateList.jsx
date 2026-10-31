@@ -45,11 +45,7 @@ const KategoriTemplateList = () => {
 
     const { data: kategoriTemplate = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['kategoriTemplate'],
-        queryFn: fetchKategoriTemplate,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchKategoriTemplate
     });
 
     const deleteMutation = useMutation({

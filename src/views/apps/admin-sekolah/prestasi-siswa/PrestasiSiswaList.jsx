@@ -45,11 +45,7 @@ const PrestasiSiswaList = () => {
 
     const { data: prestasi = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['prestasiSiswa'],
-        queryFn: fetchPrestasiSiswa,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-            }
+        queryFn: fetchPrestasiSiswa
     });
 
     const deleteMutation = useMutation({

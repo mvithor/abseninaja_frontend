@@ -71,7 +71,6 @@ const fetchUserWaliSiswa = async ({ queryKey }) => {
 const UserWaliSiswaList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [prefsOpen, setPrefsOpen] = useState(false);
   const [prefsUser, setPrefsUser] = useState({ id: null, name: "" });
@@ -116,10 +115,6 @@ const UserWaliSiswaList = () => {
       },
     ],
     queryFn: fetchUserWaliSiswa,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
@@ -175,7 +170,7 @@ const UserWaliSiswaList = () => {
   return (
     <PageContainer title="Pengguna Wali Siswa" description="Pengguna Wali Siswa">
       <ParentCard title="Pengguna Wali Siswa">
-        <Alerts error={error} success={success} />
+        <Alerts success={success} />
         <Box
           sx={{
             display: "flex",

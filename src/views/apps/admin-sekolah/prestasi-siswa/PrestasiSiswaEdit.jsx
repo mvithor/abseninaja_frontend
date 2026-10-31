@@ -91,11 +91,7 @@ const PrestasiSiswaEdit = () => {
     error: queryError
   } = useQuery({
     queryKey: ["PrestasiSiswa", id],
-    queryFn: () => fetchPrestasiSiswaById(id),
-    onError: (err) => {
-      setError(err.message || "Terjadi kesalahan saat memuat data");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPrestasiSiswaById(id)
   });
 
   useEffect(() => {
@@ -129,7 +125,7 @@ const PrestasiSiswaEdit = () => {
       }));
       setSuccess(response.data.msg || "Prestasi siswa berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["PrestasiSiswa"] });
-      queryClient.invalidateQueries({ queryKey: ["PrestasiSiswaList"] });
+      queryClient.invalidateQueries({ queryKey: ["prestasiSiswa"] });
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/prestasi-siswa");
       }, 3000);

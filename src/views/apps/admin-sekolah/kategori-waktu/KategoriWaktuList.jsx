@@ -43,11 +43,7 @@ const KategoriWaktuList = () => {
 
     const { data: kategoriWaktu = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['kategoriWaktu'],
-        queryFn: fetchKategoriWaktu,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchKategoriWaktu
       });
     const queryClient = useQueryClient();
 

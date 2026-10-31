@@ -50,11 +50,6 @@ const PpdbRoomEdit = () => {
     queryKey: ["ppdbRoom", id],
     queryFn: () => fetchPpdbRoomById(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(String(errorMessage));
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -98,7 +93,7 @@ const PpdbRoomEdit = () => {
       setUsageMeta(null);
 
       queryClient.invalidateQueries({ queryKey: ["ppdbRoom", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdb-room-list"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-test-rooms"] });
 
       setTimeout(() => navigate("/dashboard/admin-sekolah/ppdb-room"), 1200);
     },

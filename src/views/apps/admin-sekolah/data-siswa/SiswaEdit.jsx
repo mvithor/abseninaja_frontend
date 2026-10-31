@@ -71,14 +71,6 @@ const SiswaEdit = () => {
     queryKey: ["siswa", safeId],
     queryFn: () => fetchSiswaById(safeId),
     enabled: !!safeId,
-    onError: (err) => {
-      const errorMessage =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {

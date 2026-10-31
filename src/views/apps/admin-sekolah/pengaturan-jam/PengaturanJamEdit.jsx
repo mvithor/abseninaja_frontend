@@ -34,14 +34,6 @@ const PengaturanJamEdit = () => {
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["jam", id],
         queryFn: () => fetchJamById(id),
-        onSuccess: (fetchedData) => {
-            setJamData({
-                jam_masuk: fetchedData.jam_masuk || "",
-                jam_terlambat: fetchedData.jam_terlambat || "",
-                jam_alpa: fetchedData.jam_alpa || "",
-                jam_pulang: fetchedData.jam_pulang || "",
-            });
-        },
     });
 
     useEffect(() => {

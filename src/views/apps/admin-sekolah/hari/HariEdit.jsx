@@ -37,12 +37,7 @@ const HariEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['hari', id],
-        queryFn: () => fetchHariById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchHariById(id)
     });
 
     useEffect(() => {

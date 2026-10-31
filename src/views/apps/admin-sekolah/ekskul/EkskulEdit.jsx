@@ -30,11 +30,6 @@ const EkskulEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["ekskul", id],
     queryFn: () => fetchEkskulById(id),
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Gagal memuat data ekskul";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const {

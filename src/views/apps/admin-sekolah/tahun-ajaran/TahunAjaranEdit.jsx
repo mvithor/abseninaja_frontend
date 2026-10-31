@@ -30,11 +30,6 @@ const TahunAjaranEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["tahun-ajaran", id],
     queryFn: () => fetchTahunAjaranById(id),
-    onError: (error) => {
-      const errorMessage = error?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {

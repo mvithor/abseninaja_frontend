@@ -82,11 +82,6 @@ const PegawaiGuruEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["PegawaiGuru", id],
     queryFn: () => fetchPegawaiGuruById(id),
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {

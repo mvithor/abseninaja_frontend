@@ -140,7 +140,7 @@ const PpdbWaveTrackTestRequirementEdit = () => {
     onSuccess: (res) => {
       setSuccess(res.data?.msg || "Requirement berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["ppdbWaveTrackTestRequirement", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdbWaveTrackTestRequirements"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-wave-track-test-requirements"] });
       setTimeout(() => navigate(-1), 1200);
     },
     onError: (err) => {

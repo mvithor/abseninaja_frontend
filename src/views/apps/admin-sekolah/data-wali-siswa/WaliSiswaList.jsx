@@ -128,10 +128,6 @@ const WaliSiswaList = () => {
       },
     ],
     queryFn: fetchWaliSiswaFilter,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    },
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
   });

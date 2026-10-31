@@ -42,11 +42,7 @@ const UserGuruList = () => {
 
   const { data: userGuru = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['userGuru'],
-    queryFn: fetchUserGuru,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchUserGuru
   });
 
   const deleteMutation = useMutation({

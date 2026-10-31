@@ -28,16 +28,11 @@ const SemesterAjaranList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const { data: semester = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['semester'],
-    queryFn: fetchSemester,
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchSemester
   });
 
   const handleSearchChange = (event) => {
@@ -76,7 +71,6 @@ const SemesterAjaranList = () => {
   return (
     <PageContainer title="Semester | Tahun Ajaran" description="Semester dan Tahun Ajaran">
       <ParentCard title="Semester dan Tahun Ajaran">
-        <Alerts error={error} />
         <Box
           sx={{
             display: 'flex',

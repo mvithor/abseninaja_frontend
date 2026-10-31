@@ -68,14 +68,6 @@ const MitraIndustriEdit = () => {
     queryKey: ["mitra-industri", safeId],
     queryFn: () => fetchMitraIndustriById(safeId),
     enabled: !!safeId,
-    onError: (err) => {
-      const errorMessage =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const { data: skkniOptions = [], isLoading: isSkkniLoading } = useQuery({

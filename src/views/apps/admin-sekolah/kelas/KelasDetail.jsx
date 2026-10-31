@@ -26,7 +26,6 @@ const KelasDetail = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchQuery, setSearchQuery] = useState("");
-  const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
   const [selectedIds, setSelectedIds] = useState([]);
@@ -35,11 +34,6 @@ const KelasDetail = () => {
   const { data, isError, error: queryError, isLoading } = useQuery({
     queryKey: ["dataKelasDetail", String(id)],
     queryFn: () => fetchKelasBySiswa(id),
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const namaKelas = data?.nama_kelas || "Tidak Diketahui";
@@ -95,7 +89,7 @@ const KelasDetail = () => {
   return (
     <PageContainer title="Detail Kelas" description="Detail Kelas">
       <ParentCard title={`Detail Kelas: ${namaKelas}`}>
-        <Alerts error={error || (isError && (queryError?.response?.data?.msg || queryError?.message))} success={success} />
+        <Alerts error={isError && (queryError?.response?.data?.msg || queryError?.message)} success={success} />
 
         <Box
           sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2, mt: 2 }}

@@ -71,11 +71,7 @@ const PpdbWaveTrackTestRequirementList = () => {
     queryFn: () => fetchPpdbWaveTrackTestRequirements({ ppdbPeriodId, ppdbWaveTrackId, ppdbTestComponentId }),
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    placeholderData: (prev) => prev ?? [],
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Test Requirement");
-      setTimeout(() => setError(""), 3000);
-    }
+    placeholderData: (prev) => prev ?? []
   });
 
   useEffect(() => {

@@ -42,11 +42,7 @@ const UserStafList = () => {
 
   const { data: userStaf = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['userStaf'],
-    queryFn: fetchUserStaf,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchUserStaf
   });
 
   const deleteMutation = useMutation({

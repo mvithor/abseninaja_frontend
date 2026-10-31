@@ -46,12 +46,7 @@ const KategoriPegawaiDetailList = () => {
 
   const { data: subKategoriPegawai = [], isError, error: queryError } = useQuery({
     queryKey: ['subKategoriPegawai', id],
-    queryFn: () => fetchSubKategoriByKategori(id),
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchSubKategoriByKategori(id)
   });
 
   // Mutation untuk menghapus data sub-kategori pegawai

@@ -45,11 +45,7 @@ const EkskulList = () => {
 
     const { data: ekskul = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['ekskul'],
-        queryFn: fetchEkskul,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchEkskul
     });
 
     const deleteMutation = useMutation({

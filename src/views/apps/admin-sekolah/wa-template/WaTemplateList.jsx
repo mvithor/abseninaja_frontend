@@ -60,11 +60,7 @@ const WaTemplateList = () => {
 
     const { data: template = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['template'],
-        queryFn: fetchWaTemplate,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        }
+        queryFn: fetchWaTemplate
     });
 
     const deleteMutation = useMutation({

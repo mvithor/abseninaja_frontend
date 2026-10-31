@@ -41,11 +41,7 @@ const DownloadDataSiswaList = () => {
 
   const { data: kelas = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['kelas'],
-    queryFn: fetchKelas,
-    onError: (error) => {
-      const errorMessage = error?.message || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchKelas
   });
 
   const handleSearchChange = (event) => {

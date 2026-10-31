@@ -56,12 +56,7 @@ const WaliSiswaEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ['wali-siswa', id],
     queryFn: () => fetchWaliSiswaById(id),
-    enabled: !!id,
-    onError: (err) => {
-      const msg = err.response?.data?.msg || err.message || 'Terjadi kesalahan saat memuat data';
-      setError(msg);
-      setTimeout(() => setError(''), 3000);
-    }
+    enabled: !!id
   });
 
   useEffect(() => {

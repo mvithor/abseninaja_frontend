@@ -32,12 +32,7 @@ const KategoriTemplateEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["kategoriTemplate", id],
-        queryFn: () => fetchKategoriTemplateById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-            setTimeout(() => setError(""), 3000);
-        }
+        queryFn: () => fetchKategoriTemplateById(id)
     });
 
     useEffect(() => {

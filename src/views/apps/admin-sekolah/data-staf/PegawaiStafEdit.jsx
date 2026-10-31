@@ -51,11 +51,7 @@ const PegawaiStafEdit = () => {
 
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ['PegawaiStaf', id],
-    queryFn: () => fetchPegawaiStafById(id),
-    onError: (err) => {
-      setError(err?.message || 'Terjadi kesalahan saat memuat data');
-      setTimeout(() => setError(''), 3000);
-    }
+    queryFn: () => fetchPegawaiStafById(id)
   });
 
   useEffect(() => {

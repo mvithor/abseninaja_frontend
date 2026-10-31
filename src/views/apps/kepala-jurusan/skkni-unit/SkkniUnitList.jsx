@@ -33,7 +33,6 @@ const KATEGORI_OPTIONS = [
 const SkkniUnitList = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -49,10 +48,6 @@ const SkkniUnitList = () => {
   const { data, isLoading, isError, error: queryError } = useQuery({
     queryKey: ["skkni-unit-list"],
     queryFn: fetchSkkniUnitList,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data unit SKKNI";
-      setError(msg);
-    },
     refetchOnWindowFocus: false,
   });
 
@@ -130,7 +125,7 @@ const SkkniUnitList = () => {
   return (
     <PageContainer title="Unit Kompetensi (SKKNI)" description="Kurasi Unit Kompetensi SKKNI Jurusan">
       <ParentCard title="Unit Kompetensi (SKKNI)">
-        <Alerts error={error || (isError && queryError?.message)} />
+        <Alerts error={isError && queryError?.message} />
         <Box
           sx={{
             display: "flex",

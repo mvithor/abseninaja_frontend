@@ -61,11 +61,7 @@ const PpdbTestComponentList = () => {
     queryFn: () => fetchPpdbTestComponents({ ppdbPeriodId, isActive }),
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    placeholderData: (prev) => prev ?? [],
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Komponen Tes");
-      setTimeout(() => setError(""), 3000);
-    }
+    placeholderData: (prev) => prev ?? []
   });
 
   useEffect(() => {

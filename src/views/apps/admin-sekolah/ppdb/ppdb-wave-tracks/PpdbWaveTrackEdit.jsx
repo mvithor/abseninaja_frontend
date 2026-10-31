@@ -38,7 +38,7 @@ const PpdbWaveTrackEdit = () => {
     onSuccess: (res) => {
       setSuccess(res.data.msg);
       queryClient.invalidateQueries({ queryKey: ["ppdbWaveTrack", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdbWaveTracks"] });
+      queryClient.invalidateQueries({ queryKey: ["ppdb-wave-track"] });
       setTimeout(() => navigate(-1), 1200);
     },
     onError: (err) => {

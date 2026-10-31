@@ -26,16 +26,11 @@ const AdminSekolahList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const { data: admin = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['adminSekolah'],
-        queryFn: fetchAdminSekolah,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchAdminSekolah
       });
 
     const handleSearchChange = (event) => {
@@ -64,7 +59,6 @@ const AdminSekolahList = () => {
     return (
         <PageContainer title="Admin Sekolah" description="Admin Sekolah">
             <ParentCard title="Admin Sekolah">
-            <Alerts error={error}/>
             <Box
                     sx={{
                         display: 'flex',

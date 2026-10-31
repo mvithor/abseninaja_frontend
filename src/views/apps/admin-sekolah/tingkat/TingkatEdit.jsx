@@ -31,12 +31,7 @@ const TingkatEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['kategoriPegawai', id],
-        queryFn: () => fetchTingkatById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchTingkatById(id)
     });
 
     useEffect(() => {

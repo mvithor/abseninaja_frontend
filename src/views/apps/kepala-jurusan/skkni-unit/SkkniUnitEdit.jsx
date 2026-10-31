@@ -44,14 +44,6 @@ const SkkniUnitEdit = () => {
     queryKey: ["skkni-unit", safeId],
     queryFn: () => fetchSkkniUnitById(safeId),
     enabled: !!safeId,
-    onError: (err) => {
-      const errorMessage =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {

@@ -43,12 +43,7 @@ const PerizinanSiswaEdit = () => {
 
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ['perizinanSiswa', id],
-    queryFn: () => fetchPerizinanSiswaById(id),
-    onError: (err) => {
-      const errorMessage = err.response?.data?.msg || err.message || 'Terjadi kesalahan saat memuat data';
-      setError(errorMessage);
-      setTimeout(() => setError(''), 3000);
-    }
+    queryFn: () => fetchPerizinanSiswaById(id)
   });
 
   useEffect(() => {

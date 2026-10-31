@@ -64,11 +64,6 @@ const PpdbPeriodEdit = () => {
     queryKey: ["period", id],
     queryFn: () => fetchPpdbPeriodById(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const errorMessage = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(String(errorMessage));
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {

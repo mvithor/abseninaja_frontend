@@ -89,10 +89,6 @@ const RekapAbsensiList = () => {
       });
       return sortedData;
     },
-    onError: (error) => {
-      setError(error.response?.data?.msg || 'Terjadi kesalahan saat memuat data kelas');
-      setTimeout(() => setError(''), 3000);
-    },
   });
 
   // Fetch laporan saat modal dibuka

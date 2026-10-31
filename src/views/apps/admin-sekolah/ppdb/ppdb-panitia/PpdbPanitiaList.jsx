@@ -38,10 +38,7 @@ const PpdbPanitiaList = () => {
 
   const { data: panitiaList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-panitia"],
-    queryFn: fetchPpdbPanitia,
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Petugas PMB");
-    }
+    queryFn: fetchPpdbPanitia
   });
 
   const deleteMutation = useMutation({

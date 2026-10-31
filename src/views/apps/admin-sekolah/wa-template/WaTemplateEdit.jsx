@@ -35,15 +35,6 @@ const WaTemplateEdit = () => {
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ["waTemplate", id],
         queryFn: () => fetchWaTemplateById(id),
-        onSuccess: (fetchedData) => {
-            setWaTemplateData({
-                title: fetchedData.title || "",
-                body: fetchedData.body || "",
-                wa_template_category_id: fetchedData.wa_template_category_id || "",
-                description: fetchedData.description || "",
-                is_system_template: fetchedData.is_system_template || ""
-            });
-        },
     });
 
     useEffect(() => {

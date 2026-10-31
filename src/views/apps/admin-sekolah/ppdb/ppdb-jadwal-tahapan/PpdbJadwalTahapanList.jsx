@@ -98,11 +98,6 @@ const PpdbJadwalTahapanList = () => {
       },
     ],
     queryFn: fetchJadwalPaged,
-    onError: (err) => {
-      const msg = toErrorMessage(err, "Terjadi kesalahan saat memuat data");
-      setError(msg);
-      setTimeout(() => setError(""), 3500);
-    },
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });

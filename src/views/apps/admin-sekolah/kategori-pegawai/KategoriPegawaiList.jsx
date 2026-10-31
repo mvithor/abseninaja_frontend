@@ -45,11 +45,7 @@ const KategoriPegawaiList = () => {
 
   const { data: pegawai = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['kategoriPegawai'],
-    queryFn: fetchKategoriPegawai,
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchKategoriPegawai
   });
   const queryClient = useQueryClient();
 

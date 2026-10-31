@@ -36,23 +36,27 @@ const SemesterAjaranEdit = () => {
   const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
     queryKey: ["semester", id],
     queryFn: () => fetchSemesterAjaranById(id),
-    onError: (error) => {
-      const errorMessage = error?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
-  const { data: tahunRows = [], isLoading: loadingTahun } = useQuery({
+  const {
+    data: tahunRows = [],
+    isLoading: loadingTahun,
+    isError: tahunError,
+    error: tahunErr,
+  } = useQuery({
     queryKey: ["tahun-ajaran-dropdown"],
     queryFn: fetchTahunAjaran,
-    onError: (error) => {
-      const msg = error?.response?.data?.msg || "Gagal memuat data tahun ajaran";
-      setError(msg);
-      setSuccess("");
-      setTimeout(() => setError(""), 3000);
-    },
   });
+
+  // Galat memuat dropdown tahun ajaran: v5 tidak lagi memanggil onError pada useQuery,
+  // jadi pesannya dimunculkan lewat efek yang mengamati status query.
+  useEffect(() => {
+    if (!tahunError) return undefined;
+    setError(tahunErr?.response?.data?.msg || "Gagal memuat data tahun ajaran");
+    setSuccess("");
+    const t = setTimeout(() => setError(""), 3000);
+    return () => clearTimeout(t);
+  }, [tahunError, tahunErr, setError, setSuccess]);
 
   // hanya tampilkan tahun ajaran yang terbuka
   const tahunOptions = useMemo(() => {

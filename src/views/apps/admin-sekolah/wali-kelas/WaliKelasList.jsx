@@ -47,10 +47,6 @@ const WaliKelasList = () => {
     const { data: wali = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['waliKelas'],
         queryFn: fetchWaliKelas,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        },
         select: (data) => Array.isArray(data) ? data : [], // Validasi data sebagai array
     });
     

@@ -46,11 +46,7 @@ const KelasList = () => {
 
     const { data: kelas = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['kelas'],
-        queryFn: fetchKelas,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchKelas
       });
       const queryClient = useQueryClient();
 

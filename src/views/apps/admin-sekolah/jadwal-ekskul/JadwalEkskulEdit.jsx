@@ -34,11 +34,7 @@ const JadwalEkskulEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['jadwalEkskul', id],
-        queryFn: () => fetchJadwalEkskulById(id),
-        onError: (error) => {
-            setError(error.response?.data?.msg || 'Terjadi kesalahan saat memuat data');
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchJadwalEkskulById(id)
     });
 
     useEffect(() => {

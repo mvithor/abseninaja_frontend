@@ -73,11 +73,7 @@ const PpdbSesiRoomList = () => {
     }),
     refetchOnWindowFocus: false,
     refetchOnMount: true,
-    placeholderData: (prev) => prev ?? [],
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat mapping sesi ruangan tes");
-      setTimeout(() => setError(""), 3000);
-    }
+    placeholderData: (prev) => prev ?? []
   });
 
   useEffect(() => {

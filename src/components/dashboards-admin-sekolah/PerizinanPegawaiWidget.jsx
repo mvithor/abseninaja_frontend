@@ -24,7 +24,7 @@ const JENIS_COLOR = {
   Izin: { bg: '#DBEAFE', color: '#1E40AF' },
 };
 
-const PerizinanPegawaiWidget = ({ onCountChange }) => {
+const PerizinanPegawaiWidget = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const qc = useQueryClient();
@@ -33,10 +33,6 @@ const PerizinanPegawaiWidget = ({ onCountChange }) => {
     queryKey: ['perizinanPegawai'],
     queryFn: fetchPerizinanPegawai,
     staleTime: 30000,
-    onSuccess: (data) => {
-      const pending = data.filter((d) => d.status === 'Menunggu');
-      if (onCountChange) onCountChange(pending.length);
-    },
   });
 
   const pending = all.filter((d) => d.status === 'Menunggu').slice(0, 3);

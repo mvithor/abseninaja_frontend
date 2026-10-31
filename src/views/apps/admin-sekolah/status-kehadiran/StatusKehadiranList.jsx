@@ -44,11 +44,7 @@ const StatusKehadiranList = () => {
 
     const { data: statusKehadiran = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['statusKehadiran'],
-        queryFn: fetchStatusKehadiran,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchStatusKehadiran
       });
     const queryClient = useQueryClient();
 

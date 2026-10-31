@@ -45,11 +45,7 @@ const HariList = () => {
 
     const { data: hari = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['hari'],
-        queryFn: fetchHari,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchHari
     });
 
     const deleteMutation = useMutation({

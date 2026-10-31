@@ -25,7 +25,7 @@ const JENIS_COLOR = {
   Alpha: { bg: '#FEF3C7', color: '#92400E' },
 };
 
-const PerizinanSiswaWidget = ({ onCountChange }) => {
+const PerizinanSiswaWidget = () => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const qc = useQueryClient();
@@ -34,10 +34,6 @@ const PerizinanSiswaWidget = ({ onCountChange }) => {
     queryKey: ['perizinanSiswa'],
     queryFn: fetchPerizinanSiswa,
     staleTime: 30000,
-    onSuccess: (data) => {
-      const pending = data.filter((d) => d.status === 'Menunggu');
-      if (onCountChange) onCountChange(pending.length);
-    },
   });
 
   const pending = all.filter((d) => d.status === 'Menunggu').slice(0, 4);

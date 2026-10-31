@@ -264,7 +264,6 @@ const TambahPpdbJadwalTahapanForm = ({ setSuccess, setError }) => {
       setSuccess(data?.msg || "Jadwal tahapan PMB berhasil dibuat");
       setError("");
       await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-paged"] });
-      await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-tahapan"] });
 
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/ppdb-jadwal-tahapan");

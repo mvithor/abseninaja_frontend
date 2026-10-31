@@ -49,11 +49,6 @@ const PegawaiGuruList = () => {
   const { data: guru = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['pegawaiGuru'],
     queryFn: fetchPegawaiGuru,
-    onError: (err) => {
-      // NOTE: err di react-query biasanya Error (bukan axios error langsung)
-      const msg = err?.response?.data?.msg || err?.message || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    }
   });
 
   const deleteMutation = useMutation({

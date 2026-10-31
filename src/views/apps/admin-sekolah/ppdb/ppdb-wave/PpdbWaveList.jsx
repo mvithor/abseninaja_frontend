@@ -43,11 +43,7 @@ const PpdbWaveList = () => {
 
   const { data: waves = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-wave", ppdbPeriodId],
-    queryFn: () => fetchPpdbWave(ppdbPeriodId),
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat gelombang PMB");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPpdbWave(ppdbPeriodId)
   });
 
   const deleteMutation = useMutation({

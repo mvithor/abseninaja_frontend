@@ -68,11 +68,6 @@ const PpdbJadwalTahapanEdit = () => {
     queryKey: ["ppdbEventScheduleById", id],
     queryFn: () => fetchScheduleById(id),
     enabled: Boolean(id),
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   useEffect(() => {
@@ -121,9 +116,7 @@ const PpdbJadwalTahapanEdit = () => {
       setSuccess(response.data?.msg || "Jadwal tahapan berhasil diperbarui");
       setError("");
 
-      await queryClient.invalidateQueries({ queryKey: ["ppdbEventSchedules"] });
       await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-paged"] });
-      await queryClient.invalidateQueries({ queryKey: ["ppdb-jadwal-tahapan"] });
       await queryClient.invalidateQueries({ queryKey: ["ppdbEventScheduleById", id] });
 
       setTimeout(() => {

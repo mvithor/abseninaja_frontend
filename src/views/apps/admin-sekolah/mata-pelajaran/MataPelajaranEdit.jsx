@@ -39,12 +39,7 @@ const MataPelajaranEdit = () => {
 
     const { data, isLoading: isFetching, isError, error: queryError } = useQuery({
         queryKey: ['mataPelajaran', id],
-        queryFn: () => fetchMataPelajaranById(id),
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || 'Terjadi kesalahan saat memuat data';
-            setError(errorMessage);
-            setTimeout(() => setError(''), 3000);
-        }
+        queryFn: () => fetchMataPelajaranById(id)
     });
 
     const { data: kelasOptions = [], isLoading: isKelasLoading } = useQuery({

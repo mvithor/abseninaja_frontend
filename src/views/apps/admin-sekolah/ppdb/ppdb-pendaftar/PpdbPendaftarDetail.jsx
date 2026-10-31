@@ -27,14 +27,6 @@ const PpdbPendaftarDetail = () => {
     queryKey: ["ppdbApplicantDetail", id],
     queryFn: () => fetchPpdbApplicantDetail(id),
     refetchOnWindowFocus: false,
-    onError: (err) => {
-      const msg =
-        err?.response?.data?.msg ||
-        err?.message ||
-        "Gagal memuat detail pendaftar";
-      setError(String(msg));
-      setTimeout(() => setError(""), 3500);
-    },
   });
 
   const status = useMemo(() => String(data?.status || "").toUpperCase(), [data?.status]);
@@ -51,7 +43,7 @@ const PpdbPendaftarDetail = () => {
     onSuccess: (res) => {
       setSuccess(res?.msg || "Promote berhasil");
       queryClient.invalidateQueries({ queryKey: ["ppdbApplicantDetail", id] });
-      queryClient.invalidateQueries({ queryKey: ["ppdbApplicants"] }); // list
+      queryClient.invalidateQueries({ queryKey: ["ppdb-applicants"] }); // list
       setTimeout(() => setSuccess(""), 2500);
     },
     onError: (err) => {

@@ -56,10 +56,6 @@ const NotificationTemplateList = () => {
   } = useQuery({
     queryKey: ["notificationTemplate"],
     queryFn: fetchNotificationTemplate,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
   });
 
   // Client-side filter + sort

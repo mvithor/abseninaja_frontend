@@ -64,11 +64,7 @@ const PpdbProctorList = () => {
 
   const { data: proctorList = [], isLoading, isError, error: queryError } = useQuery({
     queryKey,
-    queryFn: () => fetchPpdbProctors(filters),
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat Pengawas");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPpdbProctors(filters)
   });
 
   const deleteMutation = useMutation({

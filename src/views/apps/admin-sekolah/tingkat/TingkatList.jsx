@@ -44,11 +44,7 @@ const TingkatList = () => {
 
   const { data: tingkat = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['tingkatKelas'],
-    queryFn: fetchTingkat,
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    }
+    queryFn: fetchTingkat
   });
   const queryClient = useQueryClient();
 

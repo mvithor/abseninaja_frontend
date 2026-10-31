@@ -84,10 +84,6 @@ const PrestasiMadrasahEdit = () => {
   } = useQuery({
     queryKey: ["PrestasiMadrasah", id],
     queryFn: () => fetchPrestasiMadrasahById(id),
-    onError: (err) => {
-      setError(err.message || "Terjadi kesalahan saat memuat data");
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   // Set state ketika data berhasil di-fetch
@@ -123,7 +119,7 @@ const PrestasiMadrasahEdit = () => {
       }));
       setSuccess(response.data.msg || "Prestasi madrasah berhasil diperbarui");
       queryClient.invalidateQueries({ queryKey: ["PrestasiMadrasah"] });
-      queryClient.invalidateQueries({ queryKey: ["PrestasiMadrasahList"] }); 
+      queryClient.invalidateQueries({ queryKey: ["prestasiMadrasah"] }); 
       setTimeout(() => {
         navigate("/dashboard/admin-sekolah/prestasi-institusi");
       }, 3000);

@@ -131,10 +131,6 @@ const AbsensiList = () => {
       },
     ],
     queryFn: fetchAbsensi,
-    onError: (error) => {
-      const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(errorMessage);
-    },
   });
 
   const handleSearchChange = (event) => {

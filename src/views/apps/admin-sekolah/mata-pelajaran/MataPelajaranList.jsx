@@ -28,16 +28,11 @@ const MataPelajaranList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const { data: mapel = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['mataPelajaran'],
-        queryFn: fetchMataPelajaran,
-        onError: (error) => {
-          const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-          setError(errorMessage);
-        }
+        queryFn: fetchMataPelajaran
       });
 
     const handleSearchChange = (event) => {
@@ -76,7 +71,6 @@ const MataPelajaranList = () => {
     return (
         <PageContainer title="Mata Pelajaran" description="Mata Pelajaran">
             <ParentCard title="Mata Pelajaran" description="Mata Pelajaran">
-                <Alerts error={error}/>
                 <Box
                     sx={{
                         display: 'flex',

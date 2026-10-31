@@ -26,16 +26,11 @@ const PerizinanSiswaList = () => {
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
     const [searchQuery, setSearchQuery] = useState("");
-    const [error, setError] = useState("");
     const navigate = useNavigate();
 
     const { data: perizinan = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['perizinanSiswa'],
         queryFn: fetchPerizinanSiswa,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        },
         select: (data) => Array.isArray(data) ? data : [], 
     });
 
@@ -63,7 +58,6 @@ const PerizinanSiswaList = () => {
     return (
         <PageContainer title="Perizinan Siswa" description="Perizinan Siswa">
             <ParentCard title="Perizinan Siswa">
-                <Alerts error={error}/>
                 <Box
                     sx={{
                         display: 'flex',

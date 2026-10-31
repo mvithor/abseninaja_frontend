@@ -45,11 +45,7 @@ const JadawalEkskulList = () => {
 
     const { data: jadwaEkskul = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['jadwalEkskul'],
-        queryFn: fetchJadwalEkskul,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-          }
+        queryFn: fetchJadwalEkskul
     });
 
     const deleteMutation = useMutation({

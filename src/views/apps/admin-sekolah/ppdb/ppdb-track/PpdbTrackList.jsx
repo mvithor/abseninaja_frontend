@@ -43,11 +43,7 @@ const PpdbTrackList = () => {
 
   const { data: tracks = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ["ppdb-track", ppdbPeriodId],
-    queryFn: () => fetchPpdbTrack(ppdbPeriodId),
-    onError: (err) => {
-      setError(err?.response?.data?.msg || "Gagal memuat jalur PMB");
-      setTimeout(() => setError(""), 3000);
-    }
+    queryFn: () => fetchPpdbTrack(ppdbPeriodId)
   });
 
   const deleteMutation = useMutation({

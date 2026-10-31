@@ -45,18 +45,11 @@ const UserAdminList = () => {
 
     const { data: userAdmin = [], isLoading, isError, error: queryError } = useQuery({
         queryKey: ['userAdmin'],
-        queryFn: fetchUserAdmin,
-        onError: (error) => {
-            const errorMessage = error.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-            setError(errorMessage);
-        }
+        queryFn: fetchUserAdmin
     });
 
     const deleteMutation = useMutation({
         mutationFn: async ({ id, type }) => {
-            console.log('Mutasi delete dengan parameter:');
-            console.log('id:', id, 'type:', type);
-    
             const response = await axiosInstance.delete(`/api/v1/admin-sekolah/users/${id}`, {
                 params: { type },
             });
@@ -64,7 +57,6 @@ const UserAdminList = () => {
             return response.data;
         },
         onSuccess: (data) => {
-            console.log('Penghapusan berhasil dengan respons:', data);
             queryClient.invalidateQueries({ queryKey: ['userAdmin'] });
             setSuccess(data.msg || 'Pengguna berhasil dihapus');
             setTimeout(() => setSuccess(''), 3000);
@@ -103,9 +95,6 @@ const UserAdminList = () => {
     }
 
     const handleDelete = (user_id, type = 'admin sekolah') => {
-        console.log('Menghapus admin sekolah dengan data berikut:');
-        console.log('user_id:', user_id, 'type:', type);
-    
         if (!user_id || typeof user_id !== 'number') {
             console.error('Kesalahan sistem. ID pengguna tidak valid:', user_id);
             setError('ID pengguna tidak valid.');

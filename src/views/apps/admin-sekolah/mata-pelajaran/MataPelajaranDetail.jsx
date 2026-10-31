@@ -48,11 +48,6 @@ const MataPelajaranDetail = () => {
   const offeringQuery = useQuery({
     queryKey: ["mapelDetail", String(mapelId)],
     queryFn: () => fetchMataPelajaranDetailById(mapelId),
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-      setTimeout(() => setError(""), 3000);
-    },
   });
 
   const kelasQuery = useQuery({

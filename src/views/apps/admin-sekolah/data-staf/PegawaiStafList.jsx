@@ -47,12 +47,6 @@ const PegawaiStafList = () => {
   const { data: staf = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['pegawaiStaf'],
     queryFn: fetchPegawaiStaf,
-    onError: (err) => {
-      // react-query error di sini biasanya sudah Error(message),
-      // jadi jangan berharap err.response selalu ada.
-      setError(err?.message || "Terjadi kesalahan saat memuat data");
-      setTimeout(() => setError(""), 3000);
-    }
   });
 
   const deleteMutation = useMutation({

@@ -87,10 +87,6 @@ const SiswaList = () => {
       },
     ],
     queryFn: fetchSiswaPaged,
-    onError: (err) => {
-      const msg = err?.response?.data?.msg || "Terjadi kesalahan saat memuat data";
-      setError(msg);
-    },
     placeholderData: keepPreviousData,
     refetchOnWindowFocus: false,
   });
