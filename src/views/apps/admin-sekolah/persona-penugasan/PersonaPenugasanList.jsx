@@ -109,7 +109,7 @@ const PersonaPenugasanList = () => {
               setSearchQuery(e.target.value);
               setPage(0);
             }}
-            placeholder="Cari Pegawai atau Persona"
+            placeholder="Cari Pegawai"
           />
           <FormControlLabel
             control={

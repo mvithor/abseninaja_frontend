@@ -171,6 +171,9 @@ const UserGuruList = Loadable(lazy(() => import('../views/apps/admin-sekolah/use
 const UserWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/user-wali-siswa/UserWaliSiswaList')));
 const PersonaPenugasanList = Loadable(lazy(() => import('../views/apps/admin-sekolah/persona-penugasan/PersonaPenugasanList')));
 const PersonaPenugasanAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/persona-penugasan/PersonaPenugasanAdd')));
+const AdminKantinList = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinList')));
+const AdminKantinAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinAdd')));
+const AdminKantinEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinEdit')));
 // Download Data Siswa
 const DownloadDataSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-siswa/DownloadDataSiswaList')));
 const DownloadDataWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-wali-siswa/DownloadDataWaliSiswaList')));
@@ -497,6 +500,9 @@ const Router = [
                     { path: 'user-wali-siswa', element: <UserWaliSiswaList/> },
                     { path: 'persona-penugasan', element: <PersonaPenugasanList/> },
                     { path: 'persona-penugasan/tambah', element: <PersonaPenugasanAdd/> },
+                    { path: 'admin-kantin', element: <AdminKantinList/> },
+                    { path: 'admin-kantin/tambah', element: <AdminKantinAdd/> },
+                    { path: 'admin-kantin/edit/:id', element: <AdminKantinEdit/> },
                      // Download
                      { path: 'download/data-siswa-kelas', element: <DownloadDataSiswaList/> },
                      { path: 'download/data-wali-siswa', element: <DownloadDataWaliSiswaList/> },

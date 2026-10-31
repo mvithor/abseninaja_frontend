@@ -531,6 +531,12 @@ import {
                 icon: IconUser,
                 href: '/dashboard/admin-sekolah/persona-penugasan',
             },
+            {
+                id: uniqueId(),
+                title: 'Admin Kantin',
+                icon: IconUser,
+                href: '/dashboard/admin-sekolah/admin-kantin',
+            },
         ],
     },
     {
