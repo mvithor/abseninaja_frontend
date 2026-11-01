@@ -40,6 +40,23 @@ export function definisiPola(kode, p) {
   }
 }
 
+// Apa yang sebenarnya dibaca sistem untuk memicu tiap pola (templat saran 1.2). Hanya isi data yang dipakai aturan,
+// tidak ada kata sebab. Mengubah kalimat ini mengubah instrumen penelitian: naikkan versi templat dan perbarui PRD.
+const INDIKATOR_PEMICU = Object.freeze({
+  P1: 'nilai TP dan KKTP kelas',
+  P2: 'jumlah pertemuan yang dicatat alpa (tanpa keterangan)',
+  P3: 'nilai proyek individu (nilai 0 berarti tidak dikumpulkan)',
+  P4: 'rata-rata nilai tiga lingkup materi terakhir',
+  P5: 'nilai TP, hasil remedial, dan nilai proyek individu',
+});
+
+/** Kalimat tetap pada tombol penjelasan, sama untuk P1 sampai P5. Kode yang tidak dikenal menghasilkan teks kosong. */
+export function kalimatBatasSistem(kode) {
+  const indikator = INDIKATOR_PEMICU[kode];
+  if (!indikator) return '';
+  return `Sistem hanya membaca ${indikator}. Sistem tidak mengetahui penyebabnya. Anda yang paling mengenal siswa ini, jadi ubah atau abaikan saran ini bila tidak sesuai.`;
+}
+
 /** Data apa yang dibutuhkan pola agar dapat dinilai; dipakai untuk catatan "data belum cukup". */
 export function dataDibutuhkan(kode, p) {
   switch (kode) {

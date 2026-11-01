@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  KODE_POLA, URUTAN_PRIORITAS, POLA_INFO, definisiPola, dataDibutuhkan, namaLm, namaTp, uraikanBukti,
+  KODE_POLA, URUTAN_PRIORITAS, POLA_INFO, definisiPola, dataDibutuhkan, namaLm, namaTp, uraikanBukti, kalimatBatasSistem,
   susunSiswa, hitungRingkasan, barisKonteks, alasanBelumCukup, labelTabPerhatian,
 } from './penjelasan.js';
 
@@ -137,9 +137,23 @@ test('tidak ada keluaran yang memuat undefined, NaN, null, [object, atau tanda p
     ...uraikanBukti('P1', P1, CTX), ...uraikanBukti('P2', P2, CTX), ...uraikanBukti('P3', P3, CTX),
     ...uraikanBukti('P4', P4, CTX), ...uraikanBukti('P5', P5, CTX), ...uraikanBukti('P1', P1, { lm: undefined, parameter: PARAMETER }),
     ...KODE_POLA.map((k) => definisiPola(k, PARAMETER)), ...KODE_POLA.map((k) => dataDibutuhkan(k, PARAMETER)),
-    ...Object.values(POLA_INFO).map((x) => x.judul),
+    ...Object.values(POLA_INFO).map((x) => x.judul), ...KODE_POLA.map((k) => kalimatBatasSistem(k)),
   ];
   semua.forEach((t) => assert.ok(!/undefined|NaN|null|\[object|—|–/.test(t), t));
+});
+
+test('kalimatBatasSistem (templat 1.2): kalimat tetap P1 sampai P5, hanya indikator pemicu yang berbeda', () => {
+  const TETAP = 'Sistem tidak mengetahui penyebabnya. Anda yang paling mengenal siswa ini, jadi ubah atau abaikan saran ini bila tidak sesuai.';
+  const indikator = KODE_POLA.map((k) => {
+    const t = kalimatBatasSistem(k);
+    assert.match(t, /^Sistem hanya membaca .+\. Sistem tidak mengetahui/);
+    assert.ok(t.endsWith(TETAP), `${k} harus berakhir dengan kalimat tetap`);
+    return t.slice('Sistem hanya membaca '.length, t.length - TETAP.length - 2);
+  });
+  assert.equal(new Set(indikator).size, 5, 'tiap pola punya indikator sendiri');
+  assert.equal(kalimatBatasSistem('P2'), 'Sistem hanya membaca jumlah pertemuan yang dicatat alpa (tanpa keterangan). ' + TETAP);
+  assert.equal(kalimatBatasSistem('P9'), '');
+  assert.equal(kalimatBatasSistem(undefined), '');
 });
 
 test('definisiPola memakai parameter yang dikirim server, bukan angka yang tertanam', () => {

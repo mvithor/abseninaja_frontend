@@ -10,7 +10,9 @@ import {
 import {
   abaikanSaran, bukaKembaliSaran, kunciLad, pakaiSaran, pesanGalat,
 } from '../api';
-import { POLA_INFO, URUTAN_PRIORITAS, definisiPola, uraikanBukti } from '../evaluasi/penjelasan';
+import {
+  POLA_INFO, URUTAN_PRIORITAS, definisiPola, kalimatBatasSistem, uraikanBukti,
+} from '../evaluasi/penjelasan';
 import { barisP1 } from '../evaluasi/matriks';
 import {
   KEADAAN, KOLOM_SARAN, LABEL_KEADAAN, MAKS_ALASAN, MAKS_KOLOM, adaPerubahan, isianAwal, isianDraf, isianSama,
@@ -270,8 +272,9 @@ function KotakSaran({
               </>
             )}
             <Typography variant="body2" color="text.secondary">
-              {`Draf disusun otomatis dari bukti di atas memakai templat ${templatVersi}. Kalimat yang buktinya tidak ada tidak dibuat, dan kolomnya dibiarkan kosong. Penanda adalah peringatan dini, bukan diagnosis; sistem tidak mengetahui penyebabnya.`}
+              {`Draf disusun otomatis dari bukti di atas memakai templat ${templatVersi}. Kalimat yang buktinya tidak ada tidak dibuat, dan kolomnya dibiarkan kosong. Penanda adalah peringatan dini, bukan diagnosis.`}
             </Typography>
+            <Typography variant="body2" fontWeight={600}>{kalimatBatasSistem(entri.pola)}</Typography>
           </Stack>
         </AccordionDetails>
       </Accordion>
