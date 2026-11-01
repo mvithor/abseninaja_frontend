@@ -1,6 +1,6 @@
 // Fungsi murni untuk saran tindak lanjut. Tanpa impor selain modul murni lain (lihat saran.test.js).
 //
-// Draf disusun SERVER dari bukti penanda (templat versi 1.1) dan tidak pernah dihitung ulang di sini. Berkas
+// Draf disusun SERVER dari bukti penanda (templat versi 1.2) dan tidak pernah dihitung ulang di sini. Berkas
 // ini hanya mengurus apa yang tampil: kolom, keadaan keputusan guru, nilai awal isian, dan pemeriksaan cepat
 // sebelum dikirim. Pemeriksaan yang berwenang tetap di server (kolom "langkah" wajib, batas panjang).
 
