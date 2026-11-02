@@ -1,24 +1,34 @@
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
   Button,
   CircularProgress,
+  IconButton,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { IconEye, IconTrash } from '@tabler/icons-react';
+import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import { CETAK, gayaChip, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import {
-  KEADAAN, keadaanKelas, persenPerhatian, pesanKeadaan, rincianPerhatian, teksUmur,
+  KEADAAN, keadaanKelas, persenPerhatian, pesanKeadaan, teksUmur,
 } from '../ringkasan/ringkasan';
 import { ringkasAmbang } from '../rentang';
+import { polaMuncul } from './hapusKelas';
 
 // Ukuran huruf tabel mengikuti perubahan Anda: isi 1rem agar mudah dibaca. Angka perhatian dibesarkan.
+
+const PILIHAN_BARIS = [5, 10, 25];
+const BARIS_AWAL = 5;
 
 const Judul = ({ children }) => (
   <Typography variant="h6" sx={{ fontSize: '0.9375rem' }}>{children}</Typography>
@@ -69,7 +79,6 @@ BatangTipis.propTypes = { persen: PropTypes.number.isRequired, label: PropTypes.
 function SelPerhatian({ k, w }) {
   const kartu = k.ringkasan.kartu;
   const persen = persenPerhatian(k);
-  const rincian = rincianPerhatian(kartu, { pendek: true });
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
       <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
@@ -77,13 +86,68 @@ function SelPerhatian({ k, w }) {
         <Typography component="span" sx={{ fontSize: 13, color: w.sekunder }}>{`${persen}% dari kelas`}</Typography>
       </Box>
       <BatangTipis persen={persen} label={`Siswa perlu perhatian di ${k.nama_kelas}`} />
-      <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: '17px' }}>
-        {rincian || 'Tidak ada yang ditandai'}
-      </Typography>
     </Box>
   );
 }
 SelPerhatian.propTypes = { k: PropTypes.object.isRequired, w: PropTypes.object.isRequired };
+
+/**
+ * Kolom "Pola yang muncul": satu chip per pola dengan jumlah siswanya. Jumlah semua chip sama dengan angka
+ * "Perlu perhatian" di sebelahnya, karena tiap siswa dihitung pada pola utamanya saja.
+ */
+function SelPola({ k, w }) {
+  const pola = polaMuncul(k.ringkasan.kartu);
+  if (pola.length === 0) return <Typography sx={{ fontSize: 13, color: w.sekunder }}>Tidak ada yang ditandai</Typography>;
+  return (
+    <Box component="ul" aria-label={`Pola yang muncul di ${k.nama_kelas}`} sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+      {pola.map((p) => (
+        <Box
+          component="li"
+          key={p.kode}
+          sx={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 0.75,
+            minHeight: 28,
+            pl: '10px',
+            pr: '4px',
+            borderRadius: '8px',
+            border: `1px solid ${w.garis}`,
+            bgcolor: w.latar,
+            boxShadow: 'none',
+            fontSize: 13,
+            color: w.ink,
+            whiteSpace: 'nowrap',
+            ...CETAK,
+          }}
+        >
+          {p.teks}
+          <Box
+            component="b"
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              minWidth: 20,
+              height: 20,
+              px: '5px',
+              borderRadius: '6px',
+              border: `1px solid ${w.garis}`,
+              bgcolor: w.kartu,
+              boxShadow: 'none',
+              fontSize: 13,
+              fontWeight: 700,
+              ...CETAK,
+            }}
+          >
+            {p.jumlah}
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+SelPola.propTypes = { k: PropTypes.object.isRequired, w: PropTypes.object.isRequired };
 
 function SelKelengkapan({ k, w }) {
   const kl = k.ringkasan.kartu.kelengkapan;
@@ -97,6 +161,7 @@ function SelKelengkapan({ k, w }) {
 }
 SelKelengkapan.propTypes = { k: PropTypes.object.isRequired, w: PropTypes.object.isRequired };
 
+/** Tombol teks "Buka" untuk kartu layar sempit. Di tabel, aksi memakai ikon (lihat TombolIkonBuka). */
 const TombolBuka = ({ k, onBuka, penuh = false }) => (
   <Button
     variant="outlined"
@@ -111,19 +176,53 @@ const TombolBuka = ({ k, onBuka, penuh = false }) => (
 );
 TombolBuka.propTypes = { k: PropTypes.object.isRequired, onBuka: PropTypes.func.isRequired, penuh: PropTypes.bool };
 
+/** Ikon mata pada kolom Aksi tabel (desain 1): membuka kelas. Sasaran sentuh 44px. */
+const TombolIkonBuka = ({ k, onBuka }) => {
+  const label = `Buka kelas ${k.nama_kelas} ${k.mapel}`;
+  return (
+    <Tooltip title={label}>
+      <IconButton aria-label={label} onClick={(e) => { e.stopPropagation(); onBuka(k.id); }} sx={{ width: 44, height: 44 }}>
+        <IconEye size={20} aria-hidden="true" />
+      </IconButton>
+    </Tooltip>
+  );
+};
+TombolIkonBuka.propTypes = { k: PropTypes.object.isRequired, onBuka: PropTypes.func.isRequired };
+
+/** Ikon tong sampah (desain 1): membuka dialog hapus kelas. Merah saat disorot, tetapi bentuknya yang membedakan. */
+const TombolIkonHapus = ({ k, onHapus }) => {
+  const label = `Hapus kelas ${k.nama_kelas} ${k.mapel}`;
+  return (
+    <Tooltip title={label}>
+      <IconButton
+        aria-label={label}
+        onClick={(e) => { e.stopPropagation(); onHapus(k); }}
+        sx={{ width: 44, height: 44, '&:hover': { bgcolor: 'rgba(210, 67, 31, 0.1)', color: '#C4452A' } }}
+      >
+        <IconTrash size={20} aria-hidden="true" />
+      </IconButton>
+    </Tooltip>
+  );
+};
+TombolIkonHapus.propTypes = { k: PropTypes.object.isRequired, onHapus: PropTypes.func.isRequired };
+
 /**
  * Daftar kelas nyata (L-1). Layar lebar: tabel dengan ukuran huruf besar. Layar sempit: satu kartu per kelas.
  * Kelas yang angkanya tidak bisa dibaca (galat, tanpa siswa, tanpa struktur, ringkasan tidak termuat) menampilkan
  * alasannya, bukan angka 0, karena 0 akan terbaca "tidak ada masalah".
+ * `onHapus(kelas)` membuka dialog hapus; tanpa prop ini ikon hapus tidak ditampilkan.
  */
 const KelasTable = ({
   kelas,
   onBuka,
+  onHapus,
   memuat = false,
   pesanKosong = 'Belum ada kelas.',
 }) => {
   const w = warnaRingkasan(useTheme());
   const daftar = Array.isArray(kelas) ? kelas : [];
+  const [halamanDipilih, setHalaman] = useState(0);
+  const [barisPerHalaman, setBarisPerHalaman] = useState(BARIS_AWAL);
 
   if (memuat || daftar.length === 0) {
     return (
@@ -135,50 +234,68 @@ const KelasTable = ({
     );
   }
 
+  // Halaman dijepit ke halaman terakhir yang ada: setelah sebuah kelas dihapus atau pencarian menyempit, halaman
+  // yang dipilih bisa melewati ujung daftar, dan tabel kosong akan terbaca "tidak ada kelas".
+  const halamanTerakhir = Math.max(0, Math.ceil(daftar.length / barisPerHalaman) - 1);
+  const halaman = Math.min(halamanDipilih, halamanTerakhir);
+  const awal = halaman * barisPerHalaman;
+  const tampil = daftar.slice(awal, awal + barisPerHalaman);
+
   return (
     <Box sx={{ bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '8px', overflow: 'hidden' }}>
       {/* Layar lebar: tabel */}
       <TableContainer sx={{ display: { xs: 'none', md: 'block' } }}>
-        <Table aria-label="Daftar kelas" sx={{ minWidth: 1020 }}>
+        {/* Sepuluh kolom: sela sel dirapatkan dan teks pendek tidak dipatahkan supaya Aksi tidak terdorong keluar layar. */}
+        <Table aria-label="Daftar kelas" sx={{ minWidth: 1000, '& th, & td': { px: 1 } }}>
           <TableHead>
             <TableRow sx={{ '& th': { borderBottom: `1px solid ${w.ink}` } }}>
+              <TableCell><Judul>No</Judul></TableCell>
               <TableCell><Judul>Kelas</Judul></TableCell>
               <TableCell align="center"><Judul>Siswa</Judul></TableCell>
-              <TableCell sx={{ minWidth: 200 }}><Judul>Perlu perhatian</Judul></TableCell>
+              <TableCell sx={{ minWidth: 150 }}><Judul>Perlu perhatian</Judul></TableCell>
+              <TableCell sx={{ minWidth: 190 }}><Judul>Pola yang muncul</Judul></TableCell>
               <TableCell align="center"><Judul>Pengayaan</Judul></TableCell>
               <TableCell align="center"><Judul>Data belum cukup</Judul></TableCell>
-              <TableCell sx={{ minWidth: 150 }}><Judul>Kelengkapan nilai</Judul></TableCell>
-              <TableCell><Judul>Terakhir diubah</Judul></TableCell>
+              <TableCell sx={{ minWidth: 120 }}><Judul>Kelengkapan nilai</Judul></TableCell>
+              <TableCell sx={{ minWidth: 96 }}><Judul>Terakhir diubah</Judul></TableCell>
               <TableCell align="center"><Judul>Aksi</Judul></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {daftar.map((k) => {
+            {tampil.map((k, i) => {
               const keadaan = keadaanKelas(k);
               const ada = keadaan === KEADAAN.ADA;
               return (
                 <TableRow key={k.id} hover sx={{ cursor: 'pointer', '& td': { verticalAlign: 'middle' } }} onClick={() => onBuka(k.id)}>
+                  <TableCell><Isi>{awal + i + 1}</Isi></TableCell>
                   <TableCell>
                     <Typography sx={{ fontSize: '1.0625rem', fontWeight: 700 }}>{k.nama_kelas}</Typography>
-                    <Typography sx={{ fontSize: 13, color: w.sekunder }}>{`${k.mapel} · ${semesterKelas(k)}`}</Typography>
+                    <Typography sx={{ fontSize: 13, color: w.sekunder, whiteSpace: 'nowrap' }}>{k.mapel}</Typography>
+                    <Typography sx={{ fontSize: 13, color: w.sekunder, whiteSpace: 'nowrap' }}>{semesterKelas(k)}</Typography>
                   </TableCell>
                   <TableCell align="center"><Isi>{k.jumlah_siswa}</Isi></TableCell>
                   {ada ? (
                     <>
                       <TableCell><SelPerhatian k={k} w={w} /></TableCell>
+                      <TableCell><SelPola k={k} w={w} /></TableCell>
                       <TableCell align="center"><Isi>{k.ringkasan.kartu.pengayaan}</Isi></TableCell>
                       <TableCell align="center"><Isi>{k.ringkasan.kartu.belum_cukup}</Isi></TableCell>
                       <TableCell><SelKelengkapan k={k} w={w} /></TableCell>
                     </>
                   ) : (
-                    <TableCell colSpan={4}>
+                    <TableCell colSpan={5}>
                       <Box sx={{ ...gayaChip(w, false), whiteSpace: 'normal', py: 0.5, borderStyle: 'dashed', borderRadius: '6px' }}>
                         {pesanKeadaan(keadaan)}
                       </Box>
                     </TableCell>
                   )}
-                  <TableCell><Isi>{teksUmur(k.terakhir_diubah)}</Isi></TableCell>
-                  <TableCell align="center"><TombolBuka k={k} onBuka={onBuka} /></TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}><Isi>{teksUmur(k.terakhir_diubah)}</Isi></TableCell>
+                  <TableCell align="center">
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                      <TombolIkonBuka k={k} onBuka={onBuka} />
+                      {onHapus && <TombolIkonHapus k={k} onHapus={onHapus} />}
+                    </Box>
+                  </TableCell>
                 </TableRow>
               );
             })}
@@ -189,7 +306,7 @@ const KelasTable = ({
       {/* Layar sempit: satu kartu per kelas */}
       {/* borderRadius 0: tema memberi radius ke setiap .MuiBox-root, yang membuat garis pemisah melengkung. */}
       <Box component="ul" sx={{ display: { xs: 'block', md: 'none' }, listStyle: 'none', m: 0, p: 0, borderRadius: 0 }}>
-        {daftar.map((k) => {
+        {tampil.map((k) => {
           const keadaan = keadaanKelas(k);
           const ada = keadaan === KEADAAN.ADA;
           const kartu = ada ? k.ringkasan.kartu : null;
@@ -210,6 +327,10 @@ const KelasTable = ({
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
                     <Typography sx={{ fontSize: 13, fontWeight: 600 }}>Perlu perhatian</Typography>
                     <SelPerhatian k={k} w={w} />
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                    <Typography sx={{ fontSize: 13, fontWeight: 600 }}>Pola yang muncul</Typography>
+                    <SelPola k={k} w={w} />
                   </Box>
                   <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1.5 }}>
                     <Box>
@@ -232,11 +353,28 @@ const KelasTable = ({
                 </Box>
               )}
               <Typography sx={{ fontSize: 13, color: w.sekunder }}>{`Terakhir diubah: ${teksUmur(k.terakhir_diubah)} · batas nilai ${ringkasAmbang(k)}`}</Typography>
-              <TombolBuka k={k} onBuka={onBuka} penuh />
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Box sx={{ flex: 1 }}><TombolBuka k={k} onBuka={onBuka} penuh /></Box>
+                {onHapus && <TombolIkonHapus k={k} onHapus={onHapus} />}
+              </Box>
             </Box>
           );
         })}
       </Box>
+
+      <TablePagination
+        component="div"
+        rowsPerPageOptions={PILIHAN_BARIS}
+        count={daftar.length}
+        rowsPerPage={barisPerHalaman}
+        page={halaman}
+        onPageChange={(_, p) => setHalaman(p)}
+        onRowsPerPageChange={(e) => { setBarisPerHalaman(Number(e.target.value)); setHalaman(0); }}
+        ActionsComponent={TablePaginationActions}
+        labelRowsPerPage="Baris per halaman:"
+        labelDisplayedRows={({ from, to, count }) => `${from}–${to} dari ${count}`}
+        sx={{ borderTop: `1px solid ${w.garis}` }}
+      />
     </Box>
   );
 };
@@ -244,9 +382,10 @@ const KelasTable = ({
 KelasTable.propTypes = {
   kelas: PropTypes.array.isRequired,
   onBuka: PropTypes.func.isRequired,
+  onHapus: PropTypes.func,
   memuat: PropTypes.bool,
   pesanKosong: PropTypes.string,
 };
 
-export { TagKasus, TombolBuka };
+export { TagKasus, TombolBuka, TombolIkonBuka };
 export default KelasTable;
