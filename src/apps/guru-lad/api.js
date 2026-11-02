@@ -30,6 +30,12 @@ export const cekAkses = () => ambil(axiosInstance.get(`${DASAR}/ping`));
 export const daftarKelas = () => ambil(axiosInstance.get(`${DASAR}/kelas`));
 export const buatKelas = (badan) => ambil(axiosInstance.post(`${DASAR}/kelas`, badan));
 export const ubahKelas = (kelasId, badan) => ambil(axiosInstance.patch(kelasUrl(kelasId), badan));
+// Hapus kelas beserta seluruh isiannya. Server SELALU meminta konfirmasi: tanpa `konfirmasi` ia membalas 409 dengan
+// `isian_terhapus` (hitungan isian yang akan hilang) dan tidak menghapus apa pun, jadi panggilan tanpa konfirmasi
+// aman dipakai sebagai pratinjau. Dengan `konfirmasi` kelas dihapus permanen.
+export const hapusKelas = (kelasId, konfirmasi = false) => ambil(
+  axiosInstance.delete(kelasUrl(kelasId), { params: konfirmasi ? { konfirmasi: 'hapus' } : undefined }),
+);
 
 // ---- impor blanko (FR-07)
 // Berkas dikirim sebagai multipart. Pratinjau tidak menulis apa pun; simpan memeriksa ulang dari awal dan

@@ -11,12 +11,14 @@ import AddButton from 'src/components/button-group/AddButton';
 import SearchButton from 'src/components/button-group/SearchButton';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import BuatKelasDialog from 'src/apps/guru-lad/beranda/BuatKelasDialog';
+import HapusKelasDialog from 'src/apps/guru-lad/beranda/HapusKelasDialog';
 import KelasTable from 'src/apps/guru-lad/beranda/KelasTable';
 import KelasLatihan from 'src/apps/guru-lad/beranda/KelasLatihan';
 import BannerTertinggal from 'src/apps/guru-lad/beranda/BannerTertinggal';
 import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
 import ImporBlankoDialog from 'src/apps/guru-lad/impor/ImporBlankoDialog';
 import { ringkasHasilSimpan } from 'src/apps/guru-lad/impor/impor';
+import { pesanKelasDihapus, pesanKelasTidakDitemukan } from 'src/apps/guru-lad/beranda/hapusKelas';
 import { warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
 import { kelasTertinggal, pisahKelas, ringkasBeranda } from 'src/apps/guru-lad/ringkasan/ringkasan';
 import {
@@ -47,7 +49,11 @@ export default function LadBeranda() {
   const w = warnaRingkasan(useTheme());
   const [dialog, setDialog] = useState(false);
   const [dialogImpor, setDialogImpor] = useState(false);
-  const [infoImpor, setInfoImpor] = useState('');
+  // Pemberitahuan sukses di atas daftar: hasil impor blanko atau kelas yang baru dihapus.
+  const [info, setInfo] = useState('');
+  const [infoPeringatan, setInfoPeringatan] = useState('');
+  // Kelas yang sedang akan dihapus (membuka dialog hapus); null = dialog tertutup.
+  const [hapus, setHapus] = useState(null);
   const [cari, setCari] = useState('');
 
   // Satu permintaan untuk semua kelas beserta kartu angkanya (NFR-03), dan satu kejadian BUKA_BERANDA di server.
@@ -95,6 +101,27 @@ export default function LadBeranda() {
   }
 
   const bukaKelas = (id) => navigate(`/dashboard/guru-lad/kelas/${id}`);
+
+  // Cache milik kelas yang hilang dibuang (bukan hanya ditandai basi), supaya membuka alamat lamanya tidak
+  // menampilkan ringkasan dari cache. Daftar dan ringkasan semua kelas dimuat ulang.
+  const bersihkanCacheKelas = (id) => {
+    qc.removeQueries({ queryKey: ['lad', 'kelas', id] });
+    qc.invalidateQueries({ queryKey: kunciLad.daftarKelas });
+  };
+  const selesaiHapus = (k) => {
+    setHapus(null);
+    bersihkanCacheKelas(k.id);
+    setInfoPeringatan('');
+    setInfo(pesanKelasDihapus(k));
+  };
+  // 404: server tidak menemukan kelas itu. Bukan "berhasil dihapus" (bisa juga server belum diperbarui), jadi
+  // pesannya netral dan daftar dimuat ulang supaya yang tampil sesuai server.
+  const kelasTidakAda = (k) => {
+    setHapus(null);
+    bersihkanCacheKelas(k.id);
+    setInfo('');
+    setInfoPeringatan(pesanKelasTidakDitemukan(k));
+  };
   const ringkas = ringkasBeranda(semuaNyata);
 
   return (
@@ -118,7 +145,8 @@ export default function LadBeranda() {
           </Box>
         </Box>
 
-        {infoImpor && <Alert severity="success" onClose={() => setInfoImpor('')}>{infoImpor}</Alert>}
+        {info && <Alert severity="success" onClose={() => setInfo('')}>{info}</Alert>}
+        {infoPeringatan && <Alert severity="warning" onClose={() => setInfoPeringatan('')}>{infoPeringatan}</Alert>}
         {galat && <Alert severity="error">{pesanGalat(galat)}</Alert>}
         {tanpaRingkasan && (
           <Alert
@@ -145,6 +173,7 @@ export default function LadBeranda() {
             <KelasTable
               kelas={nyata}
               onBuka={bukaKelas}
+              onHapus={setHapus}
               memuat={memuat}
               pesanKosong={cari.trim() ? PESAN_TIDAK_COCOK : PESAN_KOSONG}
             />
@@ -175,6 +204,13 @@ export default function LadBeranda() {
         }}
       />
 
+      <HapusKelasDialog
+        kelas={hapus}
+        onTutup={() => setHapus(null)}
+        onSelesai={selesaiHapus}
+        onTidakAda={kelasTidakAda}
+      />
+
       <ImporBlankoDialog
         buka={dialogImpor}
         onTutup={() => setDialogImpor(false)}
@@ -182,7 +218,7 @@ export default function LadBeranda() {
           setDialogImpor(false);
           qc.invalidateQueries({ queryKey: kunciLad.daftarKelas });
           if (hasil?.kelas?.length === 1) navigate(`/dashboard/guru-lad/kelas/${hasil.kelas[0].id}`);
-          else setInfoImpor(ringkasHasilSimpan(hasil));
+          else setInfo(ringkasHasilSimpan(hasil));
         }}
       />
     </PageContainer>
