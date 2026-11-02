@@ -10,13 +10,13 @@ import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 export default function JudulTab({ judul, keterangan, aksi, id }) {
   const w = warnaRingkasan(useTheme());
   return (
-    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
+    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
       <Box sx={{ minWidth: 0, flex: '1 1 320px' }}>
-        <Typography id={id} component="h2" sx={{ fontSize: { xs: '1.1875rem', md: '1.3125rem' }, lineHeight: 1.35, fontWeight: 700, color: w.ink }}>
+        <Typography id={id} component="h2" sx={{ fontSize: '1.1875rem', lineHeight: 1.5, fontWeight: 600, color: w.ink }}>
           {judul}
         </Typography>
         {keterangan && (
-          <Typography sx={{ mt: 0.75, fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, maxWidth: '75ch' }}>
+          <Typography sx={{ mt: 0.5, fontSize: 14, lineHeight: 1.5, color: w.sekunder, maxWidth: '80ch' }}>
             {keterangan}
           </Typography>
         )}

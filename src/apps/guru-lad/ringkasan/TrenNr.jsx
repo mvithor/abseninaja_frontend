@@ -64,11 +64,11 @@ export default function TrenNr({ data }) {
               </g>
             )}
             {g.titik.length > 1 && (
-              <polyline points={g.titik.map((t) => `${t.x.toFixed(1)},${t.y.toFixed(1)}`).join(' ')} fill="none" stroke={w.navy} strokeWidth="2.5" />
+              <polyline points={g.titik.map((t) => `${t.x.toFixed(1)},${t.y.toFixed(1)}`).join(' ')} fill="none" stroke={w.primer} strokeWidth="2.5" />
             )}
             {g.titik.map((t) => (
               <g key={t.lm}>
-                <circle cx={t.x} cy={t.y} r="5" fill={t.kosong ? w.kartu : w.navy} stroke={w.navy} strokeWidth="2.5" />
+                <circle cx={t.x} cy={t.y} r="5" fill={t.kosong ? w.kartu : w.primer} stroke={w.primer} strokeWidth="2.5" />
                 <text x={t.x} y={t.y - 12} textAnchor="middle" fontSize="13" fontWeight="700" fill={w.ink} {...halo}>{tampilAngka(t.nilai)}</text>
               </g>
             ))}

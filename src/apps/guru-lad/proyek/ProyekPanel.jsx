@@ -4,7 +4,10 @@ import {
   Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton,
   Stack, Tooltip,
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
+import AddButton from 'src/components/button-group/AddButton';
+import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import JudulTab from '../komponen/JudulTab';
 import PetunjukTab from '../komponen/PetunjukTab';
 import BilahSimpan from '../komponen/BilahSimpan';
@@ -27,6 +30,7 @@ const kunci = (siswaId, proyekId) => `${siswaId}:${proyekId}`;
 export default function ProyekPanel({
   kelasId, siswa, proyek, nilaiProyek, readOnly, onBerubah,
 }) {
+  const w = warnaRingkasan(useTheme());
   const server = useMemo(() => {
     const peta = new Map();
     nilaiProyek.forEach((n) => peta.set(kunci(n.siswa_id, n.proyek_id), n.nilai));
@@ -194,6 +198,11 @@ export default function ProyekPanel({
       <JudulTab
         judul="Nilai proyek"
         keterangan="Nilai tiap siswa untuk proyek (Latihan Materi). Perubahan baru tersimpan setelah Anda menekan Simpan nilai."
+        aksi={!readOnly && (
+          <AddButton icon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })} sx={{ width: { xs: '100%', sm: 'auto' }, maxWidth: 'none', ml: 0 }}>
+            Tambah proyek
+          </AddButton>
+        )}
       />
       <PetunjukTab
         butir={[
@@ -203,22 +212,6 @@ export default function ProyekPanel({
           ...(readOnly ? [] : ['Menu titik tiga di kepala kolom berisi Ubah dan Hapus proyek.']),
         ]}
       />
-      {!readOnly && (
-        <BilahSimpan
-          jumlahKotor={jumlahKotor}
-          sibuk={sibuk}
-          adaGalat={adaGalatLokal}
-          onBuang={buang}
-          onSimpan={mintaSimpan}
-          labelSimpan="Simpan nilai"
-          kiri={(
-            <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
-              Tambah proyek
-            </Button>
-          )}
-        />
-      )}
-
       {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
@@ -231,11 +224,14 @@ export default function ProyekPanel({
               <th className="no">No</th>
               <th className="nama">Nama siswa</th>
               {proyek.map((p) => (
-                <th key={p.id} style={{ minWidth: 168, height: 'auto', padding: '10px 10px' }}>
-                  <Stack alignItems="center" spacing={0.75}>
-                    <Stack direction="row" alignItems="center" spacing={0.5}>
-                      <span title={labelProyek(p)}>{labelProyek(p).length > 22 ? `${labelProyek(p).slice(0, 21)}…` : labelProyek(p)}</span>
-                      {!readOnly && (
+                <th key={p.id} style={{ minWidth: 200, height: 'auto', padding: '10px 10px' }}>
+                  <Box sx={{ position: 'relative', px: { xs: 0, sm: 3 } }}>
+                    <Box component="span" title={labelProyek(p)} sx={{ display: 'block', fontWeight: 600 }}>
+                      {labelProyek(p).length > 22 ? `${labelProyek(p).slice(0, 21)}…` : labelProyek(p)}
+                    </Box>
+                    <Box component="span" sx={{ display: 'block', fontSize: 13, fontWeight: 400, color: w.sekunder }}>{TEKS_JENIS[p.jenis] ?? p.jenis}</Box>
+                    {!readOnly && (
+                      <Box sx={{ position: 'absolute', top: '50%', right: 0, transform: 'translateY(-50%)' }}>
                         <MenuAksiKolom
                           label={`Aksi ${labelProyek(p)}: ubah atau hapus`}
                           judul={`Aksi ${labelProyek(p)}`}
@@ -248,10 +244,9 @@ export default function ProyekPanel({
                             },
                           ]}
                         />
-                      )}
-                    </Stack>
-                    <Chip size="small" variant="outlined" label={TEKS_JENIS[p.jenis] ?? p.jenis} />
-                  </Stack>
+                      </Box>
+                    )}
+                  </Box>
                 </th>
               ))}
             </tr>
@@ -269,7 +264,7 @@ export default function ProyekPanel({
                   const galat = (diEdit && baca.galat) || galatServer[k];
                   const nol = !galat && tidakDikumpulkan(p.jenis, baca.nilai);
                   let kelasSel = 'sel';
-                  if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor';
+                  if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor'; else if (nol) kelasSel += ' nol';
                   let judulSel;
                   if (galat) judulSel = galat; else if (diEdit) judulSel = 'Belum disimpan'; else if (nol) judulSel = 'Tidak dikumpulkan (nilai 0)';
                   return (
@@ -289,8 +284,8 @@ export default function ProyekPanel({
                         />
                         <span className="tanda">
                           {galat && <span aria-hidden="true">!</span>}
-                          {!galat && nol && <span aria-hidden="true" title="Tidak dikumpulkan">⊘</span>}
                         </span>
+                        {!galat && nol && <span className="cap">tidak dikumpulkan</span>}
                       </div>
                     </td>
                   );
@@ -300,6 +295,17 @@ export default function ProyekPanel({
           </tbody>
         </table>
       </Box>
+
+      {!readOnly && (
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan nilai"
+        />
+      )}
 
       <Dialog open={konfirmasiKosong > 0} onClose={() => setKonfirmasiKosong(0)} aria-labelledby="judul-kosongkan-proyek">
         <DialogTitle id="judul-kosongkan-proyek">Kosongkan nilai yang sudah tersimpan?</DialogTitle>

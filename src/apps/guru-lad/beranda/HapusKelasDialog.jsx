@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, TextField, Typography,
+  Alert, Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { IconTrash } from '@tabler/icons-react';
 import { hapusKelas, pesanGalat } from '../api';
+import KolomIsian from '../komponen/KolomIsian';
 import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import {
   barisIsian, judulHapusKelas, kelasTidakDitemukan, namaCocok,
@@ -82,15 +84,34 @@ export default function HapusKelasDialog({
   const tutup = () => { if (!sibuk) onTutup(); };
 
   return (
-    <Dialog open onClose={tutup} maxWidth="sm" fullWidth aria-labelledby="judul-hapus-kelas">
-      <DialogTitle id="judul-hapus-kelas">{judulHapusKelas(kelas)}</DialogTitle>
-      <DialogContent>
-        <DialogContentText sx={{ mb: 2 }}>
+    <Dialog
+      open
+      onClose={tutup}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby="judul-hapus-kelas"
+      PaperProps={{ sx: { borderRadius: '7px' } }}
+    >
+      <Box sx={{ display: 'flex', justifyContent: 'center', pt: 4 }}>
+        <Box
+          aria-hidden="true"
+          sx={{
+            width: 56, height: 56, borderRadius: '50%', bgcolor: 'rgba(250,137,107,.18)', color: '#D2431F', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+        >
+          <IconTrash size={28} />
+        </Box>
+      </Box>
+      <DialogTitle id="judul-hapus-kelas" sx={{ textAlign: 'center', fontSize: '1.25rem', fontWeight: 500, pt: 2, pb: 1 }}>
+        {judulHapusKelas(kelas)}
+      </DialogTitle>
+      <DialogContent sx={{ px: { xs: 2.5, sm: 4 } }}>
+        <DialogContentText sx={{ mb: 3, textAlign: 'center', color: w.ink }}>
           Menghapus kelas akan menghapus semua data yang sudah ada di dalamnya. Tindakan ini tidak bisa dibatalkan.
         </DialogContentText>
 
         {memuat && (
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, py: 2 }} role="status">
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1.5, py: 2 }} role="status">
             <CircularProgress size={20} />
             <Typography sx={{ fontSize: 14, color: w.sekunder }}>Menghitung isi kelas ini</Typography>
           </Box>
@@ -110,19 +131,25 @@ export default function HapusKelasDialog({
             <Box
               component="section"
               aria-labelledby="judul-isian-terhapus"
-              sx={{
-                border: `1px solid ${w.garis}`, borderRadius: '8px', p: 2, mb: 2, bgcolor: w.kartu, boxShadow: 'none',
-              }}
+              sx={{ borderRadius: '7px', p: 2.5, mb: 3, bgcolor: w.latar, boxShadow: 'none' }}
             >
-              <Typography component="h3" id="judul-isian-terhapus" sx={{ fontSize: 14, fontWeight: 700, mb: 1 }}>
+              <Typography component="h3" id="judul-isian-terhapus" sx={{ fontSize: 15, fontWeight: 600, mb: 1 }}>
                 Yang ikut terhapus dari kelas ini
               </Typography>
               {baris.length === 0 ? (
-                <Typography sx={{ fontSize: 14 }}>Kelas ini masih kosong, tidak ada isian yang ikut terhapus.</Typography>
+                <Typography sx={{ fontSize: 15 }}>Kelas ini masih kosong, tidak ada isian yang ikut terhapus.</Typography>
               ) : (
-                <Box component="ul" sx={{ m: 0, pl: 2.5, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                <Box
+                  component="ul"
+                  sx={{
+                    m: 0, p: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'repeat(2, minmax(0, 1fr))' }, columnGap: 3, rowGap: 0.75,
+                  }}
+                >
                   {baris.map((b) => (
-                    <Typography component="li" key={b.kunci} sx={{ fontSize: 15 }}>{b.teks}</Typography>
+                    <Typography component="li" key={b.kunci} sx={{ fontSize: 15, lineHeight: 1.4 }}>
+                      {/* Angkanya ditebalkan supaya jumlah yang ikut hilang terbaca sekilas. */}
+                      {b.teks.split(/(\d+)/).map((bagian, i) => (/^\d+$/.test(bagian) ? <b key={i}>{bagian}</b> : bagian))}
+                    </Typography>
                   ))}
                 </Box>
               )}
@@ -131,20 +158,17 @@ export default function HapusKelasDialog({
               </Typography>
             </Box>
 
-            <TextField
-              autoFocus
-              fullWidth
+            <KolomIsian
+              id="ketik-nama-kelas"
               label={`Ketik ${kelas.nama_kelas} untuk mengonfirmasi`}
+              placeholder="Ketik nama kelas"
               value={ketik}
               onChange={(e) => setKetik(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); hapus(); } }}
               disabled={sibuk}
+              autoFocus
               autoComplete="off"
-              slotProps={{
-                htmlInput: { 'aria-describedby': 'bantu-hapus-kelas' },
-                formHelperText: { id: 'bantu-hapus-kelas', 'aria-live': 'polite' },
-              }}
-              helperText={cocok
+              bantuan={cocok
                 ? 'Nama cocok. Tombol Hapus kelas sekarang aktif.'
                 : 'Tombol Hapus kelas aktif setelah nama kelas diketik dengan benar.'}
             />
@@ -153,9 +177,16 @@ export default function HapusKelasDialog({
 
         {galat && <Alert severity="error" sx={{ mt: 2 }}>{galat}</Alert>}
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2 }}>
-        <Button onClick={tutup} disabled={sibuk}>Batal</Button>
-        <Button color="error" variant="contained" onClick={hapus} disabled={!isian || !cocok || sibuk}>
+      <DialogActions sx={{ justifyContent: 'center', gap: 1.5, px: 3, pb: 4, pt: 1 }}>
+        <Button variant="outlined" color="inherit" onClick={tutup} disabled={sibuk} sx={{ borderColor: '#D1D5DB', color: '#374151', ml: 0 }}>Batal</Button>
+        <Button
+          variant="contained"
+          onClick={hapus}
+          disabled={!isian || !cocok || sibuk}
+          sx={{
+            ml: 0, boxShadow: 'none', bgcolor: '#D2431F', color: '#fff', '&:hover': { bgcolor: '#B83A1A', boxShadow: 'none' }, '&.Mui-disabled': { bgcolor: 'rgba(0,0,0,.12)', color: 'rgba(0,0,0,.38)' },
+          }}
+        >
           {sibuk ? 'Menghapus' : 'Hapus kelas'}
         </Button>
       </DialogActions>

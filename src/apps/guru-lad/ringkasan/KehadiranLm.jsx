@@ -41,7 +41,7 @@ export default function KehadiranLm({ data, onBukaKehadiran }) {
                   aria-label={`${b.judul}: alpa ${b.alpa}, ${b.sakitIzin}`}
                   sx={{ height: 14, borderRadius: '3px', bgcolor: w.garisLembut, overflow: 'hidden', ...CETAK }}
                 >
-                  <Box sx={{ width: `${b.lebar}%`, height: '100%', bgcolor: w.navy, borderRadius: '3px', ...CETAK }} />
+                  <Box sx={{ width: `${b.lebar}%`, height: '100%', bgcolor: w.primer, borderRadius: '3px', ...CETAK }} />
                 </Box>
                 <Typography sx={{ fontSize: 13, color: w.sekunder }}>{b.sakitIzin}</Typography>
               </Box>

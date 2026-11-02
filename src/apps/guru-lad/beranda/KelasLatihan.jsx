@@ -3,12 +3,13 @@ import {
   Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import KartuHalaman from '../komponen/KartuHalaman';
 import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { KEADAAN, keadaanKelas } from '../ringkasan/ringkasan';
 import { TagKasus, TombolBuka, TombolIkonBuka } from './KelasTable';
 
 const Judul = ({ children }) => (
-  <Typography variant="h6" sx={{ fontSize: '0.9375rem' }}>{children}</Typography>
+  <Typography sx={{ fontSize: '1rem', fontWeight: 600, lineHeight: '1.2rem' }}>{children}</Typography>
 );
 Judul.propTypes = { children: PropTypes.node };
 
@@ -24,14 +25,12 @@ export default function KelasLatihan({ kelas, onBuka }) {
   const w = warnaRingkasan(useTheme());
   if (kelas.length === 0) return null;
   return (
-    <Box component="section" aria-labelledby="judul-kelas-latihan" sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-      <Typography component="h2" id="judul-kelas-latihan" sx={{ fontSize: 16, fontWeight: 700 }}>Kelas latihan</Typography>
-
-      <Box sx={{ display: { xs: 'none', md: 'block' }, bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '8px', overflow: 'hidden' }}>
+    <KartuHalaman judul="Kelas latihan" tingkat="h2">
+      <Box sx={{ display: { xs: 'none', md: 'block' }, bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '7px', overflow: 'hidden' }}>
         <TableContainer>
-          <Table aria-label="Kelas latihan" sx={{ minWidth: 760 }}>
+          <Table aria-label="Kelas latihan" sx={{ minWidth: 760, '& th, & td': { p: '16px' }, '& tbody tr:last-of-type td': { borderBottom: 0 } }}>
             <TableHead>
-              <TableRow sx={{ '& th': { borderBottom: `1px solid ${w.ink}` } }}>
+              <TableRow>
                 <TableCell><Judul>No</Judul></TableCell>
                 <TableCell><Judul>Kelas</Judul></TableCell>
                 <TableCell align="center"><Judul>Siswa</Judul></TableCell>
@@ -42,14 +41,14 @@ export default function KelasLatihan({ kelas, onBuka }) {
             </TableHead>
             <TableBody>
               {kelas.map((k, i) => (
-                <TableRow key={k.id} hover sx={{ cursor: 'pointer', '& td': { verticalAlign: 'middle' } }} onClick={() => onBuka(k.id)}>
+                <TableRow key={k.id} hover sx={{ cursor: 'pointer', '& td': { verticalAlign: 'middle' }, '&.MuiTableRow-hover:hover': { bgcolor: w.barisHover } }} onClick={() => onBuka(k.id)}>
                   <TableCell><Typography sx={{ fontSize: '1rem' }}>{i + 1}</Typography></TableCell>
                   <TableCell>
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.25, flexWrap: 'wrap' }}>
-                      <Typography sx={{ fontSize: '1.0625rem', fontWeight: 700 }}>{k.nama_kelas}</Typography>
+                      <Typography sx={{ fontSize: '1rem', fontWeight: 700 }}>{k.nama_kelas}</Typography>
                       <TagKasus kelas={k} />
                     </Box>
-                    <Typography sx={{ fontSize: 13, color: w.sekunder }}>
+                    <Typography sx={{ fontSize: 13, lineHeight: 1.35, color: w.sekunder }}>
                       Hanya-baca. Aktivitas di sini dicatat terpisah dari kelas nyata.
                     </Typography>
                   </TableCell>
@@ -72,7 +71,7 @@ export default function KelasLatihan({ kelas, onBuka }) {
             <Box
               key={k.id}
               sx={{
-                bgcolor: w.kartu, border: `1px dashed ${w.ink}`, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.75, flexWrap: 'wrap',
+                bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '7px', display: 'flex', alignItems: 'center', gap: 2, px: 2.5, py: 1.75, flexWrap: 'wrap',
               }}
             >
               <Box sx={{ flex: '1 1 260px', display: 'flex', flexDirection: 'column', gap: 0.5 }}>
@@ -94,7 +93,7 @@ export default function KelasLatihan({ kelas, onBuka }) {
           );
         })}
       </Box>
-    </Box>
+    </KartuHalaman>
   );
 }
 

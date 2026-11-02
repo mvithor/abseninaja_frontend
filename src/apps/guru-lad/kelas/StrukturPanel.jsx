@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Button, IconButton, Stack, TextField, Tooltip, Typography,
+  Alert, Box, Button, IconButton, Stack, Tooltip, Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import {
-  IconArrowDown, IconArrowUp, IconPencil, IconPlus, IconTrash,
+  IconArrowDown, IconArrowUp, IconPencil, IconPercentage, IconPlus, IconTarget, IconTrash,
 } from '@tabler/icons-react';
 import {
   tambahLm, ubahLm, hapusLm, urutLm, tambahTp, ubahTp, hapusTp, ubahKelas, pesanGalat,
@@ -13,7 +13,8 @@ import {
 import FormDialog from '../komponen/FormDialog';
 import HapusDialog from '../komponen/HapusDialog';
 import JudulTab from '../komponen/JudulTab';
-import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
+import KolomIsian from '../komponen/KolomIsian';
+import { gayaKartu, gayaTombol, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { galatPerKolom } from '../galat';
 import { BAWAAN_AMBANG, periksaAmbang, tampilAngka } from '../rentang';
 import { judulLm, labelTp } from '../label';
@@ -74,43 +75,47 @@ function ParameterKelas({ kelas, readOnly, onBerubah }) {
   };
 
   const bidangAmbang = (kunci, label, bantu) => (
-    <TextField
+    <KolomIsian
+      id={`amb-${kunci}`}
       label={label}
       value={f[kunci]}
       onChange={ubah(kunci)}
       disabled={readOnly}
-      error={Boolean(galatAmbang(kunci))}
-      helperText={galatAmbang(kunci) ?? bantu}
-      inputProps={{ inputMode: 'decimal' }}
-      sx={{ flex: { sm: '1 1 220px' }, minWidth: { sm: 220 } }}
+      galat={galatAmbang(kunci)}
+      bantuan={bantu}
+      ikon={<IconTarget size={22} />}
+      inputMode="decimal"
     />
   );
+  const gridKolom = { display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' }, gap: { xs: 2, md: 2 } };
 
   return (
-    <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+    <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: '20px 24px' }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
       <Box sx={{ borderRadius: 0 }}>
-        <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink }}>Parameter kelas</Typography>
-        <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, mt: 0.5, maxWidth: '75ch' }}>
+        <Typography component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, color: w.ink }}>Parameter kelas</Typography>
+        <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, mt: 0.5, maxWidth: '80ch' }}>
           {readOnly
             ? 'Batas nilai TP kelas ini. Nilai tepat di batas masuk ke rentang di atasnya.'
             : 'Batas nilai TP untuk kelas ini. Nilai tepat di batas masuk ke rentang di atasnya. Mengubah batas mengubah ikon di tabel nilai dan hasil peringatan kelas ini.'}
         </Typography>
       </Box>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
-        {bidangAmbang('ambang_bagian', 'Remedial bagian tertentu mulai dari', 'Di bawah ini: remedial seluruh bagian')}
-        {bidangAmbang('kktp', 'Sudah mencapai (KKTP) mulai dari', 'Di bawah ini: belum mencapai')}
-        {bidangAmbang('ambang_pengayaan', 'Perlu pengayaan mulai dari', 'Di atas ini: pengayaan')}
-      </Stack>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }} flexWrap="wrap" useFlexGap>
-        <TextField label="Bobot nilai akhir (%)" value={f.nilai} onChange={ubah('nilai')} disabled={readOnly} helperText="Bobot nilai akhir + SAS = 100" sx={{ flex: { sm: '0 1 240px' } }} />
-        <TextField label="Bobot SAS (%)" value={f.sas} onChange={ubah('sas')} disabled={readOnly} sx={{ flex: { sm: '0 1 240px' } }} />
-      </Stack>
+      <Box role="group" aria-label="Parameter kelas" sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={gridKolom}>
+          {bidangAmbang('ambang_bagian', 'Remedial bagian tertentu mulai dari', 'Di bawah ini: remedial seluruh bagian')}
+          {bidangAmbang('kktp', 'Sudah mencapai (KKTP) mulai dari', 'Di bawah ini: belum mencapai')}
+          {bidangAmbang('ambang_pengayaan', 'Perlu pengayaan mulai dari', 'Di atas ini: pengayaan')}
+        </Box>
+        <Box sx={gridKolom}>
+          <KolomIsian id="bobot-nilai" label="Bobot nilai akhir (%)" value={f.nilai} onChange={ubah('nilai')} disabled={readOnly} ikon={<IconPercentage size={22} />} bantuan="Bobot nilai akhir + SAS = 100" inputMode="decimal" />
+          <KolomIsian id="bobot-sas" label="Bobot SAS (%)" value={f.sas} onChange={ubah('sas')} disabled={readOnly} ikon={<IconPercentage size={22} />} inputMode="decimal" />
+        </Box>
+      </Box>
       {!readOnly && (
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} alignItems={{ sm: 'center' }}>
-          <Button variant="contained" onClick={simpan} disabled={sibuk || adaGalat} sx={{ whiteSpace: 'nowrap', flexShrink: 0 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }} sx={{ mt: 1 }}>
+          <Button variant="contained" onClick={simpan} disabled={sibuk || adaGalat} sx={{ whiteSpace: 'nowrap', flexShrink: 0, boxShadow: 'none' }}>
             {sibuk ? 'Menyimpan...' : 'Simpan parameter'}
           </Button>
-          <Button variant="outlined" onClick={usulanAwal} disabled={sibuk} sx={{ whiteSpace: 'normal', textAlign: 'left' }}>
+          <Button variant="outlined" color="inherit" onClick={usulanAwal} disabled={sibuk} sx={{ whiteSpace: 'normal', textAlign: 'left', borderColor: '#D1D5DB', color: '#374151' }}>
             Kembalikan ke usulan awal ({tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, {tampilAngka(BAWAAN_AMBANG.kktp)}, {tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)})
           </Button>
         </Stack>
@@ -180,11 +185,11 @@ export default function StrukturPanel({
       />
       <ParameterKelas key={`${kelas.ambang_bagian}-${kelas.kktp}-${kelas.ambang_pengayaan}-${kelas.bobot_sas}`} kelas={kelas} readOnly={readOnly} onBerubah={onBerubah} />
 
-      <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ sm: 'center' }} spacing={1.5}>
-          <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink }}>Lingkup materi dan tujuan pembelajaran</Typography>
+          <Typography component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, color: w.ink }}>Lingkup materi dan tujuan pembelajaran</Typography>
           {!readOnly && (
-            <Button startIcon={<IconPlus size={20} />} variant="contained" onClick={() => setForm({ jenis: 'lm-baru' })}>
+            <Button startIcon={<IconPlus size={20} />} variant="contained" onClick={() => setForm({ jenis: 'lm-baru' })} sx={{ boxShadow: 'none' }}>
               Tambah lingkup materi
             </Button>
           )}
@@ -192,16 +197,16 @@ export default function StrukturPanel({
         {galat && <Alert severity="error">{galat}</Alert>}
         {lm.length === 0 && <Alert severity="info">Belum ada lingkup materi. Tambahkan dulu, lalu isi TP-nya.</Alert>}
 
-        <Stack spacing={2.5}>
+        <Stack spacing={2}>
           {lm.map((m, i) => (
-            <Box key={m.id} sx={{ border: `1px solid ${w.garis}`, borderRadius: '8px', overflow: 'hidden', boxShadow: 'none' }}>
+            <Box key={m.id} sx={{ border: `1px solid ${w.garis}`, borderRadius: '7px', overflow: 'hidden', boxShadow: 'none', bgcolor: w.kartu }}>
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={0.5}
-                sx={{ bgcolor: w.latar, borderBottom: `1px solid ${w.ink}`, borderRadius: 0, px: { xs: 1.5, md: 2 }, py: 0.75, minHeight: 56 }}
+                sx={{ bgcolor: w.latar, borderBottom: `1px solid ${w.garis}`, borderRadius: 0, pl: 2, pr: 1, py: 1, minHeight: 56 }}
               >
-                <Typography sx={{ flexGrow: 1, fontSize: '1.0625rem', fontWeight: 700, lineHeight: '1.5rem', color: w.ink }}>
+                <Typography sx={{ flexGrow: 1, fontSize: 16, fontWeight: 500, lineHeight: 1.5, color: w.ink }}>
                   {judulLm(m)}
                 </Typography>
                 {!readOnly && (
@@ -223,16 +228,17 @@ export default function StrukturPanel({
                     key={t.id}
                     sx={{
                       display: 'grid',
-                      gridTemplateColumns: { xs: 'minmax(0, 1fr) auto', md: '80px minmax(0, 1fr) auto' },
+                      gridTemplateColumns: { xs: 'minmax(0, 1fr) auto', md: '44px minmax(0, 1fr) auto' },
                       columnGap: { xs: 1, md: 2 },
                       alignItems: 'start',
-                      px: { xs: 1.5, md: 2 },
-                      py: 1.25,
-                      borderBottom: `1px solid ${w.garisLembut}`,
+                      pl: 2,
+                      pr: 1,
+                      py: 1,
+                      borderBottom: `1px solid ${w.garis}`,
                       borderRadius: 0,
                     }}
                   >
-                    <Typography sx={{ fontSize: '1rem', fontWeight: 700, lineHeight: '1.5rem', pt: { xs: 0.5, md: 0.25 }, color: w.ink }}>
+                    <Typography sx={{ fontSize: 16, fontWeight: 600, lineHeight: 1.4, pt: 1, color: w.ink }}>
                       {labelTp(t)}
                     </Typography>
                     {!readOnly && (
@@ -246,12 +252,12 @@ export default function StrukturPanel({
                       sx={{
                         gridColumn: { xs: '1 / -1', md: 2 },
                         gridRow: { xs: 2, md: 1 },
-                        fontSize: '1rem',
-                        lineHeight: '1.5rem',
+                        fontSize: 16,
+                        lineHeight: 1.4,
                         color: w.ink,
                         minWidth: 0,
                         overflowWrap: 'anywhere',
-                        pt: { md: 0.25 },
+                        pt: 1,
                       }}
                     >
                       {t.rumusan || (readOnly ? null : <i>tanpa rumusan</i>)}
@@ -259,8 +265,8 @@ export default function StrukturPanel({
                   </Box>
                 ))}
                 {!readOnly && (
-                  <Box sx={{ px: { xs: 1, md: 1.5 }, py: 1, borderRadius: 0 }}>
-                    <Button startIcon={<IconPlus size={18} />} onClick={() => setForm({ jenis: 'tp-baru', lm: m })}>
+                  <Box sx={{ px: 2, py: '10px', borderRadius: 0 }}>
+                    <Button startIcon={<IconPlus size={18} />} onClick={() => setForm({ jenis: 'tp-baru', lm: m })} sx={gayaTombol(w, {})}>
                       Tambah TP
                     </Button>
                   </Box>

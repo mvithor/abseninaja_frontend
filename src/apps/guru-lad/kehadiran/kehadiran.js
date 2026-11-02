@@ -151,11 +151,20 @@ export function tanggalPanjang(teks) {
   return `${hari}, ${u.d} ${NAMA_BULAN[u.m - 1]} ${u.y}`;
 }
 
-/** "26/10" untuk judul kolom yang sempit; teks asli bila bukan tanggal nyata. */
+const SINGKAT_BULAN = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+/** "22 Sep 2026" untuk kolom tanggal pada tabel; teks asli bila bukan tanggal nyata. */
+export function tanggalRingkas(teks) {
+  const u = uraiTanggal(teks);
+  if (!u) return String(teks ?? '');
+  return `${u.d} ${SINGKAT_BULAN[u.m - 1]} ${u.y}`;
+}
+
+/** "26 Okt" (tanpa tahun) untuk judul kolom yang sempit; teks asli bila bukan tanggal nyata. */
 export function tanggalPendek(teks) {
   const u = uraiTanggal(teks);
   if (!u) return String(teks ?? '');
-  return `${String(u.d).padStart(2, '0')}/${String(u.m).padStart(2, '0')}`;
+  return `${u.d} ${SINGKAT_BULAN[u.m - 1]}`;
 }
 
 const SINGKATAN_ZONA = {
@@ -204,4 +213,22 @@ export function labelLm(lm, lmId) {
   if (lmId === null || lmId === undefined) return null;
   const m = (lm ?? []).find((x) => x.id === lmId);
   return m ? `LM ${m.urutan}` : null;
+}
+
+/**
+ * Kelompok kolom pertemuan menurut lingkup materi untuk baris judul atas tabel ("LM 1 · 5 pertemuan"). Pertemuan yang
+ * berurutan dan satu lingkup materi digabung; pertemuan tanpa lingkup materi dikelompokkan sendiri. `awal` adalah
+ * indeks kolom pertama kelompok, dipakai untuk garis pemisah antarkelompok.
+ */
+export function kelompokLm(pertemuanUrut, lm) {
+  const hasil = [];
+  pertemuanUrut.forEach((p, i) => {
+    const id = p.lingkup_materi_id ?? null;
+    const akhir = hasil[hasil.length - 1];
+    if (akhir && akhir.lmId === id) { akhir.jumlah += 1; return; }
+    hasil.push({
+      lmId: id, label: labelLm(lm, id) ?? 'Tanpa lingkup materi', jumlah: 1, awal: i,
+    });
+  });
+  return hasil;
 }

@@ -43,11 +43,11 @@ export function buatTemaLad(luar) {
           root: { fontSize: HURUF.isi, lineHeight: '1.5rem', padding: '14px 16px' },
           sizeSmall: { padding: '12px 16px' },
           head: {
-            fontSize: HURUF.bacaan,
-            fontWeight: 700,
+            fontSize: HURUF.isi,
+            fontWeight: 600,
             color: p.text.primary,
             backgroundColor: p.background.paper,
-            borderBottom: `1px solid ${p.text.primary}`,
+            borderBottom: `1px solid ${p.divider}`,
           },
         },
       },
@@ -93,19 +93,37 @@ export function buatTemaLad(luar) {
       },
       MuiFormControlLabel: {
         styleOverrides: {
+          // Saklar tidak punya bantalan 9 px seperti kotak centang, jadi jarak ke label diatur sendiri.
+          root: { '&:has(.MuiSwitch-root)': { marginLeft: 0, gap: 10 } },
           label: { fontSize: HURUF.bacaan },
         },
       },
-      // Peringatan: tema aplikasi memberi teks berwarna sama dengan latarnya (mis. biru muda di atas biru sangat muda),
-      // kontrasnya rendah. Di LAD teks memakai warna teks biasa; jenisnya dibedakan oleh ikon, garis kiri, dan kata-katanya.
+      // Peringatan mengikuti desain: kotak berlatar lembut tanpa garis tepi, teks berwarna teks biasa (tema aplikasi
+      // memberi teks sewarna latarnya sehingga kontrasnya rendah), dan jenisnya dibedakan oleh ikon berwarna dan kata-katanya.
       MuiAlert: {
         styleOverrides: {
-          root: { fontSize: HURUF.bacaan, lineHeight: '1.4rem', padding: '10px 16px' },
-          message: { padding: '6px 0' },
-          standardInfo: { color: p.text.primary, borderLeft: `4px solid ${p.info.main}` },
-          standardSuccess: { color: p.text.primary, borderLeft: `4px solid ${p.success.main}` },
-          standardWarning: { color: p.text.primary, borderLeft: `4px solid ${p.warning.main}` },
-          standardError: { color: p.text.primary, borderLeft: `4px solid ${p.error.main}` },
+          root: {
+            fontSize: HURUF.kecil, lineHeight: 1.5, padding: '12px 16px', borderRadius: 7, alignItems: 'flex-start',
+          },
+          message: { padding: 0 },
+          icon: { padding: 0, marginRight: 12, marginTop: 1, opacity: 1 },
+          action: { padding: 0, marginTop: 0 },
+          standardInfo: { color: p.text.primary, '& .MuiAlert-icon': { color: p.info.dark } },
+          standardSuccess: { color: p.text.primary, '& .MuiAlert-icon': { color: p.success.dark } },
+          standardWarning: { color: p.text.primary, '& .MuiAlert-icon': { color: p.warning.dark } },
+          standardError: { color: p.text.primary, '& .MuiAlert-icon': { color: p.error.dark } },
+        },
+      },
+      // Saklar mengikuti desain: lintasan abu-biru muda 42x24, bulatan putih; menyala berwarna primer.
+      MuiSwitch: {
+        styleOverrides: {
+          root: { width: 42, height: 24, padding: 0 },
+          switchBase: {
+            padding: 2,
+            '&.Mui-checked': { transform: 'translateX(18px)', color: '#fff', '& + .MuiSwitch-track': { backgroundColor: p.primary.main, opacity: 1 } },
+          },
+          thumb: { width: 20, height: 20, backgroundColor: '#fff', boxShadow: '0 1px 3px rgba(0,0,0,.3)' },
+          track: { borderRadius: 12, backgroundColor: p.grey[300], opacity: 1 },
         },
       },
       MuiTooltip: {
