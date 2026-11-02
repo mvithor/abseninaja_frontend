@@ -16,6 +16,7 @@ import {
 } from '../nilai/tempel';
 import { gayaGrid } from '../nilai/gayaGrid';
 import HapusDialog from '../komponen/HapusDialog';
+import MenuAksiKolom from '../komponen/MenuAksiKolom';
 import ProyekFormDialog from './ProyekFormDialog';
 import {
   labelProyek, TEKS_JENIS, tidakDikumpulkan, hitungJenis,
@@ -199,6 +200,7 @@ export default function ProyekPanel({
           `Nilai proyek (Latihan Materi): ${jenisProyek.individu} individu, ${jenisProyek.kelompok} kelompok. Sel kosong berarti belum dinilai.`,
           <>Pada proyek <b>individu</b>, nilai <b>0</b> berarti tidak dikumpulkan dan menjadi dasar penanda &quot;Proyek individu tidak dikumpulkan&quot;.</>,
           'Proyek kelompok tidak dipakai penanda.',
+          ...(readOnly ? [] : ['Menu titik tiga di kepala kolom berisi Ubah dan Hapus proyek.']),
         ]}
       />
       {!readOnly && (
@@ -231,14 +233,24 @@ export default function ProyekPanel({
               {proyek.map((p) => (
                 <th key={p.id} style={{ minWidth: 168, height: 'auto', padding: '10px 10px' }}>
                   <Stack alignItems="center" spacing={0.75}>
-                    <span title={labelProyek(p)}>{labelProyek(p).length > 22 ? `${labelProyek(p).slice(0, 21)}…` : labelProyek(p)}</span>
+                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                      <span title={labelProyek(p)}>{labelProyek(p).length > 22 ? `${labelProyek(p).slice(0, 21)}…` : labelProyek(p)}</span>
+                      {!readOnly && (
+                        <MenuAksiKolom
+                          label={`Aksi ${labelProyek(p)}: ubah atau hapus`}
+                          judul={`Aksi ${labelProyek(p)}`}
+                          item={[
+                            {
+                              kunci: 'ubah', teks: 'Ubah proyek', ikon: <IconPencil size={20} />, onPilih: () => setForm({ proyek: p }),
+                            },
+                            {
+                              kunci: 'hapus', teks: 'Hapus proyek', ikon: <IconTrash size={20} />, onPilih: () => setHapus(p), bahaya: true,
+                            },
+                          ]}
+                        />
+                      )}
+                    </Stack>
                     <Chip size="small" variant="outlined" label={TEKS_JENIS[p.jenis] ?? p.jenis} />
-                    {!readOnly && (
-                      <Stack direction="row">
-                        <Tooltip title="Ubah"><IconButton size="small" aria-label={`Ubah proyek ${labelProyek(p)}`} onClick={() => setForm({ proyek: p })}><IconPencil size={18} /></IconButton></Tooltip>
-                        <Tooltip title="Hapus"><IconButton size="small" aria-label={`Hapus proyek ${labelProyek(p)}`} onClick={() => setHapus(p)}><IconTrash size={18} /></IconButton></Tooltip>
-                      </Stack>
-                    )}
                   </Stack>
                 </th>
               ))}
