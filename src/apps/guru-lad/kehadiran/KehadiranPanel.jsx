@@ -13,6 +13,7 @@ import {
 import { uraiTempel, terapkanTempel } from '../nilai/tempel';
 import { gayaGrid } from '../nilai/gayaGrid';
 import HapusDialog from '../komponen/HapusDialog';
+import MenuAksiKolom from '../komponen/MenuAksiKolom';
 import JudulTab from '../komponen/JudulTab';
 import PetunjukTab from '../komponen/PetunjukTab';
 import BilahSimpan from '../komponen/BilahSimpan';
@@ -269,7 +270,7 @@ export default function KehadiranPanel({
         butir={[
           <>Ketik <b>H</b> (hadir), <b>S</b> (sakit), <b>I</b> (izin), atau <b>A</b> (alpa, tanpa keterangan); kursor turun sendiri.</>,
           <>Sel <b>kosong berarti belum dicatat</b>, bukan alpa, dan tidak dihitung.</>,
-          'Tombol "Semua hadir" di kepala kolom hanya mengisi sel yang kosong.',
+          'Menu titik tiga di kepala kolom berisi Semua hadir (hanya mengisi sel yang kosong), Ubah, dan Hapus pertemuan.',
           'Kolom H S I A di kiri menghitung dari isian yang tampil.',
         ]}
       />
@@ -316,19 +317,31 @@ export default function KehadiranPanel({
                 return (
                   <th key={p.id} style={{ minWidth: 112, height: 'auto', padding: '10px 6px' }}>
                     <Stack alignItems="center" spacing={0.5}>
-                      <span title={`Pertemuan ke-${p.nomor}, ${tanggalPanjang(p.tanggal)}`}>{`P${p.nomor}`}</span>
+                      <Stack direction="row" alignItems="center" spacing={0.5}>
+                        <span title={`Pertemuan ke-${p.nomor}, ${tanggalPanjang(p.tanggal)}`}>{`P${p.nomor}`}</span>
+                        {!readOnly && (
+                          <MenuAksiKolom
+                            label={`Aksi pertemuan ${p.nomor}: semua hadir, ubah, hapus`}
+                            judul={`Aksi pertemuan ${p.nomor}`}
+                            item={[
+                              {
+                                kunci: 'semua-hadir', teks: 'Semua hadir', ikon: <IconChecks size={20} />, onPilih: () => semuaHadir(p.id),
+                              },
+                              {
+                                kunci: 'ubah', teks: 'Ubah pertemuan', ikon: <IconPencil size={20} />, onPilih: () => setForm({ pertemuan: p }),
+                              },
+                              {
+                                kunci: 'hapus', teks: 'Hapus pertemuan', ikon: <IconTrash size={20} />, onPilih: () => setHapus(p), bahaya: true,
+                              },
+                            ]}
+                          />
+                        )}
+                      </Stack>
                       <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>{tanggalPendek(p.tanggal)}</Typography>
                       {lmLabel && <Chip size="small" variant="outlined" label={lmLabel} />}
                       <Typography variant="caption" color={rp.belum > 0 ? 'text.primary' : 'text.secondary'} sx={{ lineHeight: 1.2, whiteSpace: 'nowrap', fontWeight: rp.belum > 0 ? 700 : 400 }}>
                         {rp.belum > 0 ? `${rp.belum} kosong` : 'lengkap'}
                       </Typography>
-                      {!readOnly && (
-                        <Stack direction="row">
-                          <Tooltip title="Semua hadir (hanya sel kosong)"><IconButton size="small" sx={{ p: 1 }} aria-label={`Semua hadir pada pertemuan ${p.nomor}`} onClick={() => semuaHadir(p.id)}><IconChecks size={18} /></IconButton></Tooltip>
-                          <Tooltip title="Ubah"><IconButton size="small" sx={{ p: 1 }} aria-label={`Ubah pertemuan ${p.nomor}`} onClick={() => setForm({ pertemuan: p })}><IconPencil size={18} /></IconButton></Tooltip>
-                          <Tooltip title="Hapus"><IconButton size="small" sx={{ p: 1 }} aria-label={`Hapus pertemuan ${p.nomor}`} onClick={() => setHapus(p)}><IconTrash size={18} /></IconButton></Tooltip>
-                        </Stack>
-                      )}
                     </Stack>
                   </th>
                 );
