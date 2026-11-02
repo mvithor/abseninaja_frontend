@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  MODE_URUT, bagiGolongan, bulatSatuDesimal, deretKehadiran, deretP4, barisP1, pembandingUrut, ringkasKolomTp,
+  MODE_URUT, bagiGolongan, bulatSatuDesimal, deretKehadiran, deretP4, barisP1, legendaWarnaSel, pembandingUrut, ringkasKolomTp,
   siapkanKonteks, susunBaris, susunKolom, susunRincian, titikGrafikP4,
 } from './matriks.js';
 import { golonganSiswa, hitungGolongan, labelTabPerhatian } from './penjelasan.js';
@@ -315,4 +315,18 @@ test('susunRincian: bagian P4 membawa kktp untuk grafik yang menyesuaikan lebar'
   const r = susunRincian(h, { lm: LM, parameter: {} }, siapkanKonteks({ siswa: [{ id: 1 }] }), 75);
   assert.equal(r.bagian[0].kktp, 75);
   assert.equal(susunRincian(h, { lm: LM, parameter: {} }, siapkanKonteks({ siswa: [{ id: 1 }] }), null).bagian[0].kktp, null);
+});
+
+test('legendaWarnaSel: batas mengikuti kelas, merah mencakup proyek tidak dikumpulkan, kuning sampai KKTP', () => {
+  assert.deepEqual(legendaWarnaSel(AMBANG), [
+    { kunci: 'merah', teks: 'Sel merah: nilai di bawah 41, atau proyek individu tidak dikumpulkan (\u2298)' },
+    { kunci: 'kuning', teks: 'Sel kuning: nilai 41 sampai di bawah 75' },
+  ]);
+  assert.equal(legendaWarnaSel({ ambang_bagian: 41, kktp: 66.5 })[1].teks, 'Sel kuning: nilai 41 sampai di bawah 66,5');
+});
+
+test('legendaWarnaSel: batas yang tidak ada tidak menghasilkan baris berisi NaN', () => {
+  assert.deepEqual(legendaWarnaSel({}), []);
+  assert.deepEqual(legendaWarnaSel(null), []);
+  assert.deepEqual(legendaWarnaSel({ ambang_bagian: 41 }).map((b) => b.kunci), ['merah']);
 });

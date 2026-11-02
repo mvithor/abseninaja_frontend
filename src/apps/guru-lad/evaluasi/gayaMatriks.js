@@ -94,6 +94,11 @@ export const gayaMatriks = (theme) => {
     '& tr.rata td.k-nama, & tr.rata td.k-no, & tr.rata td.k-pen': { background: theme.palette.grey[100] },
     '& tr.rata td.k-nama, & tr.rata td.k-pen': { textAlign: 'left' },
     '& tr.rata small': { display: 'block', fontSize: 13, color: theme.palette.text.secondary },
+    // Label ringkasan boleh turun baris: "Siswa yang belum mencapai KKTP 75" lebih panjang dari kolom nama.
+    '& tr.rata td.k-nama': { whiteSpace: 'normal', overflow: 'visible', textOverflow: 'clip', lineHeight: 1.3 },
+    // Baris kedua (jumlah di bawah KKTP) memakai latar putih dan huruf 14px; jumlah 0 diredam, bukan disembunyikan.
+    '& tr.rata.b2 td, & tr.rata.b2 td.k-no, & tr.rata.b2 td.k-nama, & tr.rata.b2 td.k-pen': { background: theme.palette.background.paper, fontSize: 14 },
+    '& tr.rata.b2 td.nol': { color: theme.palette.text.secondary },
     '& tr.grup td': { background: theme.palette.grey[100], fontWeight: 700, fontSize: 16, padding: 0 },
     '& tr.grup td > div': { position: 'sticky', left: 0, display: 'inline-block', padding: '10px 16px' },
     '& tr.terpilih td.k-nama': { boxShadow: `inset 4px 0 0 ${theme.palette.primary.main}` },

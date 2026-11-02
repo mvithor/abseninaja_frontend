@@ -6,7 +6,7 @@ import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, CircularProgress, Collapse,
   FormControlLabel, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import { IconChevronDown } from '@tabler/icons-react';
 import { bacaEvaluasi, bacaSaranKelas, kunciLad, pesanGalat } from '../api';
 import { ringkasKeputusan } from '../saran/saran';
@@ -18,7 +18,7 @@ import {
   KODE_POLA, POLA_INFO, alasanBelumCukup, barisKonteks, dataDibutuhkan, definisiPola, hitungGolongan, hitungRingkasan,
 } from './penjelasan';
 import {
-  MODE_URUT, bagiGolongan, siapkanKonteks, susunKolom, susunRincian,
+  MODE_URUT, bagiGolongan, legendaWarnaSel, siapkanKonteks, susunKolom, susunRincian,
 } from './matriks';
 import MatriksPerhatian from './MatriksPerhatian';
 import RincianSiswa from './RincianSiswa';
@@ -38,7 +38,8 @@ export default function EvaluasiPanel({
   const [terpilihId, setTerpilihId] = useState(null);
   const [legenda, setLegenda] = useState(false);
   const navigate = useNavigate();
-  const w = warnaRingkasan(useTheme());
+  const tema = useTheme();
+  const w = warnaRingkasan(tema);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: kunciLad.evaluasi(kelasId),
@@ -66,6 +67,7 @@ export default function EvaluasiPanel({
   const semuaSiswaId = useMemo(() => siswa.map((s) => s.id), [siswa]);
   const konteksKelas = useMemo(() => (data ? barisKonteks(data.konteks_kelas, lm) : []), [data, lm]);
   const legendaBaris = useMemo(() => legendaRentang(kelas), [kelas]);
+  const legendaWarna = useMemo(() => legendaWarnaSel(kelas), [kelas]);
 
   const hasilTerpilih = useMemo(
     () => (data && terpilihId !== null ? data.hasil.find((h) => h.siswa_id === terpilihId) ?? null : null),
@@ -175,18 +177,41 @@ export default function EvaluasiPanel({
       </Stack>
       <Collapse in={legenda} unmountOnExit>
         <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 2.5 } }} id="legenda-rentang">
-          <Stack direction="row" columnGap={3} rowGap={1} flexWrap="wrap" useFlexGap>
-            {legendaBaris.map((l) => (
-              <Stack key={l.rentang} direction="row" spacing={1} alignItems="center">
-                <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
-                <Typography variant="body2">{`${l.batas}: ${l.teks}`}</Typography>
+          <Stack spacing={1.5}>
+            <Stack component="ul" aria-label="Keterangan ikon" direction="row" columnGap={3.5} rowGap={1.25} flexWrap="wrap" useFlexGap sx={{ listStyle: 'none', m: 0, p: 0 }}>
+              {legendaBaris.map((l) => (
+                <Stack component="li" key={l.rentang} direction="row" spacing={1} alignItems="center">
+                  <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
+                  <Typography variant="body2">{`${l.batas}: ${l.teks}`}</Typography>
+                </Stack>
+              ))}
+            </Stack>
+            {legendaWarna.length > 0 && (
+              <Stack component="ul" aria-label="Warna sel" direction="row" columnGap={3.5} rowGap={1.25} flexWrap="wrap" useFlexGap sx={{ listStyle: 'none', m: 0, p: 0 }}>
+                {legendaWarna.map((l) => (
+                  <Stack component="li" key={l.kunci} direction="row" spacing={1} alignItems="center">
+                    <Box
+                      component="span"
+                      aria-hidden="true"
+                      sx={{
+                        width: 28, height: 14, borderRadius: '3px', flex: 'none', boxShadow: 'none',
+                        border: `1px solid ${w.garis}`,
+                        bgcolor: alpha(l.kunci === 'merah' ? tema.palette.error.main : tema.palette.warning.main, 0.22),
+                        WebkitPrintColorAdjust: 'exact',
+                        printColorAdjust: 'exact',
+                      }}
+                    />
+                    <Typography variant="body2">{l.teks}</Typography>
+                  </Stack>
+                ))}
               </Stack>
-            ))}
+            )}
+            <Typography variant="body2" sx={{ color: w.sekunder }}>
+              Setiap sel adalah nilai TP yang sebenarnya, bukan nilai remedial; tanda R menunjukkan ada remedial.
+              Titik tengah (·) berarti belum dinilai, bukan nol. Sel berbingkai tebal adalah TP yang menjadi bukti Kesulitan pada TP.
+              Bukti lengkap tiap penanda ada di rincian siswa.
+            </Typography>
           </Stack>
-          <Typography variant="body2" sx={{ mt: 1.5, color: w.sekunder }}>
-            Setiap sel adalah nilai TP yang sebenarnya, bukan nilai remedial; tanda R menunjukkan ada remedial.
-            Titik tengah (·) berarti belum dinilai, bukan nol. Sel berbingkai tebal adalah TP yang menjadi bukti Kesulitan pada TP.
-          </Typography>
         </Box>
       </Collapse>
 
