@@ -11,7 +11,7 @@ import {
   URUTAN_PRIORITAS, uraikanBukti,
 } from './penjelasan.js';
 import { labelTp, judulLm } from '../label.js';
-import { rentangNilai } from '../rentang.js';
+import { rentangNilai, tampilAngka } from '../rentang.js';
 import { kelompokkanRemedial, kunciRemedial, remedialTerbaru, cariTpId } from '../remedial/remedial.js';
 import { labelProyek, tidakDikumpulkan, JENIS_PROYEK } from '../proyek/proyek.js';
 import { kunciSel, petaKehadiran, rekapSiswa } from '../kehadiran/kehadiran.js';
@@ -124,6 +124,26 @@ export function ringkasKolomTp(kolomTp, siswaIds, ctx, kktp) {
     hasil.set(k.tpId, { n, rata: bulatSatuDesimal(jumlah, n), bawah });
   });
   return hasil;
+}
+
+// ------------------------------------------------------------------ legenda warna sel
+
+/**
+ * Dua baris legenda "Warna sel" di bawah legenda ikon. Batasnya mengikuti kelas: merah untuk nilai di bawah batas
+ * remedial bagian dan proyek individu yang tidak dikumpulkan, kuning untuk nilai dari batas itu sampai KKTP.
+ * Sama dengan kelas CSS sel (r-seluruh, tidak-kumpul, r-sebagian), jadi legenda dan warna tidak boleh berpisah.
+ */
+export function legendaWarnaSel(ambang) {
+  const bagian = Number(ambang?.ambang_bagian);
+  const kktp = Number(ambang?.kktp);
+  const baris = [];
+  if (Number.isFinite(bagian)) {
+    baris.push({ kunci: 'merah', teks: `Sel merah: nilai di bawah ${tampilAngka(bagian)}, atau proyek individu tidak dikumpulkan (\u2298)` });
+  }
+  if (Number.isFinite(bagian) && Number.isFinite(kktp)) {
+    baris.push({ kunci: 'kuning', teks: `Sel kuning: nilai ${tampilAngka(bagian)} sampai di bawah ${tampilAngka(kktp)}` });
+  }
+  return baris;
 }
 
 // ------------------------------------------------------------------ baris matriks

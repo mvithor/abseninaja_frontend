@@ -195,24 +195,35 @@ export default function MatriksPerhatian({
           </tr>
         </thead>
         <tbody>
+          {/* Dua baris ringkasan: rata-rata dulu, lalu siswa di bawah KKTP. Dipisah supaya masing-masing satu angka per sel. */}
           <tr className="rata">
             <td className="k-no" />
             <td className="k-nama" style={{ fontWeight: 600 }}>Rata-rata kelas</td>
-            <td className="k-pen" style={{ fontSize: 13 }}>
-              <span>di bawah KKTP</span>
-              <span aria-hidden="true"> &darr;</span>
-            </td>
+            <td className="k-pen" />
             {kolom.kolomTp.map((k, i) => {
               const r = ringkas.get(k.tpId);
               const awalLm = i === 0 || kolom.kolomTp[i - 1].lmNo !== k.lmNo;
               return (
-                <td key={k.tpId} className={awalLm ? 'pisah' : undefined} data-rata={r.rata ?? ''} data-bawah={r.bawah}>
-                  {r.rata === null ? <span aria-hidden="true">&middot;</span> : tampilAngka(r.rata)}
-                  <small>
-                    {r.n === 0 ? '' : `${r.bawah}`}
-                    {r.n > 0 && <span aria-hidden="true"> &darr;</span>}
-                    {r.n > 0 && <Box component="span" sx={sembunyi}>{` siswa di bawah KKTP dari ${r.n} yang dinilai`}</Box>}
-                  </small>
+                <td key={k.tpId} className={awalLm ? 'pisah' : undefined} data-rata={r.rata ?? ''}>
+                  {r.rata === null ? <span aria-hidden="true">&middot;</span> : <b>{tampilAngka(r.rata)}</b>}
+                  {r.rata === null && <Box component="span" sx={sembunyi}>belum ada nilai</Box>}
+                </td>
+              );
+            })}
+            <td colSpan={kolom.kolomProyek.length + 2} className="pisah" />
+          </tr>
+          <tr className="rata b2">
+            <td className="k-no" />
+            <td className="k-nama">{`Siswa yang belum mencapai KKTP ${tampilAngka(kktp)}`}</td>
+            <td className="k-pen"><small>dari siswa yang sudah dinilai</small></td>
+            {kolom.kolomTp.map((k, i) => {
+              const r = ringkas.get(k.tpId);
+              const awalLm = i === 0 || kolom.kolomTp[i - 1].lmNo !== k.lmNo;
+              const kelas = [awalLm ? 'pisah' : '', r.n > 0 && r.bawah === 0 ? 'nol' : ''].filter(Boolean).join(' ') || undefined;
+              return (
+                <td key={k.tpId} className={kelas} data-bawah={r.bawah}>
+                  {r.n === 0 ? <span aria-hidden="true">&middot;</span> : `${r.bawah} siswa`}
+                  <Box component="span" sx={sembunyi}>{r.n === 0 ? 'belum ada nilai' : ` dari ${r.n} yang dinilai`}</Box>
                 </td>
               );
             })}
