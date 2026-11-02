@@ -1,126 +1,162 @@
-// Token visual Ringkasan dan Beranda LAD, mengikuti desain yang disetujui (hitam-putih lebih dulu).
+// Token visual halaman LAD, mengikuti papan desain "Desain Ringkasan Kelas LAD" (artefak desain terbaru).
 //
-// Aturan yang dijaga di sini (NFR-06): status TIDAK pernah hanya lewat warna. Tiap rentang punya pola isian
-// sendiri (garis miring, titik, penuh sedang, penuh gelap, kosong) dan angka tertulis. Warna hanya penegas,
+// Warna diambil dari palet tema aplikasi (primary, info, success, warning, error, abu-abu) supaya halaman LAD
+// satu bahasa dengan halaman lain. Aturan yang dijaga (NFR-06): status TIDAK pernah hanya lewat warna. Tiap
+// rentang punya pola isian sendiri (garis miring, titik, penuh, kosong) dan angka tertulis; warna hanya penegas,
 // jadi cetak hitam-putih dan layar abu-abu tetap terbaca. `printColorAdjust: exact` menjaga pola ikut tercetak.
 
 import { RENTANG } from '../rentang.js';
 
-/** Palet menurut mode tema. Mode gelap menukar kedalaman supaya segmen "tertinggi" tetap yang paling menonjol. */
+// Warna pendamping yang tidak ada di palet tema: sisi gelap tiap warna status untuk garis tepi, titik, dan ikon.
+const TUA = {
+  seluruh: '#F3704D',
+  sebagian: '#AE8E59',
+  mencapai: '#1682D4',
+  pengayaan: '#02B3A9',
+  galat: '#C4452A',
+};
+
+/** Palet menurut mode tema. Mode gelap memakai warna yang sama dengan latar gelap bagi permukaan dan garis. */
 export function warnaRingkasan(theme) {
-  const gelap = theme.palette.mode === 'dark';
+  const p = theme.palette;
+  const gelap = p.mode === 'dark';
+  const dasar = {
+    gelap,
+    ink: p.text.primary,
+    kartu: p.background.paper,
+    primer: p.primary.main,
+    primerMuda: p.primary.light,
+    primerTua: p.primary.dark,
+    tautan: p.primary.main,
+    // Segmen dan ikon rentang. Mencapai = biru (info), pengayaan = hijau (success), sesuai desain.
+    seluruh: p.error.main,
+    seluruhTua: TUA.seluruh,
+    sebagian: p.warning.main,
+    sebagianTua: TUA.sebagian,
+    mencapai: p.info.main,
+    mencapaiTua: TUA.mencapai,
+    pengayaan: p.success.main,
+    pengayaanTua: TUA.pengayaan,
+    galat: TUA.galat,
+    // Putih untuk lencana angka di atas segmen berwarna.
+    putih: '#ffffff',
+    tulisanDiPutih: '#2A3547',
+  };
   if (gelap) {
     return {
-      gelap,
-      ink: '#e6e8eb',
+      ...dasar,
       sekunder: '#a3acb9',
       garis: '#3b4350',
       garisLembut: '#2e3540',
-      kartu: theme.palette.background.paper,
-      latar: theme.palette.background.default,
+      garisTegas: '#46505e',
+      latar: '#262d38',
       trek: '#2e3540',
       abu: '#8b94a1',
-      navy: '#9db8da',
-      tengah: '#6f95c4',
-      terang: '#3d5877',
-      pucat: '#26384f',
-      tautan: '#9db8da',
-      putih: '#ffffff',
+      bgPeringatan: 'rgba(255,174,31,.16)',
+      bgOk: 'rgba(19,222,185,.14)',
+      bgInfo: 'rgba(83,155,255,.16)',
+      bgGalat: 'rgba(250,137,107,.16)',
+      bgPetunjuk: 'rgba(94,92,230,.18)',
+      chipPeringatan: 'rgba(255,174,31,.26)',
+      selGalat: 'rgba(250,137,107,.28)',
+      selPeringatan: 'rgba(255,174,31,.26)',
+      barisHover: 'rgba(255,255,255,.04)',
       tulisanDiPutih: '#1c2128',
     };
   }
   return {
-    gelap,
-    ink: '#1c2128',
-    sekunder: '#4b5563',
-    garis: '#d5dae1',
-    garisLembut: '#eceef1',
-    kartu: '#ffffff',
-    latar: '#f3f4f6',
-    trek: '#e5e7eb',
-    abu: '#6b7280',
-    navy: '#1f3a5f',
-    tengah: '#5f86b5',
-    terang: '#a9bdd6',
-    pucat: '#dbe4ef',
-    tautan: '#1f3a5f',
-    putih: '#ffffff',
-    tulisanDiPutih: '#1c2128',
+    ...dasar,
+    sekunder: p.grey[500],
+    garis: p.divider,
+    garisLembut: p.grey[200],
+    garisTegas: p.grey[300],
+    latar: p.grey[100],
+    trek: p.grey[200],
+    abu: p.grey[400],
+    bgPeringatan: p.warning.light,
+    bgOk: p.success.light,
+    bgInfo: p.info.light,
+    bgGalat: p.error.light,
+    bgPetunjuk: p.primary.light,
+    chipPeringatan: 'rgba(255,174,31,.22)',
+    selGalat: 'rgba(250,137,107,.24)',
+    selPeringatan: 'rgba(255,174,31,.24)',
+    barisHover: p.action.hover,
   };
 }
 
 const CETAK = { WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact' };
 
-/** Isian segmen sebaran per rentang. s0 garis miring, s1 titik, s2 penuh sedang, s3 penuh gelap, s4 kosong berbingkai. */
+/** Warna isi dan garis tepi tiap rentang, dipakai ikon pai dan isian segmen. */
+export function warnaRentang(w, rentang) {
+  switch (rentang) {
+    case RENTANG.SELURUH: return { isi: w.seluruh, tepi: w.seluruhTua };
+    case RENTANG.SEBAGIAN: return { isi: w.sebagian, tepi: w.sebagianTua };
+    case RENTANG.MENCAPAI: return { isi: w.mencapai, tepi: w.mencapaiTua };
+    case RENTANG.PENGAYAAN: return { isi: w.pengayaan, tepi: w.pengayaanTua };
+    default: return { isi: w.kartu, tepi: w.abu };
+  }
+}
+
+/** Isian segmen sebaran per rentang. Seluruh garis miring, sebagian titik, mencapai dan pengayaan penuh, kosong berbingkai. */
 export function isianRentang(w, rentang) {
   switch (rentang) {
     case RENTANG.SELURUH:
-      return { ...CETAK, background: `repeating-linear-gradient(45deg, ${w.navy} 0 2px, ${w.pucat} 2px 7px)` };
+      return { ...CETAK, background: `repeating-linear-gradient(45deg, ${w.seluruhTua} 0 2px, ${w.seluruh} 2px 7px)` };
     case RENTANG.SEBAGIAN:
-      return { ...CETAK, background: `radial-gradient(${w.navy} 1.3px, transparent 1.5px) 0 0 / 6px 6px, ${w.terang}` };
+      return { ...CETAK, background: `radial-gradient(${w.sebagianTua} 1.2px, transparent 1.5px) 0 0 / 6px 6px, ${w.sebagian}` };
     case RENTANG.MENCAPAI:
-      return { ...CETAK, background: w.tengah };
+      return { ...CETAK, background: w.mencapai };
     case RENTANG.PENGAYAAN:
-      return { ...CETAK, background: w.navy };
+      return { ...CETAK, background: w.pengayaan };
     default:
       return { ...CETAK, background: w.kartu, boxShadow: `inset 0 0 0 1px ${w.abu}` };
   }
 }
 
-/** Isian segmen proyek: dinilai penuh sedang, bernilai 0 garis miring hitam, belum diisi kosong berbingkai. */
+/** Isian segmen proyek: dinilai biru, bernilai 0 garis miring, belum diisi kosong berbingkai. */
 export function isianProyek(w, kunci) {
   switch (kunci) {
     case 'dinilai':
-      return { ...CETAK, background: w.tengah };
+      return { ...CETAK, background: w.mencapai };
     case 'nol':
-      return {
-        ...CETAK,
-        background: `repeating-linear-gradient(45deg, ${w.ink} 0 2px, ${w.kartu} 2px 6px)`,
-        boxShadow: `inset 0 0 0 1px ${w.ink}`,
-      };
+      return { ...CETAK, background: `repeating-linear-gradient(45deg, ${w.seluruhTua} 0 2px, ${w.seluruh} 2px 7px)` };
     default:
       return { ...CETAK, background: w.kartu, boxShadow: `inset 0 0 0 1px ${w.abu}` };
   }
 }
 
-/** Lingkaran legenda: seperempat, setengah, tiga perempat, penuh (bentuk yang sama dengan ikon rentang di tab Nilai). */
-export function isiLingkaran(w, rentang) {
-  const bagian = {
-    [RENTANG.SELURUH]: 25, [RENTANG.SEBAGIAN]: 50, [RENTANG.MENCAPAI]: 75, [RENTANG.PENGAYAAN]: 100,
-  }[rentang];
-  return bagian === undefined ? w.kartu : `conic-gradient(${w.ink} 0 ${bagian}%, ${w.kartu} 0)`;
-}
-
-/** Kartu putih berbingkai tipis. `gaya` tegas = bingkai ink, putus = bingkai putus-putus. */
+/**
+ * Kartu putih. `biasa` bingkai tipis, `bayangan` tanpa bingkai dengan bayangan lembut, `putus` bingkai putus-putus
+ * (dipakai untuk "data belum cukup", yang bukan berarti aman). `tegas` dipertahankan sebagai nama lama dari `biasa`.
+ */
 export function gayaKartu(w, gaya = 'biasa') {
-  const bingkai = {
-    biasa: `1px solid ${w.garis}`,
-    tegas: `1.5px solid ${w.ink}`,
-    putus: `1px dashed ${w.ink}`,
-  }[gaya];
-  return {
+  const dasar = {
     bgcolor: w.kartu,
-    border: bingkai,
-    borderRadius: '8px',
+    borderRadius: '7px',
     // Tema memberi radius dan bayangan ke setiap .MuiBox-root; di sini sengaja ditegaskan.
     boxShadow: 'none',
   };
+  if (gaya === 'putus') return { ...dasar, border: `1px dashed ${w.abu}` };
+  if (gaya === 'bayangan') return { ...dasar, border: 0, boxShadow: '0 9px 17.5px rgba(0,0,0,.05)' };
+  return { ...dasar, border: `1px solid ${w.garis}` };
 }
 
-/** Chip pola. `utama` diisi penuh, yang lain hanya bingkai. */
+/** Chip pola. `utama` diisi warna primer, yang lain latar abu-abu muda. */
 export function gayaChip(w, utama) {
   return {
     display: 'inline-flex',
     alignItems: 'center',
-    minHeight: 28,
+    minHeight: 26,
     px: '10px',
-    borderRadius: '14px',
+    borderRadius: '8px',
     fontSize: 13,
     fontWeight: 600,
-    border: `1px solid ${w.ink}`,
-    bgcolor: utama ? w.ink : w.kartu,
-    color: utama ? w.kartu : w.ink,
+    border: 0,
+    bgcolor: utama ? w.primer : w.latar,
+    color: utama ? '#ffffff' : w.ink,
     whiteSpace: 'nowrap',
+    boxShadow: 'none',
     ...CETAK,
   };
 }
@@ -130,8 +166,10 @@ export function gayaTautan(w) {
   return {
     font: 'inherit',
     fontSize: 15,
+    fontWeight: 600,
     color: w.tautan,
     textDecoration: 'underline',
+    textUnderlineOffset: '3px',
     bgcolor: 'transparent',
     border: 0,
     // Tautan yang berdiri sendiri (bukan di dalam kalimat) diberi tinggi 40px agar mudah diketuk.
@@ -141,31 +179,32 @@ export function gayaTautan(w) {
     minHeight: 40,
     cursor: 'pointer',
     textAlign: 'left',
-    '&:hover': { opacity: 0.8 },
+    '&:hover': { color: w.primerTua },
     '&:focus-visible': { outline: `2px solid ${w.tautan}`, outlineOffset: 2, borderRadius: '2px' },
   };
 }
 
-/** Tombol garis tepi 44px, sasaran sentuh yang cukup. */
-export function gayaTombol(w, { isi = false } = {}) {
+/** Tombol 44px. `isi` = primer penuh; bila tidak, latar primer muda dengan teks primer (tombol teks di desain). */
+export function gayaTombol(w, { isi = false, garis = false } = {}) {
+  const alphaPrimer = w.gelap ? 'rgba(157,184,218,.5)' : 'rgba(94,92,230,.5)';
   return {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: 44,
-    px: 2,
-    border: `1px solid ${w.navy}`,
-    borderRadius: '6px',
-    bgcolor: isi ? w.navy : w.kartu,
-    color: isi ? w.kartu : w.navy,
+    px: 2.5,
+    border: garis ? `1px solid ${alphaPrimer}` : 0,
+    borderRadius: '7px',
+    bgcolor: isi ? w.primer : garis ? 'transparent' : w.primerMuda,
+    color: isi ? '#ffffff' : w.primer,
     font: 'inherit',
     fontSize: 14,
     fontWeight: 600,
     textDecoration: 'none',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
-    '&:hover': { opacity: 0.88 },
-    '&:focus-visible': { outline: `2px solid ${w.navy}`, outlineOffset: 2 },
+    '&:hover': garis ? { bgcolor: w.primerMuda, color: w.primer } : { bgcolor: isi ? w.primerTua : w.primer, color: '#ffffff' },
+    '&:focus-visible': { outline: `2px solid ${w.primer}`, outlineOffset: 2 },
   };
 }
 

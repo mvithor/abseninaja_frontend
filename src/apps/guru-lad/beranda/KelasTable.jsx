@@ -31,7 +31,7 @@ const PILIHAN_BARIS = [5, 10, 25];
 const BARIS_AWAL = 5;
 
 const Judul = ({ children }) => (
-  <Typography variant="h6" sx={{ fontSize: '0.9375rem' }}>{children}</Typography>
+  <Typography sx={{ fontSize: '1rem', fontWeight: 600, lineHeight: '1.2rem' }}>{children}</Typography>
 );
 Judul.propTypes = { children: PropTypes.node };
 
@@ -42,14 +42,14 @@ Isi.propTypes = { children: PropTypes.node, tebal: PropTypes.bool };
 
 const semesterKelas = (k) => `${k.semester} ${k.tahun_ajaran}`.trim();
 
-/** Penanda kelas kasus latihan: kotak hitam berisi teks, bukan hanya warna. */
+/** Penanda kelas kasus latihan: chip primer berisi teks "Kasus A", bukan hanya warna. */
 const TagKasus = ({ kelas }) => {
   const w = warnaRingkasan(useTheme());
   return (
     <Box
       component="span"
       sx={{
-        display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 13, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
+        display: 'inline-flex', alignItems: 'center', minHeight: 26, px: '10px', borderRadius: '8px', fontSize: 13, fontWeight: 600, bgcolor: w.primer, color: '#fff', ...CETAK,
       }}
     >
       {`Kasus ${kelas.kasus_kode ?? ''}`.trim()}
@@ -68,9 +68,9 @@ const BatangTipis = ({ persen, label, warna }) => {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={persen}
-      sx={{ height: 8, borderRadius: '4px', bgcolor: w.trek, overflow: 'hidden', ...CETAK }}
+      sx={{ height: 8, borderRadius: '4px', bgcolor: w.trek, overflow: 'hidden', my: '4px', ...CETAK }}
     >
-      <Box sx={{ width: `${persen}%`, height: '100%', bgcolor: warna ?? w.ink, ...CETAK }} />
+      <Box sx={{ width: `${persen}%`, height: '100%', borderRadius: '4px', bgcolor: warna ?? w.seluruh, ...CETAK }} />
     </Box>
   );
 };
@@ -80,9 +80,9 @@ function SelPerhatian({ k, w }) {
   const kartu = k.ringkasan.kartu;
   const persen = persenPerhatian(k);
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', maxWidth: 150, minWidth: 120 }}>
       <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
-        <Typography component="span" sx={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2 }}>{kartu.perhatian}</Typography>
+        <Typography component="span" sx={{ fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.2 }}>{kartu.perhatian}</Typography>
         <Typography component="span" sx={{ fontSize: 13, color: w.sekunder }}>{`${persen}% dari kelas`}</Typography>
       </Box>
       <BatangTipis persen={persen} label={`Siswa perlu perhatian di ${k.nama_kelas}`} />
@@ -99,7 +99,7 @@ function SelPola({ k, w }) {
   const pola = polaMuncul(k.ringkasan.kartu);
   if (pola.length === 0) return <Typography sx={{ fontSize: 13, color: w.sekunder }}>Tidak ada yang ditandai</Typography>;
   return (
-    <Box component="ul" aria-label={`Pola yang muncul di ${k.nama_kelas}`} sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+    <Box component="ul" aria-label={`Pola yang muncul di ${k.nama_kelas}`} sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: 230 }}>
       {pola.map((p) => (
         <Box
           component="li"
@@ -112,7 +112,6 @@ function SelPola({ k, w }) {
             pl: '10px',
             pr: '4px',
             borderRadius: '8px',
-            border: `1px solid ${w.garis}`,
             bgcolor: w.latar,
             boxShadow: 'none',
             fontSize: 13,
@@ -132,7 +131,6 @@ function SelPola({ k, w }) {
               height: 20,
               px: '5px',
               borderRadius: '6px',
-              border: `1px solid ${w.garis}`,
               bgcolor: w.kartu,
               boxShadow: 'none',
               fontSize: 13,
@@ -153,9 +151,9 @@ function SelKelengkapan({ k, w }) {
   const kl = k.ringkasan.kartu.kelengkapan;
   if (kl.total === 0) return <Typography sx={{ fontSize: 13, color: w.sekunder }}>Belum ada isian TP</Typography>;
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minWidth: 104 }}>
       <Typography sx={{ fontSize: '1rem', fontWeight: 600 }}>{`${kl.persen}%`}</Typography>
-      <BatangTipis persen={kl.persen} label={`Kelengkapan nilai TP ${k.nama_kelas}`} warna={w.navy} />
+      <BatangTipis persen={kl.persen} label={`Kelengkapan nilai TP ${k.nama_kelas}`} warna={w.primer} />
     </Box>
   );
 }
@@ -178,10 +176,11 @@ TombolBuka.propTypes = { k: PropTypes.object.isRequired, onBuka: PropTypes.func.
 
 /** Ikon mata pada kolom Aksi tabel (desain 1): membuka kelas. Sasaran sentuh 44px. */
 const TombolIkonBuka = ({ k, onBuka }) => {
+  const w = warnaRingkasan(useTheme());
   const label = `Buka kelas ${k.nama_kelas} ${k.mapel}`;
   return (
     <Tooltip title={label}>
-      <IconButton aria-label={label} onClick={(e) => { e.stopPropagation(); onBuka(k.id); }} sx={{ width: 44, height: 44 }}>
+      <IconButton aria-label={label} onClick={(e) => { e.stopPropagation(); onBuka(k.id); }} sx={{ width: 40, height: 40, '&:hover': { bgcolor: w.primerMuda, color: w.primer } }}>
         <IconEye size={20} aria-hidden="true" />
       </IconButton>
     </Tooltip>
@@ -197,7 +196,7 @@ const TombolIkonHapus = ({ k, onHapus }) => {
       <IconButton
         aria-label={label}
         onClick={(e) => { e.stopPropagation(); onHapus(k); }}
-        sx={{ width: 44, height: 44, '&:hover': { bgcolor: 'rgba(210, 67, 31, 0.1)', color: '#C4452A' } }}
+        sx={{ width: 40, height: 40, '&:hover': { bgcolor: '#FDEDE8', color: '#C4452A' } }}
       >
         <IconTrash size={20} aria-hidden="true" />
       </IconButton>
@@ -226,7 +225,7 @@ const KelasTable = ({
 
   if (memuat || daftar.length === 0) {
     return (
-      <Box sx={{ bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '8px' }}>
+      <Box sx={{ bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '7px' }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 120, p: 3, textAlign: 'center' }}>
           {memuat ? <CircularProgress size={28} /> : <Typography variant="h6">{pesanKosong}</Typography>}
         </Box>
@@ -242,22 +241,22 @@ const KelasTable = ({
   const tampil = daftar.slice(awal, awal + barisPerHalaman);
 
   return (
-    <Box sx={{ bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '8px', overflow: 'hidden' }}>
+    <Box sx={{ bgcolor: w.kartu, border: `1px solid ${w.garis}`, borderRadius: '7px', overflow: 'hidden' }}>
       {/* Layar lebar: tabel */}
       <TableContainer sx={{ display: { xs: 'none', md: 'block' } }}>
         {/* Sepuluh kolom: sela sel dirapatkan dan teks pendek tidak dipatahkan supaya Aksi tidak terdorong keluar layar. */}
-        <Table aria-label="Daftar kelas" sx={{ minWidth: 1000, '& th, & td': { px: 1 } }}>
+        <Table aria-label="Daftar kelas" sx={{ minWidth: 1000, '& th, & td': { px: '8px', py: '14px' }, '& tbody tr:last-of-type td': { borderBottom: 0 } }}>
           <TableHead>
-            <TableRow sx={{ '& th': { borderBottom: `1px solid ${w.ink}` } }}>
+            <TableRow>
               <TableCell><Judul>No</Judul></TableCell>
               <TableCell><Judul>Kelas</Judul></TableCell>
               <TableCell align="center"><Judul>Siswa</Judul></TableCell>
               <TableCell sx={{ minWidth: 150 }}><Judul>Perlu perhatian</Judul></TableCell>
               <TableCell sx={{ minWidth: 190 }}><Judul>Pola yang muncul</Judul></TableCell>
               <TableCell align="center"><Judul>Pengayaan</Judul></TableCell>
-              <TableCell align="center"><Judul>Data belum cukup</Judul></TableCell>
-              <TableCell sx={{ minWidth: 120 }}><Judul>Kelengkapan nilai</Judul></TableCell>
-              <TableCell sx={{ minWidth: 96 }}><Judul>Terakhir diubah</Judul></TableCell>
+              <TableCell align="center" sx={{ minWidth: 84 }}><Judul>Data belum cukup</Judul></TableCell>
+              <TableCell sx={{ minWidth: 104 }}><Judul>Kelengkapan nilai</Judul></TableCell>
+              <TableCell sx={{ minWidth: 84 }}><Judul>Terakhir diubah</Judul></TableCell>
               <TableCell align="center"><Judul>Aksi</Judul></TableCell>
             </TableRow>
           </TableHead>
@@ -266,12 +265,12 @@ const KelasTable = ({
               const keadaan = keadaanKelas(k);
               const ada = keadaan === KEADAAN.ADA;
               return (
-                <TableRow key={k.id} hover sx={{ cursor: 'pointer', '& td': { verticalAlign: 'middle' } }} onClick={() => onBuka(k.id)}>
+                <TableRow key={k.id} hover sx={{ cursor: 'pointer', '& td': { verticalAlign: 'middle' }, '&.MuiTableRow-hover:hover': { bgcolor: w.barisHover } }} onClick={() => onBuka(k.id)}>
                   <TableCell><Isi>{awal + i + 1}</Isi></TableCell>
                   <TableCell>
-                    <Typography sx={{ fontSize: '1.0625rem', fontWeight: 700 }}>{k.nama_kelas}</Typography>
-                    <Typography sx={{ fontSize: 13, color: w.sekunder, whiteSpace: 'nowrap' }}>{k.mapel}</Typography>
-                    <Typography sx={{ fontSize: 13, color: w.sekunder, whiteSpace: 'nowrap' }}>{semesterKelas(k)}</Typography>
+                    <Typography sx={{ fontSize: '1rem', fontWeight: 600 }}>{k.nama_kelas}</Typography>
+                    <Typography sx={{ fontSize: 13, lineHeight: 1.35, color: w.sekunder, whiteSpace: 'nowrap' }}>{k.mapel}</Typography>
+                    <Typography sx={{ fontSize: 13, lineHeight: 1.35, color: w.sekunder, whiteSpace: 'nowrap' }}>{semesterKelas(k)}</Typography>
                   </TableCell>
                   <TableCell align="center"><Isi>{k.jumlah_siswa}</Isi></TableCell>
                   {ada ? (
@@ -291,7 +290,7 @@ const KelasTable = ({
                   )}
                   <TableCell sx={{ whiteSpace: 'nowrap' }}><Isi>{teksUmur(k.terakhir_diubah)}</Isi></TableCell>
                   <TableCell align="center">
-                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5 }}>
+                    <Box sx={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                       <TombolIkonBuka k={k} onBuka={onBuka} />
                       {onHapus && <TombolIkonHapus k={k} onHapus={onHapus} />}
                     </Box>
@@ -373,7 +372,7 @@ const KelasTable = ({
         ActionsComponent={TablePaginationActions}
         labelRowsPerPage="Baris per halaman:"
         labelDisplayedRows={({ from, to, count }) => `${from}–${to} dari ${count}`}
-        sx={{ borderTop: `1px solid ${w.garis}` }}
+        sx={{ borderTop: `1px solid ${w.garis}`, '& .MuiTablePagination-toolbar': { minHeight: 52 } }}
       />
     </Box>
   );

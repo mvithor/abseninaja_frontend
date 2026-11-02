@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
   bacaKodeSel, kunciSel, petaKehadiran, kodeEfektif, rekapSiswa, rekapPertemuan, selUntukSemuaHadir,
-  terapkanIsian, hitungPengosonganKode, susunMuatanSimpan, uraiTanggal, tanggalPanjang, tanggalPendek,
-  namaZona, periksaTanggalPertemuan, idKronologis, perluUrutKronologis, labelLm,
+  terapkanIsian, hitungPengosonganKode, susunMuatanSimpan, uraiTanggal, tanggalPanjang, tanggalPendek, tanggalRingkas,
+  namaZona, periksaTanggalPertemuan, idKronologis, perluUrutKronologis, labelLm, kelompokLm,
 } from './kehadiran.js';
 
 test('bacaKodeSel: kode, huruf kecil, spasi, dan nama status Absenin', () => {
@@ -106,7 +106,7 @@ test('tanggalPanjang dan tanggalPendek tidak bergantung pada zona peramban', () 
   assert.equal(tanggalPanjang('2028-02-29'), 'Selasa, 29 Februari 2028');
   assert.equal(tanggalPanjang('2027-01-01'), 'Jumat, 1 Januari 2027');
   assert.equal(tanggalPanjang('bukan'), 'bukan');
-  assert.equal(tanggalPendek('2026-08-03'), '03/08');
+  assert.equal(tanggalPendek('2026-08-03'), '3 Agu');
   assert.equal(tanggalPendek('x'), 'x');
 });
 
@@ -172,4 +172,26 @@ test('labelLm', () => {
   assert.equal(labelLm(lm, null), null);
   assert.equal(labelLm(lm, 99), null);
   assert.equal(labelLm(undefined, 7), null);
+});
+
+test('tanggalRingkas: tanggal singkat Indonesia, teks asli bila bukan tanggal nyata', () => {
+  assert.equal(tanggalRingkas('2026-09-22'), '22 Sep 2026');
+  assert.equal(tanggalRingkas('2026-10-01'), '1 Okt 2026');
+  assert.equal(tanggalRingkas('2026-12-05'), '5 Des 2026');
+  assert.equal(tanggalRingkas('2026-02-30'), '2026-02-30');
+  assert.equal(tanggalRingkas(null), '');
+});
+
+test('kelompokLm: menggabungkan pertemuan berurutan satu lingkup materi, tanpa LM dikelompokkan sendiri', () => {
+  const lm = [{ id: 7, urutan: 1 }, { id: 8, urutan: 2 }];
+  const p = [
+    { lingkup_materi_id: 7 }, { lingkup_materi_id: 7 }, { lingkup_materi_id: 8 }, { lingkup_materi_id: null }, { lingkup_materi_id: null }, { lingkup_materi_id: 7 },
+  ];
+  assert.deepEqual(kelompokLm(p, lm), [
+    { lmId: 7, label: 'LM 1', jumlah: 2, awal: 0 },
+    { lmId: 8, label: 'LM 2', jumlah: 1, awal: 2 },
+    { lmId: null, label: 'Tanpa lingkup materi', jumlah: 2, awal: 3 },
+    { lmId: 7, label: 'LM 1', jumlah: 1, awal: 5 },
+  ]);
+  assert.deepEqual(kelompokLm([], lm), []);
 });

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton,
+  Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton,
   Stack, Tooltip, Typography,
 } from '@mui/material';
 import {
@@ -17,25 +17,45 @@ import MenuAksiKolom from '../komponen/MenuAksiKolom';
 import JudulTab from '../komponen/JudulTab';
 import PetunjukTab from '../komponen/PetunjukTab';
 import BilahSimpan from '../komponen/BilahSimpan';
-import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
+import { useTheme } from '@mui/material/styles';
+import { warnaRingkasan, gayaTombol } from '../ringkasan/gayaRingkasan';
 import PertemuanFormDialog from './PertemuanFormDialog';
 import {
-  KODE_HADIR, TEKS_KODE, bacaKodeSel, kunciSel, petaKehadiran, kodeEfektif, rekapSiswa, rekapPertemuan,
+  KODE_HADIR, TEKS_KODE, bacaKodeSel, kunciSel, petaKehadiran, kodeEfektif, rekapSiswa,
   selUntukSemuaHadir, terapkanIsian, hitungPengosonganKode, susunMuatanSimpan, tanggalPanjang, tanggalPendek,
-  namaZona, idKronologis, perluUrutKronologis, labelLm,
+  idKronologis, perluUrutKronologis, kelompokLm,
 } from './kehadiran';
 
-// Tambahan gaya khusus tab ini di atas gayaGrid: sel satu huruf dan kolom rekap.
+// Tambahan gaya khusus tab ini di atas gayaGrid, mengikuti desain: huruf di tengah sel, latar sel menurut status
+// (huruf tetap tampil, jadi status tidak hanya lewat warna), kolom rekap H S I A, dan baris judul grup lingkup materi.
 const gayaKehadiran = [
   gayaGrid,
   (theme) => {
     const w = warnaRingkasan(theme);
     return {
-      '& .sel': { minWidth: 112 },
-      '& .sel input': { width: 52, textAlign: 'center', fontWeight: 600, textTransform: 'uppercase' },
-      '& .sel.alpa input': { color: theme.palette.error.main },
-      '& .rekap': { minWidth: 48, textAlign: 'center', color: w.sekunder },
-      '& .rekap.alpa': { color: theme.palette.error.main, fontWeight: 700 },
+      '& table': { minWidth: 'max-content' },
+      '& thead th': { textAlign: 'center' },
+      '& thead th.nama, & thead th.no': { textAlign: 'left' },
+      '& thead th.kolom-p': { textAlign: 'left', minWidth: 116, padding: '10px 6px 10px 14px' },
+      '& thead th.grup': {
+        background: w.latar, textAlign: 'left', fontSize: 14, fontWeight: 600, padding: '0 14px', borderLeft: `1px solid ${w.garis}`,
+      },
+      '& thead th.grup span': { fontWeight: 400, color: w.sekunder, marginLeft: 8, fontSize: 13 },
+      '& .awal-lm': { borderLeft: `1px solid ${w.garis}` },
+      '& .nama': { fontWeight: 600, minWidth: 200 },
+      '& .sel': { minWidth: 116, height: 54 },
+      '& .isi': { height: 54 },
+      '& .sel input': { height: 52, width: 52, textAlign: 'center', fontWeight: 400, textTransform: 'uppercase' },
+      '& .sel.kode-S': { background: 'rgba(83,155,255,.2)' },
+      '& .sel.kode-I': { background: 'rgba(255,174,31,.24)' },
+      '& .sel.kode-A': { background: 'rgba(250,137,107,.28)' },
+      '& .sel.kode-A input': { fontWeight: 700 },
+      // Sel yang belum disimpan: garis putus-putus di dalam sel (bukan hanya warna), tanpa menimpa latar status.
+      '& td.kotor': { outline: `2px dashed ${w.sekunder}`, outlineOffset: -2, boxShadow: 'none' },
+      '& td.salah': { background: theme.palette.error.light, outline: `2px solid ${theme.palette.error.main}`, outlineOffset: -2, boxShadow: 'none' },
+      '& .rekap': { minWidth: 56, textAlign: 'center', color: w.ink },
+      '& .rekap.alpa': { background: 'rgba(250,137,107,.24)', fontWeight: 700 },
+      '& tbody tr:hover td:not(.sel):not(.alpa)': { background: w.barisHover },
     };
   },
 ];
@@ -143,6 +163,9 @@ export default function KehadiranPanel({
     setPesan({ jenis: 'info', teks: `${kunci.length} sel kosong diisi H. Ubah yang tidak hadir, lalu klik Simpan.` });
   };
 
+  const w = warnaRingkasan(useTheme());
+  const grup = useMemo(() => kelompokLm(urut, lm), [urut, lm]);
+  const awalGrup = useMemo(() => new Set(grup.map((g) => g.awal)), [grup]);
   const adaGalatLokal = Object.values(edit).some((t) => bacaKodeSel(t).galat);
 
   const mintaSimpan = () => {
@@ -231,8 +254,23 @@ export default function KehadiranPanel({
     />
   );
 
-  const infoWaktu = hariIni && (
-    <>Tanggal pertemuan mengikuti zona waktu sekolah{zona ? ` (${namaZona(zona)})` : ''}. Hari ini: <b>{tanggalPanjang(hariIni)}</b>.</>
+  const keterangan = `Rekap dihitung dari ${pertemuan.length} pertemuan yang dicatat. Perubahan baru tersimpan setelah Anda menekan Simpan kehadiran.`;
+  const aksiHeader = !readOnly && (
+    <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
+      <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })} sx={gayaTombol(w, { garis: true })}>
+        Tambah pertemuan
+      </Button>
+      <Button
+        variant="outlined"
+        startIcon={<IconSortAscending size={20} />}
+        onClick={urutkan}
+        disabled={sibuk || !perluUrut}
+        title={perluUrut ? undefined : 'Pertemuan sudah berurutan menurut tanggal'}
+        sx={gayaTombol(w, { garis: true })}
+      >
+        Urutkan menurut tanggal
+      </Button>
+    </Stack>
   );
   const peringatanZona = waktuSekolah?.zona_bawaan && (
     <Alert severity="warning">
@@ -244,7 +282,7 @@ export default function KehadiranPanel({
   if (siswa.length === 0 || pertemuan.length === 0) {
     return (
       <Stack spacing={2.5} alignItems="flex-start">
-        <JudulTab judul="Kehadiran siswa" keterangan={infoWaktu} />
+        <JudulTab judul="Kehadiran siswa" keterangan="Isi daftar siswa dan pertemuan dulu untuk mencatat kehadiran." />
         {peringatanZona}
         <Alert severity="info" sx={{ alignSelf: 'stretch' }}>
           {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
@@ -264,7 +302,7 @@ export default function KehadiranPanel({
 
   return (
     <Stack spacing={3}>
-      <JudulTab judul="Kehadiran siswa" keterangan={infoWaktu} />
+      <JudulTab judul="Kehadiran siswa" keterangan={keterangan} aksi={aksiHeader || undefined} />
       {peringatanZona}
       <PetunjukTab
         butir={[
@@ -274,29 +312,6 @@ export default function KehadiranPanel({
           'Kolom H S I A di kiri menghitung dari isian yang tampil.',
         ]}
       />
-      {!readOnly && (
-        <BilahSimpan
-          jumlahKotor={jumlahKotor}
-          sibuk={sibuk}
-          adaGalat={adaGalatLokal}
-          onBuang={buang}
-          onSimpan={mintaSimpan}
-          labelSimpan="Simpan kehadiran"
-          kiri={(
-            <>
-              <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
-                Tambah pertemuan
-              </Button>
-              {perluUrut && (
-                <Button variant="outlined" startIcon={<IconSortAscending size={20} />} onClick={urutkan} disabled={sibuk}>
-                  Urutkan menurut tanggal
-                </Button>
-              )}
-            </>
-          )}
-        />
-      )}
-
       {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
@@ -306,46 +321,45 @@ export default function KehadiranPanel({
         <table>
           <thead>
             <tr>
-              <th className="no">No</th>
-              <th className="nama">Nama siswa</th>
+              <th className="no" rowSpan={2} scope="col">No</th>
+              <th className="nama" rowSpan={2} scope="col">Nama siswa</th>
               {KODE_HADIR.map((kode) => (
-                <th key={kode} className="rekap" title={TEKS_KODE[kode]} style={{ padding: '4px 2px' }}>{kode}</th>
+                <th key={kode} className="rekap" rowSpan={2} scope="col" title={TEKS_KODE[kode]}>{kode}</th>
               ))}
-              {urut.map((p) => {
-                const rp = rekapPertemuan(p.id, siswa, edit, server);
-                const lmLabel = labelLm(lm, p.lingkup_materi_id);
-                return (
-                  <th key={p.id} style={{ minWidth: 112, height: 'auto', padding: '10px 6px' }}>
-                    <Stack alignItems="center" spacing={0.5}>
-                      <Stack direction="row" alignItems="center" spacing={0.5}>
-                        <span title={`Pertemuan ke-${p.nomor}, ${tanggalPanjang(p.tanggal)}`}>{`P${p.nomor}`}</span>
-                        {!readOnly && (
-                          <MenuAksiKolom
-                            label={`Aksi pertemuan ${p.nomor}: semua hadir, ubah, hapus`}
-                            judul={`Aksi pertemuan ${p.nomor}`}
-                            item={[
-                              {
-                                kunci: 'semua-hadir', teks: 'Semua hadir', ikon: <IconChecks size={20} />, onPilih: () => semuaHadir(p.id),
-                              },
-                              {
-                                kunci: 'ubah', teks: 'Ubah pertemuan', ikon: <IconPencil size={20} />, onPilih: () => setForm({ pertemuan: p }),
-                              },
-                              {
-                                kunci: 'hapus', teks: 'Hapus pertemuan', ikon: <IconTrash size={20} />, onPilih: () => setHapus(p), bahaya: true,
-                              },
-                            ]}
-                          />
-                        )}
-                      </Stack>
-                      <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.2 }}>{tanggalPendek(p.tanggal)}</Typography>
-                      {lmLabel && <Chip size="small" variant="outlined" label={lmLabel} />}
-                      <Typography variant="caption" color={rp.belum > 0 ? 'text.primary' : 'text.secondary'} sx={{ lineHeight: 1.2, whiteSpace: 'nowrap', fontWeight: rp.belum > 0 ? 700 : 400 }}>
-                        {rp.belum > 0 ? `${rp.belum} kosong` : 'lengkap'}
-                      </Typography>
-                    </Stack>
-                  </th>
-                );
-              })}
+              {grup.map((g) => (
+                <th key={g.awal} className="grup" colSpan={g.jumlah} scope="colgroup">
+                  {g.label}<span>{g.jumlah} pertemuan</span>
+                </th>
+              ))}
+            </tr>
+            <tr>
+              {urut.map((p, c) => (
+                <th key={p.id} scope="col" className={`kolom-p${awalGrup.has(c) && c > 0 ? ' awal-lm' : ''}`}>
+                  <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={0.5}>
+                    <Box>
+                      <Box component="span" sx={{ display: 'block', fontWeight: 600, fontSize: 15, lineHeight: 1.25 }} title={`Pertemuan ke-${p.nomor}, ${tanggalPanjang(p.tanggal)}`}>{`P${p.nomor}`}</Box>
+                      <Box component="span" sx={{ display: 'block', fontSize: 13, fontWeight: 400, color: w.sekunder, lineHeight: 1.3 }}>{tanggalPendek(p.tanggal)}</Box>
+                    </Box>
+                    {!readOnly && (
+                      <MenuAksiKolom
+                        label={`Aksi pertemuan ${p.nomor}: semua hadir, ubah, hapus`}
+                        judul={`Aksi pertemuan ${p.nomor}`}
+                        item={[
+                          {
+                            kunci: 'semua-hadir', teks: 'Semua hadir', ikon: <IconChecks size={20} />, onPilih: () => semuaHadir(p.id),
+                          },
+                          {
+                            kunci: 'ubah', teks: 'Ubah pertemuan', ikon: <IconPencil size={20} />, onPilih: () => setForm({ pertemuan: p }),
+                          },
+                          {
+                            kunci: 'hapus', teks: 'Hapus pertemuan', ikon: <IconTrash size={20} />, onPilih: () => setHapus(p), bahaya: true,
+                          },
+                        ]}
+                      />
+                    )}
+                  </Stack>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -368,7 +382,8 @@ export default function KehadiranPanel({
                     const galat = galatLokal || galatServer[k];
                     let kelasSel = 'sel';
                     if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor';
-                    if (!galat && kode === 'A') kelasSel += ' alpa';
+                    if (!galat && kode) kelasSel += ` kode-${kode}`;
+                    if (awalGrup.has(c) && c > 0) kelasSel += ' awal-lm';
                     let judulSel = kode ? TEKS_KODE[kode] : 'Belum dicatat';
                     if (galat) judulSel = galat; else if (diEdit) judulSel = `${judulSel} (belum disimpan)`;
                     return (
@@ -398,6 +413,18 @@ export default function KehadiranPanel({
           </tbody>
         </table>
       </Box>
+
+      {!readOnly && (
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan kehadiran"
+        />
+      )}
+
 
       <Dialog open={konfirmasiKosong > 0} onClose={() => setKonfirmasiKosong(0)} aria-labelledby="judul-kosongkan-kehadiran">
         <DialogTitle id="judul-kosongkan-kehadiran">Kosongkan catatan yang sudah tersimpan?</DialogTitle>

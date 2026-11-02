@@ -15,21 +15,19 @@ import HapusKelasDialog from 'src/apps/guru-lad/beranda/HapusKelasDialog';
 import KelasTable from 'src/apps/guru-lad/beranda/KelasTable';
 import KelasLatihan from 'src/apps/guru-lad/beranda/KelasLatihan';
 import BannerTertinggal from 'src/apps/guru-lad/beranda/BannerTertinggal';
+import KartuHalaman from 'src/apps/guru-lad/komponen/KartuHalaman';
 import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
 import ImporBlankoDialog from 'src/apps/guru-lad/impor/ImporBlankoDialog';
 import { ringkasHasilSimpan } from 'src/apps/guru-lad/impor/impor';
 import { pesanKelasDihapus, pesanKelasTidakDitemukan } from 'src/apps/guru-lad/beranda/hapusKelas';
 import { warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
-import { kelasTertinggal, pisahKelas, ringkasBeranda } from 'src/apps/guru-lad/ringkasan/ringkasan';
+import { kelasTertinggal, pisahKelas } from 'src/apps/guru-lad/ringkasan/ringkasan';
 import {
   bacaRingkasanSemuaKelas, daftarKelas, kunciLad, pesanGalat,
 } from 'src/apps/guru-lad/api';
 
 const PESAN_KOSONG = 'Belum ada kelas. Pilih Tambah Kelas lalu isi daftar siswa, struktur TP, dan nilainya, atau Impor dari Blanko bila nilai sudah ada di Excel.';
 const PESAN_TIDAK_COCOK = 'Tidak ada kelas yang cocok dengan pencarian.';
-
-// Pencarian baru berguna bila kelasnya banyak; di bawah ini hanya menambah satu kolom isian.
-const MIN_KELAS_UNTUK_CARI = 6;
 
 const SX_TOMBOL = { width: { xs: '100%', sm: 'auto' }, maxWidth: 'none', ml: 0 };
 
@@ -122,74 +120,70 @@ export default function LadBeranda() {
     setInfo('');
     setInfoPeringatan(pesanKelasTidakDitemukan(k));
   };
-  const ringkas = ringkasBeranda(semuaNyata);
 
   return (
     <TemaLad>
     <PageContainer title="Kelas Saya | Analitik Pembelajaran" description="Daftar kelas dan mata pelajaran yang Anda ampu">
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 2, flexWrap: 'wrap' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
-            <Typography component="h1" sx={{ fontSize: { xs: 24, md: 28 }, lineHeight: { xs: '30px', md: '34px' }, fontWeight: 700, color: w.ink }}>
-              Kelas saya
-            </Typography>
-            {ringkas && <Typography sx={{ fontSize: 14, color: w.sekunder }}>{ringkas}</Typography>}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 } }}>
+        <KartuHalaman judul="Kelas Saya" tingkat="h1">
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+            <Box sx={{ width: { xs: '100%', sm: 250 }, maxWidth: '100%', '& input': { fontSize: 14 } }}>
+              <SearchButton
+                value={cari}
+                onChange={(e) => setCari(e.target.value)}
+                placeholder="Cari kelas atau mapel"
+                inputProps={{ 'aria-label': 'Cari kelas atau mata pelajaran' }}
+              />
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, width: { xs: '100%', sm: 'auto' } }}>
+              <AddButton icon={<IconFileImport size={18} />} onClick={() => setDialogImpor(true)} sx={SX_TOMBOL}>
+                Impor dari Blanko
+              </AddButton>
+              <AddButton icon={<IconPlus size={20} />} onClick={() => setDialog(true)} sx={SX_TOMBOL}>
+                Tambah Kelas
+              </AddButton>
+            </Box>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, width: { xs: '100%', sm: 'auto' } }}>
-            <AddButton icon={<IconFileImport size={18} />} onClick={() => setDialogImpor(true)} sx={SX_TOMBOL}>
-              Impor dari Blanko
-            </AddButton>
-            <AddButton icon={<IconPlus size={20} />} onClick={() => setDialog(true)} sx={SX_TOMBOL}>
-              Tambah Kelas
-            </AddButton>
-          </Box>
-        </Box>
 
-        {info && <Alert severity="success" onClose={() => setInfo('')}>{info}</Alert>}
-        {infoPeringatan && <Alert severity="warning" onClose={() => setInfoPeringatan('')}>{infoPeringatan}</Alert>}
-        {galat && <Alert severity="error">{pesanGalat(galat)}</Alert>}
-        {tanpaRingkasan && (
-          <Alert
-            severity="warning"
-            action={<Button color="inherit" onClick={() => ringkasan.refetch()} disabled={ringkasan.isFetching}>Coba lagi</Button>}
-          >
-            {`Ringkasan kelas belum dapat dimuat (${pesanGalat(ringkasan.error, 'terjadi kesalahan')}). Daftar kelas tetap tampil tanpa angka.`}
-          </Alert>
-        )}
+          {info && <Alert severity="success" onClose={() => setInfo('')}>{info}</Alert>}
+          {infoPeringatan && <Alert severity="warning" onClose={() => setInfoPeringatan('')}>{infoPeringatan}</Alert>}
+          {galat && <Alert severity="error">{pesanGalat(galat)}</Alert>}
+          {tanpaRingkasan && (
+            <Alert
+              severity="warning"
+              action={<Button color="inherit" onClick={() => ringkasan.refetch()} disabled={ringkasan.isFetching}>Coba lagi</Button>}
+            >
+              {`Ringkasan kelas belum dapat dimuat (${pesanGalat(ringkasan.error, 'terjadi kesalahan')}). Daftar kelas tetap tampil tanpa angka.`}
+            </Alert>
+          )}
 
-        {!galat && <BannerTertinggal daftar={tertinggal} onBuka={(id) => navigate(`/dashboard/guru-lad/kelas/${id}`, { state: { tab: 'nilai' } })} />}
+          {!galat && <BannerTertinggal daftar={tertinggal} onBuka={(id) => navigate(`/dashboard/guru-lad/kelas/${id}`, { state: { tab: 'nilai' } })} />}
 
-        {kelas.length >= MIN_KELAS_UNTUK_CARI && (
-          <SearchButton
-            value={cari}
-            onChange={(e) => setCari(e.target.value)}
-            placeholder="Cari kelas atau mapel"
-            inputProps={{ 'aria-label': 'Cari kelas atau mata pelajaran' }}
-          />
-        )}
+          {!galat && (
+            <>
+              <KelasTable
+                kelas={nyata}
+                onBuka={bukaKelas}
+                onHapus={setHapus}
+                memuat={memuat}
+                pesanKosong={cari.trim() ? PESAN_TIDAK_COCOK : PESAN_KOSONG}
+              />
+              {!memuat && nyata.length > 1 && !tanpaRingkasan && (
+                <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, maxWidth: '80ch' }}>
+                  Diurutkan dari persentase siswa perlu perhatian yang tertinggi. Kelas yang angkanya belum bisa dibaca ada di bawah.
+                </Typography>
+              )}
+            </>
+          )}
+        </KartuHalaman>
 
-        {!galat && (
-          <>
-            <KelasTable
-              kelas={nyata}
-              onBuka={bukaKelas}
-              onHapus={setHapus}
-              memuat={memuat}
-              pesanKosong={cari.trim() ? PESAN_TIDAK_COCOK : PESAN_KOSONG}
-            />
-            {!memuat && nyata.length > 1 && !tanpaRingkasan && (
-              <Typography sx={{ fontSize: 14, color: w.sekunder }}>
-                Diurutkan dari persentase siswa perlu perhatian yang tertinggi. Kelas yang angkanya belum bisa dibaca ada di bawah.
-              </Typography>
-            )}
-            <KelasLatihan kelas={kasus} onBuka={bukaKelas} />
-            {!memuat && !tanpaRingkasan && nyata.length > 0 && (
-              <Typography sx={{ fontSize: 13, color: w.sekunder, borderTop: `1px solid ${w.garis}`, pt: 1.75, lineHeight: '20px' }}>
-                Angka tiap kelas dihitung server dalam satu permintaan dengan aturan yang sama seperti di halaman kelas. Persentase memakai
-                jumlah siswa kelas itu sebagai pembagi; kelas yang belum punya siswa atau struktur tidak diberi angka 0.
-              </Typography>
-            )}
-          </>
+        {!galat && <KelasLatihan kelas={kasus} onBuka={bukaKelas} />}
+
+        {!galat && !memuat && !tanpaRingkasan && nyata.length > 0 && (
+          <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: '20px', px: 0.5 }}>
+            Angka tiap kelas dihitung server dalam satu permintaan dengan aturan yang sama seperti di halaman kelas. Persentase memakai
+            jumlah siswa kelas itu sebagai pembagi; kelas yang belum punya siswa atau struktur tidak diberi angka 0.
+          </Typography>
         )}
       </Box>
 

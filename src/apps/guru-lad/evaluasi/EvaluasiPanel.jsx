@@ -6,7 +6,7 @@ import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, CircularProgress, Collapse,
   FormControlLabel, Stack, Switch, Table, TableBody, TableCell, TableHead, TableRow, Typography,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { IconChevronDown } from '@tabler/icons-react';
 import { bacaEvaluasi, bacaSaranKelas, kunciLad, pesanGalat } from '../api';
 import { ringkasKeputusan } from '../saran/saran';
@@ -36,7 +36,7 @@ export default function EvaluasiPanel({
   const [pola, setPola] = useState([]);
   const [urut, setUrut] = useState(MODE_URUT.PRIORITAS);
   const [terpilihId, setTerpilihId] = useState(null);
-  const [legenda, setLegenda] = useState(false);
+  const [legenda, setLegenda] = useState(true);
   const navigate = useNavigate();
   const tema = useTheme();
   const w = warnaRingkasan(tema);
@@ -124,7 +124,7 @@ export default function EvaluasiPanel({
       )}
 
       <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 2.5 } }}>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2.5} justifyContent="space-between" alignItems={{ md: 'center' }}>
+        <Stack spacing={2}>
           <Box sx={{ borderRadius: 0 }}>
             <Typography sx={{ fontSize: '1.125rem', fontWeight: 700, lineHeight: '1.625rem', color: w.ink }}>
               {`${ringkasan.ditandai} dari ${ringkasan.jumlahSiswa} siswa memiliki penanda`}
@@ -182,7 +182,11 @@ export default function EvaluasiPanel({
               {legendaBaris.map((l) => (
                 <Stack component="li" key={l.rentang} direction="row" spacing={1} alignItems="center">
                   <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
-                  <Typography variant="body2">{`${l.batas}: ${l.teks}`}</Typography>
+                  <Typography variant="body2" sx={{ fontSize: 14 }}>
+                    {l.teks}
+                    {' '}
+                    <Box component="small" sx={{ fontSize: 13, color: w.sekunder }}>{l.batas}</Box>
+                  </Typography>
                 </Stack>
               ))}
             </Stack>
@@ -196,7 +200,7 @@ export default function EvaluasiPanel({
                       sx={{
                         width: 28, height: 14, borderRadius: '3px', flex: 'none', boxShadow: 'none',
                         border: `1px solid ${w.garis}`,
-                        bgcolor: alpha(l.kunci === 'merah' ? tema.palette.error.main : tema.palette.warning.main, 0.22),
+                        bgcolor: l.kunci === 'merah' ? w.selGalat : w.selPeringatan,
                         WebkitPrintColorAdjust: 'exact',
                         printColorAdjust: 'exact',
                       }}
@@ -208,7 +212,7 @@ export default function EvaluasiPanel({
             )}
             <Typography variant="body2" sx={{ color: w.sekunder }}>
               Setiap sel adalah nilai TP yang sebenarnya, bukan nilai remedial; tanda R menunjukkan ada remedial.
-              Titik tengah (·) berarti belum dinilai, bukan nol. Sel berbingkai tebal adalah TP yang menjadi bukti Kesulitan pada TP.
+              Titik tengah (·) berarti belum dinilai, bukan nol.
               Bukti lengkap tiap penanda ada di rincian siswa.
             </Typography>
           </Stack>

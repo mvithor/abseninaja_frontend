@@ -18,7 +18,8 @@ import RemedialDialog from 'src/apps/guru-lad/remedial/RemedialDialog';
 import KehadiranPanel from 'src/apps/guru-lad/kehadiran/KehadiranPanel';
 import RingkasanPanel from 'src/apps/guru-lad/ringkasan/RingkasanPanel';
 import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
-import { gayaKartu, gayaTautan, warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
+import KartuHalaman from 'src/apps/guru-lad/komponen/KartuHalaman';
+import { gayaTautan, warnaRingkasan } from 'src/apps/guru-lad/ringkasan/gayaRingkasan';
 import { lencanaPerhatian } from 'src/apps/guru-lad/ringkasan/ringkasan';
 import {
   bacaMasukan, bacaRingkasan, kunciLad, pesanGalat,
@@ -30,16 +31,18 @@ const DASAR = '/dashboard/guru-lad';
 // Tab diurutkan dari gambaran besar ke data mentah. Ringkasan di depan karena itu yang dicari guru saat membuka kelas.
 const gayaTab = (w) => ({
   minHeight: 48,
-  '& .MuiTabs-indicator': { height: 3, bgcolor: w.navy },
+  mt: -1,
+  borderBottom: `1px solid ${w.garis}`,
+  '& .MuiTabs-indicator': { height: 2, bgcolor: w.primer },
   '& .MuiTab-root': {
-    minHeight: 48, minWidth: 0, px: 2, textTransform: 'none', fontSize: 14, fontWeight: 500, color: w.sekunder,
+    minHeight: 48, minWidth: 0, px: 2, textTransform: 'none', fontSize: 14, fontWeight: 500, color: w.ink,
   },
-  '& .MuiTab-root.Mui-selected': { color: w.navy, fontWeight: 700 },
-  '& .MuiTab-root:focus-visible': { outline: `2px solid ${w.navy}`, outlineOffset: -2 },
+  '& .MuiTab-root:hover': { color: w.primer },
+  '& .MuiTab-root.Mui-selected': { color: w.primer, fontWeight: 500 },
+  '& .MuiTab-root:focus-visible': { outline: `2px solid ${w.primer}`, outlineOffset: -2 },
 });
 
 function LabelPerhatian({ n }) {
-  const w = warnaRingkasan(useTheme());
   if (n === null) return 'Perlu Perhatian';
   return (
     <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 1 }}>
@@ -48,8 +51,8 @@ function LabelPerhatian({ n }) {
         component="span"
         aria-label={`${n} siswa perlu perhatian`}
         sx={{
-          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 22, height: 22, px: '6px', borderRadius: '11px',
-          bgcolor: w.ink, color: w.kartu, fontSize: 13, fontWeight: 700, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, px: '7px', borderRadius: '8px',
+          bgcolor: 'primary.main', color: '#fff', fontSize: 13, fontWeight: 700, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
         }}
       >
         {n}
@@ -148,58 +151,53 @@ export default function LadKelas() {
     <TemaLad>
     <PageContainer title={`${kelas.nama_kelas} ${kelas.mapel} | Analitik Pembelajaran`} description="Ringkasan dan data kelas">
       {/* Satu kolom minmax(0, 1fr): tabel lebar bergulir di dalam kartunya, bukan melebarkan seluruh halaman. */}
-      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, maxWidth: 1180, mx: 'auto' }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
-          <Box>
-            <Button
-              startIcon={<IconArrowLeft size={18} />}
-              onClick={() => navigate(DASAR)}
-              sx={{ minHeight: 36, px: 0.5, textTransform: 'none', fontSize: 14, color: w.tautan }}
+      <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, mx: 'auto' }}>
+        <Box>
+          <Button
+            variant="contained"
+            color="secondary"
+            startIcon={<IconArrowLeft size={20} />}
+            onClick={() => navigate(DASAR)}
+            sx={{ minHeight: 40, px: 3, borderRadius: '7px', textTransform: 'none', fontSize: 14, fontWeight: 500, boxShadow: 'none', color: '#fff' }}
+          >
+            Semua kelas
+          </Button>
+        </Box>
+
+        <KartuHalaman
+          tingkat="h1"
+          judul={`${kelas.nama_kelas} · ${kelas.mapel}`}
+          aksi={readOnly ? (
+            <Box
+              component="span"
+              sx={{
+                display: 'inline-flex', alignItems: 'center', minHeight: 26, px: '10px', borderRadius: '8px', bgcolor: 'primary.main', color: '#fff', fontSize: 13, fontWeight: 600,
+              }}
             >
-              Semua kelas
-            </Button>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 2, flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75, minWidth: 0 }}>
-              <Typography component="h1" sx={{ fontSize: { xs: 24, md: 28 }, lineHeight: { xs: '30px', md: '34px' }, fontWeight: 700, color: w.ink }}>
-                {`${kelas.nama_kelas} · ${kelas.mapel}`}
-              </Typography>
-              <Typography sx={{ fontSize: { xs: 13, md: 14 }, color: w.sekunder }}>{meta}</Typography>
+              {`Kelas kasus ${kelas.kasus_kode ?? ''}`.trim()}
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.25, md: 1.5 }, flexWrap: 'wrap' }}>
-              {readOnly && (
-                <Box
-                  component="span"
-                  sx={{
-                    display: 'inline-flex', alignItems: 'center', minHeight: 24, px: 1, borderRadius: '4px', bgcolor: w.ink, color: w.kartu, fontSize: 13, fontWeight: 600,
-                  }}
-                >
-                  {`Kelas kasus ${kelas.kasus_kode ?? ''}`.trim()}
-                </Box>
-              )}
-              <Typography sx={{ fontSize: 14, color: w.sekunder, display: { xs: 'none', md: 'block' } }}>
-                Batas nilai (remedial bagian / KKTP / pengayaan)
-              </Typography>
+          ) : undefined}
+        >
+          {readOnly && <Alert severity="info">Kelas kasus hanya dapat dilihat, tidak dapat diubah.</Alert>}
+          <Box sx={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: '12px 24px', flexWrap: 'wrap' }}>
+            <Typography sx={{ fontSize: 14, color: w.sekunder }}>{meta}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', fontSize: 14, color: w.sekunder }}>
+              <Box component="span" sx={{ display: { xs: 'none', md: 'inline' } }}>Batas nilai (remedial bagian / KKTP / pengayaan)</Box>
               <Box
-                component="span"
+                component="b"
                 title="Remedial bagian tertentu / KKTP / pengayaan"
                 sx={{
-                  display: 'inline-flex', alignItems: 'center', minHeight: { xs: 32, md: 36 }, px: 1.5, border: `1px solid ${w.ink}`, borderRadius: '6px', fontWeight: 700, fontSize: 14, bgcolor: w.kartu, color: w.ink,
+                  display: 'inline-flex', alignItems: 'center', minHeight: 32, px: 1.5, border: `1px solid ${w.garisTegas}`, borderRadius: '7px', fontWeight: 600, bgcolor: w.kartu, color: w.ink,
                 }}
               >
                 {ringkasAmbang(kelas)}
               </Box>
               {!readOnly && (
-                <Box component="button" type="button" onClick={() => pindah('struktur')} sx={gayaTautan(w)}>Ubah di Struktur</Box>
+                <Box component="button" type="button" onClick={() => pindah('struktur')} sx={{ ...gayaTautan(w), fontSize: 14 }}>Ubah di Struktur</Box>
               )}
             </Box>
           </Box>
-          {readOnly && (
-            <Alert severity="info">Kelas kasus hanya dapat dilihat, tidak dapat diubah.</Alert>
-          )}
-        </Box>
 
-        <Box sx={{ ...gayaKartu(w), overflow: 'hidden', mx: { xs: -2, sm: 0 }, borderRadius: { xs: 0, sm: '8px' }, borderLeftWidth: { xs: 0, sm: 1 }, borderRightWidth: { xs: 0, sm: 1 } }}>
           <Tabs
             value={tab}
             onChange={(_, v) => pindah(v)}
@@ -218,9 +216,8 @@ export default function LadKelas() {
             <Tab value="struktur" label={`Struktur (${lm.length})`} />
             <Tab value="siswa" label={`Siswa (${siswa.length})`} />
           </Tabs>
-        </Box>
 
-        {tab === 'ringkasan' && (
+          {tab === 'ringkasan' && (
           <RingkasanPanel
             ringkasan={ringkasan}
             siswa={siswa}
@@ -231,65 +228,63 @@ export default function LadKelas() {
           />
         )}
 
-        {tab !== 'ringkasan' && (
-          <Box sx={{ ...gayaKartu(w), p: { xs: 2, sm: 3, md: 4 }, minWidth: 0 }}>
-            {tab === 'nilai' && (
-              <NilaiTpGrid
-                kelasId={kelasId}
-                kelas={kelas}
-                siswa={siswa}
-                lm={lm}
-                nilaiTp={nilaiTp}
-                readOnly={readOnly}
-                onTersimpan={muatUlang}
-                sorot={sorotTp}
-                onHapusSorot={() => setSorotTp(null)}
-              />
-            )}
-            {tab === 'proyek' && (
-              <ProyekPanel
-                kelasId={kelasId}
-                siswa={siswa}
-                proyek={proyek}
-                nilaiProyek={nilaiProyek}
-                readOnly={readOnly}
-                onBerubah={muatUlang}
-              />
-            )}
-            {tab === 'remedial' && (
-              <RemedialPanel kelas={kelas} siswa={siswa} lm={lm} remedial={remedial} readOnly={readOnly} onBuka={setRemedialAwal} />
-            )}
-            {tab === 'kehadiran' && (
-              <KehadiranPanel
-                kelasId={kelasId}
-                siswa={siswa}
-                pertemuan={pertemuan}
-                lm={lm}
-                kehadiran={kehadiran}
-                waktuSekolah={waktuSekolah}
-                readOnly={readOnly}
-                onBerubah={muatUlang}
-              />
-            )}
-            {tab === 'perhatian' && (
-              <EvaluasiPanel
-                kelasId={kelasId}
-                kelas={kelas}
-                siswa={siswa}
-                lm={lm}
-                nilaiTp={nilaiTp}
-                proyek={proyek}
-                nilaiProyek={nilaiProyek}
-                remedial={remedial}
-                pertemuan={pertemuan}
-                kehadiran={kehadiran}
-                onCatatRemedial={readOnly ? undefined : setRemedialAwal}
-              />
-            )}
-            {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
-            {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
-          </Box>
+
+        {tab === 'nilai' && (
+          <NilaiTpGrid
+            kelasId={kelasId}
+            kelas={kelas}
+            siswa={siswa}
+            lm={lm}
+            nilaiTp={nilaiTp}
+            readOnly={readOnly}
+            onTersimpan={muatUlang}
+            sorot={sorotTp}
+            onHapusSorot={() => setSorotTp(null)}
+          />
         )}
+        {tab === 'proyek' && (
+          <ProyekPanel
+            kelasId={kelasId}
+            siswa={siswa}
+            proyek={proyek}
+            nilaiProyek={nilaiProyek}
+            readOnly={readOnly}
+            onBerubah={muatUlang}
+          />
+        )}
+        {tab === 'remedial' && (
+          <RemedialPanel kelas={kelas} siswa={siswa} lm={lm} remedial={remedial} readOnly={readOnly} onBuka={setRemedialAwal} />
+        )}
+        {tab === 'kehadiran' && (
+          <KehadiranPanel
+            kelasId={kelasId}
+            siswa={siswa}
+            pertemuan={pertemuan}
+            lm={lm}
+            kehadiran={kehadiran}
+            waktuSekolah={waktuSekolah}
+            readOnly={readOnly}
+            onBerubah={muatUlang}
+          />
+        )}
+        {tab === 'perhatian' && (
+          <EvaluasiPanel
+            kelasId={kelasId}
+            kelas={kelas}
+            siswa={siswa}
+            lm={lm}
+            nilaiTp={nilaiTp}
+            proyek={proyek}
+            nilaiProyek={nilaiProyek}
+            remedial={remedial}
+            pertemuan={pertemuan}
+            kehadiran={kehadiran}
+            onCatatRemedial={readOnly ? undefined : setRemedialAwal}
+          />
+        )}
+        {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}
+        {tab === 'siswa' && <SiswaPanel kelasId={kelasId} siswa={siswa} readOnly={readOnly} onBerubah={muatUlang} />}
+        </KartuHalaman>
 
         {!readOnly && (
           <RemedialDialog

@@ -5,9 +5,10 @@ import {
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import KartuBagian from './KartuBagian';
+import IkonRentang from '../komponen/IkonRentang';
 import BatangSegmen from './BatangSegmen';
 import {
-  gayaChip, gayaTautan, isiLingkaran, isianRentang, warnaRingkasan,
+  gayaChip, gayaTautan, isianRentang, warnaRingkasan,
 } from './gayaRingkasan';
 import {
   NAMA_RENTANG, ariaSebaran, cariTpId, judulKelompok, labelBarisTp, legendaSebaran, segmenBatang, siswaPadaRentang, teksDiBawahKktp,
@@ -28,14 +29,7 @@ function Legenda({ ambang }) {
     >
       {baris.map((l) => (
         <Box component="li" key={l.rentang} sx={{ display: 'flex', alignItems: 'center', gap: 1, fontSize: 13, lineHeight: '18px', color: w.ink }}>
-          <Box
-            component="span"
-            aria-hidden="true"
-            sx={{
-              width: 16, height: 16, flex: 'none', borderRadius: '50%', border: `1.5px solid ${w.ink}`, boxSizing: 'border-box', background: isiLingkaran(w, l.rentang),
-              WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
-            }}
-          />
+          <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={18} />
           <Box component="span" aria-hidden="true" sx={{ width: 28, height: 14, flex: 'none', borderRadius: '3px', ...isianRentang(w, l.rentang) }} />
           <span>
             {l.nama}

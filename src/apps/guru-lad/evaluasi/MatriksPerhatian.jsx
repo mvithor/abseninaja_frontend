@@ -21,7 +21,7 @@ const JUDUL_GOLONGAN = {
 };
 
 function SelTp({ s, k, pisah }) {
-  const kelas = ['sel', KELAS_RENTANG[s.rentang] ?? '', s.ditandaiP1 ? 'tanda-p1' : '', s.nilai === null ? 'kosong' : '', pisah ? 'pisah' : '']
+  const kelas = ['sel', KELAS_RENTANG[s.rentang] ?? '', s.nilai === null ? 'kosong' : '', pisah ? 'pisah' : '']
     .filter(Boolean).join(' ');
   if (s.nilai === null) {
     return (
@@ -214,8 +214,10 @@ export default function MatriksPerhatian({
           </tr>
           <tr className="rata b2">
             <td className="k-no" />
-            <td className="k-nama">{`Siswa yang belum mencapai KKTP ${tampilAngka(kktp)}`}</td>
-            <td className="k-pen"><small>dari siswa yang sudah dinilai</small></td>
+            <td className="k-nama" colSpan={2}>
+              {`Siswa yang belum mencapai KKTP ${tampilAngka(kktp)}`}
+              <small>dari siswa yang sudah dinilai</small>
+            </td>
             {kolom.kolomTp.map((k, i) => {
               const r = ringkas.get(k.tpId);
               const awalLm = i === 0 || kolom.kolomTp[i - 1].lmNo !== k.lmNo;

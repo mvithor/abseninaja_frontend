@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@tanstack/react-query';
 import {
-  Alert, Box, Button, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography,
+  Alert, Box, Button, IconButton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { IconPencil, IconTrash } from '@tabler/icons-react';
@@ -15,6 +15,7 @@ import {
 import FormDialog from '../komponen/FormDialog';
 import HapusDialog from '../komponen/HapusDialog';
 import JudulTab from '../komponen/JudulTab';
+import KolomIsian from '../komponen/KolomIsian';
 import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 
 export default function SiswaPanel({
@@ -47,30 +48,30 @@ export default function SiswaPanel({
           : 'Siswa di kelas ini. Nomor urut menjadi nomor absen di semua tab.'}
       />
       {!readOnly && (
-        <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: '20px 24px' }, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Box sx={{ borderRadius: 0 }}>
-            <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink }}>Tambah siswa</Typography>
-            <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, mt: 0.5 }}>
-              Tempel daftar dari Excel: satu siswa per baris, kolom pertama nama dan kolom kedua NIS (boleh kosong).
+            <Typography component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, color: w.ink }}>Tambah siswa</Typography>
+            <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, mt: 0.5, maxWidth: '80ch' }}>
+              Tempel dari Excel: satu siswa per baris, nama lalu NIS dipisah tab (NIS boleh kosong). NIS tidak boleh sama dengan siswa lain di kelas ini.
             </Typography>
           </Box>
-          <TextField
+          <KolomIsian
+            id="tempel-siswa"
+            label="Daftar siswa yang akan ditambahkan"
             value={teks}
             onChange={(e) => setTeks(e.target.value)}
             multiline
-            minRows={4}
-            maxRows={12}
-            fullWidth
+            rows={4}
             placeholder={'Ahmad Fauzi\t12345\nSiti Aminah\t12346'}
-            inputProps={{ 'aria-label': 'Daftar siswa yang akan ditambahkan' }}
           />
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'center' }}>
             <Button
               variant="contained"
               disabled={baru.length === 0 || hasil.galat.length > 0 || pilah.bentrok.length > 0 || terlaluBanyak || tambah.isPending}
               onClick={() => tambah.mutate()}
+              sx={{ boxShadow: 'none', '&.Mui-disabled': { bgcolor: w.primer, color: '#fff', opacity: 0.6 } }}
             >
-              {tambah.isPending ? 'Menyimpan...' : `Tambah ${baru.length} siswa`}
+              {tambah.isPending ? 'Menyimpan...' : (baru.length > 0 ? `Tambah ${baru.length} siswa` : 'Tambah siswa')}
             </Button>
             {hasil.galat.length > 0 && (
               <Typography sx={{ fontSize: '1rem' }} color="error">
@@ -110,9 +111,6 @@ export default function SiswaPanel({
       )}
 
       <Box>
-        <Typography component="h3" sx={{ fontSize: '1.1875rem', fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 1.5 }}>
-          Daftar siswa ({siswa.length})
-        </Typography>
         {siswa.length === 0 ? (
           <Alert severity="info">Belum ada siswa.</Alert>
         ) : (
@@ -124,7 +122,7 @@ export default function SiswaPanel({
                     <TableCell sx={{ width: { xs: 48, sm: 72 } }}>No</TableCell>
                     <TableCell>Nama</TableCell>
                     <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>NIS</TableCell>
-                    {!readOnly && <TableCell align="right" sx={{ width: { xs: 96, sm: 112 }, whiteSpace: 'nowrap' }}>Aksi</TableCell>}
+                    {!readOnly && <TableCell align="center" sx={{ width: { xs: 96, sm: 112 }, whiteSpace: 'nowrap' }}>Aksi</TableCell>}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -142,7 +140,7 @@ export default function SiswaPanel({
                       </TableCell>
                       <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{s.nis ?? ''}</TableCell>
                       {!readOnly && (
-                        <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        <TableCell align="center" sx={{ whiteSpace: 'nowrap' }}>
                           <Tooltip title="Ubah">
                             <IconButton size="small" aria-label={`Ubah ${s.nama}`} onClick={() => setUbah(s)}>
                               <IconPencil size={20} />

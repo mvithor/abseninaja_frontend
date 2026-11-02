@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Box, Chip } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { POLA_INFO } from './penjelasan';
 import { sembunyi } from './gayaMatriks';
 
@@ -8,7 +9,7 @@ import { sembunyi } from './gayaMatriks';
 // teks biasa di atas latar warna lembut supaya kontrasnya aman, bukan teks warna peringatan di atas putih.
 export default function PilKode({ kode, panjang = false, jumlah, ...sisa }) {
   const info = POLA_INFO[kode];
-  const warna = info?.jenis === 'pengayaan' ? 'info' : 'warning';
+  const pengayaan = info?.jenis === 'pengayaan';
   const judul = info?.judul ?? '';
   let isi = kode;
   if (panjang) isi = jumlah === undefined ? `${kode} ${judul}` : `${kode} ${judul} (${jumlah})`;
@@ -17,16 +18,22 @@ export default function PilKode({ kode, panjang = false, jumlah, ...sisa }) {
       size="small"
       title={judul}
       label={panjang ? isi : (<>{kode}<Box component="span" sx={sembunyi}>{` ${judul}`}</Box></>)}
-      sx={(theme) => ({
-        // Chip panjang boleh turun baris di layar sempit, supaya tidak terpotong di tepi kartu.
-        ...(panjang ? { height: 'auto', maxWidth: '100%', minHeight: 28, '& .MuiChip-label': { whiteSpace: 'normal', py: '4px' } } : {}),
-        fontWeight: 600,
-        color: theme.palette.text.primary,
-        border: `1px solid ${theme.palette[warna].main}`,
-        backgroundColor: alpha(theme.palette[warna].main, 0.2),
-        '&.MuiChip-clickable:hover': { backgroundColor: alpha(theme.palette[warna].main, 0.32) },
-        '&.pilih': { backgroundColor: alpha(theme.palette[warna].main, 0.55) },
-      })}
+      sx={(theme) => {
+        const w = warnaRingkasan(theme);
+        const dasar = pengayaan ? w.pengayaan : theme.palette.warning.main;
+        return {
+          // Chip panjang boleh turun baris di layar sempit, supaya tidak terpotong di tepi kartu.
+          ...(panjang ? { height: 'auto', maxWidth: '100%', minHeight: 26, '& .MuiChip-label': { whiteSpace: 'normal', py: '4px' } } : {}),
+          borderRadius: '8px',
+          fontWeight: 600,
+          color: theme.palette.text.primary,
+          backgroundColor: alpha(dasar, 0.22),
+          '&.MuiChip-clickable:hover': { backgroundColor: alpha(dasar, 0.34) },
+          // Saringan yang aktif: diisi warna primer dengan teks putih, seperti chip terpilih di desain; teks "Hapus
+          // saringan" dan aria-pressed ikut menandai, bukan hanya warna.
+          '&.pilih, &.pilih:hover': { backgroundColor: w.primer, color: '#fff' },
+        };
+      }}
       {...sisa}
     />
   );

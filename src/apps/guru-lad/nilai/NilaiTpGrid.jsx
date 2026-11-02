@@ -8,15 +8,15 @@ import { simpanNilaiTp, pesanGalat } from '../api';
 import {
   bacaNilaiSel, tampilNilai, uraiTempel, terapkanTempel, hitungPengosongan,
 } from './tempel';
-import { legendaRentang, rentangNilai, RENTANG } from '../rentang';
+import { rentangNilai, RENTANG } from '../rentang';
 import { judulLm, labelTp } from '../label';
 import IkonRentang from '../komponen/IkonRentang';
 import JudulTab from '../komponen/JudulTab';
 import PetunjukTab from '../komponen/PetunjukTab';
 import BilahSimpan from '../komponen/BilahSimpan';
-import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
+import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { gayaGrid } from './gayaGrid';
-import { cariTpId, labelTpRingkas } from '../ringkasan/ringkasan';
+import { cariTpId, labelTpRingkas, legendaSebaran } from '../ringkasan/ringkasan';
 
 const kunci = (siswaId, tpId) => `${siswaId}:${tpId}`;
 const potongJudul = (teks) => (teks.length > 28 ? `${teks.slice(0, 27)}…` : teks);
@@ -28,6 +28,8 @@ export default function NilaiTpGrid({
     () => lm.flatMap((m) => m.tp.map((t) => ({ ...t, lmId: m.id }))),
     [lm],
   );
+  // TP pertama tiap lingkup materi: diberi garis tegak tebal di kirinya.
+  const awalLm = useMemo(() => new Set(tpList.filter((t, i) => i === 0 || tpList[i - 1].lmId !== t.lmId).map((t) => t.id)), [tpList]);
   const server = useMemo(() => {
     const peta = new Map();
     nilaiTp.forEach((n) => peta.set(kunci(n.siswa_id, n.tp_id), n.nilai));
@@ -113,7 +115,7 @@ export default function NilaiTpGrid({
     () => ({ ambang_bagian: kelas.ambang_bagian, kktp: kelas.kktp, ambang_pengayaan: kelas.ambang_pengayaan }),
     [kelas.ambang_bagian, kelas.kktp, kelas.ambang_pengayaan],
   );
-  const legenda = useMemo(() => legendaRentang(ambang), [ambang]);
+  const legenda = useMemo(() => legendaSebaran(ambang), [ambang]);
 
   // Mengosongkan nilai yang sudah tersimpan tidak bisa dibatalkan, jadi diminta konfirmasi dulu.
   const mintaSimpan = () => {
@@ -179,37 +181,24 @@ export default function NilaiTpGrid({
           <>Sel kosong berarti belum dinilai; <b>0</b> adalah nilai nol.</>,
           'Ikon di samping nilai menunjukkan rentang pencapaian menurut batas kelas ini.',
         ]}
-      >
+      />
+      <Box component="section" role="group" aria-label="Keterangan ikon rentang nilai" sx={{ ...gayaKartu(w), px: 3, py: 2.5 }}>
         <Box
           component="ul"
-          aria-label="Keterangan ikon rentang nilai"
-          sx={{
-            listStyle: 'none', m: 0, p: 0, display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(2, minmax(0, 1fr))' }, columnGap: 3, rowGap: 1.25, borderRadius: 0,
-          }}
+          aria-label="Keterangan ikon"
+          sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '10px 28px', borderRadius: 0 }}
         >
           {legenda.map((l) => (
-            <Box key={l.rentang} component="li" sx={{ display: 'flex', alignItems: 'center', gap: 1, borderRadius: 0 }}>
+            <Box key={l.rentang} component="li" sx={{ display: 'flex', alignItems: 'center', gap: 1, borderRadius: 0, fontSize: 14 }}>
               <IkonRentang rentang={l.rentang} teksBaca={false} ukuran={22} />
-              <Typography sx={{ fontSize: '0.9375rem', lineHeight: '1.375rem', color: w.ink }}>
-                <b>{l.batas}</b>
-                {': '}
-                {l.teks}
-              </Typography>
+              <span>
+                {l.nama}
+                {l.batas && <Box component="small" sx={{ fontSize: 13, color: w.sekunder }}>{` ${l.batas}`}</Box>}
+              </span>
             </Box>
           ))}
         </Box>
-      </PetunjukTab>
-      {!readOnly && (
-        <BilahSimpan
-          jumlahKotor={jumlahKotor}
-          sibuk={sibuk}
-          adaGalat={adaGalatLokal}
-          onBuang={buang}
-          onSimpan={mintaSimpan}
-          labelSimpan="Simpan nilai"
-        />
-      )}
-
+      </Box>
       {sorot && (
         <Alert
           severity="info"
@@ -231,13 +220,13 @@ export default function NilaiTpGrid({
             <tr>
               <th className="no" rowSpan={2}>No</th>
               <th className="nama" rowSpan={2}>Nama siswa</th>
-              {lm.filter((m) => m.tp.length > 0).map((m) => (
-                <th key={m.id} colSpan={m.tp.length} title={judulLm(m)}>{potongJudul(judulLm(m))}</th>
+              {lm.filter((m) => m.tp.length > 0).map((m, i) => (
+                <th key={m.id} colSpan={m.tp.length} className={i > 0 ? 'awal-lm' : undefined} title={judulLm(m)}>{potongJudul(judulLm(m))}</th>
               ))}
             </tr>
             <tr>
               {tpList.map((t) => (
-                <th key={t.id} data-tp={t.id} className={t.id === tpSorot ? 'sorot' : undefined} title={t.rumusan || undefined}>{labelTp(t)}</th>
+                <th key={t.id} data-tp={t.id} className={[t.id === tpSorot && 'sorot', awalLm.has(t.id) && 'awal-lm'].filter(Boolean).join(' ') || undefined} title={t.rumusan || undefined}>{labelTp(t)}</th>
               ))}
             </tr>
           </thead>
@@ -254,12 +243,15 @@ export default function NilaiTpGrid({
                   const galat = (diEdit && baca.galat) || galatServer[k];
                   const efektif = galat ? null : baca.nilai;
                   const rentang = galat ? RENTANG.BELUM_DINILAI : rentangNilai(efektif, ambang);
-                  let kelasSel = 'sel';
+                  let kelasSel = awalLm.has(t.id) ? 'sel awal-lm' : 'sel';
                   if (t.id === tpSorot) kelasSel += ' sorot';
                   if (galat) kelasSel += ' salah'; else if (diEdit) kelasSel += ' kotor';
                   return (
                     <td key={t.id} className={kelasSel} title={galat || (diEdit ? 'Belum disimpan' : undefined)}>
                       <div className="isi">
+                        <span className="tanda">
+                          {galat ? <span aria-hidden="true">!</span> : <IkonRentang rentang={rentang} />}
+                        </span>
                         <input
                           value={teks}
                           data-r={r}
@@ -272,9 +264,6 @@ export default function NilaiTpGrid({
                           onPaste={(e) => !readOnly && tempel(e, r, c)}
                           onKeyDown={(e) => tombol(e, r, c)}
                         />
-                        <span className="tanda">
-                          {galat ? <span aria-hidden="true">!</span> : <IkonRentang rentang={rentang} />}
-                        </span>
                       </div>
                     </td>
                   );
@@ -284,6 +273,17 @@ export default function NilaiTpGrid({
           </tbody>
         </table>
       </Box>
+
+      {!readOnly && (
+        <BilahSimpan
+          jumlahKotor={jumlahKotor}
+          sibuk={sibuk}
+          adaGalat={adaGalatLokal}
+          onBuang={buang}
+          onSimpan={mintaSimpan}
+          labelSimpan="Simpan nilai"
+        />
+      )}
 
       <Dialog open={konfirmasiKosong > 0} onClose={() => setKonfirmasiKosong(0)} aria-labelledby="judul-kosongkan">
         <DialogTitle id="judul-kosongkan">Kosongkan nilai yang sudah tersimpan?</DialogTitle>

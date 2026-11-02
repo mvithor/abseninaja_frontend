@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { IconAlertTriangle } from '@tabler/icons-react';
 import { CETAK, gayaTautan, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 
 /**
@@ -8,34 +9,49 @@ import { CETAK, gayaTautan, warnaRingkasan } from '../ringkasan/gayaRingkasan';
  * tetap tampil di tabel, tetapi pembacanya diberi tahu bahwa angka dari data lama kurang bisa dipercaya.
  */
 export default function BannerTertinggal({ daftar, onBuka }) {
-  const w = warnaRingkasan(useTheme());
+  const tema = useTheme();
+  const w = warnaRingkasan(tema);
   if (daftar.length === 0) return null;
+  const tunggal = daftar.length === 1;
+  const tautan = (x) => (
+    <Box component="button" type="button" onClick={() => onBuka(x.id)} sx={{ ...gayaTautan(w), flex: 'none', whiteSpace: 'nowrap' }}>{`Lengkapi di ${x.nama}`}</Box>
+  );
   return (
     <Box
       role="status"
       aria-label="Kelas dengan data tertinggal"
       sx={{
-        bgcolor: w.kartu, border: `1.5px solid ${w.ink}`, borderRadius: '8px', px: 2.25, py: 1.75, display: 'flex', gap: 1.5, alignItems: 'flex-start', flexWrap: 'wrap',
+        bgcolor: w.bgPeringatan, borderRadius: '7px', px: 2, py: 1.5, display: 'flex', gap: 1.5, alignItems: 'flex-start', fontSize: 14, lineHeight: 1.5, color: w.ink, ...CETAK,
       }}
     >
-      <Box
-        component="span"
-        sx={{
-          display: 'inline-flex', alignItems: 'center', minHeight: 22, px: 1, borderRadius: '4px', fontSize: 13, fontWeight: 600, bgcolor: w.ink, color: w.kartu, ...CETAK,
-        }}
-      >
-        Data tertinggal
+      <Box component="span" aria-hidden="true" sx={{ display: 'flex', mt: '1px', color: tema.palette.warning.dark, flex: 'none' }}>
+        <IconAlertTriangle size={22} />
       </Box>
-      <Box component="ul" sx={{ flex: '1 1 400px', listStyle: 'none', m: 0, p: 0, display: 'flex', flexDirection: 'column', gap: 1 }}>
-        {daftar.map((x) => (
-          <Box component="li" key={x.id} sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between' }}>
-            <Typography sx={{ flex: '1 1 320px', fontSize: 14, lineHeight: '21px' }}>
-              <b>{x.nama}</b>
-              {`: ${x.kalimat}`}
-            </Typography>
-            <Box component="button" type="button" onClick={() => onBuka(x.id)} sx={gayaTautan(w)}>{`Lengkapi di ${x.nama}`}</Box>
+      <Box sx={{ flex: 1, minWidth: 0 }}>
+        {tunggal ? (
+          <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Box sx={{ flex: '1 1 320px' }}>
+              <b>Data tertinggal.</b>
+              {` ${daftar[0].nama}: ${daftar[0].kalimat}`}
+            </Box>
+            {tautan(daftar[0])}
           </Box>
-        ))}
+        ) : (
+          <>
+            <b>Data tertinggal.</b>
+            <Box component="ul" sx={{ listStyle: 'none', m: 0, mt: 0.5, p: 0, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+              {daftar.map((x) => (
+                <Box component="li" key={x.id} sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap', alignItems: 'baseline', justifyContent: 'space-between' }}>
+                  <Box sx={{ flex: '1 1 320px' }}>
+                    <b>{x.nama}</b>
+                    {`: ${x.kalimat}`}
+                  </Box>
+                  {tautan(x)}
+                </Box>
+              ))}
+            </Box>
+          </>
+        )}
       </Box>
     </Box>
   );

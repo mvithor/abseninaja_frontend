@@ -15,7 +15,7 @@ export default function KartuBagian({
       aria-labelledby={id ? `${id}-judul` : undefined}
       sx={{
         ...gayaKartu(w, gaya),
-        p: { xs: 2, md: 3 },
+        p: { xs: 2, md: '20px 24px' },
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
@@ -24,18 +24,18 @@ export default function KartuBagian({
       }}
     >
       {(judul || aksi) && (
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, flexWrap: 'wrap' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, minWidth: 0 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: aksi ? 'center' : 'flex-start', gap: 1.5, flexWrap: 'wrap' }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0, minWidth: 0, flex: '1 1 300px' }}>
             {judul && (
               <Typography
                 component="h2"
                 id={id ? `${id}-judul` : undefined}
-                sx={{ fontSize: { xs: 17, md: 18 }, fontWeight: 700, lineHeight: 1.3, color: w.ink }}
+                sx={{ fontSize: 18, fontWeight: 600, lineHeight: 1.5, color: w.ink }}
               >
                 {judul}
               </Typography>
             )}
-            {keterangan && <Typography sx={{ fontSize: { xs: 13, md: 14 }, lineHeight: 1.45, color: w.sekunder }}>{keterangan}</Typography>}
+            {keterangan && <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, mt: 0.5, maxWidth: '80ch' }}>{keterangan}</Typography>}
           </Box>
           {aksi}
         </Box>
