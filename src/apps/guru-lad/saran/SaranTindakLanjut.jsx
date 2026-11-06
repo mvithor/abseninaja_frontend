@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Chip, Stack, Tab, Tabs, TextField, Typography,
@@ -150,7 +151,7 @@ function KotakSaran({
         </Box>
       ) : null}
 
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
+      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr' }}>
         {KOLOM_SARAN.map((k) => (
           <TextField
             key={k.kunci}
@@ -184,6 +185,7 @@ function KotakSaran({
               {baris1.map((b) => (
                 <Button
                   key={b.kunci}
+                  size="small"
                   variant="outlined"
                   onClick={() => onCatatRemedial({ siswaId, tpId: b.tpId })}
                   aria-label={`Catat remedial ${namaSiswa}, ${b.nama}`}
@@ -338,7 +340,13 @@ export default function SaranTindakLanjut({
     <Stack spacing={3}>
       {daftar.length > 0 && (
         <>
-          <Tabs value={aktif.pola} onChange={(_, v) => setPilih(v)} variant="scrollable" scrollButtons="auto" aria-label="Saran per penanda">
+          <Tabs
+            value={aktif.pola}
+            onChange={(_, v) => setPilih(v)}
+            aria-label="Saran per penanda"
+            slotProps={{ indicator: { sx: { display: 'none' } } }}
+            sx={{ minHeight: 0, '& .MuiTabs-flexContainer': { flexWrap: 'wrap', gap: 1 } }}
+          >
             {daftar.map((e) => {
               const k = keadaanSaran(e);
               return (
@@ -347,7 +355,18 @@ export default function SaranTindakLanjut({
                   value={e.pola}
                   id={`tab-saran-${e.pola}`}
                   aria-controls={`panel-saran-${e.pola}`}
-                  sx={{ textTransform: 'none', alignItems: 'flex-start' }}
+                  sx={(theme) => ({
+                    textTransform: 'none',
+                    alignItems: 'flex-start',
+                    minHeight: 0,
+                    minWidth: 0,
+                    px: 1.5,
+                    py: 0.75,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: '6px',
+                    '&.Mui-selected': { bgcolor: alpha(theme.palette.primary.main, 0.08), borderColor: 'primary.main', boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}` },
+                  })}
                   label={(
                     <Box sx={{ textAlign: 'left' }}>
                       <Box component="span" sx={{ display: 'block', fontWeight: 600 }}>{`${e.pola} ${POLA_INFO[e.pola]?.judul ?? ''}`}</Box>

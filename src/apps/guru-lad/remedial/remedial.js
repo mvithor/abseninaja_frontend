@@ -9,10 +9,14 @@ import { bacaNilaiSel } from '../nilai/tempel.js';
 export const kunciRemedial = (siswaId, tpId) => `${siswaId}:${tpId}`;
 const centi = (x) => Math.round(Number(x) * 100);
 
-/** "TP 1.2 (LM 1)" bila TP berkode, kalau tidak "TP 2 (LM 1)". Sama dengan namaTp di evaluasi/penjelasan.js. */
+/**
+ * "TP 1.2 (LM 1)" bila kode hanya angka, "TP1 (LM 1)" bila guru sudah menulis awalan TP sendiri, dan
+ * "TP 2 (LM 1)" bila TP tanpa kode. Sama dengan namaTp di evaluasi/penjelasan.js.
+ */
 export const namaTpLengkap = (tp, lmNo) => {
   const kode = typeof tp?.kode === 'string' ? tp.kode.trim() : '';
-  return `TP ${kode || tp?.urutan} (LM ${lmNo})`;
+  const nama = /^TP/i.test(kode) ? kode : `TP ${kode || tp?.urutan}`;
+  return `${nama} (LM ${lmNo})`;
 };
 
 /** Kelompokkan catatan remedial per (siswa, TP), tiap kelompok terurut menaik menurut urutan. */

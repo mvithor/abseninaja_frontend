@@ -15,6 +15,8 @@ test('namaTpLengkap: kode bila ada, kalau tidak nomor urut', () => {
   assert.equal(namaTpLengkap({ kode: '1.2', urutan: 2 }, 1), 'TP 1.2 (LM 1)');
   assert.equal(namaTpLengkap({ kode: '  ', urutan: 3 }, 2), 'TP 3 (LM 2)');
   assert.equal(namaTpLengkap({ urutan: 1 }, 4), 'TP 1 (LM 4)');
+  assert.equal(namaTpLengkap({ kode: 'TP1', urutan: 1 }, 1), 'TP1 (LM 1)');
+  assert.equal(namaTpLengkap({ kode: 'tp 2', urutan: 2 }, 3), 'tp 2 (LM 3)');
 });
 
 test('kelompokkanRemedial: per siswa dan TP, terurut menaik menurut urutan walau masukan acak', () => {

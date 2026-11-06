@@ -56,6 +56,13 @@ test('namaLm dan namaTp memakai struktur kelas dan tidak menggandakan nomor', ()
   assert.equal(namaTp(5, 3, LM), 'TP 3 (LM 5)', 'LM tidak dikenal tetap menghasilkan kalimat');
 });
 
+test('namaTp: kode yang sudah berawalan TP tidak diberi awalan lagi (bukan "TP TP1")', () => {
+  const lmKode = [{ urutan: 1, nama: 'A', tp: [{ urutan: 1, kode: 'TP1' }, { urutan: 2, kode: 'tp 1.2' }, { urutan: 3, kode: '1.3' }] }];
+  assert.equal(namaTp(1, 1, lmKode), 'TP1 (LM 1)');
+  assert.equal(namaTp(1, 2, lmKode), 'tp 1.2 (LM 1)');
+  assert.equal(namaTp(1, 3, lmKode), 'TP 1.3 (LM 1)');
+});
+
 test('P1: satu kalimat per TP dengan rentang dan keadaan remedial, plus catatan rata-rata yang menyembunyikan', () => {
   const k = uraikanBukti('P1', P1, CTX);
   assert.equal(k[0], 'TP 1.2 (LM 1): nilai 58, remedial bagian tertentu; belum ada remedial.');

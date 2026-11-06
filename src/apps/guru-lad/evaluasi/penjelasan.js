@@ -82,7 +82,9 @@ export function namaTp(lmNo, tpNo, lm) {
   const m = cariLm(lmNo, lm);
   const t = m && Array.isArray(m.tp) ? m.tp.find((x) => x.urutan === tpNo) : undefined;
   const kode = t && typeof t.kode === 'string' ? t.kode.trim() : '';
-  return `TP ${kode || tpNo} (LM ${lmNo})`;
+  // Guru sering menamai kodenya sendiri "TP1" atau "TP 1.2"; awalan "TP" tidak ditambahkan lagi supaya tidak menjadi "TP TP1".
+  const nama = /^TP/i.test(kode) ? kode : `TP ${kode || tpNo}`;
+  return `${nama} (LM ${lmNo})`;
 }
 
 const namaTpDari = (t, ctx) => namaTp(t.lm, t.tp, ctx.lm);
