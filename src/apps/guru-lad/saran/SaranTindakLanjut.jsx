@@ -233,12 +233,15 @@ function KotakSaran({
           )}
           {keadaan !== KEADAAN.DIABAIKAN && sunting && (
             <>
-              <Button variant="contained" onClick={kirimPakai} disabled={sibuk}>
-                {diubahDariDraf || keadaan !== KEADAAN.DRAF ? 'Pakai versi saya' : 'Pakai saran ini'}
-              </Button>
-              {diubahDariDraf && (
-                <Button variant="text" onClick={() => { setIsian(draf); setGalatKolom({}); }} disabled={sibuk}>Kembalikan ke draf</Button>
-              )}
+              {/* Dua tombol ini selalu berdampingan dan selebar sama: label dipendekkan ("Pulihkan draf") agar muat satu baris. */}
+              <Stack direction="row" spacing={1} sx={{ flex: { xs: '1 1 100%', sm: '0 0 auto' } }}>
+                <Button variant="contained" onClick={kirimPakai} disabled={sibuk} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
+                  {diubahDariDraf || keadaan !== KEADAAN.DRAF ? 'Pakai versi saya' : 'Pakai saran ini'}
+                </Button>
+                {diubahDariDraf && (
+                  <Button variant="outlined" onClick={() => { setIsian(draf); setGalatKolom({}); }} disabled={sibuk} sx={{ flex: 1, whiteSpace: 'nowrap' }}>Pulihkan draf</Button>
+                )}
+              </Stack>
               {keadaan === KEADAAN.DRAF && (
                 <Button variant="outlined" color="inherit" onClick={() => { setModeAbaikan(true); setPesan(null); }} disabled={sibuk}>Abaikan saran</Button>
               )}

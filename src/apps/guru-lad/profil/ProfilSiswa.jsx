@@ -6,13 +6,13 @@ import {
 import { useTheme } from '@mui/material/styles';
 import { IconCheck, IconCircleDashed, IconX } from '@tabler/icons-react';
 import IkonRentang from '../komponen/IkonRentang';
-import DeretKehadiran from '../komponen/DeretKehadiran';
+import DeretKehadiranBulan from '../komponen/DeretKehadiranBulan';
 import GrafikTren from '../komponen/GrafikTren';
 import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { KETERANGAN_RENTANG, legendaRentang, tampilAngka } from '../rentang';
 import { TEKS_KODE } from '../kehadiran/kehadiran';
 import {
-  capaianPerLm, kehadiranSiswa, kunciP1, proyekSiswa, riwayatRemedial, trenPerLm,
+  capaianPerLm, kehadiranSiswa, kunciP1, proyekSiswa, riwayatRemedial, statistikLm, trenPerLm,
 } from './profil';
 
 function Bagian({ id, judul, children }) {
@@ -34,6 +34,45 @@ function StatusTp({ tp }) {
   return <Chip size="small" color="warning" variant="outlined" icon={<IconX size={14} />} label="Belum tuntas" />;
 }
 StatusTp.propTypes = { tp: PropTypes.object.isRequired };
+
+/**
+ * Blok "Nilai rata-rata" satu LM: angka besar, status dengan kata terhadap KKTP, dan batang 0 sampai 100 dengan
+ * penanda KKTP. Status tidak hanya lewat warna (NFR-06): kata, letak ujung batang terhadap penanda, dan angka ikut.
+ */
+function StatistikLm({ rata, kktp }) {
+  const w = warnaRingkasan(useTheme());
+  const st = useMemo(() => statistikLm(rata, kktp), [rata, kktp]);
+  if (!st.ada) return <Typography variant="body2" color="text.secondary">Nilai rata-rata: belum ada nilai</Typography>;
+  const bawah = st.status === 'DI_BAWAH';
+  const warnaIsi = bawah ? w.sebagianTua : w.mencapaiTua;
+  const teksStatus = { MENCAPAI: 'Mencapai KKTP', DI_BAWAH: 'Di bawah KKTP' }[st.status] ?? null;
+  const ringkas = `Nilai rata-rata ${tampilAngka(rata)}${teksStatus ? `, ${teksStatus.toLowerCase()} ${tampilAngka(kktp)}` : ''}`;
+  return (
+    <Box sx={{ width: '100%', maxWidth: 320, border: `1px solid ${w.garis}`, borderRadius: '8px', bgcolor: w.latar, px: 1.5, pt: 1.25, pb: 1 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="flex-end" columnGap={1.5} rowGap={0.25} flexWrap="wrap">
+        <Box sx={{ borderRadius: 0 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4 }}>Nilai rata-rata</Typography>
+          <Typography component="span" sx={{ display: 'block', fontSize: '1.625rem', fontWeight: 700, lineHeight: 1.2, color: w.ink }}>{tampilAngka(rata)}</Typography>
+        </Box>
+        {teksStatus && <Typography variant="body2" sx={{ fontWeight: 600, pb: 0.5 }}>{teksStatus}</Typography>}
+      </Stack>
+      <Box role="img" aria-label={ringkas} sx={{ position: 'relative', height: 6, borderRadius: '3px', bgcolor: w.trek, mt: 1.25 }}>
+        <Box sx={{ width: `${st.persen}%`, height: '100%', borderRadius: '3px', bgcolor: warnaIsi }} />
+        {st.tandaKktp !== null && (
+          <Box sx={{ position: 'absolute', top: -3, left: `${st.tandaKktp}%`, ml: '-1px', width: 2, height: 12, borderRadius: 0, bgcolor: w.ink }} />
+        )}
+      </Box>
+      {st.tandaKktp !== null && (
+        <Box aria-hidden="true" sx={{ position: 'relative', height: 20, borderRadius: 0 }}>
+          <Typography component="span" variant="body2" color="text.secondary" sx={{ position: 'absolute', left: `${st.tandaKktp}%`, transform: 'translateX(-50%)', whiteSpace: 'nowrap', fontSize: '0.8125rem', lineHeight: '20px' }}>
+            {`KKTP ${tampilAngka(kktp)}`}
+          </Typography>
+        </Box>
+      )}
+    </Box>
+  );
+}
+StatistikLm.propTypes = { rata: PropTypes.number, kktp: PropTypes.oneOfType([PropTypes.number, PropTypes.string]) };
 
 /**
  * Isi profil satu siswa: capaian per TP, tren rata-rata per LM, proyek, kehadiran di mapel, dan riwayat remedial.
@@ -76,11 +115,9 @@ export default function ProfilSiswa({
           <Stack spacing={2.5}>
             {capaian.map((g) => (
               <Box key={g.lmId}>
-                <Stack direction="row" justifyContent="space-between" alignItems="baseline" flexWrap="wrap" useFlexGap>
+                <Stack spacing={1.25} sx={{ mb: 1 }}>
                   <Typography variant="subtitle1" sx={{ fontWeight: 700, fontSize: '1.0625rem' }}>{g.judul}</Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {g.rata === null ? 'Nilai rata-rata: belum ada nilai' : `Nilai rata-rata ${tampilAngka(g.rata)}`}
-                  </Typography>
+                  <StatistikLm rata={g.rata} kktp={ambang.kktp} />
                 </Stack>
                 <Box sx={{ overflowX: 'auto', display: { xs: 'none', md: 'block' } }}>{/* Lebar kolom tetap dan sama di semua LM, supaya kolom Nilai, Rentang, dan Status lurus dari satu LM ke LM berikutnya. */}
                 <Table size="small" aria-label={`Capaian ${g.judul}`} sx={{ tableLayout: 'fixed', minWidth: 640 }}>
@@ -225,7 +262,7 @@ export default function ProfilSiswa({
             <Typography variant="body2" color="text.secondary">
               {`Kehadiran dihitung dari ${hadir.tercatat} pertemuan mapel ini yang tercatat untuk siswa ini, dari ${hadir.pertemuan} pertemuan. Kotak kosong (-) berarti belum dicatat, bukan alpa.`}
             </Typography>
-            <DeretKehadiran deret={hadir.deret} />
+            <DeretKehadiranBulan deret={hadir.deret} />
             <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
               {['H', 'I', 'S', 'A'].map((k) => (
                 <Typography key={k} variant="body2">{`${TEKS_KODE[k].replace(' (tanpa keterangan)', '')} ${hadir.jumlah[k]}`}</Typography>

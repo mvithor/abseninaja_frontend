@@ -57,6 +57,22 @@ export function capaianPerLm(siswaId, lm, ctx, ambang, ditandai = new Set()) {
   });
 }
 
+/**
+ * Bahan blok "Nilai rata-rata" satu LM: panjang batang (0 sampai 100), letak penanda KKTP pada batang yang sama,
+ * dan status terhadap KKTP. Status ditulis dengan kata (bukan hanya warna): MENCAPAI bila rata-rata sama dengan
+ * atau di atas KKTP, DI_BAWAH bila kurang. Tanpa nilai, tidak ada batang dan tidak ada status.
+ */
+export function statistikLm(rata, kktp) {
+  const dibatasi = (x) => Math.min(100, Math.max(0, Number(x)));
+  if (!adaNilai(rata)) return { ada: false, persen: 0, tandaKktp: null, status: null };
+  const punyaKktp = adaNilai(kktp);
+  let status = null;
+  if (punyaKktp) status = centi(rata) >= centi(kktp) ? 'MENCAPAI' : 'DI_BAWAH';
+  return {
+    ada: true, persen: dibatasi(rata), tandaKktp: punyaKktp ? dibatasi(kktp) : null, status,
+  };
+}
+
 /** Kunci TP ("lm.tp") yang menjadi bukti P1 menurut server. */
 export function kunciP1(hasil) {
   const p1 = hasil?.pola?.P1;

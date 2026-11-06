@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  capaianPerLm, kehadiranSiswa, kunciP1, proyekSiswa, rataDuaDesimal, riwayatRemedial, trenPerLm,
+  capaianPerLm, kehadiranSiswa, kunciP1, proyekSiswa, rataDuaDesimal, riwayatRemedial, statistikLm, trenPerLm,
 } from './profil.js';
 import { siapkanKonteks } from '../evaluasi/matriks.js';
 
@@ -196,4 +196,18 @@ test('riwayatRemedial terurut menurut LM, TP, lalu urutan walau datanya masuk ac
   assert.equal(r[1].nilaiAwal, 50);
   // struktur LM yang datang tidak berurutan tetap menghasilkan riwayat berurutan
   assert.deepEqual(riwayatRemedial(1, [...LM].reverse(), c).map((x) => x.id), [3, 4, 2, 1]);
+});
+
+test('statistikLm: batang 0 sampai 100, penanda KKTP di skala yang sama, status dengan kata', () => {
+  assert.deepEqual(statistikLm(84, 75), { ada: true, persen: 84, tandaKktp: 75, status: 'MENCAPAI' });
+  assert.deepEqual(statistikLm(73.33, 75), { ada: true, persen: 73.33, tandaKktp: 75, status: 'DI_BAWAH' });
+  assert.equal(statistikLm(75, 75).status, 'MENCAPAI', 'tepat di KKTP dihitung mencapai, sama dengan aturan tuntas');
+  assert.equal(statistikLm(74.99, 75).status, 'DI_BAWAH');
+});
+
+test('statistikLm: tanpa nilai tidak ada batang; tanpa KKTP tidak ada penanda dan status; nilai di luar skala dibatasi', () => {
+  assert.deepEqual(statistikLm(null, 75), { ada: false, persen: 0, tandaKktp: null, status: null });
+  assert.deepEqual(statistikLm(80, null), { ada: true, persen: 80, tandaKktp: null, status: null });
+  assert.equal(statistikLm(120, 75).persen, 100);
+  assert.equal(statistikLm(-5, 75).persen, 0);
 });
