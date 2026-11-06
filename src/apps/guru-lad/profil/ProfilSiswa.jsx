@@ -87,7 +87,7 @@ function KartuTp({ t }) {
     <Box
       component="li"
       sx={{
-        listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 0.5, px: 1.5, py: 1.25, boxShadow: 'none', borderRadius: '8px',
+        listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 1, px: 1.75, py: 1.5, boxShadow: 'none', borderRadius: '8px',
         border: `1px solid ${belum ? theme.palette.warning.main : w.garis}`,
         bgcolor: belum ? alpha(theme.palette.warning.main, 0.1) : w.kartu,
       }}
@@ -100,9 +100,9 @@ function KartuTp({ t }) {
       </Stack>
       {t.rumusan && <Typography variant="body2" color="text.secondary">{t.rumusan}</Typography>}
       {(t.remedial.length > 0 || t.ditandaiP1) && (
-        <Stack direction="row" flexWrap="wrap" alignItems="center" columnGap={1} rowGap={0.5}>
+        <Stack direction="row" flexWrap="wrap" alignItems="center" columnGap={1} rowGap={0.75} sx={{ pt: 0.5 }}>
           {t.remedial.length > 0 && <Typography variant="body2" color="text.secondary">{`Remedial ${t.remedial.length}×, terbaru ${tampilAngka(t.remedialTerbaru)}`}</Typography>}
-          {t.ditandaiP1 && <Chip size="small" variant="outlined" label="Bukti penanda P1" />}
+          {t.ditandaiP1 && <Chip size="small" variant="outlined" label="Bukti penanda P1" sx={{ borderRadius: '6px', fontWeight: 600 }} />}
         </Stack>
       )}
     </Box>
@@ -116,7 +116,7 @@ function KolomLm({ g, kktp }) {
     <Box component="section" aria-label={`Capaian ${g.judul}`} sx={{ minWidth: 0, borderRadius: 0, boxShadow: 'none' }}>
       <Typography component="h3" sx={{ fontWeight: 700, fontSize: '1.0625rem', mb: 1.25 }}>{g.judul}</Typography>
       <StatistikLm rata={g.rata} kktp={kktp} />
-      <Stack component="ul" spacing={1} sx={{ m: 0, mt: 1.5, p: 0, borderRadius: 0 }}>
+      <Stack component="ul" spacing={1.5} sx={{ m: 0, mt: 2, p: 0, borderRadius: 0 }}>
         {g.tp.map((t) => <KartuTp key={t.tpId} t={t} />)}
       </Stack>
     </Box>
@@ -136,7 +136,7 @@ function KartuProyek({ p, ambang }) {
     <Box
       component="li"
       sx={{
-        listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 0.5, px: 1.5, py: 1.25, boxShadow: 'none', borderRadius: '8px', border: `1px solid ${w.garis}`, bgcolor: w.kartu,
+        listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 1, px: 1.75, py: 1.5, boxShadow: 'none', borderRadius: '8px', border: `1px solid ${w.garis}`, bgcolor: w.kartu,
       }}
     >
       <Typography variant="body2" color="text.secondary">{`${p.label} · ${p.kelompok ? 'kelompok' : 'individu'}`}</Typography>

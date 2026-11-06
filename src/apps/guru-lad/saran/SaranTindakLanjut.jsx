@@ -119,6 +119,7 @@ function KotakSaran({
           color={keadaan === KEADAAN.DIABAIKAN ? 'default' : 'primary'}
           icon={IKON_KEADAAN[keadaan] ?? undefined}
           label={LABEL_KEADAAN[keadaan]}
+          sx={{ borderRadius: '6px', fontWeight: 600 }}
         />
         {keadaan === KEADAAN.DRAF && (
           <Typography variant="body2" color="text.secondary">
@@ -151,28 +152,43 @@ function KotakSaran({
         </Box>
       ) : null}
 
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: '1fr' }}>
-        {KOLOM_SARAN.map((k) => (
-          <TextField
-            key={k.kunci}
-            label={k.label}
-            value={isian[k.kunci]}
-            onChange={(e) => { setIsian((v) => ({ ...v, [k.kunci]: e.target.value })); setGalatKolom((g) => ({ ...g, [k.kunci]: undefined })); }}
-            multiline
-            minRows={3}
-            fullWidth
-            required={k.kunci === 'langkah'}
-            disabled={keadaan === KEADAAN.DIABAIKAN}
-            sx={!bolehUbah ? { '& .MuiInputBase-root': { bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderStyle: 'dashed' } } : undefined}
-            slotProps={{
-              htmlInput: { maxLength: MAKS_KOLOM, readOnly: !bolehUbah },
-              inputLabel: { shrink: true },
-            }}
-            error={Boolean(galatKolom[k.kunci])}
-            helperText={galatKolom[k.kunci]
-              || (alasanHilang.has(k.kunci) ? `Kalimat tidak dibuat: ${alasanHilang.get(k.kunci)}` : k.petunjuk)}
-          />
-        ))}
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: '1fr' }}>
+        {KOLOM_SARAN.map((k) => {
+          const idIsian = `saran-${entri.pola}-${k.kunci}`;
+          const galat = galatKolom[k.kunci];
+          const petunjuk = alasanHilang.has(k.kunci) ? `Kalimat tidak dibuat: ${alasanHilang.get(k.kunci)}` : k.petunjuk;
+          return (
+            <Stack key={k.kunci} spacing={0.75}>
+              <Box sx={{ borderRadius: 0, boxShadow: 'none' }}>
+                <Typography component="label" htmlFor={idIsian} sx={{ display: 'block', fontSize: '0.9375rem', fontWeight: 600, lineHeight: 1.4 }}>
+                  {k.label}
+                  {k.kunci === 'langkah' && <Box component="span" aria-hidden="true" sx={{ ml: 0.5, color: 'error.main' }}>*</Box>}
+                </Typography>
+                <Typography id={`${idIsian}-petunjuk`} variant="body2" color="text.secondary" sx={{ lineHeight: 1.45, mt: 0.25 }}>{petunjuk}</Typography>
+              </Box>
+              <TextField
+                id={idIsian}
+                value={isian[k.kunci]}
+                onChange={(e) => { setIsian((v) => ({ ...v, [k.kunci]: e.target.value })); setGalatKolom((g) => ({ ...g, [k.kunci]: undefined })); }}
+                multiline
+                minRows={k.kunci === 'langkah' ? 4 : 2}
+                fullWidth
+                required={k.kunci === 'langkah'}
+                disabled={keadaan === KEADAAN.DIABAIKAN}
+                error={Boolean(galat)}
+                sx={{
+                  '& .MuiOutlinedInput-root': { borderRadius: '8px', p: 0, fontSize: '0.9375rem', lineHeight: 1.55 },
+                  '& .MuiOutlinedInput-input': { px: 1.5, py: 1.25 },
+                  ...(!bolehUbah ? { '& .MuiInputBase-root': { bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderStyle: 'dashed' } } : {}),
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: MAKS_KOLOM, readOnly: !bolehUbah, 'aria-describedby': `${idIsian}-petunjuk`, 'aria-required': k.kunci === 'langkah' },
+                }}
+              />
+              {galat && <Typography role="alert" variant="body2" sx={{ color: 'error.main', fontWeight: 600 }}>{galat}</Typography>}
+            </Stack>
+          );
+        })}
       </Box>
 
       {entri.pola === 'P1' && !readOnly && (

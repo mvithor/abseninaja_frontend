@@ -62,7 +62,7 @@ function KartuTp({ r, kalimat }) {
         {r.rumusan ?? 'Rumusan TP belum diisi guru.'}
       </Typography>
       {buka && <Typography component="span" variant="body2">{kalimat}</Typography>}
-      {r.tersembunyi && <Chip size="small" variant="outlined" label="Tidak terlihat dari rata-rata" sx={{ alignSelf: 'flex-start' }} />}
+      {r.tersembunyi && <Chip size="small" variant="outlined" label="Tidak terlihat dari rata-rata" sx={{ alignSelf: 'flex-start', borderRadius: '6px' }} />}
     </ButtonBase>
   );
 }
