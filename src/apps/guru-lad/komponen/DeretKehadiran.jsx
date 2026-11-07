@@ -5,19 +5,19 @@ import { TEKS_KODE } from '../kehadiran/kehadiran';
 import { sembunyi } from '../evaluasi/gayaMatriks';
 
 // Deret kehadiran satu siswa per pertemuan. Kode huruf menjadi pembeda utama (NFR-06); warna hanya menegaskan.
-// Kotak putus-putus "-" berarti belum dicatat, bukan alpa.
-export default function DeretKehadiran({ deret }) {
+// Kotak putus-putus "-" berarti belum dicatat, bukan alpa. Kotak A bergaris tipis (1 px): hurufnya yang membedakan, bukan tebal garis.
+export default function DeretKehadiran({ deret, label }) {
   const theme = useTheme();
   const gaya = (kode) => {
     if (kode === 'A') {
-      return { bgcolor: alpha(theme.palette.error.main, 0.3), color: theme.palette.text.primary, border: `2px solid ${theme.palette.error.main}`, fontWeight: 800 };
+      return { bgcolor: alpha(theme.palette.error.main, 0.3), color: theme.palette.text.primary, border: `1px solid ${theme.palette.error.main}`, fontWeight: 800 };
     }
     if (kode === null) return { border: `1px dashed ${theme.palette.text.secondary}`, color: theme.palette.text.secondary };
     if (kode === 'H') return { border: `1px solid ${theme.palette.divider}`, bgcolor: theme.palette.grey[100] };
     return { border: `1px solid ${theme.palette.warning.main}`, bgcolor: alpha(theme.palette.warning.main, 0.2) };
   };
   return (
-    <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} role="list" aria-label="Kehadiran per pertemuan">
+    <Stack direction="row" flexWrap="wrap" useFlexGap spacing={0.75} role="list" aria-label={label ?? 'Kehadiran per pertemuan'}>
       {deret.map((d) => (
         <Box
           key={d.nomor}
@@ -36,4 +36,4 @@ export default function DeretKehadiran({ deret }) {
   );
 }
 
-DeretKehadiran.propTypes = { deret: PropTypes.array.isRequired };
+DeretKehadiran.propTypes = { deret: PropTypes.array.isRequired, label: PropTypes.string };

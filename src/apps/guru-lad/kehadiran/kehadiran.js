@@ -232,3 +232,63 @@ export function kelompokLm(pertemuanUrut, lm) {
   });
   return hasil;
 }
+
+// ------------------------------------------------------------------ deret per bulan (profil dan panel siswa)
+
+/** Pembanding kronologis: tanggal dulu, lalu nomor. Item tanpa tanggal nyata ikut urutan nomor di akhir. */
+const bandingKronologis = (x, y) => {
+  const tx = uraiTanggal(x.tanggal) ? x.tanggal : null;
+  const ty = uraiTanggal(y.tanggal) ? y.tanggal : null;
+  if (tx && ty && tx !== ty) return tx < ty ? -1 : 1;
+  if (tx && !ty) return -1;
+  if (!tx && ty) return 1;
+  return (x.nomor ?? 0) - (y.nomor ?? 0);
+};
+
+/** Banyak kode A pada daftar item deret. */
+const hitungAlpa = (daftar) => daftar.filter((d) => d.kode === 'A').length;
+
+/**
+ * Kelompokkan deret kehadiran satu siswa per bulan kalender, dari bulan paling awal. Hanya cara membaca: jumlah
+ * tercatat dan alpa seluruh semester tetap dihitung dari seluruh deret, tidak per bulan. Item tanpa tanggal nyata
+ * masuk kelompok terakhir "Tanpa tanggal". Tahun ditulis pada label hanya bila deret melintasi lebih dari satu tahun.
+ * Item deret: { nomor, kode, tanggal }, kode null = belum dicatat.
+ */
+export function kelompokBulan(deret) {
+  const peta = new Map();
+  [...(deret ?? [])].sort(bandingKronologis).forEach((d) => {
+    const u = uraiTanggal(d.tanggal);
+    const kunci = u ? `${u.y}-${String(u.m).padStart(2, '0')}` : '';
+    if (!peta.has(kunci)) peta.set(kunci, { kunci, y: u ? u.y : null, m: u ? u.m : null, deret: [] });
+    peta.get(kunci).deret.push(d);
+  });
+  const banyakTahun = new Set([...peta.values()].map((g) => g.y).filter((y) => y !== null)).size > 1;
+  return [...peta.values()].map((g) => {
+    const tercatat = g.deret.filter((d) => d.kode !== null).length;
+    let label = 'Tanpa tanggal';
+    if (g.m !== null) label = banyakTahun ? `${NAMA_BULAN[g.m - 1]} ${g.y}` : NAMA_BULAN[g.m - 1];
+    return {
+      kunci: g.kunci, label, deret: g.deret, jumlah: g.deret.length, tercatat, alpa: hitungAlpa(g.deret),
+    };
+  });
+}
+
+/**
+ * Isi bagian P2 pada panel siswa. Bila pertemuan tidak lebih dari `maks`, semuanya ditampilkan. Bila lebih,
+ * panel hanya memuat `maks` pertemuan terakhir (menurut tanggal) dan rincian alpa per bulan; deret lengkap ada
+ * di profil. `rentang` ("36 sampai 45") hanya diisi bila nomor pertemuan yang ditampilkan berurutan tanpa celah.
+ */
+export function ringkasPanelP2(deret, maks) {
+  const semua = [...(deret ?? [])].sort(bandingKronologis);
+  if (semua.length <= maks) return { dipotong: false, tampil: semua, total: semua.length, perBulan: [], rentang: null };
+  const tampil = semua.slice(-maks);
+  const nomor = tampil.map((d) => d.nomor).sort((p, q) => p - q);
+  const berurutan = nomor.every((n, i) => i === 0 || n === nomor[i - 1] + 1);
+  return {
+    dipotong: true,
+    tampil,
+    total: semua.length,
+    perBulan: kelompokBulan(semua).map((g) => ({ kunci: g.kunci, label: g.label, alpa: g.alpa })),
+    rentang: berurutan ? `${nomor[0]} sampai ${nomor[nomor.length - 1]}` : null,
+  };
+}

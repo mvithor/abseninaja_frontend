@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
+import { alpha } from '@mui/material/styles';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Accordion, AccordionDetails, AccordionSummary, Alert, Box, Button, Chip, Stack, Tab, Tabs, TextField, Typography,
@@ -118,6 +119,7 @@ function KotakSaran({
           color={keadaan === KEADAAN.DIABAIKAN ? 'default' : 'primary'}
           icon={IKON_KEADAAN[keadaan] ?? undefined}
           label={LABEL_KEADAAN[keadaan]}
+          sx={{ borderRadius: '6px', fontWeight: 600 }}
         />
         {keadaan === KEADAAN.DRAF && (
           <Typography variant="body2" color="text.secondary">
@@ -150,28 +152,43 @@ function KotakSaran({
         </Box>
       ) : null}
 
-      <Box sx={{ display: 'grid', gap: 2, gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' } }}>
-        {KOLOM_SARAN.map((k) => (
-          <TextField
-            key={k.kunci}
-            label={k.label}
-            value={isian[k.kunci]}
-            onChange={(e) => { setIsian((v) => ({ ...v, [k.kunci]: e.target.value })); setGalatKolom((g) => ({ ...g, [k.kunci]: undefined })); }}
-            multiline
-            minRows={3}
-            fullWidth
-            required={k.kunci === 'langkah'}
-            disabled={keadaan === KEADAAN.DIABAIKAN}
-            sx={!bolehUbah ? { '& .MuiInputBase-root': { bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderStyle: 'dashed' } } : undefined}
-            slotProps={{
-              htmlInput: { maxLength: MAKS_KOLOM, readOnly: !bolehUbah },
-              inputLabel: { shrink: true },
-            }}
-            error={Boolean(galatKolom[k.kunci])}
-            helperText={galatKolom[k.kunci]
-              || (alasanHilang.has(k.kunci) ? `Kalimat tidak dibuat: ${alasanHilang.get(k.kunci)}` : k.petunjuk)}
-          />
-        ))}
+      <Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: '1fr' }}>
+        {KOLOM_SARAN.map((k) => {
+          const idIsian = `saran-${entri.pola}-${k.kunci}`;
+          const galat = galatKolom[k.kunci];
+          const petunjuk = alasanHilang.has(k.kunci) ? `Kalimat tidak dibuat: ${alasanHilang.get(k.kunci)}` : k.petunjuk;
+          return (
+            <Stack key={k.kunci} spacing={0.75}>
+              <Box sx={{ borderRadius: 0, boxShadow: 'none' }}>
+                <Typography component="label" htmlFor={idIsian} sx={{ display: 'block', fontSize: '0.9375rem', fontWeight: 600, lineHeight: 1.4 }}>
+                  {k.label}
+                  {k.kunci === 'langkah' && <Box component="span" aria-hidden="true" sx={{ ml: 0.5, color: 'error.main' }}>*</Box>}
+                </Typography>
+                <Typography id={`${idIsian}-petunjuk`} variant="body2" color="text.secondary" sx={{ lineHeight: 1.45, mt: 0.25 }}>{petunjuk}</Typography>
+              </Box>
+              <TextField
+                id={idIsian}
+                value={isian[k.kunci]}
+                onChange={(e) => { setIsian((v) => ({ ...v, [k.kunci]: e.target.value })); setGalatKolom((g) => ({ ...g, [k.kunci]: undefined })); }}
+                multiline
+                minRows={k.kunci === 'langkah' ? 4 : 2}
+                fullWidth
+                required={k.kunci === 'langkah'}
+                disabled={keadaan === KEADAAN.DIABAIKAN}
+                error={Boolean(galat)}
+                sx={{
+                  '& .MuiOutlinedInput-root': { borderRadius: '8px', p: 0, fontSize: '0.9375rem', lineHeight: 1.55 },
+                  '& .MuiOutlinedInput-input': { px: 1.5, py: 1.25 },
+                  ...(!bolehUbah ? { '& .MuiInputBase-root': { bgcolor: 'action.hover' }, '& .MuiOutlinedInput-notchedOutline': { borderStyle: 'dashed' } } : {}),
+                }}
+                slotProps={{
+                  htmlInput: { maxLength: MAKS_KOLOM, readOnly: !bolehUbah, 'aria-describedby': `${idIsian}-petunjuk`, 'aria-required': k.kunci === 'langkah' },
+                }}
+              />
+              {galat && <Typography role="alert" variant="body2" sx={{ color: 'error.main', fontWeight: 600 }}>{galat}</Typography>}
+            </Stack>
+          );
+        })}
       </Box>
 
       {entri.pola === 'P1' && !readOnly && (
@@ -184,6 +201,7 @@ function KotakSaran({
               {baris1.map((b) => (
                 <Button
                   key={b.kunci}
+                  size="small"
                   variant="outlined"
                   onClick={() => onCatatRemedial({ siswaId, tpId: b.tpId })}
                   aria-label={`Catat remedial ${namaSiswa}, ${b.nama}`}
@@ -233,12 +251,15 @@ function KotakSaran({
           )}
           {keadaan !== KEADAAN.DIABAIKAN && sunting && (
             <>
-              <Button variant="contained" onClick={kirimPakai} disabled={sibuk}>
-                {diubahDariDraf || keadaan !== KEADAAN.DRAF ? 'Pakai versi saya' : 'Pakai saran ini'}
-              </Button>
-              {diubahDariDraf && (
-                <Button variant="text" onClick={() => { setIsian(draf); setGalatKolom({}); }} disabled={sibuk}>Kembalikan ke draf</Button>
-              )}
+              {/* Dua tombol ini selalu berdampingan dan selebar sama: label dipendekkan ("Pulihkan draf") agar muat satu baris. */}
+              <Stack direction="row" spacing={1} sx={{ flex: { xs: '1 1 100%', sm: '0 0 auto' } }}>
+                <Button variant="contained" onClick={kirimPakai} disabled={sibuk} sx={{ flex: 1, whiteSpace: 'nowrap' }}>
+                  {diubahDariDraf || keadaan !== KEADAAN.DRAF ? 'Pakai versi saya' : 'Pakai saran ini'}
+                </Button>
+                {diubahDariDraf && (
+                  <Button variant="outlined" onClick={() => { setIsian(draf); setGalatKolom({}); }} disabled={sibuk} sx={{ flex: 1, whiteSpace: 'nowrap' }}>Pulihkan draf</Button>
+                )}
+              </Stack>
               {keadaan === KEADAAN.DRAF && (
                 <Button variant="outlined" color="inherit" onClick={() => { setModeAbaikan(true); setPesan(null); }} disabled={sibuk}>Abaikan saran</Button>
               )}
@@ -335,7 +356,13 @@ export default function SaranTindakLanjut({
     <Stack spacing={3}>
       {daftar.length > 0 && (
         <>
-          <Tabs value={aktif.pola} onChange={(_, v) => setPilih(v)} variant="scrollable" scrollButtons="auto" aria-label="Saran per penanda">
+          <Tabs
+            value={aktif.pola}
+            onChange={(_, v) => setPilih(v)}
+            aria-label="Saran per penanda"
+            slotProps={{ indicator: { sx: { display: 'none' } } }}
+            sx={{ minHeight: 0, '& .MuiTabs-flexContainer': { flexWrap: 'wrap', gap: 1 } }}
+          >
             {daftar.map((e) => {
               const k = keadaanSaran(e);
               return (
@@ -344,7 +371,18 @@ export default function SaranTindakLanjut({
                   value={e.pola}
                   id={`tab-saran-${e.pola}`}
                   aria-controls={`panel-saran-${e.pola}`}
-                  sx={{ textTransform: 'none', alignItems: 'flex-start' }}
+                  sx={(theme) => ({
+                    textTransform: 'none',
+                    alignItems: 'flex-start',
+                    minHeight: 0,
+                    minWidth: 0,
+                    px: 1.5,
+                    py: 0.75,
+                    border: 1,
+                    borderColor: 'divider',
+                    borderRadius: '6px',
+                    '&.Mui-selected': { bgcolor: alpha(theme.palette.primary.main, 0.08), borderColor: 'primary.main', boxShadow: `inset 0 0 0 1px ${theme.palette.primary.main}` },
+                  })}
                   label={(
                     <Box sx={{ textAlign: 'left' }}>
                       <Box component="span" sx={{ display: 'block', fontWeight: 600 }}>{`${e.pola} ${POLA_INFO[e.pola]?.judul ?? ''}`}</Box>

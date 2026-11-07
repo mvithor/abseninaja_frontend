@@ -186,7 +186,7 @@ export default function RemedialDialog({
                         {`Ke-${r.urutan}: ${tampilNilai(r.nilai_remedial)} pada ${r.tanggal}`}
                       </Typography>
                       {i === riwayat.length - 1 && (
-                        <Chip size="small" label={mencapaiKktp(r.nilai_remedial, kelas.kktp) ? 'Terbaru, mencapai KKTP' : 'Terbaru, di bawah KKTP'} />
+                        <Chip size="small" sx={{ borderRadius: '6px' }} label={mencapaiKktp(r.nilai_remedial, kelas.kktp) ? 'Terbaru, mencapai KKTP' : 'Terbaru, di bawah KKTP'} />
                       )}
                       {r.catatan && <Typography variant="caption" color="text.secondary">{r.catatan}</Typography>}
                       {hapusId === r.id ? (

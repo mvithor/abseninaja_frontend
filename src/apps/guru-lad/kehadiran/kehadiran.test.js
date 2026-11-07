@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {
   bacaKodeSel, kunciSel, petaKehadiran, kodeEfektif, rekapSiswa, rekapPertemuan, selUntukSemuaHadir,
   terapkanIsian, hitungPengosonganKode, susunMuatanSimpan, uraiTanggal, tanggalPanjang, tanggalPendek, tanggalRingkas,
-  namaZona, periksaTanggalPertemuan, idKronologis, perluUrutKronologis, labelLm, kelompokLm,
+  namaZona, periksaTanggalPertemuan, idKronologis, perluUrutKronologis, labelLm, kelompokLm, kelompokBulan, ringkasPanelP2,
 } from './kehadiran.js';
 
 test('bacaKodeSel: kode, huruf kecil, spasi, dan nama status Absenin', () => {
@@ -194,4 +194,57 @@ test('kelompokLm: menggabungkan pertemuan berurutan satu lingkup materi, tanpa L
     { lmId: 7, label: 'LM 1', jumlah: 1, awal: 5 },
   ]);
   assert.deepEqual(kelompokLm([], lm), []);
+});
+
+// ------------------------------------------------------------------ deret per bulan
+
+const item = (nomor, tanggal, kode) => ({ nomor, tanggal, kode });
+
+test('kelompokBulan: satu kelompok per bulan kalender, hitungan alpa dan tercatat per bulan', () => {
+  const g = kelompokBulan([
+    item(1, '2026-08-03', 'H'), item(2, '2026-08-10', 'A'), item(3, '2026-09-07', 'A'), item(4, '2026-09-14', null), item(5, '2026-09-21', 'A'),
+  ]);
+  assert.deepEqual(g.map((x) => [x.label, x.jumlah, x.tercatat, x.alpa]), [['Agustus', 2, 2, 1], ['September', 3, 2, 2]]);
+  assert.deepEqual(g[1].deret.map((d) => d.nomor), [3, 4, 5]);
+});
+
+test('kelompokBulan: urut menurut tanggal walau nomor tidak berurutan, tahun ditulis hanya bila melintasi tahun', () => {
+  const g = kelompokBulan([item(2, '2027-01-04', 'H'), item(1, '2026-12-28', 'H')]);
+  assert.deepEqual(g.map((x) => x.label), ['Desember 2026', 'Januari 2027']);
+  assert.deepEqual(kelompokBulan([item(1, '2026-10-05', 'H')]).map((x) => x.label), ['Oktober']);
+});
+
+test('kelompokBulan: tanpa tanggal nyata masuk kelompok terakhir, deret kosong menghasilkan daftar kosong', () => {
+  const g = kelompokBulan([item(1, null, 'A'), item(2, '2026-10-05', 'H'), item(3, '2026-02-30', 'H')]);
+  assert.deepEqual(g.map((x) => x.label), ['Oktober', 'Tanpa tanggal']);
+  assert.equal(g[1].jumlah, 2);
+  assert.deepEqual(kelompokBulan([]), []);
+  assert.deepEqual(kelompokBulan(undefined), []);
+});
+
+test('ringkasPanelP2: tidak melebihi batas, semua ditampilkan tanpa rincian bulan', () => {
+  const d = [item(1, '2026-08-03', 'H'), item(2, '2026-08-10', 'A')];
+  const r = ringkasPanelP2(d, 10);
+  assert.equal(r.dipotong, false);
+  assert.equal(r.tampil.length, 2);
+  assert.deepEqual(r.perBulan, []);
+});
+
+test('ringkasPanelP2: melebihi batas, hanya pertemuan terakhir dan alpa per bulan dari seluruh deret', () => {
+  const d = [];
+  for (let n = 1; n <= 45; n += 1) {
+    const bulan = n <= 15 ? '08' : n <= 30 ? '09' : '10';
+    d.push(item(n, `2026-${bulan}-${String((n - 1) % 15 + 1).padStart(2, '0')}`, [7, 10, 18, 22, 27, 33, 36, 39, 44, 45].includes(n) ? 'A' : 'H'));
+  }
+  const r = ringkasPanelP2(d, 10);
+  assert.equal(r.dipotong, true);
+  assert.equal(r.total, 45);
+  assert.deepEqual(r.tampil.map((x) => x.nomor), [36, 37, 38, 39, 40, 41, 42, 43, 44, 45]);
+  assert.equal(r.rentang, '36 sampai 45');
+  assert.deepEqual(r.perBulan.map((b) => [b.label, b.alpa]), [['Agustus', 2], ['September', 3], ['Oktober', 5]]);
+});
+
+test('ringkasPanelP2: rentang kosong bila nomor yang ditampilkan tidak berurutan', () => {
+  const d = [item(1, '2026-08-03', 'H'), item(9, '2026-08-04', 'H'), item(2, '2026-08-05', 'H'), item(3, '2026-08-06', 'H')];
+  assert.equal(ringkasPanelP2(d, 3).rentang, null);
 });

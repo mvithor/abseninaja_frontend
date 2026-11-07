@@ -279,7 +279,6 @@ export default function LadKelas() {
             remedial={remedial}
             pertemuan={pertemuan}
             kehadiran={kehadiran}
-            onCatatRemedial={readOnly ? undefined : setRemedialAwal}
           />
         )}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}

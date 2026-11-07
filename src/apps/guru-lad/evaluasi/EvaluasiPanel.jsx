@@ -30,7 +30,7 @@ import PilKode from './PilKode';
  * kelas yang sudah dimuat halaman (`nilaiTp`, `proyek`, `kehadiran`, dan seterusnya).
  */
 export default function EvaluasiPanel({
-  kelasId, kelas, siswa, lm, nilaiTp, proyek, nilaiProyek, remedial, pertemuan, kehadiran, onCatatRemedial,
+  kelasId, kelas, siswa, lm, nilaiTp, proyek, nilaiProyek, remedial, pertemuan, kehadiran,
 }) {
   const [tampilTanpa, setTampilTanpa] = useState(false);
   const [pola, setPola] = useState([]);
@@ -293,7 +293,6 @@ export default function EvaluasiPanel({
       <RincianSiswa
         rincian={rincian}
         onTutup={tutupRincian}
-        onCatatRemedial={onCatatRemedial}
         onBukaProfil={(id) => navigate(`/dashboard/guru-lad/kelas/${kelasId}/siswa/${id}`)}
       />
     </Stack>
@@ -311,5 +310,4 @@ EvaluasiPanel.propTypes = {
   remedial: PropTypes.array.isRequired,
   pertemuan: PropTypes.array.isRequired,
   kehadiran: PropTypes.array.isRequired,
-  onCatatRemedial: PropTypes.func,
 };

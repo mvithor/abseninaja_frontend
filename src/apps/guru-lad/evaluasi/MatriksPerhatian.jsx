@@ -179,7 +179,7 @@ export default function MatriksPerhatian({
           </tr>
           <tr>
             {kolom.kelompokLm.flatMap((g) => g.kolom.map((k, i) => (
-              <th key={k.tpId} className={i === 0 ? 'pisah' : undefined} title={`TP ${k.label} (LM ${k.lmNo})`}>{k.label}</th>
+              <th key={k.tpId} className={i === 0 ? 'pisah' : undefined} title={`${/^TP/i.test(k.label) ? k.label : `TP ${k.label}`} (LM ${k.lmNo})`}>{k.label}</th>
             )))}
             {kolom.kolomProyek.map((p, i) => (
               <th

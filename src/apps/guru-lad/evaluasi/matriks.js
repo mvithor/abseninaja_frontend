@@ -12,7 +12,7 @@ import {
 } from './penjelasan.js';
 import { labelTp, judulLm } from '../label.js';
 import { rentangNilai, tampilAngka } from '../rentang.js';
-import { kelompokkanRemedial, kunciRemedial, remedialTerbaru, cariTpId } from '../remedial/remedial.js';
+import { kelompokkanRemedial, kunciRemedial, remedialTerbaru } from '../remedial/remedial.js';
 import { labelProyek, tidakDikumpulkan, JENIS_PROYEK } from '../proyek/proyek.js';
 import { kunciSel, petaKehadiran, rekapSiswa } from '../kehadiran/kehadiran.js';
 
@@ -197,22 +197,38 @@ export function susunBaris(h, kolom, ctx, ambang) {
 
 // ------------------------------------------------------------------ rincian siswa (panel)
 
-/** Deret kehadiran 1 siswa per pertemuan (menurut nomor): [{ nomor, kode }], kode null = belum dicatat. */
+/**
+ * Deret kehadiran 1 siswa per pertemuan (menurut nomor): [{ nomor, kode, tanggal }], kode null = belum dicatat.
+ * `tanggal` ikut dibawa supaya profil dan panel dapat mengelompokkan per bulan tanpa permintaan data tambahan.
+ */
 export function deretKehadiran(siswaId, ctx) {
-  return ctx.pertemuan.map((p) => ({ nomor: p.nomor, kode: ctx.hadir.get(kunciSel(siswaId, p.id)) ?? null }));
+  return ctx.pertemuan.map((p) => ({ nomor: p.nomor, kode: ctx.hadir.get(kunciSel(siswaId, p.id)) ?? null, tanggal: p.tanggal ?? null }));
 }
 
-/** Baris TP penanda P1 untuk panel: nilai, apakah tersembunyi, remedial terbaru, dan id TP untuk "Catat remedial". */
+/**
+ * Baris TP penanda P1 untuk panel: nilai, apakah tersembunyi, remedial terbaru, id TP untuk "Catat remedial", serta
+ * label pendek dan rumusan TP. Struktur kelas dicari sekali ke dalam peta, bukan dicari ulang untuk tiap baris, dan
+ * rumusan diambil dari struktur yang sudah dimuat (tidak ada permintaan data per TP). Rumusan kosong menjadi null.
+ */
 export function barisP1(bukti, lm) {
   if (!bukti || !Array.isArray(bukti.tp)) return [];
-  return bukti.tp.map((t) => ({
-    kunci: `${t.lm}.${t.tp}`,
-    nama: namaTp(t.lm, t.tp, lm),
-    nilai: t.nilai,
-    tersembunyi: Boolean(t.tersembunyi),
-    remedialTerbaru: t.remedial_terbaru ?? null,
-    tpId: cariTpId(lm, t.lm, t.tp),
-  }));
+  const peta = new Map();
+  (Array.isArray(lm) ? lm : []).forEach((m) => (Array.isArray(m.tp) ? m.tp : []).forEach((t) => peta.set(`${m.urutan}.${t.urutan}`, t)));
+  return bukti.tp.map((t) => {
+    const tp = peta.get(`${t.lm}.${t.tp}`);
+    const rumusan = typeof tp?.rumusan === 'string' ? tp.rumusan.trim() : '';
+    return {
+      kunci: `${t.lm}.${t.tp}`,
+      nama: namaTp(t.lm, t.tp, lm),
+      label: tp ? labelTp(tp) : `TP ${t.tp}`,
+      lmNo: t.lm,
+      rumusan: rumusan || null,
+      nilai: t.nilai,
+      tersembunyi: Boolean(t.tersembunyi),
+      remedialTerbaru: t.remedial_terbaru ?? null,
+      tpId: tp ? tp.id : null,
+    };
+  });
 }
 
 /** Deret P4: titik per LM untuk siswa dan (bila server memakai pembanding) kelas. */

@@ -24,7 +24,7 @@ export default function PilKode({ kode, panjang = false, jumlah, ...sisa }) {
         return {
           // Chip panjang boleh turun baris di layar sempit, supaya tidak terpotong di tepi kartu.
           ...(panjang ? { height: 'auto', maxWidth: '100%', minHeight: 26, '& .MuiChip-label': { whiteSpace: 'normal', py: '4px' } } : {}),
-          borderRadius: '8px',
+          borderRadius: '6px',
           fontWeight: 600,
           color: theme.palette.text.primary,
           backgroundColor: alpha(dasar, 0.22),
