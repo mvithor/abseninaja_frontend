@@ -3,11 +3,13 @@ import PropTypes from 'prop-types';
 import { useMutation } from '@tanstack/react-query';
 import {
   Alert, Button, Checkbox, Dialog, DialogActions, DialogContent, DialogTitle, FormControlLabel,
-  MenuItem, Stack, TextField, Typography,
+  MenuItem, Stack, Typography,
 } from '@mui/material';
 import { buatKelas, pesanGalat } from '../api';
 import { galatPerKolom } from '../galat';
+import KolomIsian from '../komponen/KolomIsian';
 import { BAWAAN_AMBANG, periksaAmbang, tampilAngka } from '../rentang';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const normal = (t) => String(t ?? '').trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -97,24 +99,24 @@ export default function BuatKelasDialog({
       <DialogTitle>Tambah Kelas</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField label="Nama kelas" placeholder="mis. 8A" value={f.nama_kelas} onChange={ubah('nama_kelas')} required fullWidth />
-          <TextField label="Mata pelajaran" placeholder="mis. Matematika" value={f.mapel} onChange={ubah('mapel')} required fullWidth />
+          <KolomIsian id="kelas-nama" label="Nama kelas" placeholder="mis. 8A" value={f.nama_kelas} onChange={ubah('nama_kelas')} wajib />
+          <KolomIsian id="kelas-mapel" label="Mata pelajaran" placeholder="mis. Matematika" value={f.mapel} onChange={ubah('mapel')} wajib />
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField select label="Semester" value={f.semester} onChange={ubah('semester')} fullWidth>
+            <KolomIsian id="kelas-semester" pilih label="Semester" value={f.semester} onChange={ubah('semester')} sx={{ flex: 1 }}>
               <MenuItem value="Ganjil">Ganjil</MenuItem>
               <MenuItem value="Genap">Genap</MenuItem>
-            </TextField>
-            <TextField label="Tahun ajaran" placeholder="2026/2027" value={f.tahun_ajaran} onChange={ubah('tahun_ajaran')} fullWidth />
+            </KolomIsian>
+            <KolomIsian id="kelas-tahun-ajaran" label="Tahun ajaran" placeholder="2026/2027" value={f.tahun_ajaran} onChange={ubah('tahun_ajaran')} sx={{ flex: 1 }} />
           </Stack>
 
           {sumber.length > 0 && (
-            <TextField
-              select
+            <KolomIsian
+              id="kelas-salin"
+              pilih
               label="Salin struktur dari kelas lain (opsional)"
-              helperText="Menyalin lingkup materi, TP, proyek, serta batas nilai dan bobot kelas sumber. Nilai dan siswa tidak ikut disalin."
+              bantuan="Menyalin lingkup materi, TP, proyek, serta batas nilai dan bobot kelas sumber. Nilai dan murid tidak ikut disalin."
               value={f.salin}
               onChange={ubah('salin')}
-              fullWidth
             >
               <MenuItem value="">Tidak, mulai dari kosong</MenuItem>
               {sumber.map((k) => (
@@ -122,7 +124,7 @@ export default function BuatKelasDialog({
                   {k.nama_kelas} · {k.mapel} · {k.semester} {k.tahun_ajaran}
                 </MenuItem>
               ))}
-            </TextField>
+            </KolomIsian>
           )}
 
           <FormControlLabel
@@ -133,44 +135,47 @@ export default function BuatKelasDialog({
             <Typography variant="body2" color="text.secondary">
               {kelasSumber
                 ? 'Batas nilai dan bobot disalin dari kelas sumber.'
-                : `Memakai usulan awal: remedial bagian tertentu mulai dari ${tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, sudah mencapai (KKTP) mulai dari ${tampilAngka(BAWAAN_AMBANG.kktp)}, perlu pengayaan mulai dari ${tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)}; bobot nilai akhir 75 dan SAS 25. Ini usulan dari template guru; ubah sesuai KKTP sekolah Anda.`}
+                : `Memakai usulan awal: remedial bagian tertentu mulai dari ${tampilAngka(BAWAAN_AMBANG.ambang_bagian)}, sudah mencapai (KKTP) mulai dari ${tampilAngka(BAWAAN_AMBANG.kktp)}, perlu pengayaan mulai dari ${tampilAngka(BAWAAN_AMBANG.ambang_pengayaan)}; bobot nilai akhir 75 dan SAS 25. Ini usulan dari template guru; ubah sesuai KKTP sekolah Bapak/Ibu.`}
             </Typography>
           )}
           {f.atur && (
             <>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
+                <KolomIsian
+                  id="kelas-ambang-bagian"
                   label="Remedial bagian tertentu mulai dari"
                   value={f.ambang_bagian}
                   onChange={ubah('ambang_bagian')}
-                  error={Boolean(galatAmbang('ambang_bagian'))}
-                  helperText={galatAmbang('ambang_bagian') ?? 'Di bawah ini: remedial seluruh bagian'}
-                  fullWidth
+                  galat={galatAmbang('ambang_bagian')}
+                  bantuan="Di bawah ini: remedial seluruh bagian"
+                  sx={{ flex: 1 }}
                 />
-                <TextField
+                <KolomIsian
+                  id="kelas-kktp"
                   label="Sudah mencapai (KKTP) mulai dari"
                   value={f.kktp}
                   onChange={ubah('kktp')}
-                  error={Boolean(galatAmbang('kktp'))}
-                  helperText={galatAmbang('kktp') ?? 'Di bawah ini: belum mencapai'}
-                  fullWidth
+                  galat={galatAmbang('kktp')}
+                  bantuan="Di bawah ini: belum mencapai"
+                  sx={{ flex: 1 }}
                 />
-                <TextField
+                <KolomIsian
+                  id="kelas-ambang-pengayaan"
                   label="Perlu pengayaan mulai dari"
                   value={f.ambang_pengayaan}
                   onChange={ubah('ambang_pengayaan')}
-                  error={Boolean(galatAmbang('ambang_pengayaan'))}
-                  helperText={galatAmbang('ambang_pengayaan') ?? 'Di atas ini: pengayaan'}
-                  fullWidth
+                  galat={galatAmbang('ambang_pengayaan')}
+                  bantuan="Di atas ini: pengayaan"
+                  sx={{ flex: 1 }}
                 />
               </Stack>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField label="Bobot nilai akhir (%)" value={f.bobot_nilai_akhir} onChange={ubah('bobot_nilai_akhir')} fullWidth />
-                <TextField label="Bobot SAS (%)" value={f.bobot_sas} onChange={ubah('bobot_sas')} fullWidth />
+                <KolomIsian id="kelas-bobot-nilai-akhir" label="Bobot nilai akhir (%)" value={f.bobot_nilai_akhir} onChange={ubah('bobot_nilai_akhir')} sx={{ flex: 1 }} />
+                <KolomIsian id="kelas-bobot-sas" label="Bobot SAS (%)" value={f.bobot_sas} onChange={ubah('bobot_sas')} sx={{ flex: 1 }} />
               </Stack>
             </>
           )}
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions>

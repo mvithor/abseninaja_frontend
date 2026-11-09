@@ -11,6 +11,7 @@ import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import {
   barisIsian, judulHapusKelas, kelasTidakDitemukan, namaCocok,
 } from './hapusKelas';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 /**
  * Dialog hapus kelas (desain "1b"). Dua langkah, sengaja:
@@ -154,7 +155,7 @@ export default function HapusKelasDialog({
                 </Box>
               )}
               <Typography sx={{ fontSize: 13, color: w.sekunder, mt: 1.5 }}>
-                Riwayat aktivitas akun Anda tidak ikut terhapus.
+                Riwayat aktivitas akun tidak ikut terhapus.
               </Typography>
             </Box>
 
@@ -175,7 +176,7 @@ export default function HapusKelasDialog({
           </>
         )}
 
-        {galat && <Alert severity="error" sx={{ mt: 2 }}>{galat}</Alert>}
+        {galat && <AlertOtomatis severity="error" sx={{ mt: 2 }} onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', gap: 1.5, px: 3, pb: 4, pt: 1 }}>
         <Button variant="outlined" color="inherit" onClick={tutup} disabled={sibuk} sx={{ borderColor: '#D1D5DB', color: '#374151', ml: 0 }}>Batal</Button>

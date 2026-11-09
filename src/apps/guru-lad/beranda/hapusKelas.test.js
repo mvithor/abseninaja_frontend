@@ -19,7 +19,7 @@ const ISIAN_CANVAS = {
 
 test('barisIsian: urutan dan kalimat sama dengan desain dialog hapus kelas', () => {
   assert.deepEqual(barisIsian(ISIAN_CANVAS).map((b) => b.teks), [
-    '24 siswa',
+    '24 murid',
     '3 lingkup materi dan 7 TP',
     '154 nilai TP',
     '2 proyek beserta nilainya',

@@ -85,11 +85,11 @@ export default function TrenNr({ data }) {
 
       {baris.length > 0 && (
         <Box component="table" sx={{ borderCollapse: 'collapse', width: '100%', fontSize: 13, borderRadius: 0, borderTop: `1px solid ${w.garis}`, '& th, & td': { textAlign: 'left', py: '7px', pr: 1, verticalAlign: 'top' }, '& th': { fontWeight: 600, color: w.sekunder }, '& tbody td, & tbody th': { borderTop: `1px solid ${w.garisLembut}`, fontWeight: 400, color: w.ink } }}>
-          <caption style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>Rata-rata kelas dan banyak siswa di bawah KKTP per lingkup materi</caption>
+          <caption style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>Rata-rata kelas dan banyak murid di bawah KKTP per lingkup materi</caption>
           <thead>
             <tr>
               <th scope="col">Lingkup materi</th>
-              <th scope="col">Siswa dihitung</th>
+              <th scope="col">Murid dihitung</th>
               <th scope="col">NR kelas</th>
               <th scope="col">NR di bawah KKTP</th>
             </tr>
@@ -99,7 +99,7 @@ export default function TrenNr({ data }) {
               <tr key={b.lm}>
                 <th scope="row">{b.nama}</th>
                 <td>{b.siswa}</td>
-                <td>{b.kosong ? `${b.nr} (sedikit siswa)` : b.nr}</td>
+                <td>{b.kosong ? `${b.nr} (sedikit murid)` : b.nr}</td>
                 <td>{b.bawah}</td>
               </tr>
             ))}
@@ -108,7 +108,7 @@ export default function TrenNr({ data }) {
       )}
       {adaKosong && (
         <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: 1.5 }}>
-          Titik berlubang: siswa yang dihitung masih sedikit, jadi rata-rata itu kurang kuat sebagai pembanding.
+          Titik berlubang: murid yang dihitung masih sedikit, jadi rata-rata itu kurang kuat sebagai pembanding.
         </Typography>
       )}
     </KartuBagian>

@@ -26,7 +26,7 @@ export default function PerhatianTeratas({ data, onBukaProfil, onBukaSemua }) {
       judul="Perlu perhatian"
       keterangan={baris.length > 0
         ? `${baris.length} teratas menurut urutan prioritas pola. Tiap baris menyebut nilai asalnya.`
-        : 'Siswa yang ditandai, menurut urutan prioritas pola.'}
+        : 'Murid yang ditandai, menurut urutan prioritas pola.'}
       aksi={total > 0 ? (
         <Box component="button" type="button" onClick={onBukaSemua} sx={gayaTombol(w, { garis: true })}>
           {`Lihat semua ${total}`}
@@ -36,15 +36,15 @@ export default function PerhatianTeratas({ data, onBukaProfil, onBukaSemua }) {
     >
       {baris.length === 0 ? (
         <Typography sx={{ fontSize: 14, color: w.ink, lineHeight: 1.5, p: { xs: 2, md: '8px 24px 20px' } }}>
-          Tidak ada siswa yang ditandai perlu perhatian. Ini hanya berlaku untuk siswa yang datanya cukup; lihat
+          Tidak ada murid yang ditandai perlu perhatian. Ini hanya berlaku untuk murid yang datanya cukup; lihat
           juga bagian Yang perlu dilengkapi.
         </Typography>
       ) : (
         <Box sx={{ overflowX: 'auto', borderTop: `1px solid ${w.garis}` }}>
-          <Table sx={{ minWidth: 520 }} aria-label="Siswa yang perlu perhatian, lima teratas">
+          <Table sx={{ minWidth: 520 }} aria-label="Murid yang perlu perhatian, lima teratas">
             <TableHead>
               <TableRow>
-                {['Siswa', 'Alasan', 'Penanda'].map((h) => (
+                {['Murid', 'Alasan', 'Penanda'].map((h) => (
                   <TableCell key={h} sx={{ ...sel, fontWeight: 600, fontSize: 16, lineHeight: 1.25, borderBottom: `1px solid ${w.garis}` }}>{h}</TableCell>
                 ))}
                 <TableCell align="center" sx={{ ...sel, fontWeight: 600, fontSize: 16, borderBottom: `1px solid ${w.garis}` }}>Aksi</TableCell>

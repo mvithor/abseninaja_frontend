@@ -21,7 +21,7 @@ function Bagian({ id, judul, children }) {
   const w = warnaRingkasan(useTheme());
   return (
     <Box component="section" aria-labelledby={id} sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 } }}>
-      <Typography id={id} component="h2" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 2 }}>{judul}</Typography>
+      <Typography id={id} component="h2" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 3 }}>{judul}</Typography>
       {children}
     </Box>
   );
@@ -41,7 +41,7 @@ function StatistikLm({ rata, kktp }) {
   const teksStatus = { MENCAPAI: 'Mencapai KKTP', DI_BAWAH: 'Di bawah KKTP' }[st.status] ?? null;
   const ringkas = `Nilai rata-rata ${tampilAngka(rata)}${teksStatus ? `, ${teksStatus.toLowerCase()} ${tampilAngka(kktp)}` : ''}`;
   return (
-    <Box sx={{ width: '100%', maxWidth: 320, border: `1px solid ${w.garis}`, borderRadius: '8px', bgcolor: w.latar, px: 1.5, pt: 1.25, pb: 1 }}>
+    <Box sx={{ width: '100%', border: `1px solid ${w.garis}`, borderRadius: '8px', bgcolor: w.latar, px: 1.5, pt: 1.25, pb: 1 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="flex-end" columnGap={1.5} rowGap={0.25} flexWrap="wrap">
         <Box sx={{ borderRadius: 0 }}>
           <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.4 }}>Nilai rata-rata</Typography>
@@ -114,7 +114,7 @@ KartuTp.propTypes = { t: PropTypes.object.isRequired };
 function KolomLm({ g, kktp }) {
   return (
     <Box component="section" aria-label={`Capaian ${g.judul}`} sx={{ minWidth: 0, borderRadius: 0, boxShadow: 'none' }}>
-      <Typography component="h3" sx={{ fontWeight: 700, fontSize: '1.0625rem', mb: 1.25 }}>{g.judul}</Typography>
+      <Typography component="h3" sx={{ fontWeight: 700, fontSize: '1.0625rem', mb: 1.5 }}>{g.judul}</Typography>
       <StatistikLm rata={g.rata} kktp={kktp} />
       <Stack component="ul" spacing={1.5} sx={{ m: 0, mt: 2, p: 0, borderRadius: 0 }}>
         {g.tp.map((t) => <KartuTp key={t.tpId} t={t} />)}
@@ -178,7 +178,7 @@ export default function ProfilSiswa({
         {capaian.length === 0 ? (
           <Alert severity="info">Kelas ini belum memiliki lingkup materi dan TP.</Alert>
         ) : (
-          <Stack spacing={2.5}>
+          <Stack spacing={4}>
             <Stack direction="row" columnGap={3} rowGap={1.25} flexWrap="wrap" useFlexGap aria-label="Arti ikon rentang">
               {legenda.map((l) => (
                 <Stack key={l.rentang} direction="row" spacing={1} alignItems="center">
@@ -187,7 +187,7 @@ export default function ProfilSiswa({
                 </Stack>
               ))}
             </Stack>
-            <Box sx={GRID_KARTU(260)}>
+            <Box sx={{ ...GRID_KARTU(260), gap: 3 }}>
               {capaian.map((g) => <KolomLm key={g.lmId} g={g} kktp={ambang.kktp} />)}
             </Box>
             <Typography variant="body2" color="text.secondary">
@@ -204,11 +204,11 @@ export default function ProfilSiswa({
             <GrafikTren
               deret={deretTren}
               kktp={ambang.kktp}
-              ringkasan={`Nilai rata-rata siswa per LM: ${deretTren.map((d) => `LM ${d.lm} ${tampilAngka(d.siswa)}`).join(', ')}.`}
+              ringkasan={`Nilai rata-rata murid per LM: ${deretTren.map((d) => `LM ${d.lm} ${tampilAngka(d.siswa)}`).join(', ')}.`}
             />
             <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
               Tren dibaca dari tiga LM berurutan, tidak dari satu titik. Rata-rata kelas hanya digambar bila paling sedikit
-              {` ${kelasMin} siswa terhitung pada LM itu.`}
+              {` ${kelasMin} murid terhitung pada LM itu.`}
             </Typography>
           </>
         ) : (
@@ -223,7 +223,7 @@ export default function ProfilSiswa({
             <TableHead>
               <TableRow>
                 <TableCell>LM</TableCell>
-                <TableCell align="right">Siswa</TableCell>
+                <TableCell align="right">Murid</TableCell>
                 <TableCell align="right">Rata-rata kelas</TableCell>
               </TableRow>
             </TableHead>
@@ -256,7 +256,7 @@ export default function ProfilSiswa({
         ) : (
           <Stack spacing={1.25}>
             <Typography variant="body2" color="text.secondary">
-              {`Kehadiran dihitung dari ${hadir.tercatat} pertemuan mapel ini yang tercatat untuk siswa ini, dari ${hadir.pertemuan} pertemuan. Kotak kosong (-) berarti belum dicatat, bukan alpa.`}
+              {`Kehadiran dihitung dari ${hadir.tercatat} pertemuan mapel ini yang tercatat untuk murid ini, dari ${hadir.pertemuan} pertemuan. Kotak kosong (-) berarti belum dicatat, bukan alpa.`}
             </Typography>
             <DeretKehadiranBulan deret={hadir.deret} />
             <Stack direction="row" spacing={2} flexWrap="wrap" useFlexGap>
@@ -274,7 +274,7 @@ export default function ProfilSiswa({
 
       <Bagian id="bagian-remedial" judul="Riwayat remedial">
         {remedial.length === 0 ? (
-          <Typography variant="body2" color="text.secondary">Belum ada catatan remedial untuk siswa ini.</Typography>
+          <Typography variant="body2" color="text.secondary">Belum ada catatan remedial untuk murid ini.</Typography>
         ) : (
           <Box sx={{ overflowX: 'auto' }}><Table size="small" aria-label="Riwayat remedial">
             <TableHead>

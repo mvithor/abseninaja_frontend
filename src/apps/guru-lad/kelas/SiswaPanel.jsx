@@ -17,6 +17,7 @@ import HapusDialog from '../komponen/HapusDialog';
 import JudulTab from '../komponen/JudulTab';
 import KolomIsian from '../komponen/KolomIsian';
 import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 export default function SiswaPanel({
   kelasId, siswa, readOnly, onBerubah,
@@ -42,22 +43,22 @@ export default function SiswaPanel({
   return (
     <Stack spacing={3}>
       <JudulTab
-        judul="Daftar siswa"
+        judul="Daftar murid"
         keterangan={readOnly
-          ? 'Siswa di kelas ini. Kelas kasus hanya dapat dilihat.'
-          : 'Siswa di kelas ini. Nomor urut menjadi nomor absen di semua tab.'}
+          ? 'Murid di kelas ini. Kelas kasus hanya dapat dilihat.'
+          : 'Murid di kelas ini. Nomor urut menjadi nomor absen di semua tab.'}
       />
       {!readOnly && (
         <Box sx={{ ...gayaKartu(w), p: { xs: 2, md: '20px 24px' }, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
           <Box sx={{ borderRadius: 0 }}>
-            <Typography component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, color: w.ink }}>Tambah siswa</Typography>
+            <Typography component="h3" sx={{ fontSize: '1.125rem', fontWeight: 600, lineHeight: 1.5, color: w.ink }}>Tambah murid</Typography>
             <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, mt: 0.5, maxWidth: '80ch' }}>
-              Tempel dari Excel: satu siswa per baris, nama lalu NIS dipisah tab (NIS boleh kosong). NIS tidak boleh sama dengan siswa lain di kelas ini.
+              Tempel dari Excel: satu murid per baris, nama lalu NIS dipisah tab (NIS boleh kosong). NIS tidak boleh sama dengan murid lain di kelas ini.
             </Typography>
           </Box>
           <KolomIsian
             id="tempel-siswa"
-            label="Daftar siswa yang akan ditambahkan"
+            label="Daftar murid yang akan ditambahkan"
             value={teks}
             onChange={(e) => setTeks(e.target.value)}
             multiline
@@ -71,7 +72,7 @@ export default function SiswaPanel({
               onClick={() => tambah.mutate()}
               sx={{ boxShadow: 'none', '&.Mui-disabled': { bgcolor: w.primer, color: '#fff', opacity: 0.6 } }}
             >
-              {tambah.isPending ? 'Menyimpan...' : (baru.length > 0 ? `Tambah ${baru.length} siswa` : 'Tambah siswa')}
+              {tambah.isPending ? 'Menyimpan...' : (baru.length > 0 ? `Tambah ${baru.length} murid` : 'Tambah murid')}
             </Button>
             {hasil.galat.length > 0 && (
               <Typography sx={{ fontSize: '1rem' }} color="error">
@@ -80,21 +81,21 @@ export default function SiswaPanel({
             )}
             {terlaluBanyak && (
               <Typography sx={{ fontSize: '1rem' }} color="error">
-                Jumlah siswa per kelas paling banyak {MAKS_SISWA_PER_PERMINTAAN}.
+                Jumlah murid per kelas paling banyak {MAKS_SISWA_PER_PERMINTAAN}.
               </Typography>
             )}
             {pilah.dilewati.length > 0 && (
               <Typography sx={{ fontSize: '1rem', color: w.sekunder }}>
                 {baru.length === 0 && pilah.bentrok.length === 0
-                  ? 'Semua siswa pada tempelan ini sudah ada di daftar.'
-                  : `${pilah.dilewati.length} siswa sudah ada di daftar dan akan dilewati.`}
+                  ? 'Semua murid pada tempelan ini sudah ada di daftar.'
+                  : `${pilah.dilewati.length} murid sudah ada di daftar dan akan dilewati.`}
               </Typography>
             )}
           </Stack>
           {pilah.bentrok.length > 0 && (
             <Alert severity="error">
               <Typography variant="body2" fontWeight={700}>
-                NIS berikut sudah dipakai siswa lain dengan nama berbeda. Perbaiki NIS-nya atau hapus barisnya, lalu coba lagi.
+                NIS berikut sudah dipakai murid lain dengan nama berbeda. Perbaiki NIS-nya atau hapus barisnya, lalu coba lagi.
               </Typography>
               {pilah.bentrok.slice(0, 5).map((b) => (
                 <Typography variant="body2" key={b.baris}>
@@ -106,17 +107,17 @@ export default function SiswaPanel({
               )}
             </Alert>
           )}
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Box>
       )}
 
       <Box>
         {siswa.length === 0 ? (
-          <Alert severity="info">Belum ada siswa.</Alert>
+          <Alert severity="info">Belum ada murid.</Alert>
         ) : (
           <Box sx={{ ...gayaKartu(w), overflow: 'hidden' }}>
             <TableContainer>
-              <Table aria-label="Daftar siswa" sx={{ '& th, & td': { px: { xs: 1.25, sm: 2 } } }}>
+              <Table aria-label="Daftar murid" sx={{ '& th, & td': { px: { xs: 1.25, sm: 2 } } }}>
                 <TableHead>
                   <TableRow>
                     <TableCell sx={{ width: { xs: 48, sm: 72 } }}>No</TableCell>
@@ -164,7 +165,7 @@ export default function SiswaPanel({
 
       <FormDialog
         buka={Boolean(ubah)}
-        judul="Ubah siswa"
+        judul="Ubah murid"
         bidang={[{ kunci: 'nama', label: 'Nama', wajib: true }, { kunci: 'nis', label: 'NIS' }]}
         awal={ubah ? { nama: ubah.nama, nis: ubah.nis ?? '' } : undefined}
         onTutup={() => setUbah(null)}
@@ -175,7 +176,7 @@ export default function SiswaPanel({
       />
       <HapusDialog
         buka={Boolean(hapus)}
-        judul="Hapus siswa"
+        judul="Hapus murid"
         uraian={hapus ? `Hapus ${hapus.nama} dari kelas ini?` : ''}
         onTutup={() => setHapus(null)}
         onHapus={async (konfirmasi) => {

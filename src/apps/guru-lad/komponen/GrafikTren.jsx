@@ -63,7 +63,7 @@ export default function GrafikTren({ deret, kktp, ringkasan }) {
           </svg>
           {ringkasan && <Box component="span" sx={sembunyi}>{ringkasan}</Box>}
           <Stack direction="row" spacing={2} sx={{ mt: 0.5, fontSize: 13 }} flexWrap="wrap" useFlexGap>
-            <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'primary.main', verticalAlign: 'middle', mr: 0.75 }} />Siswa</Box>
+            <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'primary.main', verticalAlign: 'middle', mr: 0.75 }} />Murid</Box>
             {g.kelas && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, height: 3, bgcolor: 'grey.600', verticalAlign: 'middle', mr: 0.75 }} />Rata-rata kelas</Box>}
             {g.yKktp !== null && <Box component="span"><Box component="span" sx={{ display: 'inline-block', width: 18, borderTop: '2px dashed', borderColor: 'error.main', verticalAlign: 'middle', mr: 0.75 }} />KKTP</Box>}
           </Stack>

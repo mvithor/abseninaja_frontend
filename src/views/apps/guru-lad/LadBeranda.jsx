@@ -25,8 +25,9 @@ import { kelasTertinggal, pisahKelas } from 'src/apps/guru-lad/ringkasan/ringkas
 import {
   bacaRingkasanSemuaKelas, daftarKelas, kunciLad, pesanGalat,
 } from 'src/apps/guru-lad/api';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
-const PESAN_KOSONG = 'Belum ada kelas. Pilih Tambah Kelas lalu isi daftar siswa, struktur TP, dan nilainya, atau Impor dari Blanko bila nilai sudah ada di Excel.';
+const PESAN_KOSONG = 'Belum ada kelas. Pilih Tambah Kelas lalu isi daftar murid, struktur TP, dan nilainya, atau Impor dari Blanko bila nilai sudah ada di Excel.';
 const PESAN_TIDAK_COCOK = 'Tidak ada kelas yang cocok dengan pencarian.';
 
 const SX_TOMBOL = { width: { xs: '100%', sm: 'auto' }, maxWidth: 'none', ml: 0 };
@@ -92,7 +93,7 @@ export default function LadBeranda() {
       <PageContainer title="Analitik Pembelajaran" description="Dashboard analitik pembelajaran guru">
         <Alert severity="info">
           {akses.pesan ?? 'Fitur Analitik Pembelajaran belum tersedia untuk akun ini.'}
-          {' '}Hubungi admin sekolah atau pengembang bila Anda seharusnya mendapat akses.
+          {' '}Hubungi admin sekolah atau pengembang bila Bapak/Ibu seharusnya mendapat akses.
         </Alert>
       </PageContainer>
     );
@@ -123,7 +124,7 @@ export default function LadBeranda() {
 
   return (
     <TemaLad>
-    <PageContainer title="Kelas Saya | Analitik Pembelajaran" description="Daftar kelas dan mata pelajaran yang Anda ampu">
+    <PageContainer title="Kelas Saya | Analitik Pembelajaran" description="Daftar kelas dan mata pelajaran yang diampu">
       <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 } }}>
         <KartuHalaman judul="Kelas Saya" tingkat="h1">
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
@@ -145,7 +146,7 @@ export default function LadBeranda() {
             </Box>
           </Box>
 
-          {info && <Alert severity="success" onClose={() => setInfo('')}>{info}</Alert>}
+          {info && <AlertOtomatis severity="success" tombolTutup onTutup={() => setInfo('')}>{info}</AlertOtomatis>}
           {infoPeringatan && <Alert severity="warning" onClose={() => setInfoPeringatan('')}>{infoPeringatan}</Alert>}
           {galat && <Alert severity="error">{pesanGalat(galat)}</Alert>}
           {tanpaRingkasan && (
@@ -170,7 +171,7 @@ export default function LadBeranda() {
               />
               {!memuat && nyata.length > 1 && !tanpaRingkasan && (
                 <Typography sx={{ fontSize: 14, lineHeight: 1.5, color: w.sekunder, maxWidth: '80ch' }}>
-                  Diurutkan dari persentase siswa perlu perhatian yang tertinggi. Kelas yang angkanya belum bisa dibaca ada di bawah.
+                  Diurutkan dari persentase murid perlu perhatian yang tertinggi. Kelas yang angkanya belum bisa dibaca ada di bawah.
                 </Typography>
               )}
             </>
@@ -182,7 +183,7 @@ export default function LadBeranda() {
         {!galat && !memuat && !tanpaRingkasan && nyata.length > 0 && (
           <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: '20px', px: 0.5 }}>
             Angka tiap kelas dihitung server dalam satu permintaan dengan aturan yang sama seperti di halaman kelas. Persentase memakai
-            jumlah siswa kelas itu sebagai pembagi; kelas yang belum punya siswa atau struktur tidak diberi angka 0.
+            jumlah murid kelas itu sebagai pembagi; kelas yang belum punya murid atau struktur tidak diberi angka 0.
           </Typography>
         )}
       </Box>

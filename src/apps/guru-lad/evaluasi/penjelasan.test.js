@@ -102,7 +102,7 @@ test('P3: proyek yang tidak dikumpulkan; catatan sumatif hanya bila benar, tanpa
   assert.deepEqual(uraikanBukti('P3', P3, CTX), ['Proyek individu 1 dan 2 tidak dikumpulkan (nilai 0).']);
   assert.deepEqual(uraikanBukti('P3', { proyek: [2], sumatif_tinggi: true }, CTX), [
     'Proyek individu 2 tidak dikumpulkan (nilai 0).',
-    'Rata-rata semua LM siswa ini berada pada batas pengayaan atau di atasnya.',
+    'Rata-rata semua LM murid ini berada pada batas pengayaan atau di atasnya.',
   ]);
 });
 
@@ -110,12 +110,12 @@ test('P4 dengan pembanding kelas: penurunan siswa, rata-rata kelas, dan selisihn
   const k = uraikanBukti('P4', P4, CTX);
   assert.equal(k[0], 'Rata-rata nilai tiga LM terakhir: LM 1 84, lalu LM 2 73,33, lalu LM 3 68. Total turun 16 poin.');
   assert.equal(k[1], 'Rata-rata kelas pada LM yang sama: LM 1 83,4, LM 2 83,14, LM 3 83,6.');
-  assert.equal(k[2], 'Kelas naik 0,2 poin; penurunan siswa ini 16,2 poin lebih besar daripada kelas.');
+  assert.equal(k[2], 'Kelas naik 0,2 poin; penurunan murid ini 16,2 poin lebih besar daripada kelas.');
 });
 
 test('P4: kelas yang ikut turun, dan kelas yang tidak berubah', () => {
-  assert.match(uraikanBukti('P4', { ...P4, turun_kelas: 4.5, lebih_dari_kelas: 11.5 }, CTX)[2], /^Kelas turun 4,5 poin; penurunan siswa ini 11,5 poin lebih besar/);
-  assert.match(uraikanBukti('P4', { ...P4, turun_kelas: 0, lebih_dari_kelas: 16 }, CTX)[2], /^Kelas tidak berubah; penurunan siswa ini 16 poin/);
+  assert.match(uraikanBukti('P4', { ...P4, turun_kelas: 4.5, lebih_dari_kelas: 11.5 }, CTX)[2], /^Kelas turun 4,5 poin; penurunan murid ini 11,5 poin lebih besar/);
+  assert.match(uraikanBukti('P4', { ...P4, turun_kelas: 0, lebih_dari_kelas: 16 }, CTX)[2], /^Kelas tidak berubah; penurunan murid ini 16 poin/);
 });
 
 test('P4 tanpa pembanding kelas: menjelaskan bahwa keputusan hanya melihat penurunan siswa itu dan menyebut kelas_min', () => {
@@ -123,7 +123,7 @@ test('P4 tanpa pembanding kelas: menjelaskan bahwa keputusan hanya melihat penur
     lm: [1, 2, 3], nr: [90, 80, 70], total_turun: 20, acuan_kelas: false, nr_kelas: [null, null, null], turun_kelas: null, lebih_dari_kelas: null,
   }, CTX);
   assert.equal(k.length, 2);
-  assert.match(k[1], /^Pembanding kelas tidak dipakai karena kurang dari 8 siswa/);
+  assert.match(k[1], /^Pembanding kelas tidak dipakai karena kurang dari 8 murid/);
   assert.ok(!k.join(' ').includes('null'));
 });
 
@@ -150,7 +150,7 @@ test('tidak ada keluaran yang memuat undefined, NaN, null, [object, atau tanda p
 });
 
 test('kalimatBatasSistem (templat 1.2): kalimat tetap P1 sampai P5, hanya indikator pemicu yang berbeda', () => {
-  const TETAP = 'Sistem tidak mengetahui penyebabnya. Anda yang paling mengenal siswa ini, jadi ubah atau abaikan saran ini bila tidak sesuai.';
+  const TETAP = 'Sistem tidak mengetahui penyebabnya. Bapak/Ibu yang paling mengenal murid ini, jadi ubah atau abaikan saran ini bila tidak sesuai.';
   const indikator = KODE_POLA.map((k) => {
     const t = kalimatBatasSistem(k);
     assert.match(t, /^Sistem hanya membaca .+\. Sistem tidak mengetahui/);
@@ -167,7 +167,7 @@ test('definisiPola memakai parameter yang dikirim server, bukan angka yang terta
   const p = { ...PARAMETER, a_min: 4, kktp: 66, turun_total: 12, turun_relatif: 7, kelas_min: 5, lm_min_p5: 3, ambang_pengayaan: 86, pertemuan_min: 6 };
   assert.match(definisiPola('P1', p), /KKTP \(66\)/);
   assert.match(definisiPola('P2', p), /paling sedikit 4 pertemuan.*6 pertemuan tercatat/);
-  assert.match(definisiPola('P4', p), /paling sedikit 12 poin.*paling sedikit 7 poin.*di bawah 86.*paling sedikit 5 siswa/);
+  assert.match(definisiPola('P4', p), /paling sedikit 12 poin.*paling sedikit 7 poin.*di bawah 86.*paling sedikit 5 murid/);
   assert.match(definisiPola('P5', p), /paling sedikit 3 LM bernilai 86 ke atas/);
   assert.equal(definisiPola('PX', p), '');
   assert.match(dataDibutuhkan('P2', p), /6 pertemuan/);

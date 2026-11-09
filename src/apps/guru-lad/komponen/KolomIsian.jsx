@@ -1,57 +1,78 @@
 import PropTypes from 'prop-types';
-import { Box, InputBase, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
-import { warnaRingkasan } from '../ringkasan/gayaRingkasan';
+import { Box, FormHelperText, InputAdornment } from '@mui/material';
+import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
+import CustomOutlinedInput from 'src/components/forms/theme-elements/CustomOutlinedInput';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
 
 /**
- * Kolom isian bergaya desain: label tebal di atas kotak, ikon opsional di dalam kotak, dan teks bantuan 13 px di bawahnya.
- * Label selalu terlihat (tidak melayang), jadi tetap terbaca saat kolom kosong. Galat tampil sebagai teks merah di
- * bawah kotak dan lewat aria-invalid, bukan hanya warna garis.
+ * Kolom isian LAD. Memakai komponen form yang sama dengan seluruh aplikasi (contoh: form Tambah Murid):
+ * label tebal DI ATAS kotak (CustomFormLabel), kotak CustomOutlinedInput atau CustomSelect, ikon opsional di
+ * dalam kotak (startAdornment), dan teks bantuan atau galat di bawahnya. Label tidak melayang, jadi tetap
+ * terbaca saat kolom kosong.
+ *
+ * - Teks biasa, angka, tanggal: `type` ("text" bawaan, "date"), `multiline` + `rows`.
+ * - Pilihan: beri `pilih` dan MenuItem sebagai `children`. Untuk placeholder "Pilih ...", pakai
+ *   `<MenuItem value="" disabled>Pilih ...</MenuItem>` dan `displayEmpty` (bawaan menyala).
+ * - `wajib` menambahkan tanda bintang pada label dan atribut required.
+ * - Galat tampil sebagai teks merah di bawah kotak (role="alert", diumumkan pembaca layar) dan lewat aria-invalid,
+ *   bukan hanya warna garis. Teks `bantuan` tetap tampil di bawah galat, jadi petunjuk tidak hilang saat galat muncul.
+ * - Pemilih: label terhubung ke combobox lewat labelId, jadi nama aksesibelnya "Semester", bukan nilai yang tampil.
+ * - Multiline: `rows` (tinggi tetap) atau `minRows` (tumbuh).
  */
 export default function KolomIsian({
-  id, label, bantuan, galat, ikon, multiline = false, rows, readOnly = false, disabled = false, inputMode, placeholder, sx, ...sisa
+  id, label, bantuan, galat, ikon, wajib = false, pilih = false, children, tipe, inputMode, sx, labelSx, inputProps, ...sisa
 }) {
-  const tema = useTheme();
-  const w = warnaRingkasan(tema);
   const idBantu = `${id}-bantuan`;
-  const teksBantu = galat || bantuan;
+  const idGalat = `${id}-galat`;
+  const idLabel = `${id}-label`;
+  const adaGalat = Boolean(galat);
+  const adaBantuan = Boolean(bantuan);
+  const idTerkait = [adaGalat && idGalat, adaBantuan && idBantu].filter(Boolean).join(' ') || undefined;
+  const gabungInput = {
+    ...inputProps,
+    inputMode,
+    'aria-invalid': adaGalat ? 'true' : undefined,
+    'aria-describedby': idTerkait,
+  };
+  const awalan = ikon
+    ? <InputAdornment position="start"><Box component="span" aria-hidden="true" sx={{ display: 'flex' }}>{ikon}</Box></InputAdornment>
+    : undefined;
+
   return (
     <Box sx={{ minWidth: 0, ...sx }}>
-      <Typography component="label" htmlFor={id} sx={{ display: 'block', fontSize: 14, fontWeight: 600, color: w.ink, mb: '5px' }}>
+      <CustomFormLabel id={idLabel} htmlFor={id} sx={{ mt: 0, ...labelSx }}>
         {label}
-      </Typography>
-      <InputBase
-        id={id}
-        fullWidth
-        multiline={multiline}
-        rows={multiline ? rows : undefined}
-        readOnly={readOnly}
-        disabled={disabled}
-        placeholder={placeholder}
-        startAdornment={ikon ? <Box component="span" aria-hidden="true" sx={{ display: 'flex', mr: 1, color: w.sekunder }}>{ikon}</Box> : undefined}
-        inputProps={{ inputMode, 'aria-invalid': galat ? 'true' : undefined, 'aria-describedby': teksBantu ? idBantu : undefined }}
-        sx={{
-          alignItems: multiline ? 'flex-start' : 'center',
-          border: `1px solid ${galat ? tema.palette.error.main : w.garisTegas}`,
-          borderRadius: '7px',
-          bgcolor: disabled ? w.latar : w.kartu,
-          minHeight: 46,
-          px: '14px',
-          fontSize: 14,
-          color: w.ink,
-          '& .MuiInputBase-input': { py: '12px', fontSize: 14, height: 'auto', ...(multiline ? { resize: 'vertical' } : {}) },
-          '& .MuiInputBase-inputMultiline': { py: 0, mt: '12px', mb: '12px' },
-          '& .MuiInputBase-input::placeholder': { color: w.sekunder, opacity: 1 },
-          '&.Mui-focused': { borderColor: w.primer, boxShadow: `0 0 0 1px ${w.primer}` },
-          ...(multiline ? { '& textarea': { resize: 'vertical' } } : {}),
-        }}
-        {...sisa}
-      />
-      {teksBantu && (
-        <Typography id={idBantu} sx={{ fontSize: 13, color: galat ? tema.palette.error.main : w.sekunder, mt: '6px', mx: '2px', lineHeight: 1.35 }}>
-          {teksBantu}
-        </Typography>
+        {wajib && <Box component="span" aria-hidden="true" sx={{ color: 'error.main' }}>{' *'}</Box>}
+      </CustomFormLabel>
+      {pilih ? (
+        <CustomSelect
+          id={id}
+          labelId={idLabel}
+          fullWidth
+          displayEmpty
+          required={wajib}
+          error={adaGalat}
+          startAdornment={awalan}
+          inputProps={gabungInput}
+          MenuProps={{ PaperProps: { style: { maxHeight: 300, overflowY: 'auto' } } }}
+          {...sisa}
+        >
+          {children}
+        </CustomSelect>
+      ) : (
+        <CustomOutlinedInput
+          id={id}
+          fullWidth
+          type={tipe}
+          required={wajib}
+          error={adaGalat}
+          startAdornment={awalan}
+          inputProps={gabungInput}
+          {...sisa}
+        />
       )}
+      {adaGalat && <FormHelperText id={idGalat} error role="alert">{galat}</FormHelperText>}
+      {adaBantuan && <FormHelperText id={idBantu}>{bantuan}</FormHelperText>}
     </Box>
   );
 }
@@ -62,11 +83,12 @@ KolomIsian.propTypes = {
   bantuan: PropTypes.node,
   galat: PropTypes.string,
   ikon: PropTypes.node,
-  multiline: PropTypes.bool,
-  rows: PropTypes.number,
-  readOnly: PropTypes.bool,
-  disabled: PropTypes.bool,
+  wajib: PropTypes.bool,
+  pilih: PropTypes.bool,
+  children: PropTypes.node,
+  tipe: PropTypes.string,
   inputMode: PropTypes.string,
-  placeholder: PropTypes.string,
   sx: PropTypes.object,
+  labelSx: PropTypes.object,
+  inputProps: PropTypes.object,
 };

@@ -5,9 +5,9 @@
 // sebelum dikirim. Pemeriksaan yang berwenang tetap di server (kolom "langkah" wajib, batas panjang).
 
 export const KOLOM_SARAN = Object.freeze([
-  { kunci: 'koneksi', label: 'Mulai dari koneksi', petunjuk: 'Hubungan dengan siswa atau kondisi yang sudah diketahui guru.' },
-  { kunci: 'tujuan', label: 'Ke mana tujuannya?', petunjuk: 'Tujuan belajar yang ingin dicapai siswa.' },
-  { kunci: 'posisi', label: 'Sudah sampai mana?', petunjuk: 'Posisi siswa saat ini menurut data kelas.' },
+  { kunci: 'koneksi', label: 'Mulai dari koneksi', petunjuk: 'Hubungan dengan murid atau kondisi yang sudah diketahui guru.' },
+  { kunci: 'tujuan', label: 'Ke mana tujuannya?', petunjuk: 'Tujuan belajar yang ingin dicapai murid.' },
+  { kunci: 'posisi', label: 'Sudah sampai mana?', petunjuk: 'Posisi murid saat ini menurut data kelas.' },
   { kunci: 'langkah', label: 'Langkah berikutnya?', petunjuk: 'Tindakan yang akan guru lakukan. Wajib diisi.' },
 ]);
 

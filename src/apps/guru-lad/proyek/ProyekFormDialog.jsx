@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField,
+  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack,
 } from '@mui/material';
+import KolomIsian from '../komponen/KolomIsian';
 import { pesanGalat } from '../api';
 import { JENIS_PROYEK, TEKS_JENIS, periksaFormProyek } from './proyek';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 /** Form tambah atau ubah proyek: nama dan jenis (individu atau kelompok). */
 export default function ProyekFormDialog({
@@ -46,30 +48,31 @@ export default function ProyekFormDialog({
       <DialogTitle>{judul}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
+          <KolomIsian
+            id="proyek-nama"
             label="Nama proyek"
             placeholder="mis. Poster ekosistem"
             value={nama}
             onChange={(e) => setNama(e.target.value)}
-            error={sentuh && Boolean(galatLokal.nama)}
-            helperText={sentuh && galatLokal.nama ? galatLokal.nama : 'Sebagaimana tertulis di blanko nilai, mis. nama Latihan Materi'}
-            required
-            fullWidth
+            galat={(sentuh && galatLokal.nama) || undefined}
+            bantuan="Sebagaimana tertulis di blanko nilai, mis. nama Latihan Materi"
+            wajib
           />
-          <TextField
-            select
+          <KolomIsian
+            id="proyek-jenis"
+            pilih
             label="Jenis"
             value={jenis}
             onChange={(e) => setJenis(e.target.value)}
-            helperText={jenis === JENIS_PROYEK.INDIVIDU
+            bantuan={jenis === JENIS_PROYEK.INDIVIDU
               ? 'Nilai 0 berarti tidak dikumpulkan dan menjadi dasar penanda "Proyek individu tidak dikumpulkan".'
-              : 'Proyek kelompok tidak dipakai oleh penanda siswa.'}
-            fullWidth
+              : 'Proyek kelompok tidak dipakai oleh penanda murid.'}
           >
+            <MenuItem value="" disabled>Pilih jenis</MenuItem>
             <MenuItem value={JENIS_PROYEK.INDIVIDU}>{TEKS_JENIS.INDIVIDU}</MenuItem>
             <MenuItem value={JENIS_PROYEK.KELOMPOK}>{TEKS_JENIS.KELOMPOK}</MenuItem>
-          </TextField>
-          {galat && <Alert severity="error">{galat}</Alert>}
+          </KolomIsian>
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions>

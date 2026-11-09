@@ -17,6 +17,7 @@ import BilahSimpan from '../komponen/BilahSimpan';
 import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { gayaGrid } from './gayaGrid';
 import { cariTpId, labelTpRingkas, legendaSebaran } from '../ringkasan/ringkasan';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const kunci = (siswaId, tpId) => `${siswaId}:${tpId}`;
 const potongJudul = (teks) => (teks.length > 28 ? `${teks.slice(0, 27)}…` : teks);
@@ -163,7 +164,7 @@ export default function NilaiTpGrid({
   if (siswa.length === 0 || tpList.length === 0) {
     return (
       <Alert severity="info">
-        {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
+        {siswa.length === 0 ? 'Isi daftar murid dulu di tab Murid. ' : ''}
         {tpList.length === 0 ? 'Tambahkan lingkup materi dan TP dulu di tab Struktur.' : ''}
       </Alert>
     );
@@ -173,7 +174,7 @@ export default function NilaiTpGrid({
     <Stack spacing={3}>
       <JudulTab
         judul="Nilai tujuan pembelajaran"
-        keterangan="Isi nilai tiap siswa per TP. Perubahan baru tersimpan setelah Anda menekan Simpan nilai."
+        keterangan="Isi nilai tiap murid per TP. Perubahan baru tersimpan setelah tombol Simpan nilai ditekan."
       />
       <PetunjukTab
         butir={[
@@ -209,7 +210,7 @@ export default function NilaiTpGrid({
             : `Menyorot ${labelSorot} dari Ringkasan. Kolomnya diberi garis tebal.`}
         </Alert>
       )}
-      {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
+      {pesan && <AlertOtomatis severity={pesan.jenis} pemicu={pesan} tombolTutup onTutup={() => setPesan(null)}>{pesan.teks}</AlertOtomatis>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
       )}
@@ -219,7 +220,7 @@ export default function NilaiTpGrid({
           <thead>
             <tr>
               <th className="no" rowSpan={2}>No</th>
-              <th className="nama" rowSpan={2}>Nama siswa</th>
+              <th className="nama" rowSpan={2}>Nama murid</th>
               {lm.filter((m) => m.tp.length > 0).map((m, i) => (
                 <th key={m.id} colSpan={m.tp.length} className={i > 0 ? 'awal-lm' : undefined} title={judulLm(m)}>{potongJudul(judulLm(m))}</th>
               ))}
