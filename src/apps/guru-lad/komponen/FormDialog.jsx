@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, TextField,
+  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack,
 } from '@mui/material';
 import { pesanGalat } from '../api';
+import KolomIsian from './KolomIsian';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 /**
  * Dialog isian sederhana. `bidang`: [{ kunci, label, multiline?, wajib?, helper? }].
@@ -41,19 +43,19 @@ export default function FormDialog({
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           {bidang.map((b) => (
-            <TextField
+            <KolomIsian
               key={b.kunci}
+              id={`form-${b.kunci}`}
               label={b.label}
-              helperText={b.helper}
+              bantuan={b.helper}
               value={nilai[b.kunci] ?? ''}
               onChange={(e) => setNilai((s) => ({ ...s, [b.kunci]: e.target.value }))}
               multiline={b.multiline}
               minRows={b.multiline ? 3 : undefined}
-              required={b.wajib}
-              fullWidth
+              wajib={b.wajib}
             />
           ))}
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions>

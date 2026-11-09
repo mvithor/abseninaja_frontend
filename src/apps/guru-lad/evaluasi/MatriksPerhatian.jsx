@@ -158,7 +158,7 @@ export default function MatriksPerhatian({
   const ariaSort = (mode) => (urut === mode ? 'ascending' : undefined);
 
   return (
-    <Box sx={gayaMatriks} role="region" aria-label="Matriks siswa dan capaian" tabIndex={-1}>
+    <Box sx={gayaMatriks} role="region" aria-label="Matriks murid dan capaian" tabIndex={-1}>
       <table>
         <thead>
           <tr>
@@ -166,7 +166,7 @@ export default function MatriksPerhatian({
               <TombolUrut mode={MODE_URUT.NOMOR} aktif={urut === MODE_URUT.NOMOR} onUrut={onUrut} label="Urutkan menurut nomor absen">No</TombolUrut>
             </th>
             <th className="k-nama" rowSpan={2} aria-sort={ariaSort(MODE_URUT.NAMA)}>
-              <TombolUrut mode={MODE_URUT.NAMA} aktif={urut === MODE_URUT.NAMA} onUrut={onUrut} label="Urutkan menurut nama">Siswa</TombolUrut>
+              <TombolUrut mode={MODE_URUT.NAMA} aktif={urut === MODE_URUT.NAMA} onUrut={onUrut} label="Urutkan menurut nama">Murid</TombolUrut>
             </th>
             <th className="k-pen" rowSpan={2} aria-sort={ariaSort(MODE_URUT.PRIORITAS)}>
               <TombolUrut mode={MODE_URUT.PRIORITAS} aktif={urut === MODE_URUT.PRIORITAS} onUrut={onUrut} label="Urutkan menurut prioritas penanda">Penanda</TombolUrut>
@@ -215,8 +215,8 @@ export default function MatriksPerhatian({
           <tr className="rata b2">
             <td className="k-no" />
             <td className="k-nama" colSpan={2}>
-              {`Siswa yang belum mencapai KKTP ${tampilAngka(kktp)}`}
-              <small>dari siswa yang sudah dinilai</small>
+              {`Murid yang belum mencapai KKTP ${tampilAngka(kktp)}`}
+              <small>dari murid yang sudah dinilai</small>
             </td>
             {kolom.kolomTp.map((k, i) => {
               const r = ringkas.get(k.tpId);
@@ -224,7 +224,7 @@ export default function MatriksPerhatian({
               const kelas = [awalLm ? 'pisah' : '', r.n > 0 && r.bawah === 0 ? 'nol' : ''].filter(Boolean).join(' ') || undefined;
               return (
                 <td key={k.tpId} className={kelas} data-bawah={r.bawah}>
-                  {r.n === 0 ? <span aria-hidden="true">&middot;</span> : `${r.bawah} siswa`}
+                  {r.n === 0 ? <span aria-hidden="true">&middot;</span> : `${r.bawah} murid`}
                   <Box component="span" sx={sembunyi}>{r.n === 0 ? 'belum ada nilai' : ` dari ${r.n} yang dinilai`}</Box>
                 </td>
               );
@@ -234,7 +234,7 @@ export default function MatriksPerhatian({
           {golongan.map((g) => (
             <Fragment key={g}>
               <tr className="grup">
-                <td colSpan={kolom.jumlahKolom}><div>{`${JUDUL_GOLONGAN[g]} · ${bagi[g].length} siswa`}</div></td>
+                <td colSpan={kolom.jumlahKolom}><div>{`${JUDUL_GOLONGAN[g]} · ${bagi[g].length} murid`}</div></td>
               </tr>
               {barisPer[g].map((b) => (
                 <BarisSiswaMatriks key={b.siswaId} b={b} kolom={kolom} terpilih={terpilihId === b.siswaId} onBuka={onBuka} keputusan={keputusan?.get(b.siswaId)} />

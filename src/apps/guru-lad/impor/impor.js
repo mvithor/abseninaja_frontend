@@ -98,7 +98,7 @@ export function isiDariLaporan(butir, laporan) {
 }
 
 export const ringkasBerkas = (r) => (r
-  ? `${r.jumlah_siswa} siswa, ${r.jumlah_lm} lingkup materi, ${r.jumlah_tp} TP, ${r.jumlah_proyek} proyek, ${r.sel_nilai_terisi} nilai terisi`
+  ? `${r.jumlah_siswa} murid, ${r.jumlah_lm} lingkup materi, ${r.jumlah_tp} TP, ${r.jumlah_proyek} proyek, ${r.sel_nilai_terisi} nilai terisi`
   : '');
 
 /** Satu baris galat: sel Excel (bila ada) diikuti pesannya. */
@@ -110,5 +110,5 @@ export function ringkasHasilSimpan(hasil) {
   if (kelas.length === 0) return '';
   const siswa = kelas.reduce((a, k) => a + k.jumlah_siswa, 0);
   const nilai = kelas.reduce((a, k) => a + k.jumlah_nilai, 0);
-  return `${kelas.length} kelas dibuat: ${siswa} siswa dan ${nilai} nilai tersimpan.`;
+  return `${kelas.length} kelas dibuat: ${siswa} murid dan ${nilai} nilai tersimpan.`;
 }

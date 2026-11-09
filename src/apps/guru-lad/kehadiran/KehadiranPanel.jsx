@@ -25,6 +25,7 @@ import {
   selUntukSemuaHadir, terapkanIsian, hitungPengosonganKode, susunMuatanSimpan, tanggalPanjang, tanggalPendek,
   idKronologis, perluUrutKronologis, kelompokLm,
 } from './kehadiran';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 // Tambahan gaya khusus tab ini di atas gayaGrid, mengikuti desain: huruf di tengah sel, latar sel menurut status
 // (huruf tetap tampil, jadi status tidak hanya lewat warna), kolom rekap H S I A, dan baris judul grup lingkup materi.
@@ -156,7 +157,7 @@ export default function KehadiranPanel({
   const semuaHadir = (pertemuanId) => {
     const kunci = selUntukSemuaHadir(pertemuanId, siswa, edit, server);
     if (kunci.length === 0) {
-      setPesan({ jenis: 'info', teks: 'Semua siswa pada pertemuan ini sudah punya catatan; tidak ada yang diubah.' });
+      setPesan({ jenis: 'info', teks: 'Semua murid pada pertemuan ini sudah punya catatan; tidak ada yang diubah.' });
       return;
     }
     setEdit((prev) => kunci.reduce((acc, k) => terapkanIsian(acc, k, 'H', server), prev));
@@ -254,7 +255,7 @@ export default function KehadiranPanel({
     />
   );
 
-  const keterangan = `Rekap dihitung dari ${pertemuan.length} pertemuan yang dicatat. Perubahan baru tersimpan setelah Anda menekan Simpan kehadiran.`;
+  const keterangan = `Rekap dihitung dari ${pertemuan.length} pertemuan yang dicatat. Perubahan baru tersimpan setelah tombol Simpan kehadiran ditekan.`;
   const aksiHeader = !readOnly && (
     <Stack direction="row" spacing={1.5} useFlexGap flexWrap="wrap">
       <Button variant="outlined" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })} sx={gayaTombol(w, { garis: true })}>
@@ -274,7 +275,7 @@ export default function KehadiranPanel({
   );
   const peringatanZona = waktuSekolah?.zona_bawaan && (
     <Alert severity="warning">
-      Zona waktu sekolah belum diisi dengan benar di data sekolah, jadi dipakai WIB. Bila sekolah Anda di WITA atau WIT,
+      Zona waktu sekolah belum diisi dengan benar di data sekolah, jadi dipakai WIB. Bila sekolah di WITA atau WIT,
       tanggal &quot;hari ini&quot; bisa meleset satu hari; minta admin sekolah memperbaikinya.
     </Alert>
   );
@@ -282,12 +283,12 @@ export default function KehadiranPanel({
   if (siswa.length === 0 || pertemuan.length === 0) {
     return (
       <Stack spacing={2.5} alignItems="flex-start">
-        <JudulTab judul="Kehadiran siswa" keterangan="Isi daftar siswa dan pertemuan dulu untuk mencatat kehadiran." />
+        <JudulTab judul="Kehadiran murid" keterangan="Isi daftar murid dan pertemuan dulu untuk mencatat kehadiran." />
         {peringatanZona}
         <Alert severity="info" sx={{ alignSelf: 'stretch' }}>
-          {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
+          {siswa.length === 0 ? 'Isi daftar murid dulu di tab Murid. ' : ''}
           {pertemuan.length === 0
-            ? (readOnly ? 'Kelas ini belum memiliki pertemuan.' : 'Belum ada pertemuan. Tambahkan pertemuan pada tanggal berlangsungnya, lalu catat kehadiran siswa.')
+            ? (readOnly ? 'Kelas ini belum memiliki pertemuan.' : 'Belum ada pertemuan. Tambahkan pertemuan pada tanggal berlangsungnya, lalu catat kehadiran murid.')
             : ''}
         </Alert>
         {!readOnly && (
@@ -302,7 +303,7 @@ export default function KehadiranPanel({
 
   return (
     <Stack spacing={3}>
-      <JudulTab judul="Kehadiran siswa" keterangan={keterangan} aksi={aksiHeader || undefined} />
+      <JudulTab judul="Kehadiran murid" keterangan={keterangan} aksi={aksiHeader || undefined} />
       {peringatanZona}
       <PetunjukTab
         butir={[
@@ -312,17 +313,17 @@ export default function KehadiranPanel({
           'Kolom H S I A di kiri menghitung dari isian yang tampil.',
         ]}
       />
-      {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
+      {pesan && <AlertOtomatis severity={pesan.jenis} pemicu={pesan} tombolTutup onTutup={() => setPesan(null)}>{pesan.teks}</AlertOtomatis>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
       )}
 
-      <Box ref={wadah} sx={gayaKehadiran} role="region" aria-label="Tabel kehadiran siswa" tabIndex={-1}>
+      <Box ref={wadah} sx={gayaKehadiran} role="region" aria-label="Tabel kehadiran murid" tabIndex={-1}>
         <table>
           <thead>
             <tr>
               <th className="no" rowSpan={2} scope="col">No</th>
-              <th className="nama" rowSpan={2} scope="col">Nama siswa</th>
+              <th className="nama" rowSpan={2} scope="col">Nama murid</th>
               {KODE_HADIR.map((kode) => (
                 <th key={kode} className="rekap" rowSpan={2} scope="col" title={TEKS_KODE[kode]}>{kode}</th>
               ))}

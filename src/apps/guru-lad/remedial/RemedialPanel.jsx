@@ -62,7 +62,7 @@ export default function RemedialPanel({
     <Stack spacing={3}>
       <JudulTab
         judul="Catatan remedial"
-        keterangan="Catatan remedial per siswa dan TP."
+        keterangan="Catatan remedial per murid dan TP."
         aksi={!readOnly && (
           <AddButton icon={<IconPlus size={20} />} onClick={() => onBuka({})} sx={{ width: { xs: '100%', sm: 'auto' }, maxWidth: 'none', ml: 0 }}>
             Catat remedial
@@ -73,7 +73,7 @@ export default function RemedialPanel({
         butir={[
           'Nilai asli TP tidak berubah; remedial dicatat terpisah dari nilai asli.',
           `Penanda "Kesulitan pada TP tertentu" padam untuk sebuah TP bila remedial terbarunya mencapai KKTP (${kktp}).`,
-          'Remedial juga dapat dicatat langsung dari rincian siswa di tab Perlu Perhatian.',
+          'Remedial juga dapat dicatat langsung dari rincian murid di tab Perlu Perhatian.',
         ]}
       />
       {baris.length === 0 ? (
@@ -86,7 +86,7 @@ export default function RemedialPanel({
               <TableHead>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}`, pl: 2 }}>No</TableCell>
-                  <TableCell sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}` }}>Siswa dan TP</TableCell>
+                  <TableCell sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}` }}>Murid dan TP</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}` }}>Nilai asli</TableCell>
                   <TableCell align="center" sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}` }}>Skor remedial</TableCell>
                   <TableCell sx={{ fontWeight: 600, fontSize: 16, bgcolor: w.kartu, borderBottom: `1px solid ${w.garis}` }}>Tanggal</TableCell>

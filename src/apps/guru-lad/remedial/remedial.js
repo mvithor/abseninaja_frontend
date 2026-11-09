@@ -112,7 +112,7 @@ export function barisRemedial({ remedial, siswa, lm }) {
       id: r.id,
       siswaId: r.siswa_id,
       tpId: r.tp_id,
-      nama: s ? s.nama : `Siswa ${r.siswa_id}`,
+      nama: s ? s.nama : `Murid ${r.siswa_id}`,
       urutanSiswa: s ? s.urutan : Number.MAX_SAFE_INTEGER,
       labelTp: p ? namaTpLengkap(p.t, p.lmNo) : `TP ${r.tp_id}`,
       urutanTp: p ? p.lmNo * 1000 + p.t.urutan : Number.MAX_SAFE_INTEGER,

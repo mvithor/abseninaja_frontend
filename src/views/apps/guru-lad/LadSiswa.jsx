@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Alert, Box, Button, CircularProgress, Link, Stack, Typography,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { IconArrowLeft } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
@@ -81,7 +81,7 @@ export default function LadSiswa() {
   }
   if (!akses.boleh) {
     return (
-      <PageContainer title="Analitik Pembelajaran" description="Profil siswa">
+      <PageContainer title="Analitik Pembelajaran" description="Profil murid">
         <Alert severity="info">{akses.pesan ?? 'Fitur Analitik Pembelajaran belum tersedia untuk akun ini.'}</Alert>
       </PageContainer>
     );
@@ -89,7 +89,7 @@ export default function LadSiswa() {
   const galat = masukan.error ?? evaluasi.error;
   if (galat) {
     return (
-      <PageContainer title="Profil siswa | Analitik Pembelajaran" description="Profil siswa">
+      <PageContainer title="Profil murid | Analitik Pembelajaran" description="Profil murid">
         <Alert severity={galat.response?.status === 404 ? 'warning' : 'error'} action={<Button onClick={() => navigate('/dashboard/guru-lad')}>Kembali</Button>}>
           {galat.response?.status === 404 ? 'Kelas tidak ditemukan.' : pesanGalat(galat)}
         </Alert>
@@ -98,8 +98,8 @@ export default function LadSiswa() {
   }
   if (!siswa) {
     return (
-      <PageContainer title="Profil siswa | Analitik Pembelajaran" description="Profil siswa">
-        <Alert severity="warning" action={<Button onClick={balik}>Kembali</Button>}>Siswa tidak ditemukan di kelas ini.</Alert>
+      <PageContainer title="Profil murid | Analitik Pembelajaran" description="Profil murid">
+        <Alert severity="warning" action={<Button onClick={balik}>Kembali</Button>}>Murid tidak ditemukan di kelas ini.</Alert>
       </PageContainer>
     );
   }
@@ -113,7 +113,7 @@ export default function LadSiswa() {
 
   return (
     <TemaLad>
-    <PageContainer title={`${siswa.nama} | Analitik Pembelajaran`} description="Profil siswa dan saran tindak lanjut">
+    <PageContainer title={`${siswa.nama} | Analitik Pembelajaran`} description="Profil murid dan saran tindak lanjut">
       {/* Satu kolom minmax(0, 1fr) seperti halaman kelas: selebar ruang yang tersedia, tidak dibatasi lebar tetap. */}
       <Box sx={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignContent: 'start', gap: { xs: 2, md: 2.5 }, width: '100%', minWidth: 0 }}>
         <Box>
@@ -142,12 +142,12 @@ export default function LadSiswa() {
                     </Stack>
                   ) : (
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      {evaluasi.data ? 'Tidak ada penanda yang memicu untuk siswa ini.' : 'Penanda belum dapat dimuat.'}
+                      {evaluasi.data ? 'Tidak ada penanda yang memicu untuk murid ini.' : 'Penanda belum dapat dimuat.'}
                     </Typography>
                   )}
                   {penanda.length > 1 && (
                     <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 760 }}>
-                      Beberapa penanda muncul bersamaan. Sistem tidak menyimpulkan hubungan di antaranya; keterkaitannya dinilai guru. Penanda adalah titik awal untuk melihat data, bukan label bagi siswa.
+                      Beberapa penanda muncul bersamaan. Sistem tidak menyimpulkan hubungan di antaranya; keterkaitannya dinilai guru. Penanda adalah titik awal untuk melihat data, bukan label bagi murid.
                     </Typography>
                   )}
                 </Box>
@@ -159,8 +159,8 @@ export default function LadSiswa() {
                 </Stack>
               </Stack>
               {rincian && rincian.belumCukup.length > 0 && (
-                <Alert severity="info" icon={false} sx={{ mt: 1.5 }}>
-                  <Typography variant="body2" fontWeight={600}>Sebagian penanda belum dapat dinilai karena datanya belum cukup. Ini bukan berarti siswa aman.</Typography>
+                <Alert severity="info" sx={{ mt: 1.5 }}>
+                  <Typography variant="body2" fontWeight={600}>Sebagian penanda belum dapat dinilai karena datanya belum cukup. Ini bukan berarti murid aman.</Typography>
                   <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
                     {rincian.belumCukup.map((x) => (
                       <Typography key={x.kode} component="li" variant="body2">{`${x.kode} ${x.judul}: ${x.alasan || `butuh ${x.butuh}`}`}</Typography>
@@ -197,7 +197,7 @@ export default function LadSiswa() {
               component="section"
               aria-labelledby="bagian-saran-judul"
               id="bagian-saran"
-              sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, borderColor: alpha(w.primer, 0.4), minWidth: 0 }}
+              sx={{ ...gayaKartu(w), p: { xs: 2, md: 3 }, minWidth: 0 }}
             >
               <Typography id="bagian-saran-judul" component="h2" sx={{ fontSize: { xs: '1.125rem', md: '1.25rem' }, fontWeight: 700, lineHeight: '1.75rem', color: w.ink, mb: 0.5 }}>Saran tindak lanjut</Typography>
               <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder, mb: 2.5 }}>

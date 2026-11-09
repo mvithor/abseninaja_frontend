@@ -73,7 +73,7 @@ export default function BatangSegmen({
             component="button"
             type="button"
             title={`${s.nama}: ${s.n}`}
-            aria-label={labelSegmen ? labelSegmen(s) : `${s.nama}: ${s.n} siswa`}
+            aria-label={labelSegmen ? labelSegmen(s) : `${s.nama}: ${s.n} murid`}
             onClick={() => onPilih(s)}
             sx={{
               ...gaya,

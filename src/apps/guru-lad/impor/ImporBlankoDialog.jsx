@@ -2,14 +2,16 @@ import { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useMutation } from '@tanstack/react-query';
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography, useMediaQuery,
+  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, Typography, useMediaQuery,
 } from '@mui/material';
 import { IconFileSpreadsheet } from '@tabler/icons-react';
 import { pesanGalat, pratinjauImpor, simpanImpor } from '../api';
+import KolomIsian from '../komponen/KolomIsian';
 import KartuBerkasImpor from './KartuBerkasImpor';
 import {
   butirBaru, isiDariLaporan, periksaPilihan, susunMeta, tahunAjaranSekarang, tandaPermintaan,
 } from './impor';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const BERSAMA_AWAL = () => ({ semester: '', tahun_ajaran: tahunAjaranSekarang(), mapel: '' });
 
@@ -102,42 +104,45 @@ export default function ImporBlankoDialog({ buka, onTutup, onSukses }) {
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Satu berkas Excel (.xlsx) menjadi satu kelas baru lengkap dengan lingkup materi, TP, proyek, daftar siswa, dan
+            Satu berkas Excel (.xlsx) menjadi satu kelas baru lengkap dengan lingkup materi, TP, proyek, daftar murid, dan
             nilai yang sudah terisi. Berkas tidak pernah menimpa kelas yang sudah ada. Kolom jumlah, rata-rata, dan nilai
             rapor di blanko diabaikan karena dihitung sendiri oleh aplikasi. Bila ada satu saja sel yang salah, tidak ada
             kelas yang dibuat.
           </Typography>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-            <TextField
-              select
+            <KolomIsian
+              id="impor-semester"
+              pilih
               label="Semester"
               value={bersama.semester}
               onChange={atur('semester')}
               disabled={sibuk}
-              helperText="Berlaku untuk semua berkas"
-              fullWidth
+              bantuan="Berlaku untuk semua berkas. Bila dikosongkan, semester mengikuti isi blanko."
+              sx={{ flex: 1 }}
             >
-              <MenuItem value="">Pilih semester</MenuItem>
+              <MenuItem value="">Ikuti isi blanko</MenuItem>
               <MenuItem value="Ganjil">Ganjil</MenuItem>
               <MenuItem value="Genap">Genap</MenuItem>
-            </TextField>
-            <TextField
+            </KolomIsian>
+            <KolomIsian
+              id="impor-tahun-ajaran"
               label="Tahun ajaran"
               placeholder="2026/2027"
               value={bersama.tahun_ajaran}
               onChange={atur('tahun_ajaran')}
               disabled={sibuk}
-              fullWidth
+              sx={{ flex: 1 }}
             />
-            <TextField
+            <KolomIsian
+              id="impor-mapel"
               label="Mata pelajaran"
               placeholder="mis. Bahasa Arab"
               value={bersama.mapel}
               onChange={atur('mapel')}
               disabled={sibuk}
-              helperText="Blanko biasanya tidak mengisinya"
-              fullWidth
+              bantuan="Blanko biasanya tidak mengisinya"
+              sx={{ flex: 1 }}
             />
           </Stack>
 
@@ -187,7 +192,7 @@ export default function ImporBlankoDialog({ buka, onTutup, onSukses }) {
               Semua berkas lolos pemeriksaan. Simpan akan membuat {butir.length} kelas baru.
             </Alert>
           )}
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ flexWrap: 'wrap', gap: 1, px: 3, pb: 2, '& > :not(style) ~ :not(style)': { ml: 0 } }}>

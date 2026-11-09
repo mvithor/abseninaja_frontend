@@ -121,7 +121,7 @@ test('barisRemedial: urut siswa, TP, lalu urutan remedial; hanya remedial terbar
 test('barisRemedial: siswa atau TP yang tidak dikenal tetap tampil di akhir, tidak melempar galat', () => {
   const baris = barisRemedial({ remedial: [{ id: 9, siswa_id: 99, tp_id: 999, urutan: 1, nilai_awal: 1, nilai_remedial: 2, tanggal: '2026-10-01' }], siswa: SISWA, lm: LM });
   assert.equal(baris.length, 1);
-  assert.equal(baris[0].nama, 'Siswa 99');
+  assert.equal(baris[0].nama, 'Murid 99');
   assert.equal(baris[0].labelTp, 'TP 999');
   assert.deepEqual(barisRemedial({ remedial: undefined, siswa: SISWA, lm: LM }), []);
 });

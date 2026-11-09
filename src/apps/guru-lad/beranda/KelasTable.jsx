@@ -25,7 +25,7 @@ import {
 import { ringkasAmbang } from '../rentang';
 import { polaMuncul } from './hapusKelas';
 
-// Ukuran huruf tabel mengikuti perubahan Anda: isi 1rem agar mudah dibaca. Angka perhatian dibesarkan.
+// Ukuran huruf tabel mengikuti permintaan perubahan: isi 1rem agar mudah dibaca. Angka perhatian dibesarkan.
 
 const PILIHAN_BARIS = [5, 10, 25];
 const BARIS_AWAL = 5;
@@ -85,7 +85,7 @@ function SelPerhatian({ k, w }) {
         <Typography component="span" sx={{ fontSize: '1.5rem', fontWeight: 600, lineHeight: 1.2 }}>{kartu.perhatian}</Typography>
         <Typography component="span" sx={{ fontSize: 13, color: w.sekunder }}>{`${persen}% dari kelas`}</Typography>
       </Box>
-      <BatangTipis persen={persen} label={`Siswa perlu perhatian di ${k.nama_kelas}`} />
+      <BatangTipis persen={persen} label={`Murid perlu perhatian di ${k.nama_kelas}`} />
     </Box>
   );
 }
@@ -250,7 +250,7 @@ const KelasTable = ({
             <TableRow>
               <TableCell><Judul>No</Judul></TableCell>
               <TableCell><Judul>Kelas</Judul></TableCell>
-              <TableCell align="center"><Judul>Siswa</Judul></TableCell>
+              <TableCell align="center"><Judul>Murid</Judul></TableCell>
               <TableCell sx={{ minWidth: 150 }}><Judul>Perlu perhatian</Judul></TableCell>
               <TableCell sx={{ minWidth: 190 }}><Judul>Pola yang muncul</Judul></TableCell>
               <TableCell align="center"><Judul>Pengayaan</Judul></TableCell>
@@ -319,7 +319,7 @@ const KelasTable = ({
             >
               <Box>
                 <Typography sx={{ fontSize: '1.125rem', fontWeight: 700 }}>{k.nama_kelas}</Typography>
-                <Typography sx={{ fontSize: 14, color: w.sekunder }}>{`${k.mapel} · ${semesterKelas(k)} · ${k.jumlah_siswa} siswa`}</Typography>
+                <Typography sx={{ fontSize: 14, color: w.sekunder }}>{`${k.mapel} · ${semesterKelas(k)} · ${k.jumlah_siswa} murid`}</Typography>
               </Box>
               {ada ? (
                 <>

@@ -82,7 +82,7 @@ test('barisGalat dan ringkasHasilSimpan', () => {
   assert.equal(barisGalat({ sel: null, pesan: 'Kelas sudah ada' }), 'Kelas sudah ada');
   assert.equal(
     ringkasHasilSimpan({ kelas: [{ jumlah_siswa: 42, jumlah_nilai: 7 }, { jumlah_siswa: 30, jumlah_nilai: 0 }] }),
-    '2 kelas dibuat: 72 siswa dan 7 nilai tersimpan.',
+    '2 kelas dibuat: 72 murid dan 7 nilai tersimpan.',
   );
   assert.equal(ringkasHasilSimpan({ kelas: [] }), '');
 });

@@ -65,8 +65,8 @@ export default function RingkasanPanel({
   }
   if (kartu.jumlah_siswa === 0 && data.galat.length === 0) {
     return (
-      <Alert severity="info" action={<Button color="inherit" onClick={() => onPindah('siswa')}>Isi siswa</Button>}>
-        Kelas ini belum memiliki siswa, jadi belum ada yang dapat diringkas.
+      <Alert severity="info" action={<Button color="inherit" onClick={() => onPindah('siswa')}>Isi murid</Button>}>
+        Kelas ini belum memiliki murid, jadi belum ada yang dapat diringkas.
       </Alert>
     );
   }
@@ -75,7 +75,7 @@ export default function RingkasanPanel({
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 2, md: 2.5 } }}>
       {data.galat.length > 0 && (
         <Alert severity="warning">
-          {`${data.galat.length} siswa tidak dapat dievaluasi karena datanya bermasalah. Mereka tidak berarti aman: `}
+          {`${data.galat.length} murid tidak dapat dievaluasi karena datanya bermasalah. Mereka tidak berarti aman: `}
           {data.galat.slice(0, 5).map((g) => g.nama ?? `ID ${g.siswa_id}`).join(', ')}
           {data.galat.length > 5 ? ', dan lainnya.' : '.'}
         </Alert>
@@ -107,7 +107,7 @@ export default function RingkasanPanel({
       </Box>
 
       <Typography sx={{ fontSize: 13, color: w.sekunder, borderTop: `1px solid ${w.garis}`, borderRadius: 0, pt: 1.75, lineHeight: '20px' }}>
-        {`Dihitung dengan aturan versi ${data.aturan_versi} memakai batas nilai yang Anda tetapkan di tab Struktur. Satu siswa dihitung sekali pada kartu Perlu perhatian, menurut pola utamanya. Gambar hanya penegas: semua angka tertulis dan bisa dicetak hitam-putih.`}
+        {`Dihitung dengan aturan versi ${data.aturan_versi} memakai batas nilai yang ditetapkan di tab Struktur. Satu murid dihitung sekali pada kartu Perlu perhatian, menurut pola utamanya. Gambar hanya penegas: semua angka tertulis dan bisa dicetak hitam-putih.`}
       </Typography>
     </Box>
   );

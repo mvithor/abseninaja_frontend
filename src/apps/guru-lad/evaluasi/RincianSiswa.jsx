@@ -117,7 +117,7 @@ BagianP2.propTypes = { b: PropTypes.object.isRequired, siswaId: PropTypes.number
 function TabelP4({ deret }) {
   const adaKelas = deret.some((d) => d.kelas !== null);
   return (
-    <Table size="small" aria-label="Nilai rata-rata per LM, siswa dan kelas">
+    <Table size="small" aria-label="Nilai rata-rata per LM, murid dan kelas">
       <TableHead>
         <TableRow>
           <TableCell><span aria-hidden="true">&nbsp;</span></TableCell>
@@ -126,7 +126,7 @@ function TabelP4({ deret }) {
       </TableHead>
       <TableBody>
         <TableRow>
-          <TableCell sx={{ fontWeight: 600 }}>Siswa ini</TableCell>
+          <TableCell sx={{ fontWeight: 600 }}>Murid ini</TableCell>
           {deret.map((d, i) => (
             <TableCell key={d.lm} align="center" sx={i === deret.length - 1 ? { fontWeight: 700, color: (t) => warnaRingkasan(t).galat } : undefined}>{tampilAngka(d.siswa)}</TableCell>
           ))}
@@ -176,7 +176,7 @@ export default function RincianSiswa({ rincian, onTutup, onBukaProfil }) {
         paper: {
           id: 'panel-rincian',
           role: 'region',
-          'aria-label': rincian ? `Rincian ${rincian.nama}` : 'Rincian siswa',
+          'aria-label': rincian ? `Rincian ${rincian.nama}` : 'Rincian murid',
           onKeyDown: (e) => { if (e.key === 'Escape') { e.stopPropagation(); tutup(); } },
         },
       }}
@@ -235,8 +235,8 @@ export default function RincianSiswa({ rincian, onTutup, onBukaProfil }) {
               <>
                 <Divider />
                 <Box sx={{ p: 3 }}>
-                  <Alert severity="info" icon={false}>
-                    <Typography variant="body2" fontWeight={600} gutterBottom>Belum dapat dinilai. Ini bukan berarti siswa aman.</Typography>
+                  <Alert severity="info">
+                    <Typography variant="body2" fontWeight={600} gutterBottom>Belum dapat dinilai. Ini bukan berarti murid aman.</Typography>
                     <Kalimat baris={rincian.belumCukup.map((x) => `${x.kode} ${x.judul}: ${x.alasan || `butuh ${x.butuh}`}`)} />
                   </Alert>
                 </Box>

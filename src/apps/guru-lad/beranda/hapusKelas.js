@@ -16,7 +16,7 @@ const n = (x) => Number(x) || 0;
 export function barisIsian(isian) {
   const i = isian ?? {};
   const baris = [
-    { kunci: 'siswa', ada: n(i.siswa) > 0, teks: `${n(i.siswa)} siswa` },
+    { kunci: 'siswa', ada: n(i.siswa) > 0, teks: `${n(i.siswa)} murid` },
     { kunci: 'struktur', ada: n(i.lingkup_materi) + n(i.tp) > 0, teks: `${n(i.lingkup_materi)} lingkup materi dan ${n(i.tp)} TP` },
     { kunci: 'nilai_tp', ada: n(i.nilai_tp) > 0, teks: `${n(i.nilai_tp)} nilai TP` },
     { kunci: 'proyek', ada: n(i.proyek) + n(i.nilai_proyek) > 0, teks: `${n(i.proyek)} proyek beserta nilainya` },
