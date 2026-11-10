@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff, MailOutline, LockOutlined } from '@mui/icons
 import { setUser, clearUser } from 'src/store/apps/user/userSlice';
 import { jwtDecode } from 'jwt-decode';
 import { getDefaultPortal, normalisasiDaftarPersona } from 'src/portals/registry';
+import { PESAN_LOGIN, pesanDariGalatLogin, pesanTanpaPortal } from './pesanLogin';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     if (searchParams.get('expired')) {
-      setError('Sesi anda telah berakhir. Silakan login kembali.');
+      setError(PESAN_LOGIN.SESI_BERAKHIR);
       dispatch(clearUser());
       const timer = setTimeout(() => navigate('/login'), 5000);
       return () => clearTimeout(timer);
@@ -52,7 +53,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
     // Form memakai noValidate, jadi atribut `required` tidak dicek browser.
     // Cek di sini agar tidak mengirim request yang pasti ditolak backend.
     if (!email.trim() || !password) {
-      setError('Email dan password wajib diisi.');
+      setError(PESAN_LOGIN.WAJIB_DIISI);
       return;
     }
 
@@ -72,11 +73,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       const daftar = normalisasiDaftarPersona(daftarPersona);
       const portal = getDefaultPortal({ role, personas, isKepalaJurusan, isGuruMapel, daftarPersona: daftar });
       if (!portal) {
-        setError(
-          role === 'pegawai'
-            ? 'Akun Anda tidak memiliki akses ke dashboard ini.'
-            : 'Pengguna tidak valid.',
-        );
+        setError(pesanTanpaPortal(role));
         dispatch(clearUser());
         setIsSubmitting(false);
         return;
@@ -89,8 +86,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       setSuccess('Login berhasil! Mengarahkan...');
       setTimeout(() => navigate(portal.path), 2000);
     } catch (error) {
-      const msg = error.response?.data?.msg || 'Terjadi kesalahan. Silakan coba lagi.';
-      setError(msg);
+      setError(pesanDariGalatLogin(error));
       dispatch(clearUser());
       setIsSubmitting(false);
     }
@@ -137,7 +133,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
           name="password"
           type={showPassword ? 'text' : 'password'}
           variant="outlined"
-          placeholder="Masukkan password Anda"
+          placeholder="Masukkan password"
           fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
