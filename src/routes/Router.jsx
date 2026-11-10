@@ -47,6 +47,9 @@ const PegawaiGuruEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/
 const PegawaiStafList = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafList')));
 const PegawaiStafAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafAdd')));
 const PegawaiStafEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafEdit')));
+// Pegawai Nonaktif dan Perlu Pengganti
+const PegawaiNonaktifList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pegawai-nonaktif/PegawaiNonaktifList')));
+const PerluPenggantiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pegawai-nonaktif/PerluPenggantiList')));
 // Data Wali Siswa
 const WaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-wali-siswa/WaliSiswaList')));
 const WaliSiswaAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-wali-siswa/WaliSiswaAdd')));
@@ -322,6 +325,7 @@ const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/Admi
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
+const LadProfil = Loadable(lazy(() => import('../views/apps/guru-lad/LadProfil')));
 
 // Landing
 const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
@@ -381,6 +385,8 @@ const Router = [
                     { path: 'pegawai/guru/edit/:id', element: <PegawaiGuruEdit /> },
                     // Data Pegawai Staff
                     { path: 'pegawai/staf', element: <PegawaiStafList /> },
+                    { path: 'pegawai/nonaktif', element: <PegawaiNonaktifList /> },
+                    { path: 'pegawai/perlu-pengganti', element: <PerluPenggantiList /> },
                     { path: 'pegawai/staf/tambah-staf', element: <PegawaiStafAdd /> },
                     { path: 'pegawai/staf/edit/:id', element: <PegawaiStafEdit /> },
                     // Wali Kelas
@@ -672,6 +678,7 @@ const Router = [
                     { path: '', element: <LadBeranda /> },
                     { path: 'kelas/:kelasId', element: <LadKelas /> },
                     { path: 'kelas/:kelasId/siswa/:siswaId', element: <LadSiswa /> },
+                    { path: 'profil', element: <LadProfil /> },
                 ]
             },
             {

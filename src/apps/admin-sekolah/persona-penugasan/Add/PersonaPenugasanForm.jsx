@@ -36,7 +36,7 @@ const PersonaPenugasanForm = ({ setError }) => {
   });
 
   const { data: pegawaiOptions = [], isLoading: pegawaiMemuat } = useQuery({
-    queryKey: ['pegawaiOptions'],
+    queryKey: ['dropdownPegawai'],
     queryFn: async () => (await axiosInstance.get('/api/v1/admin-sekolah/dropdown/pegawai')).data.data,
   });
 

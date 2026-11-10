@@ -80,3 +80,18 @@ export const pesanHasilNonaktif = (respons) => {
   }
   return { galat: '', sukses: respons?.msg || 'Pegawai berhasil dinonaktifkan.' };
 };
+
+// Tempat mengganti tanggung jawab pegawai nonaktif (halaman Perlu Pengganti). Hanya yang perlu pengganti.
+const TUJUAN_PENGGANTI = [
+  ['guru_mapel', 'Guru mata pelajaran', '/dashboard/admin-sekolah/guru-mapel'],
+  ['jadwal', 'Jadwal pelajaran', '/dashboard/admin-sekolah/jadwal-mapel'],
+  ['wali_kelas', 'Wali kelas', '/dashboard/admin-sekolah/wali-kelas'],
+  ['ekskul', 'Ekstrakurikuler', '/dashboard/admin-sekolah/ekskul'],
+  ['kepala_jurusan', 'Kepala jurusan', '/dashboard/admin-sekolah/jurusan'],
+];
+
+/** [{ kunci, label, jumlah, href }] untuk tanggung jawab yang masih > 0 dan perlu diganti. */
+export const butirPengganti = (tj) =>
+  TUJUAN_PENGGANTI
+    .map(([kunci, label, href]) => ({ kunci, label, href, jumlah: Number(tj?.[kunci]) || 0 }))
+    .filter((b) => b.jumlah > 0);

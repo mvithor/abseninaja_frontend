@@ -15,7 +15,7 @@ const GuruMapelEditForm = ({
     isLoading
 }) => {
     const { data: pegawaiOptions = [], isLoading: isPegawaiLoading } = useQuery({
-        queryKey: ["pegawaiOptions"],
+        queryKey: ["dropdownGuru"],
         queryFn: async () => {
             const response = await axiosInstance.get('/api/v1/admin-sekolah/dropdown/guru');
             return response.data.data;

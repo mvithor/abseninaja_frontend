@@ -18,6 +18,8 @@ import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import PegawaiGuruTable from "src/apps/admin-sekolah/data-guru/List/PegawaiGuruTable";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DialogNonaktif from 'src/apps/pegawai-status/DialogNonaktif';
+import useNonaktifkanPegawai from 'src/apps/pegawai-status/useNonaktifkanPegawai';
 import axiosInstance from "src/utils/axiosInstance";
 
 const fetchPegawaiGuru = async () => {
@@ -45,6 +47,18 @@ const PegawaiGuruList = () => {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Nonaktifkan = mekanisme umum semua pegawai: alasan wajib, riwayat tersimpan, dan akun bisa diaktifkan kembali.
+  const nonaktif = useNonaktifkanPegawai({
+    onHasil: ({ sukses, galat }) => {
+      setSuccess(sukses);
+      setError(galat);
+      setTimeout(() => {
+        setSuccess('');
+        setError('');
+      }, galat ? 10000 : 4000);
+    },
+  });
 
   const { data: guru = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['pegawaiGuru'],
@@ -173,6 +187,7 @@ const PegawaiGuruList = () => {
           handleChangeRowsPerPage={handleRowsPerPageChange}
           handleEdit={handleEdit}
           handleDelete={handleOpenConfirmDialog}
+          handleNonaktifkan={nonaktif.buka}
           isLoading={isLoading}
           isError={isError}
           errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"}
@@ -214,6 +229,7 @@ const PegawaiGuruList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <DialogNonaktif {...nonaktif.dialog} />
     </PageContainer>
   );
 };

@@ -1,4 +1,4 @@
-import { IconChartBar } from '@tabler/icons-react';
+import { IconChartBar, IconId } from '@tabler/icons-react';
 import { uniqueId } from 'lodash';
 
 // Menu Dashboard Analitik Pembelajaran (LAD). Akses akhirnya diputuskan server (fitur sekolah aktif DAN akun terdaftar
@@ -17,6 +17,12 @@ const MenuitemsGuruLad = [
     icon: IconChartBar,
     href: '/dashboard/guru-lad',
     chipColor: 'secondary',
+  },
+  {
+    id: uniqueId(),
+    title: 'Profil Laporan',
+    icon: IconId,
+    href: '/dashboard/guru-lad/profil',
   },
 ];
 

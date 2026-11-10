@@ -19,7 +19,7 @@ const TambahWaliKelasForm = ({ setSuccess, setError }) => {
 
     // Fetch pegawai
     const { data: pegawaiOptions = [], isError: pegawaiError } = useQuery({
-        queryKey: ["pegawaiOptions"],
+        queryKey: ["dropdownGuru"],
         queryFn: async () => {
             const response = await axiosInstance.get('/api/v1/admin-sekolah/dropdown/guru');
             return response.data.data;

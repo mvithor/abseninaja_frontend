@@ -70,7 +70,7 @@ const KategoriPegawaiList = () => {
             setError(errorMsg);
         }
         setSuccess('');
-        setTimeout(() => setError(''), 3000); 
+        setTimeout(() => setError(''), 6000); 
     }
   });
 

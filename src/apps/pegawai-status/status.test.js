@@ -65,3 +65,12 @@ test('metaStatusPegawai', () => {
   assert.equal(metaStatusPegawai('aktif').label, 'Aktif');
   assert.equal(metaStatusPegawai(undefined).label, 'Aktif');
 });
+
+test('butirPengganti: hanya yang perlu diganti dan > 0, dengan tujuan halaman', async () => {
+  const { butirPengganti } = await import('./status.js');
+  assert.deepEqual(butirPengganti(null), []);
+  assert.deepEqual(butirPengganti({ penugasan_peran: 3, kelas_lad: 2 }), []);
+  const butir = butirPengganti({ guru_mapel: 2, jadwal: 0, wali_kelas: 1, kelas_lad: 5 });
+  assert.deepEqual(butir.map((b) => [b.kunci, b.jumlah]), [['guru_mapel', 2], ['wali_kelas', 1]]);
+  assert.ok(butir.every((b) => b.href.startsWith('/dashboard/admin-sekolah/')));
+});

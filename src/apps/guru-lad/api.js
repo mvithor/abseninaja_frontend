@@ -11,6 +11,7 @@ const ambil = async (promise) => (await promise).data;
 
 export const kunciLad = {
   akses: ['lad', 'akses'],
+  profil: ['lad', 'profil'],
   daftarKelas: ['lad', 'kelas'],
   masukan: (kelasId) => ['lad', 'kelas', kelasId, 'masukan'],
   // Berawalan sama dengan daftarKelas, jadi setiap invalidasi daftarKelas ikut menyegarkan evaluasi.
@@ -26,6 +27,10 @@ export const kunciLad = {
 
 /** Probe akses: 200 bila fitur aktif dan akun terdaftar sebagai guru LAD, 403 bila tidak. */
 export const cekAkses = () => ambil(axiosInstance.get(`${DASAR}/ping`));
+
+// Profil laporan: NIP guru, nama dan NIP kepala sekolah (opsional, diisi guru). Respons: { profil, laporan, sumber }.
+export const bacaProfil = () => ambil(axiosInstance.get(`${DASAR}/profil`));
+export const ubahProfil = (badan) => ambil(axiosInstance.put(`${DASAR}/profil`, badan));
 
 export const daftarKelas = () => ambil(axiosInstance.get(`${DASAR}/kelas`));
 export const buatKelas = (badan) => ambil(axiosInstance.post(`${DASAR}/kelas`, badan));

@@ -5,7 +5,7 @@ import {
     IconChartBar, IconUser, IconBuildingArch, IconBooks, IconCategory2, IconCalendar, 
     IconBell, IconCoin, IconCreditCard, IconPoint, IconClipboardText, IconMessage,IconKey, 
     IconTemplate, IconBroadcast, IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, 
-    IconLicense, IconUsersGroup, IconDatabase, IconActivity, IconFileDownload, IconCalendarClock
+    IconLicense, IconUsersGroup, IconDatabase, IconActivity, IconFileDownload, IconCalendarClock, IconUserOff
   } from '@tabler/icons-react';
   
   import { uniqueId } from 'lodash';
@@ -126,6 +126,18 @@ import {
                 title: 'Data Staff',
                 icon: IconDatabase,
                 href: '/dashboard/admin-sekolah/pegawai/staf',
+            },
+            {
+                id: uniqueId(),
+                title: 'Pegawai Nonaktif',
+                icon: IconUserOff,
+                href: '/dashboard/admin-sekolah/pegawai/nonaktif',
+            },
+            {
+                id: uniqueId(),
+                title: 'Perlu Pengganti',
+                icon: IconUserOff,
+                href: '/dashboard/admin-sekolah/pegawai/perlu-pengganti',
             },
             {
                 id: uniqueId(),
