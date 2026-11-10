@@ -26,6 +26,7 @@ import {
   idKronologis, perluUrutKronologis, kelompokLm,
 } from './kehadiran';
 import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
+import { KEPASTIAN, kepastianSimpan, pesanSimpanGagal } from '../kepastian';
 
 // Tambahan gaya khusus tab ini di atas gayaGrid, mengikuti desain: huruf di tengah sel, latar sel menurut status
 // (huruf tetap tampil, jadi status tidak hanya lewat warna), kolom rekap H S I A, dan baris judul grup lingkup materi.
@@ -200,7 +201,9 @@ export default function KehadiranPanel({
         if (c) peta[kunciSel(c.siswa_id, error.pertemuanGagal)] = g.pesan;
       });
       setGalatServer(peta);
-      setPesan({ jenis: 'error', teks: pesanGalat(error, 'Kehadiran belum tersimpan. Coba lagi.') });
+      setPesan(pesanSimpanGagal(error, { teksPasti: pesanGalat(error, 'Kehadiran belum tersimpan. Coba lagi.'), objek: 'kehadiran' }));
+      // Belum pasti tersimpan: muat ulang dari server supaya tampilan mengikuti yang sebenarnya tersimpan.
+      if (kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onBerubah();
     } finally {
       setSibuk(false);
     }

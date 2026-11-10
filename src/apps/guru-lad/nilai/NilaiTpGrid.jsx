@@ -18,6 +18,7 @@ import { gayaKartu, warnaRingkasan } from '../ringkasan/gayaRingkasan';
 import { gayaGrid } from './gayaGrid';
 import { cariTpId, labelTpRingkas, legendaSebaran } from '../ringkasan/ringkasan';
 import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
+import { KEPASTIAN, kepastianSimpan, pesanSimpanGagal } from '../kepastian';
 
 const kunci = (siswaId, tpId) => `${siswaId}:${tpId}`;
 const potongJudul = (teks) => (teks.length > 28 ? `${teks.slice(0, 27)}…` : teks);
@@ -153,7 +154,9 @@ export default function NilaiTpGrid({
         if (s) peta[kunci(s.siswa_id, s.tp_id)] = g.pesan;
       });
       setGalatServer(peta);
-      setPesan({ jenis: 'error', teks: pesanGalat(error, 'Nilai belum tersimpan. Coba lagi.') });
+      setPesan(pesanSimpanGagal(error, { teksPasti: pesanGalat(error, 'Nilai belum tersimpan. Coba lagi.'), objek: 'nilai' }));
+      // Belum pasti tersimpan: muat ulang dari server supaya tampilan mengikuti yang sebenarnya tersimpan.
+      if (kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onTersimpan();
     } finally {
       setSibuk(false);
     }
