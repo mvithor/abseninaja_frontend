@@ -203,7 +203,7 @@ export default function KehadiranPanel({
       setGalatServer(peta);
       setPesan(pesanSimpanGagal(error, { teksPasti: pesanGalat(error, 'Kehadiran belum tersimpan. Coba lagi.'), objek: 'kehadiran' }));
       // Belum pasti tersimpan: muat ulang dari server supaya tampilan mengikuti yang sebenarnya tersimpan.
-      if (kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onBerubah();
+      if (sudah.size === 0 && kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onBerubah();
     } finally {
       setSibuk(false);
     }

@@ -156,7 +156,7 @@ export default function NilaiTpGrid({
       setGalatServer(peta);
       setPesan(pesanSimpanGagal(error, { teksPasti: pesanGalat(error, 'Nilai belum tersimpan. Coba lagi.'), objek: 'nilai' }));
       // Belum pasti tersimpan: muat ulang dari server supaya tampilan mengikuti yang sebenarnya tersimpan.
-      if (kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onTersimpan();
+      if (sudah.size === 0 && kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onTersimpan();
     } finally {
       setSibuk(false);
     }
