@@ -16,6 +16,7 @@ import MenuitemsWakaKurikulum from './MenuItemsWakaKurikulum';
 import MenuitemsGuruBk from './MenuItemsGuruBk';
 import MenuitemsAdminKantin from './MenuItemsAdminKantin';
 import useAksesLad from 'src/apps/guru-lad/useAksesLad';
+import { gabungMenuLad } from './menuLad';
 import NavItem from './NavItem';
 import NavCollapse from './NavCollapse';
 import NavGroup from './NavGroup/NavGroup';
@@ -27,6 +28,7 @@ const MENU_BY_PORTAL = {
   'admin-sekolah': MenuitemsAdminSekolah,
   'kepala-jurusan': MenuitemsKepalaJurusan,
   'guru': MenuitemsGuruSekolah,
+  'guru-lad': MenuitemsGuruLad,
   'admin-mitra-industri': MenuitemsAdminMitraIndustri,
   'kepala-sekolah': MenuitemsKepalaSekolah,
   'waka-kurikulum': MenuitemsWakaKurikulum,
@@ -69,10 +71,12 @@ const SidebarItems = () => {
     return menu;
   });
 
-  // Menu LAD tidak berasal dari registri portal: aksesnya diputuskan server (fitur sekolah dan
-  // pendaftaran guru LAD), jadi tampil hanya bila probe berhasil.
+  // Menu LAD sekarang berasal dari portal `guru-lad` bila persona guru_lad sudah dikenal sesi ini. Untuk sesi yang
+  // belum membawa persona itu (mis. daftar persona dari server belum menyegarkan), probe /lad/ping tetap menambahkan
+  // menu LAD seperti dulu, tetapi tidak pernah dobel dengan menu dari portal.
   const { boleh: bolehLad } = useAksesLad();
-  const menuItems = bolehLad ? [...menuPortal, ...MenuitemsGuruLad] : menuPortal;
+  const adaPortalLad = getUserPortals(user).some((portal) => portal.key === 'guru-lad');
+  const menuItems = gabungMenuLad(menuPortal, MenuitemsGuruLad, { bolehLad, adaPortalLad });
 
   return (
     <Box sx={{ px: 3 }}>

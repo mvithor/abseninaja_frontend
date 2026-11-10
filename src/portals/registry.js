@@ -19,6 +19,7 @@ export const PERSONA = Object.freeze({
   KEPALA_SEKOLAH: 'kepala_sekolah',
   WAKA_KURIKULUM: 'waka_kurikulum',
   GURU_BK: 'guru_bk',
+  GURU_LAD: 'guru_lad',
 });
 
 // Sesi lama (token terbit sebelum klaim `personas` ada) hanya membawa boolean.
@@ -112,6 +113,17 @@ export const PORTALS = [
     path: '/dashboard/guru-sekolah',
     priority: 70,
     isAllowed: isPegawaiDengan(PERSONA.GURU_MAPEL),
+  },
+  {
+    // Guru yang memakai Analitik Pembelajaran (LAD). BE menghitung persona ini dari fitur sekolah dan baris lad_guru
+    // yang aktif (guru_lad). Prioritas di bawah guru mata pelajaran: guru yang merangkap tetap mendarat di
+    // dashboard Guru, sedangkan guru yang hanya memakai LAD (mis. sekolah standalone) mendarat di LAD, bukan
+    // ditolak. Akses akhir tetap diputuskan server di setiap permintaan.
+    key: 'guru-lad',
+    label: 'Analitik Pembelajaran',
+    path: '/dashboard/guru-lad',
+    priority: 65,
+    isAllowed: isPegawaiDengan(PERSONA.GURU_LAD),
   },
   {
     key: 'admin-mitra-industri',
