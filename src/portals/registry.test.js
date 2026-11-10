@@ -9,6 +9,7 @@ import {
   getDefaultPortal,
   canAccessPortal,
   tujuanSaatDitolak,
+  PERAN_GURU_LAD,
 } from './registry.js';
 
 const daftar = (...kode) => kode.map((k) => ({ kode: k, label: k, portal: null, tahun_ajaran_id: null }));
@@ -180,4 +181,16 @@ test('guru LAD yang dinonaktifkan (persona hilang dari daftar server) tidak puny
 test('guru LAD yang masih punya portal lain diarahkan ke portal itu saat LAD ditolak', () => {
   const masihGuru = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) });
   assert.equal(tujuanSaatDitolak(masihGuru, '/dashboard/guru-lad'), '/dashboard/guru-sekolah');
+});
+
+test('guru mandiri: hanya portal guru-lad, dan hanya bila persona guru_lad ada', () => {
+  const mandiri = (extra = {}) => ({ role: 'guru mandiri', ...extra });
+  assert.deepEqual(PERAN_GURU_LAD, ['pegawai', 'guru mandiri']);
+  assert.deepEqual(keys(mandiri({ daftarPersona: daftar(PERSONA.GURU_LAD) })), ['guru-lad']);
+  assert.equal(getDefaultPortal(mandiri({ daftarPersona: daftar(PERSONA.GURU_LAD) })).path, '/dashboard/guru-lad');
+  assert.deepEqual(keys(mandiri({ personas: [PERSONA.GURU_LAD] })), ['guru-lad']);
+  // tanpa persona (dibekukan) tidak punya portal; persona lain tidak membuka portal lain bagi peran ini
+  assert.equal(getDefaultPortal(mandiri({ daftarPersona: [] })), null);
+  assert.deepEqual(keys(mandiri({ daftarPersona: daftar(PERSONA.GURU_MAPEL, PERSONA.KEPALA_SEKOLAH) })), []);
+  assert.equal(tujuanSaatDitolak(mandiri({ daftarPersona: [] }), '/dashboard/guru-lad'), '/forbidden');
 });

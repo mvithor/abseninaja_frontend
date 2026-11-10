@@ -13,10 +13,25 @@ export const PESAN_LOGIN = Object.freeze({
   AKUN_BELUM_AKTIVASI: 'Akun belum diaktivasi. Gunakan tautan aktivasi yang diberikan admin.',
   AKUN_NONAKTIF: 'Akun ini dinonaktifkan. Hubungi admin sekolah bila Bapak/Ibu seharusnya masih memiliki akses.',
   TANPA_AKSES: 'Akun ini belum memiliki akses ke dashboard. Hubungi admin sekolah bila Bapak/Ibu seharusnya memiliki akses.',
+  // Guru mandiri tidak punya admin sekolah: yang mengelola akunnya adalah pengelola layanan.
+  TANPA_AKSES_MANDIRI: 'Akun ini belum memiliki akses ke Analitik Pembelajaran. Hubungi pengelola layanan bila Bapak/Ibu seharusnya memiliki akses.',
+  // Server menjawab WAJIB_GANTI_SANDI tanpa tiket (tidak seharusnya terjadi): minta masuk ulang.
+  WAJIB_GANTI_SANDI: 'Sandi awal harus diganti sebelum masuk. Silakan coba masuk lagi.',
 });
 
-/** Pesan untuk akun pegawai yang token-nya terbit tetapi tidak punya portal (sisi klien). */
-export const pesanTanpaPortal = (role) => (role === 'pegawai' ? PESAN_LOGIN.TANPA_AKSES : PESAN_LOGIN.PENGGUNA_TIDAK_VALID);
+/** Pesan untuk akun pegawai atau guru mandiri yang token-nya terbit tetapi tidak punya portal (sisi klien). */
+export const pesanTanpaPortal = (role) => {
+  if (role === 'pegawai') return PESAN_LOGIN.TANPA_AKSES;
+  if (role === 'guru mandiri') return PESAN_LOGIN.TANPA_AKSES_MANDIRI;
+  return PESAN_LOGIN.PENGGUNA_TIDAK_VALID;
+};
+
+/** Login ditahan karena sandi awal belum diganti: server mengirim tiket sekali pakai untuk form ganti sandi. */
+export const tiketGantiSandiDariGalat = (error) => {
+  const data = error?.response?.data;
+  if (error?.response?.status !== 403 || data?.kode !== 'WAJIB_GANTI_SANDI') return null;
+  return typeof data.tiket === 'string' && data.tiket ? data.tiket : null;
+};
 
 /**
  * Pesan dari galat axios saat login. Kode yang dikenal dipetakan ke kalimat di atas. Kode tidak dikenal atau

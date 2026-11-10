@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
+import { PERAN_GURU_LAD } from "src/portals/registry";
 
 // Layout
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -20,6 +21,9 @@ const AdminSekolahAdd = Loadable(lazy(() => import('../views/apps/super-admin/ad
 // Fitur Tambahan Sekolah
 const FiturTambahanSekolahList = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanSekolahList')));
 const FiturTambahanSekolahEdit = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanEdit')));
+// Guru Mandiri (LAD standalone)
+const GuruMandiriList = Loadable(lazy(() => import('../views/apps/super-admin/guru-mandiri/GuruMandiriList')));
+const GuruMandiriAdd = Loadable(lazy(() => import('../views/apps/super-admin/guru-mandiri/GuruMandiriAdd')));
 
 
 
@@ -324,6 +328,8 @@ const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
 
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
+// Halaman akun: semua peran yang sudah masuk
+const GantiPassword = Loadable(lazy(() => import('../views/apps/akun/GantiPassword')));
 const Activation = Loadable(lazy(() => import('../views/authentication/auth/Activation')));
 const PrivacyPolicy = Loadable(lazy(() => import('../views/privacy-policy/PrivacyPolicy')));
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
@@ -347,6 +353,14 @@ const Router = [
         path: '/',
         element: <FullLayout/>,
         children: [
+            {
+                // Tanpa allowedRoles: ProtectedRoute hanya memastikan sesi masih berlaku.
+                path: 'akun',
+                element: <ProtectedRoute />,
+                children: [
+                    { path: 'ganti-password', element: <GantiPassword /> },
+                ]
+            },
             {
                 path: 'dashboard/admin-sekolah',
                 element: <ProtectedRoute allowedRoles={['admin sekolah']}/>,
@@ -600,6 +614,9 @@ const Router = [
                     // Fitur Tambahan Sekolah
                     { path: 'fitur-tambahan', element: <FiturTambahanSekolahList /> },
                     { path: 'fitur-tambahan/edit/:id', element: <FiturTambahanSekolahEdit /> },
+                    // Guru Mandiri
+                    { path: 'guru-mandiri', element: <GuruMandiriList /> },
+                    { path: 'guru-mandiri/tambah', element: <GuruMandiriAdd /> },
                 ]
         
               },
@@ -650,7 +667,7 @@ const Router = [
             {
                 // LAD: akses akhir diputuskan server (fitur sekolah + guru terdaftar); halaman menangani 403.
                 path: 'dashboard/guru-lad',
-                element: <ProtectedRoute allowedRoles={['pegawai']} />,
+                element: <ProtectedRoute allowedRoles={PERAN_GURU_LAD} />,
                 children: [
                     { path: '', element: <LadBeranda /> },
                     { path: 'kelas/:kelasId', element: <LadKelas /> },

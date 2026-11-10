@@ -57,6 +57,11 @@ export const hasPersona = (user, persona) => {
 const isPegawaiDengan = (persona) => (user) =>
   user?.role === 'pegawai' && hasPersona(user, persona);
 
+// Peran yang boleh memegang persona guru LAD: pegawai sekolah (terintegrasi) dan guru mandiri (tanpa sekolah Absenin).
+// Guru mandiri HANYA punya persona ini, jadi tidak ada portal lain yang cocok untuknya.
+export const PERAN_GURU_LAD = Object.freeze(['pegawai', 'guru mandiri']);
+const isGuruLad = (user) => PERAN_GURU_LAD.includes(user?.role) && hasPersona(user, PERSONA.GURU_LAD);
+
 // priority: semakin besar semakin diutamakan sebagai tujuan awal setelah login.
 // Hanya menentukan halaman pertama dan urutan grup menu; BUKAN pagar akses.
 // Aturan urutan: peran yang lebih berwenang atau lebih khusus mengalahkan yang umum.
@@ -123,7 +128,7 @@ export const PORTALS = [
     label: 'Analitik Pembelajaran',
     path: '/dashboard/guru-lad',
     priority: 65,
-    isAllowed: isPegawaiDengan(PERSONA.GURU_LAD),
+    isAllowed: isGuruLad,
   },
   {
     key: 'admin-mitra-industri',

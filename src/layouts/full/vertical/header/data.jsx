@@ -61,11 +61,12 @@ const notifications = [
   // Profile dropdown
   //
   
+  // Hanya tautan yang benar-benar ada rutenya. "My Profile" (/dashboard/admin/account-settings) tidak punya halaman.
   const profileAdmin = [
     {
-      href: '/dashboard/admin/account-settings',
-      title: 'My Profile',
-      subtitle: 'Account Settings',
+      href: '/akun/ganti-password',
+      title: 'Ganti Password',
+      subtitle: 'Ubah password akun',
       icon: icon1,
     },
   ]
