@@ -14,6 +14,8 @@ import { pesanHasilNonaktif } from './status';
  */
 export default function useNonaktifkanPegawai({ onHasil }) {
   const [target, setTarget] = useState(null);
+  // Galat nonaktifkan tampil DI DALAM dialog: dialog tetap terbuka supaya alasan dan catatan yang sudah diketik tidak hilang.
+  const [galat, setGalat] = useState('');
   const queryClient = useQueryClient();
 
   const tanggungJawab = useQuery({
@@ -29,17 +31,18 @@ export default function useNonaktifkanPegawai({ onHasil }) {
   const mutation = useMutation({
     mutationFn: async (badan) => (await axiosInstance.post(urlPegawai(target.id, 'nonaktifkan'), badan)).data,
     onSuccess: (respons) => {
+      setGalat('');
       KUNCI_TERDAMPAK.forEach((kunci) => queryClient.invalidateQueries({ queryKey: [kunci] }));
       setTarget(null);
       onHasil(pesanHasilNonaktif(respons));
     },
-    onError: (err) => {
-      setTarget(null);
-      onHasil({ sukses: '', galat: pesanGalat(err, 'Terjadi kesalahan saat menonaktifkan pegawai.') });
-    },
+    onError: (err) => setGalat(pesanGalat(err, 'Terjadi kesalahan saat menonaktifkan pegawai.')),
   });
 
-  const buka = useCallback((id, nama) => setTarget({ id, nama }), []);
+  const buka = useCallback((id, nama) => {
+    setGalat('');
+    setTarget({ id, nama });
+  }, []);
   const tutup = useCallback(() => setTarget(null), []);
 
   return {
@@ -51,6 +54,7 @@ export default function useNonaktifkanPegawai({ onHasil }) {
       memuatTanggungJawab: tanggungJawab.isFetching,
       galatTanggungJawab: tanggungJawab.isError,
       sibuk: mutation.isPending,
+      galatServer: galat,
       onKonfirmasi: (badan) => mutation.mutate(badan),
       onTutup: tutup,
     },

@@ -8,7 +8,7 @@ import { IconCheck, IconCopy } from '@tabler/icons-react';
  * menampilkannya lagi (hanya reset yang membuat sandi baru). Dialog tidak bisa ditutup dengan klik di luar atau Esc,
  * supaya sandi tidak hilang tanpa sengaja; hanya tombol "Sudah disalin" yang menutupnya.
  */
-const SandiAwalDialog = ({ buka, nama, email, sandi, judul = 'Sandi Awal Guru Mandiri', onTutup }) => {
+const SandiAwalDialog = ({ buka, nama, email, sandi, judul = 'Sandi Awal Guru Mandiri', peringatan = '', onTutup }) => {
   const [tersalin, setTersalin] = useState(false);
   const [galatSalin, setGalatSalin] = useState(false);
   const timer = useRef(null);
@@ -35,13 +35,14 @@ const SandiAwalDialog = ({ buka, nama, email, sandi, judul = 'Sandi Awal Guru Ma
   };
 
   return (
-    <Dialog open={buka} onClose={(_, alasan) => { if (alasan !== 'backdropClick' && alasan !== 'escapeKeyDown') onTutup(); }} maxWidth="sm" fullWidth>
+    <Dialog open={buka} onClose={(_, alasan) => { if (alasan !== 'backdropClick' && alasan !== 'escapeKeyDown') onTutup(); }} maxWidth="sm" fullWidth aria-labelledby="judul-sandi-awal">
       <DialogContent>
-        <Typography variant="h5" align="center" sx={{ mt: 2, mb: 1 }}>{judul}</Typography>
+        <Typography id="judul-sandi-awal" variant="h5" align="center" sx={{ mt: 2, mb: 1 }}>{judul}</Typography>
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
           {nama ? `${nama}${email ? ` (${email})` : ''}` : email}
         </Typography>
 
+        {peringatan && <Alert severity="error" sx={{ mb: 2 }}>{peringatan}</Alert>}
         <Alert severity="warning" sx={{ mb: 2 }}>
           Sandi ini hanya tampil sekali. Salin dan berikan kepada guru. Guru wajib menggantinya saat masuk pertama.
         </Alert>
@@ -55,7 +56,6 @@ const SandiAwalDialog = ({ buka, nama, email, sandi, judul = 'Sandi Awal Guru Ma
           {/* user-select: all supaya satu klik memilih seluruh sandi bila tombol salin tidak berfungsi */}
           <Typography
             component="code"
-            aria-label="Sandi awal"
             sx={{ fontFamily: 'monospace', fontSize: '1.25rem', letterSpacing: 1, userSelect: 'all', wordBreak: 'break-all' }}
           >
             {sandi}
@@ -87,6 +87,7 @@ SandiAwalDialog.propTypes = {
   email: PropTypes.string,
   sandi: PropTypes.string,
   judul: PropTypes.string,
+  peringatan: PropTypes.string,
   onTutup: PropTypes.func.isRequired,
 };
 

@@ -3,9 +3,9 @@ import { Button, CircularProgress, Dialog, DialogActions, DialogContent, Typogra
 
 // Dialog konfirmasi seragam dengan dialog Nonaktifkan/Hapus yang sudah ada di aplikasi (judul tengah, tombol oranye).
 const DialogKonfirmasi = ({ buka, judul, isi, tombol, sibuk = false, onKonfirmasi, onTutup }) => (
-  <Dialog open={buka} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth>
+  <Dialog open={buka} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth aria-labelledby="judul-konfirmasi">
     <DialogContent>
-      <Typography variant="h5" align="center" sx={{ mt: 2, mb: 2 }}>
+      <Typography id="judul-konfirmasi" variant="h5" align="center" sx={{ mt: 2, mb: 2 }}>
         {judul}
       </Typography>
       <Typography variant="body2" color="text.secondary" align="center">

@@ -1,8 +1,9 @@
 import { useCallback, useState } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Alert, Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useMutation } from '@tanstack/react-query';
 import Alerts from 'src/components/alerts/Alerts';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import SubmitButton from 'src/components/button-group/SubmitButton';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
@@ -19,19 +20,24 @@ const KOSONG = { sandiLama: '', sandiBaru: '', konfirmasi: '' };
 // perangkat lain dan mempertahankan sesi ini.
 const GantiPassword = () => {
   const [form, setForm] = useState(KOSONG);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [error, setError, kunciError] = usePesanAlert();
+  const [success, setSuccess, kunciSukses] = usePesanAlert();
+  // Sandi sudah diganti tetapi sesi di perangkat lain gagal dikeluarkan: peringatan keamanan, tidak hilang sendiri.
+  const [peringatan, setPeringatan] = useState('');
 
   const mutation = useMutation({
+    // gcTime 0: sandi lama dan baru tidak boleh tertinggal di cache mutasi.
+    gcTime: 0,
     mutationFn: async (payload) => (await axiosInstance.post(URL_GANTI_SANDI, payload)).data,
     onSuccess: (respons) => {
       setForm(KOSONG);
       // Sandi sudah berubah, tetapi sesi di perangkat lain belum berhasil dikeluarkan: bukan sukses polos.
+      setError('');
       if (respons?.peringatan) {
         setSuccess('');
-        setError(respons.peringatan);
+        setPeringatan(respons.peringatan);
       } else {
-        setError('');
+        setPeringatan('');
         setSuccess(PESAN_SANDI.SUKSES_BIASA);
       }
     },
@@ -41,7 +47,10 @@ const GantiPassword = () => {
     },
   });
 
-  const ubah = useCallback((nama) => (e) => setForm((prev) => ({ ...prev, [nama]: e.target.value })), []);
+  // Tiga handler stabil: KolomSandi di-memo, jadi mengetik di satu kolom tidak merender dua kolom lain.
+  const ubahLama = useCallback((e) => setForm((p) => ({ ...p, sandiLama: e.target.value })), []);
+  const ubahBaru = useCallback((e) => setForm((p) => ({ ...p, sandiBaru: e.target.value })), []);
+  const ubahKonfirmasi = useCallback((e) => setForm((p) => ({ ...p, konfirmasi: e.target.value })), []);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -59,7 +68,8 @@ const GantiPassword = () => {
   return (
     <PageContainer title="Ganti Password" description="Ganti password akun">
       <ParentCard title="Ganti Password">
-        <Alerts error={error} success={success} />
+        {peringatan && <Alert severity="warning" onClose={() => setPeringatan('')} sx={{ mb: 2, mt: -2 }}>{peringatan}</Alert>}
+        <Alerts key={`${kunciError}-${kunciSukses}`} error={error} success={success} />
         <Grid container>
           <Grid size={{ xs: 12, md: 6 }}>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: -2 }}>
@@ -67,7 +77,7 @@ const GantiPassword = () => {
                 id="sandi-lama"
                 label="Sandi Lama"
                 value={form.sandiLama}
-                onChange={ubah('sandiLama')}
+                onChange={ubahLama}
                 autoComplete="current-password"
                 disabled={mutation.isPending}
               />
@@ -75,7 +85,7 @@ const GantiPassword = () => {
                 id="sandi-baru"
                 label="Sandi Baru"
                 value={form.sandiBaru}
-                onChange={ubah('sandiBaru')}
+                onChange={ubahBaru}
                 autoComplete="new-password"
                 bantuan={PETUNJUK_SANDI}
                 disabled={mutation.isPending}
@@ -84,7 +94,7 @@ const GantiPassword = () => {
                 id="konfirmasi-sandi"
                 label="Konfirmasi Sandi Baru"
                 value={form.konfirmasi}
-                onChange={ubah('konfirmasi')}
+                onChange={ubahKonfirmasi}
                 autoComplete="new-password"
                 disabled={mutation.isPending}
               />

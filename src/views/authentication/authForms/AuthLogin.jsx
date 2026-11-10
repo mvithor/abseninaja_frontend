@@ -10,6 +10,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import Alerts from 'src/components/alerts/Alerts';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -39,6 +40,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -85,6 +87,8 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
         return;
       }
 
+      // Pengguna lain bisa masuk di tab yang sama tanpa logout: cache akun sebelumnya tidak boleh terpakai.
+      queryClient.clear();
       dispatch(
         setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas, daftarPersona: daftar }),
       );

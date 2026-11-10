@@ -1,6 +1,7 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Alerts from 'src/components/alerts/Alerts';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import SearchButton from 'src/components/button-group/SearchButton';
 import DialogKonfirmasi from 'src/components/dialog/DialogKonfirmasi';
 import PageContainer from 'src/components/container/PageContainer';
@@ -19,16 +20,21 @@ const PegawaiNonaktifList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [cari, setCari] = useState('');
   const q = useDebouncedValue(cari.trim(), 400);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [success, setSuccess, kunciSukses] = usePesanAlert();
+  const [error, setError, kunciError] = usePesanAlert();
   const [target, setTarget] = useState(null);
 
   const params = { q: q || undefined, limit: rowsPerPage, offset: page * rowsPerPage };
-  const { data, isLoading, isError, error: queryError } = useQuery({
+  const { data, isLoading, isFetching, isError, error: queryError } = useQuery({
     queryKey: [KUNCI.nonaktif, params],
     queryFn: async () => (await axiosInstance.get(`${URL_PEGAWAI}/nonaktif`, { params })).data,
     placeholderData: keepPreviousData,
   });
+
+  // Sesudah aktifkan/nonaktifkan, halaman terakhir bisa habis: mundur satu halaman, bukan menampilkan tabel kosong.
+  useEffect(() => {
+    if (page > 0 && data && !isFetching && data.data.length === 0) setPage((p) => Math.max(0, p - 1));
+  }, [data, isFetching, page]);
 
   const aktifkan = useMutation({
     mutationFn: async (id) => (await axiosInstance.post(urlPegawai(id, 'aktifkan'))).data,
@@ -54,7 +60,7 @@ const PegawaiNonaktifList = () => {
   return (
     <PageContainer title="Pegawai Nonaktif" description="Pegawai Nonaktif">
       <ParentCard title="Pegawai Nonaktif">
-        <Alerts error={error} success={success} />
+        <Alerts key={`${kunciError}-${kunciSukses}`} error={error} success={success} />
         <SearchButton
           value={cari}
           onChange={(e) => {

@@ -4,6 +4,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import { useMutation } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import Alerts from 'src/components/alerts/Alerts';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import KolomSandi from './KolomSandi';
 import {
   PETUNJUK_SANDI, bangunPayloadGantiAwal, pesanDariGalatSandi, tiketTidakBerlaku, validasiGantiAwal,
@@ -22,9 +23,11 @@ const URL_GANTI_AWAL = '/api/v1/auth/ganti-sandi-awal';
 const FormGantiSandiAwal = ({ tiket, onSelesai, onTiketHabis, onBatal }) => {
   const [sandiBaru, setSandiBaru] = useState('');
   const [konfirmasi, setKonfirmasi] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError, kunciError] = usePesanAlert();
 
   const mutation = useMutation({
+    // gcTime 0: tiket dan sandi baru tidak boleh tertinggal di cache mutasi.
+    gcTime: 0,
     mutationFn: async (payload) => (await axiosInstance.post(URL_GANTI_AWAL, payload)).data,
     onSuccess: () => onSelesai(),
     onError: (err) => {
@@ -61,7 +64,7 @@ const FormGantiSandiAwal = ({ tiket, onSelesai, onTiketHabis, onBatal }) => {
         Sandi awal dari pengelola layanan hanya untuk masuk pertama kali. Buat sandi baru agar akun ini aman.
       </Typography>
 
-      {error && <Alerts error={error} />}
+      {error && <Alerts key={kunciError} error={error} />}
 
       <Box component="form" onSubmit={handleSubmit} noValidate>
         <KolomSandi

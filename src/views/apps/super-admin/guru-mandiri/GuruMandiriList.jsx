@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Box, Button, Dialog, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, MenuItem, Typography } from '@mui/material';
 import { IconPlus } from '@tabler/icons-react';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Alerts from 'src/components/alerts/Alerts';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import AddButton from 'src/components/button-group/AddButton';
 import SearchButton from 'src/components/button-group/SearchButton';
 import SubmitButton from 'src/components/button-group/SubmitButton';
@@ -15,7 +16,7 @@ import KolomIsian from 'src/apps/guru-lad/komponen/KolomIsian';
 import GuruMandiriTable from 'src/apps/super-admin/guru-mandiri/List/GuruMandiriTable';
 import SandiAwalDialog from 'src/apps/super-admin/guru-mandiri/Dialog/SandiAwalDialog';
 import DialogNonaktif from 'src/apps/pegawai-status/DialogNonaktif';
-import { pesanHasilNonaktif } from 'src/apps/pegawai-status/status';
+import { adaEfekGagal, pesanHasilNonaktif } from 'src/apps/pegawai-status/status';
 import {
   KUNCI_GURU_MANDIRI, OPSI_STATUS, URL_GURU_MANDIRI, ambilSandiAwal, bangunPayloadUbah, teksDialogAksi, validasiUbah,
 } from 'src/apps/super-admin/guru-mandiri/guruMandiri';
@@ -38,12 +39,16 @@ const GuruMandiriList = () => {
   const [status, setStatus] = useState('');
   const q = useDebouncedValue(cari.trim(), 400);
 
-  const [success, setSuccess] = useState(location.state?.pesan || '');
-  const [error, setError] = useState('');
+  const [success, setSuccess, kunciSukses] = usePesanAlert(location.state?.pesan || '');
+  const [error, setError, kunciError] = usePesanAlert();
   // Satu dialog aktif pada satu waktu: { aksi: 'nonaktif'|'aktif'|'reset'|'ubah', guru }.
   const [dialog, setDialog] = useState(null);
   // Sandi awal hasil reset: hanya di state, hilang saat dialog ditutup.
   const [sandiReset, setSandiReset] = useState(null);
+  // Peringatan keamanan (sesi guru belum berhasil dicabut) TIDAK hilang sendiri: admin harus membacanya dan bertindak.
+  const [peringatan, setPeringatan] = useState('');
+  // Galat server untuk dialog yang berisi ketikan (Nonaktifkan, Ubah): dialog tetap terbuka supaya isian tidak hilang.
+  const [galatDialog, setGalatDialog] = useState('');
 
   // Pesan dari halaman Tambah ikut hilang bila halaman dimuat ulang (state navigasi dibersihkan).
   useEffect(() => {
@@ -51,19 +56,41 @@ const GuruMandiriList = () => {
   }, [location.pathname, location.state, navigate]);
 
   const params = { q: q || undefined, status: status || undefined, limit: rowsPerPage, offset: page * rowsPerPage };
-  const { data, isLoading, isError, error: queryError } = useQuery({
+  const { data, isLoading, isFetching, isError, error: queryError } = useQuery({
     queryKey: [KUNCI_GURU_MANDIRI, params],
     queryFn: () => ambilDaftar(params),
     placeholderData: keepPreviousData,
   });
+
+  // Selama sandi reset tampil, menutup tab atau memuat ulang menghilangkannya.
+  const adaSandiReset = Boolean(sandiReset);
+  useEffect(() => {
+    if (!adaSandiReset) return undefined;
+    const jaga = (e) => { e.preventDefault(); e.returnValue = ''; };
+    window.addEventListener('beforeunload', jaga);
+    return () => window.removeEventListener('beforeunload', jaga);
+  }, [adaSandiReset]);
+
+  // Sesudah aktifkan/nonaktifkan, halaman terakhir bisa habis: mundur satu halaman, bukan menampilkan tabel kosong.
+  useEffect(() => {
+    if (page > 0 && data && !isFetching && data.data.length === 0) setPage((p) => Math.max(0, p - 1));
+  }, [data, isFetching, page]);
 
   const segarkan = () => queryClient.invalidateQueries({ queryKey: [KUNCI_GURU_MANDIRI] });
   const tampilkan = ({ sukses = '', galat = '' }) => {
     setSuccess(sukses);
     setError(galat);
   };
+  // Hasil yang menyangkut keamanan sesi ditampilkan menetap, bukan alert yang hilang dalam beberapa detik.
+  const tampilkanTetap = (teks) => {
+    setSuccess('');
+    setError('');
+    setPeringatan(teks);
+  };
 
   const aksi = useMutation({
+    // gcTime 0: sandi awal hasil reset tidak boleh tertinggal di cache mutasi.
+    gcTime: 0,
     mutationFn: async ({ jenis, id, badan }) => {
       const peta = { nonaktif: 'nonaktifkan', aktif: 'aktifkan', reset: 'reset-sandi' };
       if (jenis === 'ubah') return (await axiosInstance.put(`${URL_GURU_MANDIRI}/${id}`, badan)).data;
@@ -73,25 +100,45 @@ const GuruMandiriList = () => {
       segarkan();
       setDialog(null);
       if (jenis === 'reset') {
-        setSandiReset({ nama: guru.nama, email: guru.email, sandi: ambilSandiAwal(respons) });
-        // Sandi reset sudah berubah, tetapi sesi lama gagal dicabut: bukan sukses polos.
-        tampilkan(respons.peringatan && respons.data?.sesi_gagal ? { galat: respons.peringatan } : { sukses: respons.msg });
+        const sandi = ambilSandiAwal(respons);
+        aksi.reset();
+        setPeringatan('');
+        // Sandi lama sudah mati di server. Tanpa sandi di respons, dialog kosong menyesatkan: minta reset ulang.
+        if (!sandi) {
+          tampilkan({ galat: 'Sandi direset, tetapi sandi baru tidak diterima. Ulangi Reset Sandi.' });
+          return;
+        }
+        // Sandi sudah berubah, tetapi sesi lama gagal dicabut: peringatan menetap, juga di dalam dialog sandi.
+        const sesiGagal = Boolean(respons.peringatan && respons.data?.sesi_gagal);
+        setSandiReset({ nama: guru.nama, email: guru.email, sandi, peringatan: sesiGagal ? respons.peringatan : '' });
+        tampilkan(sesiGagal ? {} : { sukses: respons.msg });
       } else if (jenis === 'nonaktif') {
-        tampilkan(pesanHasilNonaktif(respons));
+        const hasil = pesanHasilNonaktif(respons);
+        if (adaEfekGagal(respons)) tampilkanTetap(hasil.galat);
+        else tampilkan(hasil);
       } else {
         tampilkan({ sukses: respons.msg });
       }
     },
-    onError: (err) => {
+    onError: (err, { jenis }) => {
+      const pesan = pesanGalat(err, 'Terjadi kesalahan saat memproses permintaan.');
+      if (jenis === 'nonaktif' || jenis === 'ubah') {
+        setGalatDialog(pesan);
+        return;
+      }
       setDialog(null);
-      tampilkan({ galat: pesanGalat(err, 'Terjadi kesalahan saat memproses permintaan.') });
+      tampilkan({ galat: pesan });
     },
   });
 
-  const bukaEdit = useCallback((guru) => setDialog({ aksi: 'ubah', guru }), []);
-  const bukaReset = useCallback((guru) => setDialog({ aksi: 'reset', guru }), []);
-  const bukaNonaktif = useCallback((guru) => setDialog({ aksi: 'nonaktif', guru }), []);
-  const bukaAktif = useCallback((guru) => setDialog({ aksi: 'aktif', guru }), []);
+  const buka = useCallback((aksiBaru) => (guruBaru) => {
+    setGalatDialog('');
+    setDialog({ aksi: aksiBaru, guru: guruBaru });
+  }, []);
+  const bukaEdit = useCallback((g) => buka('ubah')(g), [buka]);
+  const bukaReset = useCallback((g) => buka('reset')(g), [buka]);
+  const bukaNonaktif = useCallback((g) => buka('nonaktif')(g), [buka]);
+  const bukaAktif = useCallback((g) => buka('aktif')(g), [buka]);
   const ubahHalaman = useCallback((_, halamanBaru) => setPage(halamanBaru), []);
   const ubahUkuran = useCallback((e) => {
     setRowsPerPage(parseInt(e.target.value, 10));
@@ -105,7 +152,10 @@ const GuruMandiriList = () => {
   return (
     <PageContainer title="Guru Mandiri" description="Guru Mandiri">
       <ParentCard title="Guru Mandiri">
-        <Alerts error={error} success={success} />
+        {peringatan && (
+          <Alert severity="warning" onClose={() => setPeringatan('')} sx={{ mb: 2, mt: -2 }}>{peringatan}</Alert>
+        )}
+        <Alerts key={`${kunciError}-${kunciSukses}`} error={error} success={success} />
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 2, width: '100%', mb: 2, flexWrap: 'wrap' }}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
             <SearchButton
@@ -155,6 +205,7 @@ const GuruMandiriList = () => {
         buka={dialog?.aksi === 'nonaktif'}
         nama={guru?.nama}
         sibuk={aksi.isPending}
+        galatServer={galatDialog}
         onKonfirmasi={(badan) => aksi.mutate({ jenis: 'nonaktif', id: guru.pegawai_id, guru, badan })}
         onTutup={tutup}
       />
@@ -171,6 +222,7 @@ const GuruMandiriList = () => {
         buka={dialog?.aksi === 'ubah'}
         guru={guru}
         sibuk={aksi.isPending}
+        galatServer={galatDialog}
         onSimpan={(badan) => aksi.mutate({ jenis: 'ubah', id: guru.pegawai_id, guru, badan })}
         onTutup={tutup}
       />
@@ -180,14 +232,18 @@ const GuruMandiriList = () => {
         nama={sandiReset?.nama}
         email={sandiReset?.email}
         sandi={sandiReset?.sandi || ''}
-        onTutup={() => setSandiReset(null)}
+        peringatan={sandiReset?.peringatan || ''}
+        onTutup={() => {
+          if (sandiReset?.peringatan) tampilkanTetap(sandiReset.peringatan);
+          setSandiReset(null);
+        }}
       />
     </PageContainer>
   );
 };
 
 // Ubah data: hanya nama guru dan nama sekolah (email tidak bisa diubah; salah email berarti buat akun baru).
-const DialogUbah = ({ buka, guru, sibuk, onSimpan, onTutup }) => {
+const DialogUbah = ({ buka, guru, sibuk, galatServer, onSimpan, onTutup }) => {
   const [nama, setNama] = useState('');
   const [namaSekolah, setNamaSekolah] = useState('');
   const [galat, setGalat] = useState('');
@@ -211,11 +267,11 @@ const DialogUbah = ({ buka, guru, sibuk, onSimpan, onTutup }) => {
   };
 
   return (
-    <Dialog open={Boolean(buka)} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth>
+    <Dialog open={Boolean(buka)} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth aria-labelledby="judul-ubah">
       <Box component="form" onSubmit={kirim} noValidate>
         <DialogContent>
-          <Typography variant="h5" align="center" sx={{ mt: 2, mb: 2 }}>Ubah Data Guru Mandiri</Typography>
-          <KolomIsian id="ubah-nama" label="Nama Guru" wajib value={nama} onChange={(e) => setNama(e.target.value)} galat={galat} />
+          <Typography id="judul-ubah" variant="h5" align="center" sx={{ mt: 2, mb: 2 }}>Ubah Data Guru Mandiri</Typography>
+          <KolomIsian id="ubah-nama" label="Nama Guru" wajib value={nama} onChange={(e) => setNama(e.target.value)} galat={galat || galatServer} />
           <KolomIsian
             id="ubah-sekolah" label="Nama Sekolah" wajib value={namaSekolah} onChange={(e) => setNamaSekolah(e.target.value)}
             bantuan={`Email ${guru?.email || ''} tidak bisa diubah.`} sx={{ mt: 1 }}

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Alert, Box, CircularProgress, Typography } from '@mui/material';
+import { useSelector } from 'react-redux';
+import { Alert, Box, Button, CircularProgress, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { IconId, IconUser } from '@tabler/icons-react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import PageContainer from 'src/components/container/PageContainer';
 import SubmitButton from 'src/components/button-group/SubmitButton';
 import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
-import useAksesLad from 'src/apps/guru-lad/useAksesLad';
 import KartuHalaman from 'src/apps/guru-lad/komponen/KartuHalaman';
 import KolomIsian from 'src/apps/guru-lad/komponen/KolomIsian';
 import TemaLad from 'src/apps/guru-lad/gaya/TemaLad';
@@ -19,14 +19,19 @@ import {
 // Profil laporan guru LAD. Semua isian opsional. Guru sekolah Absenin yang datanya sudah diisi admin sekolah tidak perlu
 // mengisi apa pun: laporan memakai data sekolah, dan isian di sini hanya menimpanya. Guru mandiri mengisi sendiri.
 export default function LadProfil() {
-  const akses = useAksesLad();
+  // Tanpa menunggu probe /lad/ping (dua putaran berurutan): server sendiri menjawab 403 bila akun belum terdaftar.
+  const userId = useSelector((state) => state.user?.userId);
   const qc = useQueryClient();
   const [form, setForm] = useState(null);
   const [galatKolom, setGalatKolom] = useState({});
   const [sukses, setSukses] = useState('');
   const [galat, setGalat] = useState('');
 
-  const profil = useQuery({ queryKey: kunciLad.profil, queryFn: bacaProfil, enabled: akses.boleh, retry: false });
+  // Kunci per pengguna dan selalu diambil segar saat halaman dibuka: formulir tidak boleh diisi dari profil lama atau milik akun lain.
+  const kunciProfil = [...kunciLad.profil, userId];
+  const profil = useQuery({
+    queryKey: kunciProfil, queryFn: bacaProfil, enabled: Boolean(userId), retry: false, staleTime: 0, refetchOnMount: 'always', refetchOnWindowFocus: false,
+  });
 
   // Form diisi sekali dari server; muat ulang di latar (fokus jendela) tidak menimpa ketikan yang belum disimpan.
   useEffect(() => {
@@ -36,7 +41,7 @@ export default function LadProfil() {
   const simpan = useMutation({
     mutationFn: ubahProfil,
     onSuccess: (hasil) => {
-      qc.setQueryData(kunciLad.profil, hasil);
+      qc.setQueryData(kunciProfil, hasil);
       setForm(formDariProfil(hasil.profil));
       setGalatKolom({});
       setGalat('');
@@ -75,12 +80,16 @@ export default function LadProfil() {
   };
 
   let isi;
-  if (akses.memuat || profil.isLoading || (profil.data && form === null)) {
+  if (profil.isLoading || (profil.data && form === null)) {
     isi = <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}><CircularProgress /></Box>;
-  } else if (akses.ditolak) {
-    isi = <Alert severity="warning">{akses.pesan || 'Akun ini belum terdaftar sebagai guru Analitik Pembelajaran.'}</Alert>;
+  } else if (profil.isError && profil.error?.response?.status === 403) {
+    isi = <Alert severity="warning">{profil.error.response.data?.msg || 'Akun ini belum terdaftar sebagai guru Analitik Pembelajaran.'}</Alert>;
   } else if (profil.isError) {
-    isi = <Alert severity="error">{pesanGalat(profil.error, 'Profil laporan belum bisa dimuat.')}</Alert>;
+    isi = (
+      <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => profil.refetch()}>Coba lagi</Button>}>
+        {pesanGalat(profil.error, 'Profil laporan belum bisa dimuat.')}
+      </Alert>
+    );
   } else if (form) {
     const { laporan, sumber } = profil.data;
     isi = (

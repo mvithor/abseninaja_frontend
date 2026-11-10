@@ -96,7 +96,7 @@ const GuruMandiriTable = ({
                           <IconEdit width={18} />
                         </IconButton>
                       </Tooltip>
-                      <Tooltip title="Reset sandi" placement="bottom">
+                      <Tooltip title={nonaktif ? 'Aktifkan guru dahulu untuk mereset sandi' : 'Reset sandi'} placement="bottom">
                         <span>
                           <IconButton onClick={() => handleResetSandi(item)} disabled={nonaktif} aria-label={`Reset sandi ${item.nama}`}>
                             <IconKey width={18} />

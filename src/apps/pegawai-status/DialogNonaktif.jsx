@@ -15,7 +15,7 @@ import {
  *
  * Isian dikosongkan setiap dialog dibuka untuk pegawai lain, supaya alasan pegawai sebelumnya tidak terbawa.
  */
-const DialogNonaktif = ({ buka, nama, tanggungJawab, memuatTanggungJawab, galatTanggungJawab, sibuk, onKonfirmasi, onTutup }) => {
+const DialogNonaktif = ({ buka, nama, tanggungJawab, memuatTanggungJawab, galatTanggungJawab, galatServer, sibuk, onKonfirmasi, onTutup }) => {
   const [alasanKode, setAlasanKode] = useState('');
   const [catatan, setCatatan] = useState('');
   const [galat, setGalat] = useState('');
@@ -42,9 +42,9 @@ const DialogNonaktif = ({ buka, nama, tanggungJawab, memuatTanggungJawab, galatT
   };
 
   return (
-    <Dialog open={buka} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth>
+    <Dialog open={buka} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth aria-labelledby="judul-nonaktif">
       <DialogContent>
-        <Typography variant="h5" align="center" sx={{ mt: 2, mb: 1 }}>
+        <Typography id="judul-nonaktif" variant="h5" align="center" sx={{ mt: 2, mb: 1 }}>
           Nonaktifkan {nama || 'pegawai'}?
         </Typography>
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 2 }}>
@@ -101,7 +101,7 @@ const DialogNonaktif = ({ buka, nama, tanggungJawab, memuatTanggungJawab, galatT
             bantuan={`Opsional, maksimal ${BATAS_CATATAN} karakter.`}
             disabled={sibuk}
           />
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {(galat || galatServer) && <Alert severity="error">{galat || galatServer}</Alert>}
         </Stack>
       </DialogContent>
       <DialogActions sx={{ justifyContent: 'center', mb: 2 }}>
@@ -127,6 +127,7 @@ DialogNonaktif.propTypes = {
   tanggungJawab: PropTypes.object,
   memuatTanggungJawab: PropTypes.bool,
   galatTanggungJawab: PropTypes.bool,
+  galatServer: PropTypes.string,
   sibuk: PropTypes.bool,
   onKonfirmasi: PropTypes.func.isRequired,
   onTutup: PropTypes.func.isRequired,

@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -112,6 +112,13 @@ const PegawaiGuruList = () => {
         return an.localeCompare(bn, 'id', { sensitivity: 'base' });
       });
   }, [guru, searchQuery]);
+
+  // Sesudah Nonaktifkan atau Hapus, halaman terakhir bisa habis: mundur ke halaman terakhir yang masih berisi.
+  useEffect(() => {
+    if (rowsPerPage > 0 && page > 0 && page * rowsPerPage >= filteredPegawaiGuru.length) {
+      setPage(Math.max(0, Math.ceil(filteredPegawaiGuru.length / rowsPerPage) - 1));
+    }
+  }, [filteredPegawaiGuru.length, page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
