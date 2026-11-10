@@ -8,6 +8,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import PegawaiNonaktifTable from 'src/apps/admin-sekolah/pegawai-nonaktif/List/PegawaiNonaktifTable';
 import { KUNCI, KUNCI_TERDAMPAK, URL_PEGAWAI, urlPegawai } from 'src/apps/pegawai-status/api';
+import { pesanHasilNonaktif } from 'src/apps/pegawai-status/status';
 import { pesanGalat } from 'src/apps/admin-sekolah/persona-penugasan/penugasan';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
@@ -23,6 +24,7 @@ const PegawaiNonaktifList = () => {
   const [success, setSuccess, kunciSukses] = usePesanAlert();
   const [error, setError, kunciError] = usePesanAlert();
   const [target, setTarget] = useState(null);
+  const [targetCabut, setTargetCabut] = useState(null);
 
   const params = { q: q || undefined, limit: rowsPerPage, offset: page * rowsPerPage };
   const { data, isLoading, isFetching, isError, error: queryError } = useQuery({
@@ -48,6 +50,23 @@ const PegawaiNonaktifList = () => {
       setSuccess('');
       setError(pesanGalat(err, 'Terjadi kesalahan saat mengaktifkan pegawai.'));
       setTarget(null);
+    },
+  });
+
+  // Mengulang Nonaktifkan pada pegawai yang sudah nonaktif tidak mengubah data; server hanya menjalankan ulang pencabutan
+  // sesi dan pembersihan notifikasi. Dipakai bila peringatan "sesi belum berhasil dicabut" muncul saat menonaktifkan.
+  const cabutSesi = useMutation({
+    mutationFn: async (item) => (await axiosInstance.post(urlPegawai(item.id, 'nonaktifkan'), { alasan_kode: item.alasan_kode })).data,
+    onSuccess: (respons) => {
+      const hasil = pesanHasilNonaktif(respons);
+      setSuccess(hasil.galat ? '' : 'Sesi login pegawai sudah dicabut.');
+      setError(hasil.galat);
+      setTargetCabut(null);
+    },
+    onError: (err) => {
+      setSuccess('');
+      setError(pesanGalat(err, 'Terjadi kesalahan saat mencabut sesi.'));
+      setTargetCabut(null);
     },
   });
 
@@ -78,6 +97,7 @@ const PegawaiNonaktifList = () => {
           handleChangePage={ubahHalaman}
           handleChangeRowsPerPage={ubahUkuran}
           handleAktifkan={setTarget}
+          handleCabutSesi={setTargetCabut}
           timeZone={timeZone}
           isLoading={isLoading}
           isError={isError}
@@ -92,6 +112,15 @@ const PegawaiNonaktifList = () => {
         sibuk={aktifkan.isPending}
         onKonfirmasi={() => aktifkan.mutate(target.id)}
         onTutup={() => setTarget(null)}
+      />
+      <DialogKonfirmasi
+        buka={Boolean(targetCabut)}
+        judul={`Cabut sesi login ${targetCabut?.nama || 'pegawai'}?`}
+        isi="Akun dikeluarkan dari semua perangkat dan notifikasinya dibersihkan lagi. Status nonaktif dan alasannya tidak berubah."
+        tombol="Cabut Sesi"
+        sibuk={cabutSesi.isPending}
+        onKonfirmasi={() => cabutSesi.mutate(targetCabut)}
+        onTutup={() => setTargetCabut(null)}
       />
     </PageContainer>
   );

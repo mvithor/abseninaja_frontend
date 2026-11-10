@@ -4,7 +4,7 @@ import {
   Typography, TableHead, Table, TableBody, Tooltip, TableCell, TablePagination, TableRow, TableFooter, IconButton,
   TableContainer, Box, Paper, CircularProgress,
 } from '@mui/material';
-import { IconUserCheck } from '@tabler/icons-react';
+import { IconUserCheck, IconLogout } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import { formatWaktu } from 'src/apps/admin-sekolah/persona-penugasan/penugasan';
 import { labelAlasan } from 'src/apps/pegawai-status/status';
@@ -32,7 +32,7 @@ Judul.propTypes = { children: PropTypes.node, align: PropTypes.string };
 
 // Server-side paging: `total` dari server, baris tidak diiris di klien.
 const PegawaiNonaktifTable = ({
-  data, total, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, handleAktifkan, timeZone, isLoading, isError, errorMessage,
+  data, total, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, handleAktifkan, handleCabutSesi, timeZone, isLoading, isError, errorMessage,
 }) => (
   <Paper variant="outlined">
     <TableContainer>
@@ -76,6 +76,11 @@ const PegawaiNonaktifTable = ({
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                    <Tooltip title="Cabut sesi login (ulangi bila sesi belum berhasil dicabut)" placement="bottom">
+                      <IconButton onClick={() => handleCabutSesi(item)} aria-label={`Cabut sesi login ${item.nama}`}>
+                        <IconLogout width={18} />
+                      </IconButton>
+                    </Tooltip>
                     <Tooltip title="Aktifkan kembali" placement="bottom">
                       <IconButton onClick={() => handleAktifkan(item)} aria-label={`Aktifkan kembali ${item.nama}`}>
                         <IconUserCheck width={18} />
@@ -115,6 +120,7 @@ PegawaiNonaktifTable.propTypes = {
   handleChangePage: PropTypes.func.isRequired,
   handleChangeRowsPerPage: PropTypes.func.isRequired,
   handleAktifkan: PropTypes.func.isRequired,
+  handleCabutSesi: PropTypes.func.isRequired,
   timeZone: PropTypes.string,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
