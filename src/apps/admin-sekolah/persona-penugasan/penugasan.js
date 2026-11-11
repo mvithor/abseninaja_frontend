@@ -56,6 +56,11 @@ export const petunjukPersona = (persona, tahunAjaranAktif) => {
       );
     }
   }
+  if (persona.kode === 'koordinator_bk') {
+    catatan.push(
+      'Koordinator BK mengelola Tim BK di portal Guru BK: menambah guru BK lain dan mengatur kelas tanggung jawabnya. Guru BK lain tidak perlu diberi persona di sini; mereka otomatis mendapat akses saat ditambahkan koordinator.',
+    );
+  }
   if (persona.unik_per_sekolah) {
     catatan.push(
       `Hanya boleh ada satu ${persona.label} aktif per sekolah. Jika sudah ada, cabut penugasan lamanya terlebih dahulu.`,

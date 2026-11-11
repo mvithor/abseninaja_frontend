@@ -109,3 +109,10 @@ test('pesanGalat: errors[] lebih dulu, lalu msg, lalu fallback', () => {
   assert.equal(pesanGalat(new Error('x'), 'f'), 'f');
   assert.equal(pesanGalat(undefined, 'f'), 'f');
 });
+
+test('petunjukPersona: koordinator_bk menjelaskan bahwa guru BK lain ditambahkan lewat Tim BK', () => {
+  const { catatan, tahan } = petunjukPersona({ kode: 'koordinator_bk', label: 'Koordinator BK', perlu_tahun_ajaran: false, unik_per_sekolah: false }, null);
+  assert.equal(tahan, false);
+  assert.equal(catatan.length, 1);
+  assert.match(catatan[0], /otomatis mendapat akses/);
+});

@@ -1,6 +1,7 @@
 import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
+import GerbangKonteksBk from "src/components/pemetaan-siswa/GerbangKonteksBk";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
 
 // Layout
@@ -314,10 +315,34 @@ const DashboardGuruSekolah = Loadable(lazy(() => import('../views/dashboard/Guru
 const DashboardKepalaSekolah = Loadable(lazy(() => import('../views/dashboard/KepalaSekolah')));
 const DashboardWakaKurikulum = Loadable(lazy(() => import('../views/dashboard/WakaKurikulum')));
 const DashboardGuruBk = Loadable(lazy(() => import('../views/dashboard/GuruBk')));
+// Guru BK
+const PemetaanSiswaList = Loadable(lazy(() => import('../views/apps/guru-bk/pemetaan-siswa/PemetaanSiswaList')));
+const TimBkList = Loadable(lazy(() => import('../views/apps/guru-bk/tim-bk/TimBkList')));
+const JurnalHarianPage = Loadable(lazy(() => import('../views/apps/guru-bk/jurnal/JurnalHarianPage')));
+const JurnalAdd = Loadable(lazy(() => import('../views/apps/guru-bk/jurnal/JurnalAdd')));
+const JurnalEdit = Loadable(lazy(() => import('../views/apps/guru-bk/jurnal/JurnalEdit')));
+const RiwayatSiswaList = Loadable(lazy(() => import('../views/apps/guru-bk/riwayat/RiwayatSiswaList')));
+const RiwayatSiswaDetail = Loadable(lazy(() => import('../views/apps/guru-bk/riwayat/RiwayatSiswaDetail')));
+const PengaduanList = Loadable(lazy(() => import('../views/apps/guru-bk/pengaduan/PengaduanList')));
+const PengaduanDetail = Loadable(lazy(() => import('../views/apps/guru-bk/pengaduan/PengaduanDetail')));
+const JadwalKonselingPage = Loadable(lazy(() => import('../views/apps/guru-bk/jadwal/JadwalKonselingPage')));
 const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/AdminKantin')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
+// Perangkat Ajar (Guru)
+const PerangkatAjarSaya = Loadable(lazy(() => import('../views/apps/guru-sekolah/perangkat-ajar/PerangkatAjarSaya')));
+
+// DASHBOARD WAKA KURIKULUM
+// Perangkat Ajar
+const PerangkatAjarGuruList = Loadable(lazy(() => import('../views/apps/waka-kurikulum/perangkat-ajar/PerangkatAjarGuruList')));
+const PerangkatAjarGuruDetail = Loadable(lazy(() => import('../views/apps/waka-kurikulum/perangkat-ajar/PerangkatAjarGuruDetail')));
+// Deadline Perangkat Ajar
+const DeadlinePerangkatAjarList = Loadable(lazy(() => import('../views/apps/waka-kurikulum/deadline/DeadlinePerangkatAjarList')));
+const DeadlinePerangkatAjarAdd = Loadable(lazy(() => import('../views/apps/waka-kurikulum/deadline/DeadlinePerangkatAjarAdd')));
+const DeadlinePerangkatAjarEdit = Loadable(lazy(() => import('../views/apps/waka-kurikulum/deadline/DeadlinePerangkatAjarEdit')));
+// Arsip Perangkat Ajar
+const ArsipPerangkatAjarList = Loadable(lazy(() => import('../views/apps/waka-kurikulum/arsip/ArsipPerangkatAjarList')));
 
 // Landing
 const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
@@ -645,6 +670,8 @@ const Router = [
                 element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="guru" />,
                 children: [
                     { path: '', element: <DashboardGuruSekolah /> },
+                    // Perangkat Ajar
+                    { path: 'perangkat-ajar', element: <PerangkatAjarSaya/> },
                 ]
             },
             {
@@ -669,13 +696,44 @@ const Router = [
                 element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="waka-kurikulum" />,
                 children: [
                     { path: '', element: <DashboardWakaKurikulum /> },
+                    // Perangkat Ajar
+                    { path: 'perangkat-ajar', element: <PerangkatAjarGuruList/> },
+                    { path: 'perangkat-ajar/guru/:guruId', element: <PerangkatAjarGuruDetail/> },
+                    // Deadline Perangkat Ajar
+                    { path: 'deadline', element: <DeadlinePerangkatAjarList/> },
+                    { path: 'deadline/tambah', element: <DeadlinePerangkatAjarAdd/> },
+                    { path: 'deadline/edit/:id', element: <DeadlinePerangkatAjarEdit/> },
+                    // Arsip Perangkat Ajar
+                    { path: 'arsip', element: <ArsipPerangkatAjarList/> },
                 ]
             },
             {
                 path: 'dashboard/guru-bk',
                 element: <ProtectedRoute allowedRoles={['pegawai']} requirePortal="guru-bk" />,
                 children: [
+                  {
+                    // Bukan anggota Tim BK / akun BK nonaktif: tampilkan pesan, jangan muat halaman.
+                    element: <GerbangKonteksBk />,
+                    children: [
                     { path: '', element: <DashboardGuruBk /> },
+                    // Pemetaan Siswa
+                    { path: 'pemetaan-siswa', element: <PemetaanSiswaList/> },
+                    // Tim BK
+                    { path: 'tim-bk', element: <TimBkList/> },
+                    // Jurnal Harian Penanganan
+                    { path: 'jurnal', element: <JurnalHarianPage/> },
+                    { path: 'jurnal/tambah', element: <JurnalAdd/> },
+                    { path: 'jurnal/edit/:id', element: <JurnalEdit/> },
+                    // Riwayat Permasalahan Siswa
+                    { path: 'riwayat-siswa', element: <RiwayatSiswaList/> },
+                    { path: 'riwayat-siswa/:siswaId', element: <RiwayatSiswaDetail/> },
+                    // Pengaduan Anonim
+                    { path: 'pengaduan', element: <PengaduanList/> },
+                    { path: 'pengaduan/:id', element: <PengaduanDetail/> },
+                    // Jadwal Konseling
+                    { path: 'jadwal', element: <JadwalKonselingPage/> },
+                    ],
+                  },
                 ]
             },
             {
