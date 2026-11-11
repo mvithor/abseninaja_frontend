@@ -18,6 +18,7 @@ import { gayaKartu, gayaTombol, warnaRingkasan } from '../ringkasan/gayaRingkasa
 import { galatPerKolom } from '../galat';
 import { BAWAAN_AMBANG, periksaAmbang, tampilAngka } from '../rentang';
 import { judulLm, labelTp } from '../label';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const tampil = (x) => String(x ?? '').replace('.', ',');
 
@@ -120,7 +121,7 @@ function ParameterKelas({ kelas, readOnly, onBerubah }) {
           </Button>
         </Stack>
       )}
-      {pesan && <Alert severity={pesan.jenis}>{pesan.teks}</Alert>}
+      {pesan && <AlertOtomatis severity={pesan.jenis} pemicu={pesan} onTutup={() => setPesan(null)}>{pesan.teks}</AlertOtomatis>}
     </Box>
   );
 }
@@ -194,7 +195,7 @@ export default function StrukturPanel({
             </Button>
           )}
         </Stack>
-        {galat && <Alert severity="error">{galat}</Alert>}
+        {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         {lm.length === 0 && <Alert severity="info">Belum ada lingkup materi. Tambahkan dulu, lalu isi TP-nya.</Alert>}
 
         <Stack spacing={2}>

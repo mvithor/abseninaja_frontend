@@ -30,7 +30,7 @@ import PilKode from './PilKode';
  * kelas yang sudah dimuat halaman (`nilaiTp`, `proyek`, `kehadiran`, dan seterusnya).
  */
 export default function EvaluasiPanel({
-  kelasId, kelas, siswa, lm, nilaiTp, proyek, nilaiProyek, remedial, pertemuan, kehadiran, onCatatRemedial,
+  kelasId, kelas, siswa, lm, nilaiTp, proyek, nilaiProyek, remedial, pertemuan, kehadiran,
 }) {
   const [tampilTanpa, setTampilTanpa] = useState(false);
   const [pola, setPola] = useState([]);
@@ -103,11 +103,11 @@ export default function EvaluasiPanel({
   return (
     <Stack spacing={3}>
       <JudulTab
-        judul="Siswa perlu perhatian"
+        judul="Murid perlu perhatian"
         keterangan={(
           <>
             Penanda adalah peringatan dini dari data kelas ini, bukan diagnosis; keputusan tetap pada guru.
-            Klik nama siswa untuk melihat alasan dan buktinya. Aturan versi {data.aturan_versi}, dihitung ulang setiap data berubah.
+            Klik nama murid untuk melihat alasan dan buktinya. Aturan versi {data.aturan_versi}, dihitung ulang setiap data berubah.
           </>
         )}
       />
@@ -117,7 +117,7 @@ export default function EvaluasiPanel({
       )}
       {ringkasan.jumlahGalat > 0 && (
         <Alert severity="warning">
-          {`${ringkasan.jumlahGalat} siswa tidak dapat dievaluasi karena datanya bermasalah. Mereka tidak berarti aman: `}
+          {`${ringkasan.jumlahGalat} murid tidak dapat dievaluasi karena datanya bermasalah. Mereka tidak berarti aman: `}
           {data.galat.slice(0, 5).map((g) => g.nama ?? `ID ${g.siswa_id}`).join(', ')}
           {ringkasan.jumlahGalat > 5 ? ', dan lainnya.' : '.'}
         </Alert>
@@ -127,7 +127,7 @@ export default function EvaluasiPanel({
         <Stack spacing={2}>
           <Box sx={{ borderRadius: 0 }}>
             <Typography sx={{ fontSize: '1.125rem', fontWeight: 700, lineHeight: '1.625rem', color: w.ink }}>
-              {`${ringkasan.ditandai} dari ${ringkasan.jumlahSiswa} siswa memiliki penanda`}
+              {`${ringkasan.ditandai} dari ${ringkasan.jumlahSiswa} murid memiliki penanda`}
             </Typography>
             <Typography sx={{ fontSize: '1rem', lineHeight: '1.5rem', color: w.sekunder }}>
               {`${golongan.perhatian} perlu perhatian · ${golongan.pengayaan} peluang pengayaan · ${golongan.tanpa} tanpa penanda`}
@@ -153,12 +153,12 @@ export default function EvaluasiPanel({
       {belumCukup.length > 0 && (
         <Alert severity="info">
           <Typography variant="body2" fontWeight={600} gutterBottom>
-            Sebagian penanda belum dapat dinilai karena datanya belum cukup. Ini bukan berarti siswa aman.
+            Sebagian penanda belum dapat dinilai karena datanya belum cukup. Ini bukan berarti murid aman.
           </Typography>
           <Box component="ul" sx={{ m: 0, pl: 2.5 }}>
             {belumCukup.map((k) => (
               <Typography key={k} component="li" variant="body2">
-                {`${k} ${POLA_INFO[k].judul}: ${ringkasan.belumCukup[k]} siswa. Dibutuhkan ${dataDibutuhkan(k, data.parameter)}.`}
+                {`${k} ${POLA_INFO[k].judul}: ${ringkasan.belumCukup[k]} murid. Dibutuhkan ${dataDibutuhkan(k, data.parameter)}.`}
                 {alasanBelumCukup(data.hasil, k) ? ` Alasan tersering: ${alasanBelumCukup(data.hasil, k)}` : ''}
               </Typography>
             ))}
@@ -169,7 +169,7 @@ export default function EvaluasiPanel({
       <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" useFlexGap spacing={1.5}>
         <FormControlLabel
           control={<Switch checked={tampilTanpa} onChange={(e) => setTampilTanpa(e.target.checked)} />}
-          label={`Tampilkan juga ${golongan.tanpa} siswa tanpa penanda`}
+          label={`Tampilkan juga ${golongan.tanpa} murid tanpa penanda`}
         />
         <Button variant="outlined" onClick={() => setLegenda((v) => !v)} aria-expanded={legenda} aria-controls="legenda-rentang">
           Arti ikon dan warna sel
@@ -213,7 +213,7 @@ export default function EvaluasiPanel({
             <Typography variant="body2" sx={{ color: w.sekunder }}>
               Setiap sel adalah nilai TP yang sebenarnya, bukan nilai remedial; tanda R menunjukkan ada remedial.
               Titik tengah (·) berarti belum dinilai, bukan nol.
-              Bukti lengkap tiap penanda ada di rincian siswa.
+              Bukti lengkap tiap penanda ada di rincian murid.
             </Typography>
           </Stack>
         </Box>
@@ -222,8 +222,8 @@ export default function EvaluasiPanel({
       {!adaBaris ? (
         <Alert severity="info">
           {pola.length > 0
-            ? 'Tidak ada siswa dengan penanda yang dipilih.'
-            : 'Tidak ada siswa yang memenuhi aturan penanda saat ini.'}
+            ? 'Tidak ada murid dengan penanda yang dipilih.'
+            : 'Tidak ada murid yang memenuhi aturan penanda saat ini.'}
         </Alert>
       ) : (
         <MatriksPerhatian
@@ -254,7 +254,7 @@ export default function EvaluasiPanel({
               <TableHead>
                 <TableRow>
                   <TableCell>Lingkup materi</TableCell>
-                  <TableCell align="right">Siswa terhitung</TableCell>
+                  <TableCell align="right">Murid terhitung</TableCell>
                   <TableCell align="right">Rata-rata kelas</TableCell>
                   <TableCell>Dipakai sebagai pembanding</TableCell>
                 </TableRow>
@@ -265,7 +265,7 @@ export default function EvaluasiPanel({
                     <TableCell>{r.nama}</TableCell>
                     <TableCell align="right">{r.jumlahSiswa}</TableCell>
                     <TableCell align="right">{r.rata}</TableCell>
-                    <TableCell>{r.dipakai ? 'Ya' : `Tidak (kurang dari ${data.parameter.kelas_min} siswa)`}</TableCell>
+                    <TableCell>{r.dipakai ? 'Ya' : `Tidak (kurang dari ${data.parameter.kelas_min} murid)`}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -293,7 +293,6 @@ export default function EvaluasiPanel({
       <RincianSiswa
         rincian={rincian}
         onTutup={tutupRincian}
-        onCatatRemedial={onCatatRemedial}
         onBukaProfil={(id) => navigate(`/dashboard/guru-lad/kelas/${kelasId}/siswa/${id}`)}
       />
     </Stack>
@@ -311,5 +310,4 @@ EvaluasiPanel.propTypes = {
   remedial: PropTypes.array.isRequired,
   pertemuan: PropTypes.array.isRequired,
   kehadiran: PropTypes.array.isRequired,
-  onCatatRemedial: PropTypes.func,
 };

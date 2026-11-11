@@ -49,7 +49,7 @@ function LabelPerhatian({ n }) {
       Perlu Perhatian
       <Box
         component="span"
-        aria-label={`${n} siswa perlu perhatian`}
+        aria-label={`${n} murid perlu perhatian`}
         sx={{
           display: 'inline-flex', alignItems: 'center', justifyContent: 'center', minWidth: 24, height: 24, px: '7px', borderRadius: '8px',
           bgcolor: 'primary.main', color: '#fff', fontSize: 13, fontWeight: 700, WebkitPrintColorAdjust: 'exact', printColorAdjust: 'exact',
@@ -142,7 +142,7 @@ export default function LadKelas() {
   const aturanVersi = ringkasan.data?.aturan_versi ?? akses.aturanVersi;
   const meta = [
     `${kelas.semester} ${kelas.tahun_ajaran}`.trim(),
-    `${siswa.length} siswa`,
+    `${siswa.length} murid`,
     `${lm.length} lingkup materi`,
     aturanVersi ? `Aturan versi ${aturanVersi}` : null,
   ].filter(Boolean).join(' · ');
@@ -214,7 +214,7 @@ export default function LadKelas() {
             <Tab value="kehadiran" label={`Kehadiran (${pertemuan.length})`} />
             <Tab value="perhatian" label={<LabelPerhatian n={lencanaPerhatian(ringkasan.data)} />} />
             <Tab value="struktur" label={`Struktur (${lm.length})`} />
-            <Tab value="siswa" label={`Siswa (${siswa.length})`} />
+            <Tab value="siswa" label={`Murid (${siswa.length})`} />
           </Tabs>
 
           {tab === 'ringkasan' && (
@@ -279,7 +279,6 @@ export default function LadKelas() {
             remedial={remedial}
             pertemuan={pertemuan}
             kehadiran={kehadiran}
-            onCatatRemedial={readOnly ? undefined : setRemedialAwal}
           />
         )}
         {tab === 'struktur' && <StrukturPanel kelas={kelas} lm={lm} readOnly={readOnly} onBerubah={muatUlang} />}

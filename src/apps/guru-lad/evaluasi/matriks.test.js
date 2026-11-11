@@ -216,7 +216,7 @@ test('susunBaris: penanda diurutkan menurut prioritas tampilan', () => {
 
 test('deretKehadiran: urut menurut nomor pertemuan, pertemuan tanpa catatan null (bukan alpa)', () => {
   assert.deepEqual(deretKehadiran(5, konteksContoh()), [
-    { nomor: 1, kode: 'A' }, { nomor: 2, kode: 'A' }, { nomor: 3, kode: null },
+    { nomor: 1, kode: 'A', tanggal: '2026-08-01' }, { nomor: 2, kode: 'A', tanggal: '2026-08-08' }, { nomor: 3, kode: null, tanggal: '2026-08-15' },
   ]);
 });
 
@@ -230,6 +230,19 @@ test('barisP1: id TP dicari dari struktur kelas; TP yang tidak dikenal mendapat 
   assert.equal(b[0].nama, 'TP 1.2 (LM 1)');
   assert.equal(b[1].tpId, null);
   assert.deepEqual(barisP1(null, LM), []);
+});
+
+test('barisP1: label, nomor LM, dan rumusan TP dari struktur yang sama; rumusan kosong atau spasi menjadi null', () => {
+  const lmRumusan = [
+    {
+      id: 1, urutan: 1, nama: 'Bilangan', tp: [{ id: 11, urutan: 1, kode: '1.1', rumusan: '  Peserta didik mampu membaca data.  ' }, { id: 12, urutan: 2, kode: null, rumusan: '   ' }, { id: 13, urutan: 3, kode: '1.3' }],
+    },
+  ];
+  const b = barisP1(buktiP1(tp1(1, 1, 60), tp1(1, 2, 60), tp1(1, 3, 60), tp1(9, 9, 50)), lmRumusan);
+  assert.deepEqual(b.map((x) => x.label), ['1.1', 'TP 2', '1.3', 'TP 9']);
+  assert.deepEqual(b.map((x) => x.rumusan), ['Peserta didik mampu membaca data.', null, null, null]);
+  assert.deepEqual(b.map((x) => x.lmNo), [1, 1, 1, 9]);
+  assert.equal(b[3].tpId, null);
 });
 
 test('deretP4: pembanding kelas hanya bila server memakainya', () => {

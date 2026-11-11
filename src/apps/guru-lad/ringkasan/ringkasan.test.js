@@ -211,12 +211,12 @@ test('susunGrafikTren: nilai tepat di KKTP tetap terlihat di atas garisnya (tanp
 test('ariaTren dan barisTren', () => {
   assert.equal(
     ariaTren(data().tren_lm, 66),
-    'Rata-rata nilai per lingkup materi: LM 1 78,4 (32 siswa dihitung); LM 2 72,1 (31 siswa dihitung); LM 3 69,8 (5 siswa dihitung). KKTP 66.',
+    'Rata-rata nilai per lingkup materi: LM 1 78,4 (32 murid dihitung); LM 2 72,1 (31 murid dihitung); LM 3 69,8 (5 murid dihitung). KKTP 66.',
   );
   assert.match(ariaTren([{ lm: 1, nr_rata: null, jumlah_siswa: 0 }], null), /LM 1 belum ada rata-rata/);
   const b = barisTren(data().tren_lm);
   assert.deepEqual(b[0], {
-    lm: 1, nama: 'LM 1. Bilangan', siswa: '32', nr: '78,4', bawah: '3 siswa', kosong: false,
+    lm: 1, nama: 'LM 1. Bilangan', siswa: '32', nr: '78,4', bawah: '3 murid', kosong: false,
   });
   assert.equal(b[2].kosong, true);
   assert.deepEqual(barisTren([{ lm: 4, lm_nama: null, jumlah_siswa: 0, nr_rata: null, dipakai: false, di_bawah_kktp: 0 }])[0], {
@@ -251,9 +251,9 @@ test('barisKehadiran: lebar batang mengikuti skala, LM tanpa catatan tidak diber
 });
 
 test('kalimatSeringAlpa: tiga keadaan yang berbeda', () => {
-  assert.equal(kalimatSeringAlpa(data().kehadiran).teks, '3 siswa mencapai 3 alpa atau lebih.');
-  assert.equal(kalimatSeringAlpa({ ...data().kehadiran, siswa_sering_alpa: 1 }).teks, '1 siswa mencapai 3 alpa atau lebih.');
-  assert.equal(kalimatSeringAlpa({ ...data().kehadiran, siswa_sering_alpa: 0 }).teks, 'Belum ada siswa dengan 3 alpa atau lebih.');
+  assert.equal(kalimatSeringAlpa(data().kehadiran).teks, '3 murid mencapai 3 alpa atau lebih.');
+  assert.equal(kalimatSeringAlpa({ ...data().kehadiran, siswa_sering_alpa: 1 }).teks, '1 murid mencapai 3 alpa atau lebih.');
+  assert.equal(kalimatSeringAlpa({ ...data().kehadiran, siswa_sering_alpa: 0 }).teks, 'Belum ada murid dengan 3 alpa atau lebih.');
   const sedikit = kalimatSeringAlpa({
     lm: [{ lm: 1, pertemuan: 3 }], a_min: 3, pertemuan_min: 5, siswa_sering_alpa: 0,
   });
@@ -356,9 +356,9 @@ test('barisPerhatian: nama, alasan, chip; nama cadangan dari nomor urut', () => 
   assert.equal(b[0].nama, 'Rafi A.');
   assert.equal(b[0].alasan, '4 alpa dari 24 pertemuan tercatat. Batasnya 3 alpa.');
   assert.deepEqual(b[0].chip, [{ kode: 'P2', teks: 'Sering alpa', utama: true }]);
-  assert.equal(b[1].nama, 'Siswa nomor 8');
+  assert.equal(b[1].nama, 'Murid nomor 8');
   assert.equal(b[1].alasan, 'Poster bernilai 0 (tidak dikumpulkan).');
-  assert.equal(b[2].nama, 'Siswa 9');
+  assert.equal(b[2].nama, 'Murid 9');
 });
 
 // ------------------------------------------------------------------ yang perlu dilengkapi
@@ -376,14 +376,14 @@ test('butirLengkapi: urutan TP, proyek, lalu siswa; tujuan tab dan sorotan TP', 
   });
   const b = butirLengkapi(d);
   assert.deepEqual(b.map((x) => x.kunci), ['tp-3-2', 'tp-2-2', 'proyek-2', 'siswa']);
-  assert.equal(b[0].teks, 'LM 3 · TP 2: 5 siswa belum punya nilai');
-  assert.equal(b[1].teks, 'LM 2 · TP C: 4 siswa belum punya nilai');
+  assert.equal(b[0].teks, 'LM 3 · TP 2: 5 murid belum punya nilai');
+  assert.equal(b[1].teks, 'LM 2 · TP C: 4 murid belum punya nilai');
   assert.deepEqual(b[0].sorot, { lm: 3, tp: 2 });
   assert.equal(b[0].tab, 'nilai');
-  assert.equal(b[2].teks, 'Proyek 2: 11 siswa belum dinilai');
+  assert.equal(b[2].teks, 'Proyek 2: 11 murid belum dinilai');
   assert.equal(b[2].tab, 'proyek');
-  assert.equal(b[3].teks, '4 siswa berstatus data belum cukup');
-  assert.deepEqual(b[3].rinci, ['Sering alpa: 4 siswa. Kurang dari 5 pertemuan tercatat.', 'Proyek individu tidak dikumpulkan: 2 siswa']);
+  assert.equal(b[3].teks, '4 murid berstatus data belum cukup');
+  assert.deepEqual(b[3].rinci, ['Sering alpa: 4 murid. Kurang dari 5 pertemuan tercatat.', 'Proyek individu tidak dikumpulkan: 2 murid']);
   assert.equal(b[3].tab, 'perhatian');
 });
 
@@ -406,7 +406,7 @@ test('butirLengkapi: kosong bila semuanya lengkap', () => {
 test('kartuAngka: teks keempat kartu, tidak ada kata "aman" yang menyesatkan', () => {
   const k = kartuAngka(data());
   assert.equal(k.perhatian.angka, 9);
-  assert.equal(k.perhatian.satuan, 'dari 32 siswa');
+  assert.equal(k.perhatian.satuan, 'dari 32 murid');
   assert.equal(k.perhatian.rinci, 'Sering alpa 3 · Proyek individu tidak dikumpulkan 2 · Kesulitan pada TP tertentu 3 · Capaian menurun 1');
   assert.equal(k.pengayaan.angka, 3);
   assert.match(k.pengayaan.rinci, /batas pengayaan 86/);
@@ -531,7 +531,7 @@ test('keadaanKelas: galat, tanpa siswa, tanpa struktur, dan normal', () => {
   assert.equal(keadaanKelas(kelas(1, 'A', { struktur: true })), KEADAAN.TANPA_STRUKTUR);
   assert.equal(keadaanKelas(kelas(1, 'A')), KEADAAN.ADA);
   assert.match(pesanKeadaan(KEADAAN.GALAT), /Struktur/);
-  assert.match(pesanKeadaan(KEADAAN.TANPA_SISWA), /daftar siswa/);
+  assert.match(pesanKeadaan(KEADAAN.TANPA_SISWA), /daftar murid/);
   assert.match(pesanKeadaan(KEADAAN.TANPA_STRUKTUR), /belum diisi/);
   assert.equal(pesanKeadaan(KEADAAN.ADA), '');
 });
@@ -587,8 +587,8 @@ test('pisahKelas: kelas nyata terurut, kasus latihan terpisah', () => {
 
 test('ringkasBeranda: jumlah kelas, siswa, perhatian, semester tunggal', () => {
   const nyata = [kelas(1, 'A', { siswa: 34, perhatian: 12 }), kelas(2, 'B', { siswa: 32, perhatian: 9 })];
-  assert.equal(ringkasBeranda(nyata), '2 kelas · 66 siswa · 21 siswa perlu perhatian · Ganjil 2026/2027');
-  assert.equal(ringkasBeranda([kelas(1, 'A', { siswa: 1, perhatian: 1 })]), '1 kelas · 1 siswa · 1 siswa perlu perhatian · Ganjil 2026/2027');
+  assert.equal(ringkasBeranda(nyata), '2 kelas · 66 murid · 21 murid perlu perhatian · Ganjil 2026/2027');
+  assert.equal(ringkasBeranda([kelas(1, 'A', { siswa: 1, perhatian: 1 })]), '1 kelas · 1 murid · 1 murid perlu perhatian · Ganjil 2026/2027');
   assert.equal(ringkasBeranda([]), '');
   const campur = [kelas(1, 'A'), { ...kelas(2, 'B'), semester: 'Genap' }];
   assert.doesNotMatch(ringkasBeranda(campur), /Ganjil|Genap/);
@@ -596,8 +596,8 @@ test('ringkasBeranda: jumlah kelas, siswa, perhatian, semester tunggal', () => {
 
 test('ringkasBeranda: kelas yang tak terbaca tidak dihitung nol, disebut terpisah', () => {
   const s = ringkasBeranda([kelas(1, 'A', { siswa: 30, perhatian: 6 }), kelas(2, 'B', { galat: true, siswa: 10 })]);
-  assert.match(s, /40 siswa/);
-  assert.match(s, /6 siswa perlu perhatian/);
+  assert.match(s, /40 murid/);
+  assert.match(s, /6 murid perlu perhatian/);
   assert.match(s, /1 kelas belum bisa dibaca angkanya/);
   const semua = ringkasBeranda([kelas(2, 'B', { galat: true })]);
   assert.doesNotMatch(semua, /perlu perhatian/);

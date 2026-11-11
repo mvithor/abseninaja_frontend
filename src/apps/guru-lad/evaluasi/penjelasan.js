@@ -9,7 +9,7 @@ import { tampilAngka } from '../rentang.js';
 import { judulLm } from '../label.js';
 
 export const KODE_POLA = Object.freeze(['P1', 'P2', 'P3', 'P4', 'P5']);
-// Urutan prioritas TAMPILAN, sama dengan server (PRD 7.2). Tidak memengaruhi apakah siswa ditandai.
+// Urutan prioritas TAMPILAN, sama dengan server (PRD 7.2). Tidak memengaruhi apakah murid ditandai.
 export const URUTAN_PRIORITAS = Object.freeze(['P2', 'P3', 'P1', 'P4', 'P5']);
 
 export const POLA_INFO = Object.freeze({
@@ -28,11 +28,11 @@ export function definisiPola(kode, p) {
     case 'P1':
       return `Ditandai bila ada TP yang nilainya di bawah KKTP (${a(p.kktp)}) dan belum dituntaskan lewat remedial.`;
     case 'P2':
-      return `Ditandai bila siswa alpa (tanpa keterangan) pada paling sedikit ${a(p.a_min)} pertemuan, dengan syarat sudah ada ${a(p.pertemuan_min)} pertemuan tercatat. Yang dihitung jumlah alpa, bukan persentase hadir. Penyebab tidak hadir tidak diketahui sistem.`;
+      return `Ditandai bila murid alpa (tanpa keterangan) pada paling sedikit ${a(p.a_min)} pertemuan, dengan syarat sudah ada ${a(p.pertemuan_min)} pertemuan tercatat. Yang dihitung jumlah alpa, bukan persentase hadir. Penyebab tidak hadir tidak diketahui sistem.`;
     case 'P3':
       return 'Ditandai bila ada proyek individu yang bernilai 0 (tidak dikumpulkan). Proyek kelompok tidak dipakai.';
     case 'P4':
-      return `Ditandai bila rata-rata nilai tiga LM terakhir yang sudah terhitung turun berurutan, total turunnya paling sedikit ${a(p.turun_total)} poin, penurunan itu melebihi penurunan rata-rata kelas paling sedikit ${a(p.turun_relatif)} poin, dan nilai terakhirnya masih di bawah ${a(p.ambang_pengayaan)}. Pembanding kelas hanya dipakai bila paling sedikit ${a(p.kelas_min)} siswa terhitung pada LM pertama dan terakhir; kalau tidak, hanya penurunan siswa itu sendiri yang dilihat.`;
+      return `Ditandai bila rata-rata nilai tiga LM terakhir yang sudah terhitung turun berurutan, total turunnya paling sedikit ${a(p.turun_total)} poin, penurunan itu melebihi penurunan rata-rata kelas paling sedikit ${a(p.turun_relatif)} poin, dan nilai terakhirnya masih di bawah ${a(p.ambang_pengayaan)}. Pembanding kelas hanya dipakai bila paling sedikit ${a(p.kelas_min)} murid terhitung pada LM pertama dan terakhir; kalau tidak, hanya penurunan murid itu sendiri yang dilihat.`;
     case 'P5':
       return `Ditandai bila semua TP pada paling sedikit ${a(p.lm_min_p5)} LM bernilai ${a(p.ambang_pengayaan)} ke atas, tidak ada TP yang belum tuntas, dan tidak ada proyek individu bernilai 0.`;
     default:
@@ -54,7 +54,7 @@ const INDIKATOR_PEMICU = Object.freeze({
 export function kalimatBatasSistem(kode) {
   const indikator = INDIKATOR_PEMICU[kode];
   if (!indikator) return '';
-  return `Sistem hanya membaca ${indikator}. Sistem tidak mengetahui penyebabnya. Anda yang paling mengenal siswa ini, jadi ubah atau abaikan saran ini bila tidak sesuai.`;
+  return `Sistem hanya membaca ${indikator}. Sistem tidak mengetahui penyebabnya. Bapak/Ibu yang paling mengenal murid ini, jadi ubah atau abaikan saran ini bila tidak sesuai.`;
 }
 
 /** Data apa yang dibutuhkan pola agar dapat dinilai; dipakai untuk catatan "data belum cukup". */
@@ -82,7 +82,9 @@ export function namaTp(lmNo, tpNo, lm) {
   const m = cariLm(lmNo, lm);
   const t = m && Array.isArray(m.tp) ? m.tp.find((x) => x.urutan === tpNo) : undefined;
   const kode = t && typeof t.kode === 'string' ? t.kode.trim() : '';
-  return `TP ${kode || tpNo} (LM ${lmNo})`;
+  // Guru sering menamai kodenya sendiri "TP1" atau "TP 1.2"; awalan "TP" tidak ditambahkan lagi supaya tidak menjadi "TP TP1".
+  const nama = /^TP/i.test(kode) ? kode : `TP ${kode || tpNo}`;
+  return `${nama} (LM ${lmNo})`;
 }
 
 const namaTpDari = (t, ctx) => namaTp(t.lm, t.tp, ctx.lm);
@@ -140,7 +142,7 @@ function bukti2(b) {
 
 function bukti3(b) {
   const baris = [`Proyek individu ${daftarKata(b.proyek)} tidak dikumpulkan (nilai 0).`];
-  if (b.sumatif_tinggi) baris.push('Rata-rata semua LM siswa ini berada pada batas pengayaan atau di atasnya.');
+  if (b.sumatif_tinggi) baris.push('Rata-rata semua LM murid ini berada pada batas pengayaan atau di atasnya.');
   return baris;
 }
 
@@ -155,9 +157,9 @@ function bukti4(b, ctx) {
     if (tk > 0) arah = `turun ${a(tk)} poin`;
     else if (tk < 0) arah = `naik ${a(-tk)} poin`;
     else arah = 'tidak berubah';
-    baris.push(`Kelas ${arah}; penurunan siswa ini ${a(b.lebih_dari_kelas)} poin lebih besar daripada kelas.`);
+    baris.push(`Kelas ${arah}; penurunan murid ini ${a(b.lebih_dari_kelas)} poin lebih besar daripada kelas.`);
   } else {
-    baris.push(`Pembanding kelas tidak dipakai karena kurang dari ${a(ctx.parameter.kelas_min)} siswa yang nilainya terhitung pada LM pertama atau terakhir; keputusan hanya melihat penurunan siswa ini sendiri.`);
+    baris.push(`Pembanding kelas tidak dipakai karena kurang dari ${a(ctx.parameter.kelas_min)} murid yang nilainya terhitung pada LM pertama atau terakhir; keputusan hanya melihat penurunan murid ini sendiri.`);
   }
   return baris;
 }
@@ -211,7 +213,7 @@ export function susunSiswa(hasil, { hanyaDitandai = true, pola = [] } = {}) {
   return [...lolos].sort(bandingPrioritas);
 }
 
-/** Hitungan untuk ringkasan: ditandai per pola, dan siswa yang pola itu BELUM_CUKUP datanya. */
+/** Hitungan untuk ringkasan: ditandai per pola, dan murid yang pola itu BELUM_CUKUP datanya. */
 export function hitungRingkasan(data) {
   const perPola = {};
   const belumCukup = {};
@@ -237,14 +239,14 @@ export function hitungRingkasan(data) {
 /**
  * Golongan tampilan satu siswa: 'perhatian' bila punya penanda selain pengayaan (kode yang tidak dikenal
  * dihitung perhatian supaya tidak ada yang terlewat), 'pengayaan' bila penandanya hanya pengayaan (P5),
- * 'tanpa' bila tidak ada penanda. Siswa dengan P5 DAN penanda lain masuk 'perhatian'.
+ * 'tanpa' bila tidak ada penanda. Murid dengan P5 DAN penanda lain masuk 'perhatian'.
  */
 export function golonganSiswa(h) {
   if (!h || !Array.isArray(h.penanda) || h.penanda.length === 0) return 'tanpa';
   return h.penanda.some((k) => !POLA_INFO[k] || POLA_INFO[k].jenis !== 'pengayaan') ? 'perhatian' : 'pengayaan';
 }
 
-/** Jumlah siswa per golongan tampilan. */
+/** Jumlah murid per golongan tampilan. */
 export function hitungGolongan(hasil) {
   const n = { perhatian: 0, pengayaan: 0, tanpa: 0 };
   (hasil ?? []).forEach((h) => { n[golonganSiswa(h)] += 1; });
@@ -252,7 +254,7 @@ export function hitungGolongan(hasil) {
 }
 
 /**
- * Label tab: hanya siswa golongan perhatian yang dihitung. Peluang pengayaan bukan peringatan, dan angka di
+ * Label tab: hanya murid golongan perhatian yang dihitung. Peluang pengayaan bukan peringatan, dan angka di
  * tab terbaca sebagai peringatan. Angka 0 tidak ditampilkan karena dapat terbaca "aman", padahal bisa juga
  * berarti data belum cukup untuk menandai siapa pun.
  */

@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField, Typography,
+  Alert, Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, Typography,
 } from '@mui/material';
+import KolomIsian from '../komponen/KolomIsian';
 import { tambahRemedial, ubahRemedial, hapusRemedial, pesanGalat } from '../api';
 import { tampilNilai } from '../nilai/tempel';
 import { tampilAngka } from '../rentang';
@@ -10,9 +11,10 @@ import {
   kunciRemedial, kelompokkanRemedial, mencapaiKktp, catatanBatas, periksaSkor, periksaTanggal, tanggalLokal,
   tpUntukRemedial,
 } from './remedial';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 /**
- * Catat, ubah, atau hapus remedial untuk satu siswa pada satu TP. Remedial tidak menimpa nilai asli TP;
+ * Catat, ubah, atau hapus remedial untuk satu murid pada satu TP. Remedial tidak menimpa nilai asli TP;
  * yang dipakai penanda adalah remedial TERBARU (urutan terbesar). Dibuka dari tab Remedial maupun dari
  * bukti penanda "Kesulitan pada TP tertentu".
  */
@@ -143,34 +145,36 @@ export default function RemedialDialog({
             Remedial tidak mengubah nilai asli TP. Yang menentukan penanda adalah remedial terbaru: bila skornya
             mencapai KKTP ({kktpTeks}), TP itu dianggap tuntas.
           </Typography>
-          <TextField
-            select
-            label="Siswa"
+          <KolomIsian
+            id="remedial-murid"
+            pilih
+            label="Murid"
             value={siswaId}
             onChange={(e) => ubahSiswa(e.target.value)}
             disabled={editId !== null || sibuk}
-            fullWidth
           >
+            <MenuItem value="" disabled>Pilih murid</MenuItem>
             {siswa.map((s) => <MenuItem key={s.id} value={s.id}>{`${s.urutan}. ${s.nama}`}</MenuItem>)}
-          </TextField>
-          <TextField
-            select
+          </KolomIsian>
+          <KolomIsian
+            id="remedial-tp"
+            pilih
             label="TP"
             value={tpTerpilih ? tpId : ''}
             onChange={(e) => ubahTp(e.target.value)}
             disabled={siswaId === '' || editId !== null || sibuk}
-            error={siswaId !== '' && daftarTp.length === 0}
-            helperText={siswaId !== '' && daftarTp.length === 0
-              ? 'Siswa ini belum punya nilai TP. Isi nilai TP dulu di tab Nilai TP.'
-              : 'Hanya TP yang sudah bernilai untuk siswa ini.'}
-            fullWidth
+            galat={siswaId !== '' && daftarTp.length === 0
+              ? 'Murid ini belum punya nilai TP. Isi nilai TP dulu di tab Nilai TP.'
+              : undefined}
+            bantuan="Hanya TP yang sudah bernilai untuk murid ini."
           >
+            <MenuItem value="" disabled>Pilih TP</MenuItem>
             {daftarTp.map((t) => (
               <MenuItem key={t.id} value={t.id}>
                 {`${t.label}, nilai ${tampilNilai(t.nilai)}${t.bawahKktp ? ', di bawah KKTP' : ''}`}
               </MenuItem>
             ))}
-          </TextField>
+          </KolomIsian>
 
           {tpTerpilih && (
             <Box>
@@ -186,7 +190,7 @@ export default function RemedialDialog({
                         {`Ke-${r.urutan}: ${tampilNilai(r.nilai_remedial)} pada ${r.tanggal}`}
                       </Typography>
                       {i === riwayat.length - 1 && (
-                        <Chip size="small" label={mencapaiKktp(r.nilai_remedial, kelas.kktp) ? 'Terbaru, mencapai KKTP' : 'Terbaru, di bawah KKTP'} />
+                        <Chip size="small" sx={{ borderRadius: '6px' }} label={mencapaiKktp(r.nilai_remedial, kelas.kktp) ? 'Terbaru, mencapai KKTP' : 'Terbaru, di bawah KKTP'} />
                       )}
                       {r.catatan && <Typography variant="caption" color="text.secondary">{r.catatan}</Typography>}
                       {hapusId === r.id ? (
@@ -211,39 +215,47 @@ export default function RemedialDialog({
             <Stack spacing={2}>
               <Typography variant="subtitle2">{editId === null ? 'Remedial baru' : `Ubah remedial ke-${riwayat.find((r) => r.id === editId)?.urutan ?? ''}`}</Typography>
               <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-                <TextField
+                <KolomIsian
+                  id="remedial-skor"
                   label="Skor remedial"
                   value={skor}
                   onChange={(e) => setSkor(e.target.value)}
-                  inputProps={{ inputMode: 'decimal' }}
-                  error={sentuh && Boolean(hasilSkor.galat)}
-                  helperText={(sentuh && hasilSkor.galat) || catatanSkor || 'mis. 80 atau 80,5'}
-                  required
-                  fullWidth
+                  inputMode="decimal"
+                  galat={(sentuh && hasilSkor.galat) || undefined}
+                  bantuan={catatanSkor || 'mis. 80 atau 80,5'}
+                  wajib
+                  sx={{ flex: 1 }}
                 />
-                <TextField
+                <KolomIsian
+                  id="remedial-tanggal"
                   label="Tanggal"
-                  type="date"
+                  tipe="date"
                   value={tanggal}
                   onChange={(e) => setTanggal(e.target.value)}
-                  InputLabelProps={{ shrink: true }}
-                  error={sentuh && Boolean(hasilTanggal.galat)}
-                  helperText={sentuh && hasilTanggal.galat ? hasilTanggal.galat : ' '}
-                  required
-                  fullWidth
+                  galat={(sentuh && hasilTanggal.galat) || undefined}
+                  wajib
+                  sx={{ flex: 1 }}
                 />
               </Stack>
-              <TextField label="Catatan (opsional)" value={catatan} onChange={(e) => setCatatan(e.target.value)} multiline minRows={2} inputProps={{ maxLength: 2000 }} fullWidth />
+              <KolomIsian
+                id="remedial-catatan"
+                label="Catatan (opsional)"
+                value={catatan}
+                onChange={(e) => setCatatan(e.target.value)}
+                multiline
+                minRows={2}
+                inputProps={{ maxLength: 2000 }}
+              />
             </Stack>
           )}
 
           {info && (
-            <Alert severity={info.jenis} onClose={() => setInfo(null)}>
+            <AlertOtomatis severity={info.jenis} pemicu={info} tombolTutup onTutup={() => setInfo(null)}>
               {info.teks}
               {info.peringatan.map((p) => <Box key={p} component="span" sx={{ display: 'block' }}>{p}</Box>)}
-            </Alert>
+            </AlertOtomatis>
           )}
-          {galat && <Alert severity="error">{galat}</Alert>}
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions>

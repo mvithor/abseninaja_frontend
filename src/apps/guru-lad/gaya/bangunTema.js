@@ -98,22 +98,6 @@ export function buatTemaLad(luar) {
           label: { fontSize: HURUF.bacaan },
         },
       },
-      // Peringatan mengikuti desain: kotak berlatar lembut tanpa garis tepi, teks berwarna teks biasa (tema aplikasi
-      // memberi teks sewarna latarnya sehingga kontrasnya rendah), dan jenisnya dibedakan oleh ikon berwarna dan kata-katanya.
-      MuiAlert: {
-        styleOverrides: {
-          root: {
-            fontSize: HURUF.kecil, lineHeight: 1.5, padding: '12px 16px', borderRadius: 7, alignItems: 'flex-start',
-          },
-          message: { padding: 0 },
-          icon: { padding: 0, marginRight: 12, marginTop: 1, opacity: 1 },
-          action: { padding: 0, marginTop: 0 },
-          standardInfo: { color: p.text.primary, '& .MuiAlert-icon': { color: p.info.dark } },
-          standardSuccess: { color: p.text.primary, '& .MuiAlert-icon': { color: p.success.dark } },
-          standardWarning: { color: p.text.primary, '& .MuiAlert-icon': { color: p.warning.dark } },
-          standardError: { color: p.text.primary, '& .MuiAlert-icon': { color: p.error.dark } },
-        },
-      },
       // Saklar mengikuti desain: lintasan abu-biru muda 42x24, bulatan putih; menyala berwarna primer.
       MuiSwitch: {
         styleOverrides: {

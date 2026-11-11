@@ -4,6 +4,7 @@ import {
   Alert, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle,
 } from '@mui/material';
 import { pesanGalat } from '../api';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const NAMA_ISIAN = {
   nilai_tp: 'nilai TP',
@@ -58,7 +59,7 @@ export default function HapusDialog({
             Tindakan ini tidak dapat dibatalkan.
           </Alert>
         )}
-        {galat && <Alert severity="error" sx={{ mt: 1 }}>{galat}</Alert>}
+        {galat && <AlertOtomatis severity="error" sx={{ mt: 1 }} onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
       </DialogContent>
       <DialogActions>
         <Button onClick={tutup} disabled={sibuk}>Batal</Button>

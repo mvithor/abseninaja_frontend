@@ -69,7 +69,7 @@ function BarisTp({ lmNo, t, onPilih }) {
           isian={(s) => isianRentang(w, s.rentang)}
           label={aria}
           onPilih={(s) => onPilih({ lmNo, tp: t.tp, label, rentang: s.rentang, n: s.n })}
-          labelSegmen={(s) => `TP ${label} LM ${lmNo}: ${s.n} siswa ${s.nama.toLowerCase()}. Lihat nama siswa.`}
+          labelSegmen={(s) => `TP ${label} LM ${lmNo}: ${s.n} murid ${s.nama.toLowerCase()}. Lihat nama murid.`}
         />
       </Box>
       <Box
@@ -80,7 +80,7 @@ function BarisTp({ lmNo, t, onPilih }) {
         {t.terbanyak && (
           <Box
             component="span"
-            title="Persentase siswa di bawah KKTP tertinggi di kelas ini, dihitung bila paling sedikit 5 siswa sudah dinilai"
+            title="Persentase murid di bawah KKTP tertinggi di kelas ini, dihitung bila paling sedikit 5 murid sudah dinilai"
             sx={gayaChip(w, true)}
           >
             Terbanyak
@@ -108,11 +108,11 @@ function DialogSiswa({ pilihan, daftar, tpAda, onTutup, onBukaNilai }) {
           <Typography sx={{ fontSize: 14 }}>Daftar nama belum bisa disusun karena struktur TP berubah. Buka tabel nilai untuk melihatnya.</Typography>
         )}
         {tpAda && daftar.length === 0 && (
-          <Typography sx={{ fontSize: 14 }}>Tidak ada siswa pada rentang ini menurut data terbaru.</Typography>
+          <Typography sx={{ fontSize: 14 }}>Tidak ada murid pada rentang ini menurut data terbaru.</Typography>
         )}
         {tpAda && daftar.length > 0 && (
           <>
-            <Typography sx={{ fontSize: 13, color: w.sekunder, mb: 1 }}>{`${daftar.length} siswa`}</Typography>
+            <Typography sx={{ fontSize: 13, color: w.sekunder, mb: 1 }}>{`${daftar.length} murid`}</Typography>
             <Box component="ol" sx={{ listStyle: 'none', m: 0, p: 0 }}>
               {daftar.map((s) => (
                 <Box
@@ -174,17 +174,17 @@ export default function SebaranTp({
     <KartuBagian
       id="sebaran-tp"
       judul="Sebaran capaian per TP"
-      keterangan="Banyak siswa pada tiap rentang. Angka di dalam batang adalah jumlah siswa."
+      keterangan="Banyak murid pada tiap rentang. Angka di dalam batang adalah jumlah murid."
       aksi={<Box component="button" type="button" onClick={() => onBukaNilai(null)} sx={gayaTautan(w)}>Buka tabel nilai</Box>}
     >
       {kosong ? (
-        <Typography sx={{ fontSize: 14, color: w.sekunder }}>Belum ada TP atau siswa untuk disebar.</Typography>
+        <Typography sx={{ fontSize: 14, color: w.sekunder }}>Belum ada TP atau murid untuk disebar.</Typography>
       ) : (
         <>
           <Legenda ambang={ambang} />
           <Box sx={{ display: { xs: 'none', md: 'grid' }, gridTemplateColumns: '56px minmax(0, 1fr) 220px', columnGap: 1.5, fontSize: 13, fontWeight: 600, color: w.sekunder, pt: 0.5 }}>
             <span>TP</span>
-            <span>{`Jumlah siswa (${data.kartu.jumlah_siswa})`}</span>
+            <span>{`Jumlah murid (${data.kartu.jumlah_siswa})`}</span>
             <Box component="span" sx={{ textAlign: 'right' }}>Di bawah KKTP</Box>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: { xs: 1.5, md: '14px' } }}>
@@ -201,7 +201,7 @@ export default function SebaranTp({
             ))}
           </Box>
           <Typography sx={{ fontSize: 13, color: w.sekunder, lineHeight: 1.5 }}>
-            {'Siswa pada rentang "belum dinilai" tidak dihitung di kolom KKTP. Ketuk batang untuk melihat nama siswa pada rentang itu. Segmen yang terlalu sempit tidak memuat angka; jumlahnya tampil saat segmen diketuk.'}
+            {'Murid pada rentang "belum dinilai" tidak dihitung di kolom KKTP. Ketuk batang untuk melihat nama murid pada rentang itu. Segmen yang terlalu sempit tidak memuat angka; jumlahnya tampil saat segmen diketuk.'}
           </Typography>
         </>
       )}

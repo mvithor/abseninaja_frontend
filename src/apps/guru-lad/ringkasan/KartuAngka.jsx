@@ -107,7 +107,7 @@ export default function KartuAngka({ data, onBukaPerhatian, onBukaLengkapi }) {
         onAksi={onBukaPerhatian}
       >
         {pola.length > 0 && (
-          <Box component="ul" aria-label="Pola utama siswa yang perlu perhatian" sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: 260 }}>
+          <Box component="ul" aria-label="Pola utama murid yang perlu perhatian" sx={{ listStyle: 'none', m: 0, p: 0, display: 'flex', flexWrap: 'wrap', gap: '6px', maxWidth: 260 }}>
             {pola.map((x) => <ChipPola key={x.kode} teks={x.teks} jumlah={x.jumlah} />)}
           </Box>
         )}

@@ -24,6 +24,7 @@ import ProyekFormDialog from './ProyekFormDialog';
 import {
   labelProyek, TEKS_JENIS, tidakDikumpulkan, hitungJenis,
 } from './proyek';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 const kunci = (siswaId, proyekId) => `${siswaId}:${proyekId}`;
 
@@ -176,15 +177,15 @@ export default function ProyekPanel({
 
   if (siswa.length === 0 || proyek.length === 0) {
     return (
-      <Stack spacing={2.5} alignItems="flex-start">
-        <Alert severity="info" sx={{ alignSelf: 'stretch' }}>
-          {siswa.length === 0 ? 'Isi daftar siswa dulu di tab Siswa. ' : ''}
+      <Stack spacing={2.5}>
+        <Alert severity="info">
+          {siswa.length === 0 ? 'Isi daftar murid dulu di tab Murid. ' : ''}
           {proyek.length === 0
             ? (readOnly ? 'Kelas ini belum memiliki proyek.' : 'Belum ada proyek. Tambahkan proyek (Latihan Materi) untuk mulai mengisi nilainya.')
             : ''}
         </Alert>
         {!readOnly && (
-          <Button variant="contained" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })}>
+          <Button variant="contained" startIcon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })} sx={{ alignSelf: 'flex-start' }}>
             Tambah proyek
           </Button>
         )}
@@ -197,7 +198,7 @@ export default function ProyekPanel({
     <Stack spacing={3}>
       <JudulTab
         judul="Nilai proyek"
-        keterangan="Nilai tiap siswa untuk proyek (Latihan Materi). Perubahan baru tersimpan setelah Anda menekan Simpan nilai."
+        keterangan="Nilai tiap murid untuk proyek (Latihan Materi). Perubahan baru tersimpan setelah tombol Simpan nilai ditekan."
         aksi={!readOnly && (
           <AddButton icon={<IconPlus size={20} />} onClick={() => setForm({ baru: true })} sx={{ width: { xs: '100%', sm: 'auto' }, maxWidth: 'none', ml: 0 }}>
             Tambah proyek
@@ -212,7 +213,7 @@ export default function ProyekPanel({
           ...(readOnly ? [] : ['Menu titik tiga di kepala kolom berisi Ubah dan Hapus proyek.']),
         ]}
       />
-      {pesan && <Alert severity={pesan.jenis} onClose={() => setPesan(null)}>{pesan.teks}</Alert>}
+      {pesan && <AlertOtomatis severity={pesan.jenis} pemicu={pesan} tombolTutup onTutup={() => setPesan(null)}>{pesan.teks}</AlertOtomatis>}
       {adaGalatLokal && !pesan && (
         <Alert severity="warning">Ada sel dengan isian tidak sah (ditandai !). Perbaiki dulu sebelum menyimpan.</Alert>
       )}
@@ -222,7 +223,7 @@ export default function ProyekPanel({
           <thead>
             <tr>
               <th className="no">No</th>
-              <th className="nama">Nama siswa</th>
+              <th className="nama">Nama murid</th>
               {proyek.map((p) => (
                 <th key={p.id} style={{ minWidth: 200, height: 'auto', padding: '10px 10px' }}>
                   <Box sx={{ position: 'relative', px: { xs: 0, sm: 3 } }}>

@@ -18,14 +18,14 @@ const PerluDilengkapi = forwardRef(({ data, onBuka }, ref) => {
       id="lengkapi"
       judul="Yang perlu dilengkapi"
       keterangan={butir.length > 0
-        ? 'Selama bagian ini terisi, siswa terkait tidak dinyatakan aman.'
+        ? 'Selama bagian ini terisi, murid terkait tidak dinyatakan aman.'
         : 'Semua isian yang dibutuhkan pola sudah lengkap.'}
       gaya="putus"
     >
       <Box ref={ref} tabIndex={-1} sx={{ outline: 'none', display: 'flex', flexDirection: 'column', gap: 1.25 }}>
         {butir.length === 0 && (
           <Typography sx={{ fontSize: 14, color: w.sekunder, lineHeight: 1.5 }}>
-            Tidak ada TP atau proyek yang kosong, dan tidak ada siswa yang polanya belum bisa dinilai.
+            Tidak ada TP atau proyek yang kosong, dan tidak ada murid yang polanya belum bisa dinilai.
           </Typography>
         )}
         {butir.map((b) => (

@@ -194,19 +194,19 @@ export function susunGrafikTren(tren, kktp, {
 /** Kalimat untuk pembaca layar: seluruh grafik dalam satu paragraf. */
 export function ariaTren(tren, kktp) {
   const bagian = (tren ?? []).map((m) => (nilaiAda(m.nr_rata)
-    ? `LM ${m.lm} ${a(m.nr_rata)} (${jamak(m.jumlah_siswa, 'siswa')} dihitung)`
+    ? `LM ${m.lm} ${a(m.nr_rata)} (${jamak(m.jumlah_siswa, 'murid')} dihitung)`
     : `LM ${m.lm} belum ada rata-rata`));
   return `Rata-rata nilai per lingkup materi: ${bagian.join('; ')}.${nilaiAda(kktp) ? ` KKTP ${a(kktp)}.` : ''}`;
 }
 
-/** Baris tabel di bawah grafik: LM, siswa dihitung, dan banyak siswa dengan NR di bawah KKTP. */
+/** Baris tabel di bawah grafik: LM, murid dihitung, dan banyak murid dengan NR di bawah KKTP. */
 export function barisTren(tren) {
   return (tren ?? []).map((m) => ({
     lm: m.lm,
     nama: judulLm({ urutan: m.lm, nama: m.lm_nama }),
     siswa: nilaiAda(m.nr_rata) ? String(m.jumlah_siswa) : '-',
     nr: nilaiAda(m.nr_rata) ? a(m.nr_rata) : 'Belum ada',
-    bawah: nilaiAda(m.nr_rata) ? jamak(m.di_bawah_kktp, 'siswa') : '-',
+    bawah: nilaiAda(m.nr_rata) ? jamak(m.di_bawah_kktp, 'murid') : '-',
     kosong: nilaiAda(m.nr_rata) && !m.dipakai,
   }));
 }
@@ -252,8 +252,8 @@ export function kalimatSeringAlpa(kehadiran) {
     return { teks: `Pola Sering alpa belum bisa dinilai: baru ${jamak(total, 'pertemuan')} tercatat, dibutuhkan paling sedikit ${min}.`, tautan: true };
   }
   const n = kehadiran.siswa_sering_alpa;
-  if (n === 0) return { teks: `Belum ada siswa dengan ${aMin} alpa atau lebih.`, tautan: true };
-  return { teks: `${jamak(n, 'siswa')} mencapai ${aMin} alpa atau lebih.`, tautan: true };
+  if (n === 0) return { teks: `Belum ada murid dengan ${aMin} alpa atau lebih.`, tautan: true };
+  return { teks: `${jamak(n, 'murid')} mencapai ${aMin} alpa atau lebih.`, tautan: true };
 }
 
 // ------------------------------------------------------------------ proyek individu
@@ -337,7 +337,7 @@ export function barisPerhatian(data) {
   const ctx = { lm: strukturDariRingkasan(data), parameter, proyek: data.proyek };
   return (data.perhatian_teratas ?? []).map((x) => ({
     siswaId: x.siswa_id,
-    nama: x.nama ?? (x.urutan ? `Siswa nomor ${x.urutan}` : `Siswa ${x.siswa_id}`),
+    nama: x.nama ?? (x.urutan ? `Murid nomor ${x.urutan}` : `Murid ${x.siswa_id}`),
     alasan: alasanSingkat(x, ctx),
     chip: chipPola(x),
   }));
@@ -360,7 +360,7 @@ export function butirLengkapi(data) {
   p.tp.slice(0, BATAS_BARIS_LENGKAPI).forEach((t) => {
     butir.push({
       kunci: `tp-${t.lm}-${t.tp}`,
-      teks: `${labelTpRingkas(t)}: ${jamak(t.jumlah_siswa, 'siswa')} belum punya nilai`,
+      teks: `${labelTpRingkas(t)}: ${jamak(t.jumlah_siswa, 'murid')} belum punya nilai`,
       aksi: 'Isi nilai',
       tab: 'nilai',
       sorot: { lm: t.lm, tp: t.tp },
@@ -380,7 +380,7 @@ export function butirLengkapi(data) {
   p.proyek.slice(0, BATAS_BARIS_LENGKAPI).forEach((x) => {
     butir.push({
       kunci: `proyek-${x.proyek}`,
-      teks: `${x.nama || `Proyek ${x.proyek}`}: ${jamak(x.jumlah_siswa, 'siswa')} belum dinilai`,
+      teks: `${x.nama || `Proyek ${x.proyek}`}: ${jamak(x.jumlah_siswa, 'murid')} belum dinilai`,
       aksi: 'Isi proyek',
       tab: 'proyek',
       sorot: null,
@@ -400,9 +400,9 @@ export function butirLengkapi(data) {
   if (bc.jumlah_siswa > 0) {
     butir.push({
       kunci: 'siswa',
-      teks: `${jamak(bc.jumlah_siswa, 'siswa')} berstatus data belum cukup`,
-      rinci: bc.per_pola.map((e) => `${POLA_INFO[e.pola]?.judul ?? e.pola}: ${jamak(e.jumlah_siswa, 'siswa')}${e.alasan ? `. ${e.alasan}` : ''}`),
-      aksi: 'Lihat siswa',
+      teks: `${jamak(bc.jumlah_siswa, 'murid')} berstatus data belum cukup`,
+      rinci: bc.per_pola.map((e) => `${POLA_INFO[e.pola]?.judul ?? e.pola}: ${jamak(e.jumlah_siswa, 'murid')}${e.alasan ? `. ${e.alasan}` : ''}`),
+      aksi: 'Lihat murid',
       tab: 'perhatian',
       sorot: null,
     });
@@ -420,19 +420,19 @@ export function kartuAngka(data) {
   return {
     perhatian: {
       angka: k.perhatian,
-      satuan: `dari ${jamak(k.jumlah_siswa, 'siswa')}`,
+      satuan: `dari ${jamak(k.jumlah_siswa, 'murid')}`,
       rinci: k.perhatian > 0
         ? rincianPerhatian(k)
-        : 'Tidak ada siswa yang ditandai. Lihat juga kartu Data belum cukup di sebelahnya.',
+        : 'Tidak ada murid yang ditandai. Lihat juga kartu Data belum cukup di sebelahnya.',
     },
     pengayaan: {
       angka: k.pengayaan,
-      satuan: 'siswa',
+      satuan: 'murid',
       rinci: `Nilai TP di atas batas pengayaan ${ambangPengayaan}, tanpa TP yang belum tuntas dan tanpa proyek bernilai 0.`,
     },
     belumCukup: {
       angka: k.belum_cukup,
-      satuan: 'siswa',
+      satuan: 'murid',
       rinci: 'Belum bisa dinilai. Ini bukan berarti aman.',
     },
     kelengkapan: {
@@ -564,10 +564,10 @@ export function ringkasBeranda(nyata) {
   const daftar = nyata ?? [];
   if (daftar.length === 0) return '';
   const siswa = daftar.reduce((s, k) => s + Number(k.jumlah_siswa ?? 0), 0);
-  const bagian = [jamak(daftar.length, 'kelas'), `${siswa} siswa`];
+  const bagian = [jamak(daftar.length, 'kelas'), `${siswa} murid`];
   const terbaca = daftar.filter((k) => keadaanKelas(k) === KEADAAN.ADA);
   const perhatian = terbaca.reduce((s, k) => s + k.ringkasan.kartu.perhatian, 0);
-  if (terbaca.length > 0) bagian.push(`${perhatian} siswa perlu perhatian`);
+  if (terbaca.length > 0) bagian.push(`${perhatian} murid perlu perhatian`);
   if (terbaca.length < daftar.length) bagian.push(`${daftar.length - terbaca.length} kelas belum bisa dibaca angkanya`);
   const semester = [...new Set(daftar.map((k) => `${k.semester} ${k.tahun_ajaran}`.trim()))];
   if (semester.length === 1) bagian.push(semester[0]);
@@ -598,7 +598,7 @@ export function pesanKeadaan(keadaan) {
   switch (keadaan) {
     case KEADAAN.TANPA_RINGKASAN: return 'Ringkasan kelas ini belum dapat dimuat. Buka kelasnya untuk melihat datanya.';
     case KEADAAN.GALAT: return 'Ringkasan tidak tersedia karena batas nilai kelas ini tidak sah. Perbaiki di tab Struktur.';
-    case KEADAAN.TANPA_SISWA: return 'Belum ada siswa. Isi daftar siswa dulu.';
+    case KEADAAN.TANPA_SISWA: return 'Belum ada murid. Isi daftar murid dulu.';
     case KEADAAN.TANPA_STRUKTUR: return 'Struktur lingkup materi dan TP belum diisi.';
     default: return '';
   }

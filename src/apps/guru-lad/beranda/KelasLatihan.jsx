@@ -33,7 +33,7 @@ export default function KelasLatihan({ kelas, onBuka }) {
               <TableRow>
                 <TableCell><Judul>No</Judul></TableCell>
                 <TableCell><Judul>Kelas</Judul></TableCell>
-                <TableCell align="center"><Judul>Siswa</Judul></TableCell>
+                <TableCell align="center"><Judul>Murid</Judul></TableCell>
                 <TableCell align="center"><Judul>Perlu perhatian</Judul></TableCell>
                 <TableCell align="center"><Judul>Pengayaan</Judul></TableCell>
                 <TableCell align="center"><Judul>Aksi</Judul></TableCell>
@@ -85,8 +85,8 @@ export default function KelasLatihan({ kelas, onBuka }) {
               </Box>
               <Typography sx={{ fontSize: 14 }}>
                 {ada
-                  ? `${kartu.jumlah_siswa} siswa · ${kartu.perhatian} perlu perhatian · ${kartu.pengayaan} pengayaan`
-                  : `${k.jumlah_siswa} siswa`}
+                  ? `${kartu.jumlah_siswa} murid · ${kartu.perhatian} perlu perhatian · ${kartu.pengayaan} pengayaan`
+                  : `${k.jumlah_siswa} murid`}
               </Typography>
               <TombolBuka k={k} onBuka={onBuka} />
             </Box>

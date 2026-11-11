@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack, TextField,
+  Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Stack,
 } from '@mui/material';
 import { pesanGalat } from '../api';
+import KolomIsian from '../komponen/KolomIsian';
 import { namaZona, periksaTanggalPertemuan, tanggalPanjang } from './kehadiran';
+import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
 
 /**
  * Form tambah atau ubah pertemuan: tanggal dan (opsional) lingkup materi. `hariIni` adalah tanggal hari ini
@@ -48,37 +50,39 @@ export default function PertemuanFormDialog({
     ? `Hari ini menurut zona waktu sekolah: ${tanggalPanjang(hariIni)} (${namaZona(zona)}).`
     : '';
   if (hasil.peringatan) bantuan = hasil.peringatan;
+  const tampilGalat = Boolean(hasil.galat) && (sentuh || tanggal !== '');
+  const peringatanSaja = Boolean(hasil.peringatan) && !hasil.galat;
 
   return (
     <Dialog open={buka} onClose={sibuk ? undefined : onTutup} maxWidth="sm" fullWidth>
       <DialogTitle>{judul}</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
-          <TextField
-            type="date"
+          <KolomIsian
+            id="pertemuan-tanggal"
+            tipe="date"
             label="Tanggal pertemuan"
             value={tanggal}
             onChange={(e) => setTanggal(e.target.value)}
-            InputLabelProps={{ shrink: true }}
             inputProps={{ max: hariIni || undefined }}
-            error={Boolean(hasil.galat) && (sentuh || tanggal !== '')}
-            helperText={(hasil.galat && (sentuh || tanggal !== '')) ? hasil.galat : bantuan}
-            FormHelperTextProps={hasil.peringatan && !hasil.galat ? { sx: { color: 'warning.dark' } } : undefined}
-            required
-            fullWidth
+            galat={tampilGalat ? hasil.galat : undefined}
+            bantuan={peringatanSaja
+              ? <Box component="span" sx={{ color: 'warning.dark' }}>{bantuan}</Box>
+              : bantuan}
+            wajib
           />
-          <TextField
-            select
+          <KolomIsian
+            id="pertemuan-lingkup-materi"
+            pilih
             label="Lingkup materi (opsional)"
             value={lmId}
             onChange={(e) => setLmId(e.target.value)}
-            helperText="Menautkan pertemuan ke lingkup materi yang diajarkan pada hari itu."
-            fullWidth
+            bantuan="Menautkan pertemuan ke lingkup materi yang diajarkan pada hari itu."
           >
             <MenuItem value="">Tanpa tautan</MenuItem>
             {lm.map((m) => <MenuItem key={m.id} value={m.id}>{`LM ${m.urutan}: ${m.nama}`}</MenuItem>)}
-          </TextField>
-          {galat && <Alert severity="error">{galat}</Alert>}
+          </KolomIsian>
+          {galat && <AlertOtomatis severity="error" onTutup={() => setGalat('')}>{galat}</AlertOtomatis>}
         </Stack>
       </DialogContent>
       <DialogActions>
