@@ -9,6 +9,14 @@ import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './store/Store';
 import Spinner from './views/spinner/Spinner';
+import axiosInstance from './utils/axiosInstance';
+import { pasangMockDummy } from './mocks/dummy/pasangMockDummy';
+
+// Akun dummy Waka Kurikulum & Guru selama backend Perangkat Ajar belum ada.
+// import.meta.env.DEV bernilai false saat build, jadi mock ikut terbuang dari bundel produksi.
+if (import.meta.env.DEV) {
+  pasangMockDummy(axiosInstance, () => store.getState().user.accessToken);
+}
 
 
 //Import React Query client and Devtols

@@ -20,6 +20,7 @@ import { Visibility, VisibilityOff, MailOutline, LockOutlined } from '@mui/icons
 import { setUser, clearUser } from 'src/store/apps/user/userSlice';
 import { jwtDecode } from 'jwt-decode';
 import { getDefaultPortal, normalisasiDaftarPersona } from 'src/portals/registry';
+import DummyAkunHint from 'src/mocks/dummy/DummyAkunHint';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [email, setEmail] = useState('');
@@ -106,6 +107,15 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       ) : null}
 
       {(error || success) && <Alerts error={error} success={success} />}
+
+      {import.meta.env.DEV && (
+        <DummyAkunHint
+          onPilih={(akun) => {
+            setEmail(akun.email);
+            setPassword(akun.password);
+          }}
+        />
+      )}
 
       <Box component="form" onSubmit={handleLogin} noValidate>
         <CustomFormLabel htmlFor="email" sx={{ mt: 0 }}>
