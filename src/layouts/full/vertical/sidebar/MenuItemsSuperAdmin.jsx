@@ -4,6 +4,7 @@ import {
     IconHealthRecognition,
     IconTargetArrow,
     IconDashboard,
+    IconSchool,
   } from '@tabler/icons-react';
   
 import { uniqueId } from 'lodash';
@@ -57,6 +58,12 @@ import { uniqueId } from 'lodash';
         title: 'Fitur Tambahan Sekolah',
         icon: IconHealthRecognition,
         href: '/dashboard/super-admin/fitur-tambahan',
+    },
+    {
+        id: uniqueId(),
+        title: 'Guru Mandiri',
+        icon: IconSchool,
+        href: '/dashboard/super-admin/guru-mandiri',
     },
     {
         id: uniqueId(),

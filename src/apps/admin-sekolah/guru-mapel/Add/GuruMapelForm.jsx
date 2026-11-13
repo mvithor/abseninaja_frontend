@@ -16,7 +16,7 @@ const TambahGuruMapelForm = ({ setSuccess, setError }) => {
   });
 
   const { data: pegawaiOptions = [], isError: pegawaiError, isLoading: pegawaiLoading } = useQuery({
-    queryKey: ["pegawaiOptions"],
+    queryKey: ["dropdownGuru"],
     queryFn: async () => {
       const res = await axiosInstance.get("/api/v1/admin-sekolah/dropdown/guru");
       return res.data?.data ?? [];

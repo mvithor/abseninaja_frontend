@@ -2,6 +2,7 @@ import axios from 'axios';
 import { store } from '../store/Store';
 import { clearUser } from '../store/apps/user/userSlice';
 import isTokenExpired from './isTokenExpired';
+import { adalahGalat401Bisnis } from './galatSesi';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -9,7 +10,8 @@ const axiosInstance = axios.create({
   withCredentials: true,
 });
 
-const PUBLIC_AUTH_ENDPOINTS = ['/api/v1/login'];
+// ganti-sandi-awal dipanggil sebelum ada sesi (kewenangannya tiket sekali pakai), jadi tanpa token dan tanpa pengalihan.
+const PUBLIC_AUTH_ENDPOINTS = ['/api/v1/login', '/api/v1/auth/ganti-sandi-awal'];
 const isPublicAuthRequest = (url) => PUBLIC_AUTH_ENDPOINTS.some((path) => url?.includes(path));
 
 // Logout butuh token, tapi 401-nya tidak boleh memicu pengalihan sendiri:
@@ -60,7 +62,8 @@ axiosInstance.interceptors.response.use(
 
     // 401 dari server berarti sesi tidak berlaku (token tidak valid, kedaluwarsa, atau dicabut).
     // 503 (Redis bermasalah) dan 403 (tidak punya izin) sengaja TIDAK mengeluarkan pengguna.
-    if (error.response?.status === 401 && !isPublicAuthCall && !isLogoutRequest(error.config?.url)) {
+    // 401 bisnis (mis. sandi lama salah di form ganti sandi) bukan akhir sesi: pesannya tampil di form.
+    if (error.response?.status === 401 && !isPublicAuthCall && !isLogoutRequest(error.config?.url) && !adalahGalat401Bisnis(error)) {
       forceLogout();
     }
 

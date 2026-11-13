@@ -15,7 +15,7 @@ import {
   Paper,
   CircularProgress
 } from '@mui/material';
-import { IconEdit, IconTrash } from '@tabler/icons-react';
+import { IconEdit, IconTrash, IconUserOff } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 
 const getNamaPegawai = (row) => {
@@ -43,6 +43,7 @@ const PegawaiGuruTable = ({
   handleChangeRowsPerPage,
   handleEdit,
   handleDelete,
+  handleNonaktifkan,
   isLoading,
   isError,
   errorMessage
@@ -171,6 +172,14 @@ const PegawaiGuruTable = ({
                           <IconEdit width={18} />
                         </IconButton>
                       </Tooltip>
+                      <Tooltip title="Nonaktifkan" placement="bottom">
+                        <IconButton
+                          onClick={() => handleNonaktifkan(pegawaiGuru.id, getNamaPegawai(pegawaiGuru))}
+                          aria-label="Nonaktifkan pegawai"
+                        >
+                          <IconUserOff width={18} />
+                        </IconButton>
+                      </Tooltip>
                       <Tooltip title="Hapus" placement="bottom">
                         <IconButton onClick={() => handleDelete(pegawaiGuru.id)}>
                           <IconTrash width={18} />
@@ -212,6 +221,7 @@ PegawaiGuruTable.propTypes = {
   handleChangeRowsPerPage: PropTypes.func.isRequired,
   handleEdit: PropTypes.func.isRequired,
   handleDelete: PropTypes.func.isRequired,
+  handleNonaktifkan: PropTypes.func.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isError: PropTypes.bool.isRequired,
   errorMessage: PropTypes.string

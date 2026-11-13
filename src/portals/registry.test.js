@@ -10,6 +10,7 @@ import {
   canAccessPortal,
   portalLainSelain,
   tujuanSaatDitolak,
+  PERAN_GURU_LAD,
 } from './registry.js';
 
 const daftar = (...kode) => kode.map((k) => ({ kode: k, label: k, portal: null, tahun_ajaran_id: null }));
@@ -141,6 +142,58 @@ test('tujuanSaatDitolak: sudah berada di bawah portal utama tidak dialihkan lagi
   assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/guru-sekolah/apa-saja'), '/forbidden');
   // awalan yang mirip tetapi bukan sub-rute tidak dianggap berada di bawahnya
   assert.equal(tujuanSaatDitolak(guruSaja, '/dashboard/guru-sekolah-lain'), '/dashboard/guru-sekolah');
+});
+
+test('guru LAD: portal terbuka hanya untuk pegawai dengan persona guru_lad, dari server maupun klaim token lama', () => {
+  assert.deepEqual(keys(pegawai({ daftarPersona: daftar(PERSONA.GURU_LAD) })), ['guru-lad']);
+  assert.deepEqual(keys(pegawai({ personas: [PERSONA.GURU_LAD] })), ['guru-lad']);
+  assert.deepEqual(keys({ role: 'admin sekolah', daftarPersona: daftar(PERSONA.GURU_LAD) }), ['admin-sekolah']);
+  assert.deepEqual(keys({ role: 'siswa', daftarPersona: daftar(PERSONA.GURU_LAD) }), []);
+  assert.equal(canAccessPortal(pegawai({ daftarPersona: daftar(PERSONA.GURU_LAD) }), 'guru-lad'), true);
+  assert.equal(canAccessPortal(pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) }), 'guru-lad'), false);
+});
+
+test('guru yang HANYA memakai LAD tidak lagi ditolak: tujuan awalnya dashboard LAD', () => {
+  const guruLad = pegawai({ daftarPersona: daftar(PERSONA.GURU_LAD) });
+  assert.equal(getDefaultPortal(guruLad).path, '/dashboard/guru-lad');
+  assert.equal(getDefaultPortal(guruLad).key, 'guru-lad');
+});
+
+test('guru yang merangkap mata pelajaran dan LAD tetap mendarat di dashboard Guru (perilaku lama tidak bergeser)', () => {
+  const rangkap = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL, PERSONA.GURU_LAD) });
+  assert.deepEqual(keys(rangkap), ['guru', 'guru-lad']);
+  assert.equal(getDefaultPortal(rangkap).key, 'guru');
+  const sesiLama = pegawai({ personas: [PERSONA.GURU_MAPEL, PERSONA.GURU_LAD] });
+  assert.equal(getDefaultPortal(sesiLama).key, 'guru');
+});
+
+test('persona lain mengalahkan LAD sebagai tujuan awal, dan LAD mengalahkan akun pihak luar', () => {
+  const kepala = pegawai({ daftarPersona: daftar(PERSONA.GURU_LAD, PERSONA.KEPALA_SEKOLAH) });
+  assert.equal(getDefaultPortal(kepala).key, 'kepala-sekolah');
+  const bk = pegawai({ daftarPersona: daftar(PERSONA.GURU_LAD, PERSONA.GURU_BK) });
+  assert.equal(getDefaultPortal(bk).key, 'guru-bk');
+});
+
+test('guru LAD yang dinonaktifkan (persona hilang dari daftar server) tidak punya portal lagi', () => {
+  assert.equal(getDefaultPortal(pegawai({ daftarPersona: [] })), null);
+  assert.equal(tujuanSaatDitolak(pegawai({ daftarPersona: [] }), '/dashboard/guru-lad'), '/forbidden');
+});
+
+test('guru LAD yang masih punya portal lain diarahkan ke portal itu saat LAD ditolak', () => {
+  const masihGuru = pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) });
+  assert.equal(tujuanSaatDitolak(masihGuru, '/dashboard/guru-lad'), '/dashboard/guru-sekolah');
+});
+
+test('guru mandiri: hanya portal guru-lad, dan hanya bila persona guru_lad ada', () => {
+  const mandiri = (extra = {}) => ({ role: 'guru mandiri', ...extra });
+  assert.deepEqual(PERAN_GURU_LAD, ['pegawai', 'guru mandiri']);
+  assert.deepEqual(keys(mandiri({ daftarPersona: daftar(PERSONA.GURU_LAD) })), ['guru-lad']);
+  assert.equal(getDefaultPortal(mandiri({ daftarPersona: daftar(PERSONA.GURU_LAD) })).path, '/dashboard/guru-lad');
+  assert.deepEqual(keys(mandiri({ personas: [PERSONA.GURU_LAD] })), ['guru-lad']);
+  // tanpa persona (dibekukan) tidak punya portal; persona lain tidak membuka portal lain bagi peran ini
+  assert.equal(getDefaultPortal(mandiri({ daftarPersona: [] })), null);
+  assert.deepEqual(keys(mandiri({ daftarPersona: daftar(PERSONA.GURU_MAPEL, PERSONA.KEPALA_SEKOLAH) })), []);
+  assert.equal(tujuanSaatDitolak(mandiri({ daftarPersona: [] }), '/dashboard/guru-lad'), '/forbidden');
 });
 
 test('portal guru-bk: terbuka untuk guru_bk maupun koordinator_bk', () => {

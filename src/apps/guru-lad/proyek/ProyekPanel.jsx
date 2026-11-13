@@ -25,6 +25,7 @@ import {
   labelProyek, TEKS_JENIS, tidakDikumpulkan, hitungJenis,
 } from './proyek';
 import AlertOtomatis from 'src/components/alerts/AlertOtomatis';
+import { KEPASTIAN, kepastianSimpan, pesanSimpanGagal } from '../kepastian';
 
 const kunci = (siswaId, proyekId) => `${siswaId}:${proyekId}`;
 
@@ -139,7 +140,9 @@ export default function ProyekPanel({
         if (s) peta[kunci(s.siswa_id, s.proyek_id)] = g.pesan;
       });
       setGalatServer(peta);
-      setPesan({ jenis: 'error', teks: pesanGalat(error, 'Nilai belum tersimpan. Coba lagi.') });
+      setPesan(pesanSimpanGagal(error, { teksPasti: pesanGalat(error, 'Nilai belum tersimpan. Coba lagi.'), objek: 'nilai proyek' }));
+      // Belum pasti tersimpan: muat ulang dari server supaya tampilan mengikuti yang sebenarnya tersimpan.
+      if (sudah.size === 0 && kepastianSimpan(error) === KEPASTIAN.TIDAK_PASTI) onBerubah();
     } finally {
       setSibuk(false);
     }

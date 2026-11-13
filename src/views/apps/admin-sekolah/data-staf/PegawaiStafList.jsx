@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -18,6 +18,8 @@ import PageContainer from "src/components/container/PageContainer";
 import ParentCard from "src/components/shared/ParentCard";
 import PegawaiStafTable from "src/apps/admin-sekolah/data-staf/List/PegawaiStafTable";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import DialogNonaktif from 'src/apps/pegawai-status/DialogNonaktif';
+import useNonaktifkanPegawai from 'src/apps/pegawai-status/useNonaktifkanPegawai';
 import axiosInstance from "src/utils/axiosInstance";
 
 const fetchPegawaiStaf = async () => {
@@ -43,6 +45,18 @@ const PegawaiStafList = () => {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  // Nonaktifkan = mekanisme umum semua pegawai: alasan wajib, riwayat tersimpan, dan akun bisa diaktifkan kembali.
+  const nonaktif = useNonaktifkanPegawai({
+    onHasil: ({ sukses, galat }) => {
+      setSuccess(sukses);
+      setError(galat);
+      setTimeout(() => {
+        setSuccess('');
+        setError('');
+      }, galat ? 10000 : 4000);
+    },
+  });
 
   const { data: staf = [], isLoading, isError, error: queryError } = useQuery({
     queryKey: ['pegawaiStaf'],
@@ -85,6 +99,13 @@ const PegawaiStafList = () => {
         return na.localeCompare(nb);
       });
   }, [staf, searchQuery]);
+
+  // Sesudah Nonaktifkan atau Hapus, halaman terakhir bisa habis: mundur ke halaman terakhir yang masih berisi.
+  useEffect(() => {
+    if (rowsPerPage > 0 && page > 0 && page * rowsPerPage >= filteredPegawaiStaf.length) {
+      setPage(Math.max(0, Math.ceil(filteredPegawaiStaf.length / rowsPerPage) - 1));
+    }
+  }, [filteredPegawaiStaf.length, page, rowsPerPage]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -163,6 +184,7 @@ const PegawaiStafList = () => {
           handleChangeRowsPerPage={handleRowsPerPageChange}
           handleEdit={handleEdit}
           handleDelete={handleOpenConfirmDialog}
+          handleNonaktifkan={nonaktif.buka}
           isLoading={isLoading}
           isError={isError}
           errorMessage={queryError?.message || "Terjadi kesalahan saat memuat data"}
@@ -204,6 +226,7 @@ const PegawaiStafList = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <DialogNonaktif {...nonaktif.dialog} />
     </PageContainer>
   );
 };

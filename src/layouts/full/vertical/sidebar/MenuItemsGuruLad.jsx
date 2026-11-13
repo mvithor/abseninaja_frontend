@@ -1,9 +1,11 @@
-import { IconChartBar } from '@tabler/icons-react';
+import { IconChartBar, IconId } from '@tabler/icons-react';
 import { uniqueId } from 'lodash';
 
-// Menu Dashboard Analitik Pembelajaran (LAD). Tidak lewat registri portal karena aksesnya ditentukan
-// server (fitur sekolah aktif DAN akun terdaftar sebagai guru LAD); SidebarItems menampilkannya
-// hanya bila probe /api/v1/lad/ping berhasil.
+// Menu Dashboard Analitik Pembelajaran (LAD). Akses akhirnya diputuskan server (fitur sekolah aktif DAN akun terdaftar
+// aktif sebagai guru LAD). SidebarItems memakainya lewat portal `guru-lad` (persona guru_lad dari login atau /konteks);
+// untuk sesi yang belum membawa persona itu, probe /api/v1/lad/ping menambahkannya (lihat menuLad.js). Guru yang baru
+// dinonaktifkan masih melihat menu ini sampai /konteks menyegarkan persona (maksimal sekitar satu menit); halaman LAD
+// tetap menolak dengan pesan yang jelas.
 const MenuitemsGuruLad = [
   {
     navlabel: true,
@@ -15,6 +17,12 @@ const MenuitemsGuruLad = [
     icon: IconChartBar,
     href: '/dashboard/guru-lad',
     chipColor: 'secondary',
+  },
+  {
+    id: uniqueId(),
+    title: 'Profil Laporan',
+    icon: IconId,
+    href: '/dashboard/guru-lad/profil',
   },
 ];
 

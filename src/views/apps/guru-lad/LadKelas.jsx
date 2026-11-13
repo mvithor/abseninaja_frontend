@@ -108,7 +108,9 @@ export default function LadKelas() {
       </PageContainer>
     );
   }
-  if (error) {
+  // Layar galat penuh HANYA bila tidak ada data sama sekali. Bila muat ulang gagal tetapi data sebelumnya masih ada
+  // (mis. koneksi putus tepat setelah simpan), tab dan isian yang belum tersimpan tidak boleh hilang.
+  if (error && !data) {
     const tidakAda = error.response?.status === 404;
     return (
       <PageContainer title="Kelas | Analitik Pembelajaran" description="Detail kelas">

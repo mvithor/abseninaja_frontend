@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux';
 import { useQuery } from '@tanstack/react-query';
+import { PERAN_GURU_LAD } from 'src/portals/registry';
 import { cekAkses, kunciLad } from './api';
 
 /**
@@ -12,7 +13,7 @@ export default function useAksesLad() {
   const { data, isLoading, error } = useQuery({
     queryKey: kunciLad.akses,
     queryFn: cekAkses,
-    enabled: role === 'pegawai',
+    enabled: PERAN_GURU_LAD.includes(role),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });

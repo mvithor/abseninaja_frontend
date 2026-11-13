@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
 import GerbangKonteksBk from "src/components/pemetaan-siswa/GerbangKonteksBk";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
+import { PERAN_GURU_LAD } from "src/portals/registry";
 
 // Layout
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -21,6 +22,9 @@ const AdminSekolahAdd = Loadable(lazy(() => import('../views/apps/super-admin/ad
 // Fitur Tambahan Sekolah
 const FiturTambahanSekolahList = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanSekolahList')));
 const FiturTambahanSekolahEdit = Loadable(lazy(() => import('../views/apps/super-admin/fitur-tambahan-sekolah/FiturTambahanEdit')));
+// Guru Mandiri (LAD standalone)
+const GuruMandiriList = Loadable(lazy(() => import('../views/apps/super-admin/guru-mandiri/GuruMandiriList')));
+const GuruMandiriAdd = Loadable(lazy(() => import('../views/apps/super-admin/guru-mandiri/GuruMandiriAdd')));
 
 
 
@@ -44,6 +48,9 @@ const PegawaiGuruEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/
 const PegawaiStafList = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafList')));
 const PegawaiStafAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafAdd')));
 const PegawaiStafEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-staf/PegawaiStafEdit')));
+// Pegawai Nonaktif dan Perlu Pengganti
+const PegawaiNonaktifList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pegawai-nonaktif/PegawaiNonaktifList')));
+const PerluPenggantiList = Loadable(lazy(() => import('../views/apps/admin-sekolah/pegawai-nonaktif/PerluPenggantiList')));
 // Data Wali Siswa
 const WaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-wali-siswa/WaliSiswaList')));
 const WaliSiswaAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/data-wali-siswa/WaliSiswaAdd')));
@@ -330,6 +337,7 @@ const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/Admi
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
+const LadProfil = Loadable(lazy(() => import('../views/apps/guru-lad/LadProfil')));
 // Perangkat Ajar (Guru)
 const PerangkatAjarSaya = Loadable(lazy(() => import('../views/apps/guru-sekolah/perangkat-ajar/PerangkatAjarSaya')));
 
@@ -349,6 +357,8 @@ const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
 
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
+// Halaman akun: semua peran yang sudah masuk
+const GantiPassword = Loadable(lazy(() => import('../views/apps/akun/GantiPassword')));
 const Activation = Loadable(lazy(() => import('../views/authentication/auth/Activation')));
 const PrivacyPolicy = Loadable(lazy(() => import('../views/privacy-policy/PrivacyPolicy')));
 const Error = Loadable(lazy(() => import('../views/authentication/Error')));
@@ -373,6 +383,14 @@ const Router = [
         element: <FullLayout/>,
         children: [
             {
+                // Tanpa allowedRoles: ProtectedRoute hanya memastikan sesi masih berlaku.
+                path: 'akun',
+                element: <ProtectedRoute />,
+                children: [
+                    { path: 'ganti-password', element: <GantiPassword /> },
+                ]
+            },
+            {
                 path: 'dashboard/admin-sekolah',
                 element: <ProtectedRoute allowedRoles={['admin sekolah']}/>,
                 children: [
@@ -392,6 +410,8 @@ const Router = [
                     { path: 'pegawai/guru/edit/:id', element: <PegawaiGuruEdit /> },
                     // Data Pegawai Staff
                     { path: 'pegawai/staf', element: <PegawaiStafList /> },
+                    { path: 'pegawai/nonaktif', element: <PegawaiNonaktifList /> },
+                    { path: 'pegawai/perlu-pengganti', element: <PerluPenggantiList /> },
                     { path: 'pegawai/staf/tambah-staf', element: <PegawaiStafAdd /> },
                     { path: 'pegawai/staf/edit/:id', element: <PegawaiStafEdit /> },
                     // Wali Kelas
@@ -625,6 +645,9 @@ const Router = [
                     // Fitur Tambahan Sekolah
                     { path: 'fitur-tambahan', element: <FiturTambahanSekolahList /> },
                     { path: 'fitur-tambahan/edit/:id', element: <FiturTambahanSekolahEdit /> },
+                    // Guru Mandiri
+                    { path: 'guru-mandiri', element: <GuruMandiriList /> },
+                    { path: 'guru-mandiri/tambah', element: <GuruMandiriAdd /> },
                 ]
         
               },
@@ -677,11 +700,12 @@ const Router = [
             {
                 // LAD: akses akhir diputuskan server (fitur sekolah + guru terdaftar); halaman menangani 403.
                 path: 'dashboard/guru-lad',
-                element: <ProtectedRoute allowedRoles={['pegawai']} />,
+                element: <ProtectedRoute allowedRoles={PERAN_GURU_LAD} />,
                 children: [
                     { path: '', element: <LadBeranda /> },
                     { path: 'kelas/:kelasId', element: <LadKelas /> },
                     { path: 'kelas/:kelasId/siswa/:siswaId', element: <LadSiswa /> },
+                    { path: 'profil', element: <LadProfil /> },
                 ]
             },
             {

@@ -19,6 +19,7 @@ export const PERSONA = Object.freeze({
   KEPALA_SEKOLAH: 'kepala_sekolah',
   WAKA_KURIKULUM: 'waka_kurikulum',
   GURU_BK: 'guru_bk',
+  GURU_LAD: 'guru_lad',
   // Diberikan Admin Sekolah. Anggota Tim BK lain mendapat `guru_bk` otomatis saat ditambahkan
   // koordinator, jadi admin tidak lagi memberi persona Guru BK secara langsung.
   KOORDINATOR_BK: 'koordinator_bk',
@@ -58,6 +59,11 @@ export const hasPersona = (user, persona) => {
 
 const isPegawaiDengan = (persona) => (user) =>
   user?.role === 'pegawai' && hasPersona(user, persona);
+
+// Peran yang boleh memegang persona guru LAD: pegawai sekolah (terintegrasi) dan guru mandiri (tanpa sekolah Absenin).
+// Guru mandiri HANYA punya persona ini, jadi tidak ada portal lain yang cocok untuknya.
+export const PERAN_GURU_LAD = Object.freeze(['pegawai', 'guru mandiri']);
+const isGuruLad = (user) => PERAN_GURU_LAD.includes(user?.role) && hasPersona(user, PERSONA.GURU_LAD);
 
 // priority: semakin besar semakin diutamakan sebagai tujuan awal setelah login.
 // Hanya menentukan halaman pertama dan urutan grup menu; BUKAN pagar akses.
@@ -115,6 +121,17 @@ export const PORTALS = [
     path: '/dashboard/guru-sekolah',
     priority: 70,
     isAllowed: isPegawaiDengan(PERSONA.GURU_MAPEL),
+  },
+  {
+    // Guru yang memakai Analitik Pembelajaran (LAD). BE menghitung persona ini dari fitur sekolah dan baris lad_guru
+    // yang aktif (guru_lad). Prioritas di bawah guru mata pelajaran: guru yang merangkap tetap mendarat di
+    // dashboard Guru, sedangkan guru yang hanya memakai LAD (mis. sekolah standalone) mendarat di LAD, bukan
+    // ditolak. Akses akhir tetap diputuskan server di setiap permintaan.
+    key: 'guru-lad',
+    label: 'Analitik Pembelajaran',
+    path: '/dashboard/guru-lad',
+    priority: 65,
+    isAllowed: isGuruLad,
   },
   {
     key: 'admin-mitra-industri',

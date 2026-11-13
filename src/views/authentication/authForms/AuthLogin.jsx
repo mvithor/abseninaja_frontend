@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import {
   Box,
   Typography,
   FormGroup,
   FormControlLabel,
   Button,
-  Stack,
   InputAdornment,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import { useDispatch } from 'react-redux';
+import { useQueryClient } from '@tanstack/react-query';
 import axiosInstance from 'src/utils/axiosInstance';
 import Alerts from 'src/components/alerts/Alerts';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import CustomCheckbox from 'src/components/forms/theme-elements/CustomCheckbox';
 import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
@@ -20,6 +21,11 @@ import { Visibility, VisibilityOff, MailOutline, LockOutlined } from '@mui/icons
 import { setUser, clearUser } from 'src/store/apps/user/userSlice';
 import { jwtDecode } from 'jwt-decode';
 import { getDefaultPortal, normalisasiDaftarPersona } from 'src/portals/registry';
+import { PESAN_LOGIN, pesanDariGalatLogin, pesanTanpaPortal, tiketGantiSandiDariGalat } from './pesanLogin';
+import { PESAN_SANDI } from 'src/apps/auth/sandi';
+
+// Hanya dibutuhkan pada login pertama guru mandiri, jadi tidak ikut bundel halaman login.
+const FormGantiSandiAwal = lazy(() => import('src/apps/auth/FormGantiSandiAwal'));
 import DummyAkunHint from 'src/mocks/dummy/DummyAkunHint';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
@@ -30,14 +36,17 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Tiket sekali pakai dari server saat sandi awal wajib diganti. Sengaja state lokal: tidak masuk Redux persist atau URL.
+  const [tiketGanti, setTiketGanti] = useState(null);
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     if (searchParams.get('expired')) {
-      setError('Sesi anda telah berakhir. Silakan login kembali.');
+      setError(PESAN_LOGIN.SESI_BERAKHIR);
       dispatch(clearUser());
       const timer = setTimeout(() => navigate('/login'), 5000);
       return () => clearTimeout(timer);
@@ -53,7 +62,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
     // Form memakai noValidate, jadi atribut `required` tidak dicek browser.
     // Cek di sini agar tidak mengirim request yang pasti ditolak backend.
     if (!email.trim() || !password) {
-      setError('Email dan password wajib diisi.');
+      setError(PESAN_LOGIN.WAJIB_DIISI);
       return;
     }
 
@@ -73,16 +82,14 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       const daftar = normalisasiDaftarPersona(daftarPersona);
       const portal = getDefaultPortal({ role, personas, isKepalaJurusan, isGuruMapel, daftarPersona: daftar });
       if (!portal) {
-        setError(
-          role === 'pegawai'
-            ? 'Akun Anda tidak memiliki akses ke dashboard ini.'
-            : 'Pengguna tidak valid.',
-        );
+        setError(pesanTanpaPortal(role));
         dispatch(clearUser());
         setIsSubmitting(false);
         return;
       }
 
+      // Pengguna lain bisa masuk di tab yang sama tanpa logout: cache akun sebelumnya tidak boleh terpakai.
+      queryClient.clear();
       dispatch(
         setUser({ name, role, userId, accessToken, deviceId, isKepalaJurusan, isGuruMapel, personas, daftarPersona: daftar }),
       );
@@ -90,12 +97,44 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       setSuccess('Login berhasil! Mengarahkan...');
       setTimeout(() => navigate(portal.path), 2000);
     } catch (error) {
-      const msg = error.response?.data?.msg || 'Terjadi kesalahan. Silakan coba lagi.';
-      setError(msg);
       dispatch(clearUser());
       setIsSubmitting(false);
+      // Sandi awal belum diganti: server tidak menerbitkan sesi, hanya tiket untuk form ganti sandi.
+      const tiket = tiketGantiSandiDariGalat(error);
+      if (tiket) {
+        setPassword('');
+        setTiketGanti(tiket);
+        return;
+      }
+      setError(pesanDariGalatLogin(error));
     }
   };
+
+  const kembaliKeMasuk = ({ pesanSukses = '', pesanGalat = '' } = {}) => {
+    setTiketGanti(null);
+    setPassword('');
+    setSuccess(pesanSukses);
+    setError(pesanGalat);
+  };
+
+  if (tiketGanti) {
+    return (
+      <Suspense
+        fallback={
+          <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+            <CircularProgress />
+          </Box>
+        }
+      >
+        <FormGantiSandiAwal
+          tiket={tiketGanti}
+          onSelesai={() => kembaliKeMasuk({ pesanSukses: PESAN_SANDI.SUKSES_AWAL })}
+          onTiketHabis={(pesan) => kembaliKeMasuk({ pesanGalat: pesan })}
+          onBatal={() => kembaliKeMasuk()}
+        />
+      </Suspense>
+    );
+  }
 
   return (
     <>
@@ -147,7 +186,7 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
           name="password"
           type={showPassword ? 'text' : 'password'}
           variant="outlined"
-          placeholder="Masukkan password Anda"
+          placeholder="Masukkan password"
           fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -174,22 +213,12 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
           }}
         />
 
-        <Stack justifyContent="space-between" direction="row" alignItems="center" my={2}>
-          <FormGroup>
-            <FormControlLabel
-              control={<CustomCheckbox defaultChecked />}
-              label="Ingat perangkat ini"
-            />
-          </FormGroup>
-          <Typography
-            component={Link}
-            to="/auth/forgot-password"
-            fontWeight={500}
-            sx={{ textDecoration: 'none', color: 'primary.main' }}
-          >
-            Lupa Password?
-          </Typography>
-        </Stack>
+        <FormGroup sx={{ my: 1 }}>
+          <FormControlLabel
+            control={<CustomCheckbox defaultChecked />}
+            label="Ingat perangkat ini"
+          />
+        </FormGroup>
 
         <Button
           type="submit"

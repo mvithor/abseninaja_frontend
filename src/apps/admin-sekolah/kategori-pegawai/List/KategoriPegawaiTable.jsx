@@ -13,10 +13,12 @@ import {
   TableContainer,
   Box,
   Paper,
-  CircularProgress
+  CircularProgress,
+  Chip,
 } from '@mui/material';
 import { IconEdit, IconTrash, IconEye } from '@tabler/icons-react';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
+import { adalahKategoriBawaan, judulAksiKategori } from 'src/apps/admin-sekolah/kategori-pegawai/kategori';
 
 const KategoriPegawaiTable = ({
     pegawai,
@@ -111,7 +113,10 @@ const KategoriPegawaiTable = ({
                             <Typography sx={{ fontSize: '1rem' }}>{page * rowsPerPage + index + 1}</Typography>
                             </TableCell>
                             <TableCell align='center'>
-                            <Typography sx={{ fontSize: '1rem' }}>{kategoriPegawai.nama_kategori}</Typography>
+                            <Typography component="span" sx={{ fontSize: '1rem' }}>{kategoriPegawai.nama_kategori}</Typography>
+                            {adalahKategoriBawaan(kategoriPegawai) && (
+                              <Chip label="Bawaan" size="small" sx={{ ml: 1, borderRadius: '8px', fontWeight: 600 }} />
+                            )}
                             </TableCell>
                             <TableCell>
                             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -120,15 +125,28 @@ const KategoriPegawaiTable = ({
                                     <IconEye width={20} />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Edit" placement="bottom">
-                                <IconButton onClick={() => handleEdit(kategoriPegawai.id)}>
+                                <Tooltip title={judulAksiKategori(kategoriPegawai, 'edit')} placement="bottom">
+                                {/* span: tooltip tetap muncul pada tombol yang dinonaktifkan */}
+                                <span>
+                                <IconButton
+                                    onClick={() => handleEdit(kategoriPegawai.id)}
+                                    disabled={adalahKategoriBawaan(kategoriPegawai)}
+                                    aria-label={`Edit ${kategoriPegawai.nama_kategori}`}
+                                >
                                     <IconEdit width={18} />
                                 </IconButton>
+                                </span>
                                 </Tooltip>
-                                <Tooltip title="Hapus" placement="bottom">
-                                <IconButton onClick={() => handleDelete(kategoriPegawai.id)}>
+                                <Tooltip title={judulAksiKategori(kategoriPegawai, 'hapus')} placement="bottom">
+                                <span>
+                                <IconButton
+                                    onClick={() => handleDelete(kategoriPegawai.id)}
+                                    disabled={adalahKategoriBawaan(kategoriPegawai)}
+                                    aria-label={`Hapus ${kategoriPegawai.nama_kategori}`}
+                                >
                                     <IconTrash width={18} />
                                 </IconButton>
+                                </span>
                                 </Tooltip>
                             </Box>
                             </TableCell>
