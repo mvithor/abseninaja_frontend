@@ -26,6 +26,7 @@ import { PESAN_SANDI } from 'src/apps/auth/sandi';
 
 // Hanya dibutuhkan pada login pertama guru mandiri, jadi tidak ikut bundel halaman login.
 const FormGantiSandiAwal = lazy(() => import('src/apps/auth/FormGantiSandiAwal'));
+import DummyAkunHint from 'src/mocks/dummy/DummyAkunHint';
 
 const AuthLogin = ({ title, subtitle, subtext }) => {
   const [email, setEmail] = useState('');
@@ -145,6 +146,15 @@ const AuthLogin = ({ title, subtitle, subtext }) => {
       ) : null}
 
       {(error || success) && <Alerts error={error} success={success} />}
+
+      {import.meta.env.DEV && (
+        <DummyAkunHint
+          onPilih={(akun) => {
+            setEmail(akun.email);
+            setPassword(akun.password);
+          }}
+        />
+      )}
 
       <Box component="form" onSubmit={handleLogin} noValidate>
         <CustomFormLabel htmlFor="email" sx={{ mt: 0 }}>

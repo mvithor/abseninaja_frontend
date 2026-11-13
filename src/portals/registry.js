@@ -20,6 +20,9 @@ export const PERSONA = Object.freeze({
   WAKA_KURIKULUM: 'waka_kurikulum',
   GURU_BK: 'guru_bk',
   GURU_LAD: 'guru_lad',
+  // Diberikan Admin Sekolah. Anggota Tim BK lain mendapat `guru_bk` otomatis saat ditambahkan
+  // koordinator, jadi admin tidak lagi memberi persona Guru BK secara langsung.
+  KOORDINATOR_BK: 'koordinator_bk',
 });
 
 // Sesi lama (token terbit sebelum klaim `personas` ada) hanya membawa boolean.
@@ -110,7 +113,7 @@ export const PORTALS = [
     label: 'Guru BK',
     path: '/dashboard/guru-bk',
     priority: 72,
-    isAllowed: isPegawaiDengan(PERSONA.GURU_BK),
+    isAllowed: (user) => isPegawaiDengan(PERSONA.GURU_BK)(user) || isPegawaiDengan(PERSONA.KOORDINATOR_BK)(user),
   },
   {
     key: 'guru',
@@ -154,6 +157,12 @@ export const getDefaultPortal = (user) => getUserPortals(user)[0] || null;
 
 export const canAccessPortal = (user, key) =>
   getUserPortals(user).some((portal) => portal.key === key);
+
+/**
+ * Portal utama selain `key`. Dipakai saat server menolak sebuah portal padahal persona di browser
+ * belum diperbarui (mis. akun BK dinonaktifkan): pengguna dialihkan ke portal lain yang masih ia pegang.
+ */
+export const portalLainSelain = (user, key) => getUserPortals(user).find((portal) => portal.key !== key) || null;
 
 /**
  * Tujuan saat akses ke sebuah portal ditolak. Pegawai yang kehilangan satu persona tetapi masih punya

@@ -1,4 +1,4 @@
-import { IconDashboard } from '@tabler/icons-react';
+import { IconDashboard, IconFileText } from '@tabler/icons-react';
 import { uniqueId } from 'lodash';
 
 
@@ -13,6 +13,12 @@ const MenuitemsGuruSekolah = [
     icon: IconDashboard,
     href: '/dashboard/guru-sekolah',
     chipColor: 'secondary',
+  },
+  {
+    id: uniqueId(),
+    title: 'Perangkat Ajar',
+    icon: IconFileText,
+    href: '/dashboard/guru-sekolah/perangkat-ajar',
   },
 ];
 

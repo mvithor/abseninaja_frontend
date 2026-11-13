@@ -8,6 +8,7 @@ import {
   getUserPortals,
   getDefaultPortal,
   canAccessPortal,
+  portalLainSelain,
   tujuanSaatDitolak,
   PERAN_GURU_LAD,
 } from './registry.js';
@@ -193,4 +194,18 @@ test('guru mandiri: hanya portal guru-lad, dan hanya bila persona guru_lad ada',
   assert.equal(getDefaultPortal(mandiri({ daftarPersona: [] })), null);
   assert.deepEqual(keys(mandiri({ daftarPersona: daftar(PERSONA.GURU_MAPEL, PERSONA.KEPALA_SEKOLAH) })), []);
   assert.equal(tujuanSaatDitolak(mandiri({ daftarPersona: [] }), '/dashboard/guru-lad'), '/forbidden');
+});
+
+test('portal guru-bk: terbuka untuk guru_bk maupun koordinator_bk', () => {
+  assert.equal(canAccessPortal(pegawai({ daftarPersona: daftar(PERSONA.KOORDINATOR_BK) }), 'guru-bk'), true);
+  assert.equal(canAccessPortal(pegawai({ daftarPersona: daftar(PERSONA.GURU_BK) }), 'guru-bk'), true);
+  assert.equal(canAccessPortal(pegawai({ daftarPersona: daftar(PERSONA.GURU_MAPEL) }), 'guru-bk'), false);
+  // satu portal saja walau memegang keduanya
+  assert.deepEqual(keys(pegawai({ daftarPersona: daftar(PERSONA.GURU_BK, PERSONA.KOORDINATOR_BK) })), ['guru-bk']);
+});
+
+test('portalLainSelain: portal utama berikutnya, atau null bila tidak ada', () => {
+  const guruBkDanMapel = pegawai({ daftarPersona: daftar(PERSONA.GURU_BK, PERSONA.GURU_MAPEL) });
+  assert.equal(portalLainSelain(guruBkDanMapel, 'guru-bk')?.key, 'guru');
+  assert.equal(portalLainSelain(pegawai({ daftarPersona: daftar(PERSONA.GURU_BK) }), 'guru-bk'), null);
 });
