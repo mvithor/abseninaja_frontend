@@ -4,6 +4,7 @@ import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
 import GerbangKonteksBk from "src/components/pemetaan-siswa/GerbangKonteksBk";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
 import { PERAN_GURU_LAD } from "src/portals/registry";
+import { landingRoutes } from "../views/landing/routes";
 
 // Layout
 const FullLayout = Loadable(lazy(() => import('../layouts/full/FullLayout')));
@@ -365,6 +366,7 @@ const Error = Loadable(lazy(() => import('../views/authentication/Error')));
 const Forbidden = Loadable(lazy(() => import('../views/authentication/Forbidden')));
 
 const Router = [
+    ...landingRoutes,
     {
         path: '/',
         element: <BlankLayout />, 
