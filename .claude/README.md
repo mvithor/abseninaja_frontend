@@ -17,6 +17,8 @@ Folder ini berisi subagent dan skill Claude Code yang dipakai bersama tim. Berka
 | `frontend-developer` | Halaman dan komponen React, MUI, TanStack Query |
 | `code-reviewer` | Review PR antar pemilik modul |
 | `test-engineer` | Strategi dan penulisan tes |
+| `landing-copywriter` | Copy landing page berbahasa Indonesia (judul, CTA, seksi, FAQ), dengan tahap anti-slop dan penandaan klaim. Tidak menulis kode. Skill terhubung: `copywriting`, `anti-slop-id` |
+| `landing-builder` | Membangun seksi landing di `src/views/landing` sesuai stack repo (JavaScript, MUI 7, tanpa Tailwind). Skill terhubung: `frontend-design`, `react-best-practices`, `web-performance-optimization` |
 
 ## Daftar skill
 
@@ -25,6 +27,8 @@ Folder ini berisi subagent dan skill Claude Code yang dipakai bersama tim. Berka
 | `react-best-practices` | Kinerja React: waterfall data, ukuran bundle, re-render. Sebagian aturan khusus Next.js dan tidak berlaku untuk Vite |
 | `web-performance-optimization` | Core Web Vitals, ukuran bundle, gambar, cache |
 | `frontend-design` | Arah visual untuk halaman baru. **Untuk dashboard admin dan LAD, utamakan konsistensi dengan komponen dan tema yang sudah ada** |
+| `copywriting` | Struktur dan copy halaman pemasaran (judul, CTA, ragam seksi). Berbahasa Inggris, disalin dari skill pribadi di vault. Terapkan prinsipnya, bukan contoh kalimatnya |
+| `anti-slop-id` | Menyunting teks Indonesia agar tidak generik dan menandai klaim yang belum terbukti. Mode Sunting dan Deteksi. Ditulis untuk proyek ini (15 Nov 2026) |
 
 ## Konvensi tim
 
