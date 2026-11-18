@@ -2,10 +2,13 @@ import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { IconChevronDown } from '@tabler/icons-react';
+import PenandaVerifikasi from './PenandaVerifikasi';
 import { colors, gerak, radius, shadows } from '../theme/tokens';
 import { resetDaftar, resetTombol } from '../theme/sx';
 
 // Akordeon FAQ. Satu butir terbuka sekali waktu. Tombol memakai aria-expanded.
+// Butir boleh memuat `verifikasi` (true atau teks label): penanda desain di
+// bawah jawaban untuk klaim yang belum terbukti.
 export default function Faq({ butir, bukaAwal = 0, sx }) {
   const dasarId = useId();
   const [buka, setBuka] = useState(bukaAwal);
@@ -96,6 +99,7 @@ export default function Faq({ butir, bukaAwal = 0, sx }) {
                 }}
               >
                 {b.a}
+                <PenandaVerifikasi verifikasi={b.verifikasi} sx={{ display: 'flex', width: 'fit-content', mt: '12px' }} />
               </Box>
             )}
           </Box>
@@ -107,7 +111,11 @@ export default function Faq({ butir, bukaAwal = 0, sx }) {
 
 Faq.propTypes = {
   butir: PropTypes.arrayOf(
-    PropTypes.shape({ q: PropTypes.string.isRequired, a: PropTypes.node.isRequired }),
+    PropTypes.shape({
+      q: PropTypes.string.isRequired,
+      a: PropTypes.node.isRequired,
+      verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+    }),
   ).isRequired,
   bukaAwal: PropTypes.number,
   sx: PropTypes.object,

@@ -49,7 +49,7 @@ function KartuJenis({ data }) {
       <Box component="p" sx={{ m: '4px 0 0', fontSize: '14px', color: g.sub }}>
         {data.sub}
       </Box>
-      <Box component="ul" sx={{ ...resetDaftar, mt: '24px', display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '15px' }}>
+      <Box component="ul" role="list" sx={{ ...resetDaftar, mt: '24px', display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '15px' }}>
         {data.butir.map((b) => (
           <Box key={b} component="li" sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
             <Box
@@ -63,7 +63,7 @@ function KartuJenis({ data }) {
           </Box>
         ))}
       </Box>
-      <Box component="ul" aria-label="Peran pengguna" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '8px', mt: '24px' }}>
+      <Box component="ul" role="list" aria-label="Peran pengguna" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '8px', mt: '24px' }}>
         {data.peran.map((p) => (
           <li key={p}>
             <Tag sx={{ height: 'auto', py: '6px', px: '12px', background: g.tag, color: colors.white }}>{p}</Tag>

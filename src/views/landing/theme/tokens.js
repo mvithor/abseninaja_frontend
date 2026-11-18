@@ -60,6 +60,13 @@ export const colors = {
   glassGaris: 'rgba(255,255,255,0.14)',
   penandaDaftar: '#7B7FC9', // butir daftar di kartu Sebelum
 
+  // Halaman dalam (F2): kartu kaca di bagian gelap perbandingan, strip lembut.
+  glassSangatTipis: 'rgba(255,255,255,0.06)', // kartu "Jalan sendiri"
+  garisKaca: 'rgba(255,255,255,0.2)', // tepi kartu dan tabel kaca
+  garisKacaAksen: 'rgba(255,255,255,0.28)', // tepi kartu gradasi di latar gelap
+  penandaTidak: '#9EA1D6', // ikon "tidak ada" pada tabel perbandingan
+  kartuLembut: '#F5F5FC', // strip bawah panel jenis sekolah
+
   // Status berhasil (ikon centang). Selalu berdampingan dengan label teks.
   success: '#12B76A',
 
@@ -79,6 +86,7 @@ export const gradients = {
   hero: 'linear-gradient(180deg,rgba(94,92,230,0.06) 0%,rgba(94,92,230,0) 100%)',
   heroFade: 'linear-gradient(180deg,rgba(255,255,255,0) 0%,#FFFFFF 100%)',
   stepLine: 'linear-gradient(90deg,#5E5CE6,#D9DCF5)',
+  stepLineVertikal: 'linear-gradient(180deg,#5E5CE6,#D9DCF5)', // garis linimasa
 };
 
 // Blob latar (lingkaran buram). Setiap butir: posisi, ukuran, warna, blur.
@@ -95,6 +103,10 @@ export const blobs = {
     { right: -80, top: -80, size: 280, color: 'rgba(255,255,255,0.14)', blur: 6 },
     { left: -60, bottom: -100, size: 260, color: 'rgba(56,161,255,0.35)', blur: 60 },
   ],
+  // Halaman dalam (F2): kilau pada kartu gradasi besar.
+  banner: [{ right: -90, top: -90, size: 300, color: 'rgba(255,255,255,0.12)', blur: 6 }], // banner analitik
+  panelJenis: [{ right: -90, top: -90, size: 280, color: 'rgba(255,255,255,0.12)', blur: 6 }], // kartu jenis sekolah
+  stripGelap: [{ left: -60, bottom: -120, size: 320, color: 'rgba(94,92,230,0.55)', blur: 100 }], // strip Prakersa
 };
 
 export const radius = {
@@ -135,6 +147,7 @@ export const shadows = {
   keAtas: '0 14px 28px -12px rgba(47,50,125,0.65)',
   kartuAksen: '0 30px 60px -30px rgba(94,92,230,0.7)', // kartu gradasi di latar gelap/terang (Beranda)
   lembar: '0 -20px 40px -20px rgba(23,22,58,0.4)',
+  tabKartu: '0 18px 36px -18px rgba(94,92,230,0.7)', // kartu tab jenis sekolah (aktif)
 };
 
 // Nilai khusus peraga (mock/ dan hiasan di Beranda). Bukan bagian sistem desain
@@ -160,6 +173,7 @@ export const peraga = {
     kartuKabar: '0 22px 48px -18px rgba(47,46,133,0.45)',
     ponsel: '0 36px 70px -30px rgba(16,16,51,0.7)',
     balon: '0 1px 2px rgba(16,24,40,0.06)',
+    perhatian: '0 24px 50px -24px rgba(16,16,51,0.6)', // peraga "Perlu perhatian" (Fitur)
   },
 };
 
@@ -213,6 +227,14 @@ export const huruf = {
     lineHeight: 1.1,
     fontWeight: 700,
   },
+  // Halaman dalam (F2).
+  angkaKartu: { fontSize: { xs: '20px', md: '30px' }, lineHeight: 1.15, fontWeight: 700 }, // kartu angka hero Fitur
+  angkaKartuTeks: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.15, fontWeight: 700 }, // angka berupa teks ("Web + HP")
+  judulBanner: { fontSize: { xs: '22px', md: '32px' } }, // h2 banner analitik (menimpa judulBagian)
+  judulPanel: { fontSize: { xs: '20px', md: '30px' } }, // h2 strip Prakersa dan nama jenis sekolah
+  judulKartuBesar: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu perbandingan
+  judulModul: { fontSize: { xs: '16px', md: '18px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu modul sebaris
+  judulTab: { fontSize: { xs: '16px', md: '18px' }, fontWeight: 600 }, // kartu tab jenis sekolah
   eyebrow: {
     fontSize: '12.5px',
     fontWeight: 600,

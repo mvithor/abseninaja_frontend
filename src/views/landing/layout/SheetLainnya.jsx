@@ -186,7 +186,7 @@ export default function SheetLainnya({ id, terbuka, onTutup }) {
         </Box>
 
         <Box component="nav" aria-label="Menu lainnya" sx={{ overflowY: 'auto', overscrollBehavior: 'contain', minHeight: 0 }}>
-          <Box component="ul" sx={resetDaftar}>
+          <Box component="ul" role="list" sx={resetDaftar}>
             {grupMenu.map((g) => {
               const buka = grupBuka === g.key;
               const idSub = `${id}-${g.key}`;

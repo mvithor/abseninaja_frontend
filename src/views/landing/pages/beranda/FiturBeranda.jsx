@@ -110,7 +110,7 @@ export default function FiturBeranda() {
           <Box component="p" sx={{ m: '8px 0 0', ...huruf.isi, color: colors.onDark }}>
             <Teks web={analitik.deskripsi.web} seluler={analitik.deskripsi.mobile} />
           </Box>
-          <Box component="ul" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '8px', mt: '14px' }}>
+          <Box component="ul" role="list" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '8px', mt: '14px' }}>
             {analitik.tag.map((t) => (
               <li key={t}>
                 <Tag sx={{ height: 'auto', py: '5px', px: '12px', background: colors.glassGaris, color: colors.white }}>{t}</Tag>

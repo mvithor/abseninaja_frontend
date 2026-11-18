@@ -31,7 +31,7 @@ export default function Komunikasi() {
             rata="kiri"
             sx={{ gap: '20px', ...sxJudulBeranda }}
           />
-          <Box component="ul" aria-label="Kanal kabar" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          <Box component="ul" role="list" aria-label="Kanal kabar" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
             {D.kanal.map((k) => (
               <li key={k}>
                 <Tag

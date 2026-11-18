@@ -99,7 +99,7 @@ export default function Footer({ tampilkanAfiliator = false }) {
               <Box component="p" sx={{ m: '0 0 8px', fontSize: '14px', fontWeight: 600, color: colors.white }}>
                 {k.judul}
               </Box>
-              <Box component="ul" sx={{ ...resetDaftar, display: 'flex', flexDirection: 'column' }}>
+              <Box component="ul" role="list" sx={{ ...resetDaftar, display: 'flex', flexDirection: 'column' }}>
                 {k.tautan.map((t) => (
                   <li key={t.label}>
                     {t.teks ? (

@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Box, ThemeProvider, createTheme } from '@mui/material';
 import { baselightTheme } from 'src/theme/DefaultColors';
 import PromoBar from './PromoBar';
@@ -8,6 +8,7 @@ import BottomTabBar from './BottomTabBar';
 import TombolKeAtas from './TombolKeAtas';
 import { colors, font, gradients, layout } from '../theme/tokens';
 import { cincinFokus, hanyaPembaca } from '../theme/sx';
+import { footerDenganAfiliator } from './rute';
 
 // Tema landing: selalu terang, diturunkan dari palet terang aplikasi
 // (src/theme/DefaultColors.jsx). Dibuat sekali di tingkat modul dan tidak
@@ -33,7 +34,10 @@ const temaLanding = createTheme({
 // Layout rute landing: Poppins dimuat hanya di sini (bukan index.html, supaya
 // seluruh aplikasi tidak terpengaruh), mode terang dipaksa, lalu menyusun
 // PromoBar, Header, konten, Footer, TombolKeAtas, dan bar tab bawah (< md).
+// Footer berkartu afiliator di semua halaman dalam, tanpa kartu di Beranda
+// (aturan per rute di layout/rute.js).
 export default function LandingLayout() {
+  const { pathname } = useLocation();
   return (
     <ThemeProvider theme={temaLanding}>
       {/* React 19 mengangkat link ini ke <head> otomatis; precedence membuat render menunggu CSS font dimuat. */}
@@ -95,7 +99,7 @@ export default function LandingLayout() {
         </Box>
         {/* Padding bawah di seluler: footer tidak tertutup bar tab. */}
         <Box sx={{ background: gradients.dark, pb: { xs: layout.tinggiBarTab, md: 0 } }}>
-          <Footer />
+          <Footer tampilkanAfiliator={footerDenganAfiliator(pathname)} />
         </Box>
         <TombolKeAtas />
         <BottomTabBar />

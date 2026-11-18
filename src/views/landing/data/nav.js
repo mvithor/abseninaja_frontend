@@ -7,9 +7,9 @@
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
-  fitur: { to: '/produk/fitur', tersedia: false },
-  untukSekolah: { to: '/produk/untuk-sekolah', tersedia: false },
-  pendampingan: { to: '/produk/pendampingan', tersedia: false },
+  fitur: { to: '/produk/fitur', tersedia: true }, // pages/Fitur.jsx, F2
+  untukSekolah: { to: '/produk/untuk-sekolah', tersedia: true }, // pages/UntukSekolah.jsx, F2
+  pendampingan: { to: '/produk/pendampingan', tersedia: true }, // pages/Pendampingan.jsx, F2
   paket: { to: '/produk/paket', tersedia: false },
   promo: { to: '/produk/promo', tersedia: false },
   analitik: { to: '/analitik-pembelajaran', tersedia: false },

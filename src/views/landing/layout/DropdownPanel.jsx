@@ -52,7 +52,7 @@ export default function DropdownPanel({ id, label, butir, onPilih, statis = fals
         ...sx,
       }}
     >
-      <Box component="ul" sx={resetDaftar}>
+      <Box component="ul" role="list" sx={resetDaftar}>
         {butir.map((b, i) => (
           <Box component="li" key={b.label}>
             <TautanNav
