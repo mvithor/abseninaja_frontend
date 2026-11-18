@@ -10,8 +10,8 @@ export const REGISTRI_RUTE = {
   fitur: { to: '/produk/fitur', tersedia: true }, // pages/Fitur.jsx, F2
   untukSekolah: { to: '/produk/untuk-sekolah', tersedia: true }, // pages/UntukSekolah.jsx, F2
   pendampingan: { to: '/produk/pendampingan', tersedia: true }, // pages/Pendampingan.jsx, F2
-  paket: { to: '/produk/paket', tersedia: false },
-  promo: { to: '/produk/promo', tersedia: false },
+  paket: { to: '/produk/paket', tersedia: true }, // pages/Paket.jsx, F3
+  promo: { to: '/produk/promo', tersedia: true }, // pages/Promo.jsx, F3
   analitik: { to: '/analitik-pembelajaran', tersedia: false },
   dampak: { to: '/bukti/dampak', tersedia: false },
   testimoni: { to: '/bukti/testimoni', tersedia: false },
@@ -22,8 +22,8 @@ export const REGISTRI_RUTE = {
   kerjaSama: { to: '/kerja-sama', tersedia: false },
   afiliator: { to: '/afiliator', tersedia: false },
   blog: { to: '/blog', tersedia: false },
-  demo: { to: '/jadwalkan-demo', tersedia: false },
-  akunGuruMandiri: { to: '/akun-guru-mandiri', tersedia: false },
+  demo: { to: '/jadwalkan-demo', tersedia: true }, // pages/JadwalkanDemo.jsx, F3
+  akunGuruMandiri: { to: '/akun-guru-mandiri', tersedia: true }, // pages/GuruMandiri.jsx, F3
   kalkulator: { to: '/kalkulator', tersedia: false },
   masuk: { to: '/login', tersedia: true },
   kebijakanPrivasi: { to: '/privacy-policy', tersedia: true },

@@ -13,6 +13,8 @@ import { resetDaftar } from '../theme/sx';
 //            2 kolom di sm, 1 kolom di seluler (sesuai desain seluler).
 //  manfaat : ikon + judul + keterangan, tiga kolom maks 900 (hero Pendampingan).
 //            Satu kolom di bawah md.
+//  ringkas : tumpukan satu kolom maks 460, kartu sudut 20 berisi ikon + judul +
+//            keterangan (hero Jadwalkan Demo, rata kiri).
 // Butir: { ikon, label, angka?, kecil?, sub?, verifikasi? }. `kecil` = angka
 // berupa teks pendek (mis. "Web + HP") dengan huruf lebih kecil.
 const KISI = {
@@ -26,8 +28,49 @@ const KISI = {
   },
 };
 
+function Ringkas({ butir, sx }) {
+  return (
+    <Box
+      component="ul"
+      role="list"
+      sx={{ ...resetDaftar, display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', maxWidth: 460, textAlign: 'left', ...sx }}
+    >
+      {butir.map((b) => (
+        <Box
+          key={b.label}
+          component="li"
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '14px',
+            boxSizing: 'border-box',
+            p: '16px 20px',
+            borderRadius: radius.kartu,
+            background: colors.white,
+            border: `1px solid ${colors.border}`,
+            boxShadow: shadows.kartu,
+          }}
+        >
+          <KotakIkon ikon={b.ikon} ukuran={46} ikonUkuran={22} sudut="14px" />
+          <Box sx={{ minWidth: 0 }}>
+            <Box sx={{ fontSize: '15px', fontWeight: 600, color: colors.ink }}>{b.label}</Box>
+            <Box sx={{ mt: '1px', fontSize: '13px', color: colors.muted }}>{b.sub}</Box>
+            <PenandaVerifikasi verifikasi={b.verifikasi} sx={{ mt: '8px' }} />
+          </Box>
+        </Box>
+      ))}
+    </Box>
+  );
+}
+
+Ringkas.propTypes = {
+  butir: PropTypes.arrayOf(PropTypes.object).isRequired,
+  sx: PropTypes.object,
+};
+
 export default function BarisKartuFakta({ butir, varian = 'fakta', sx }) {
   if (varian === 'fakta') return <BarisFakta butir={butir} varian="ikon" sx={sx} />;
+  if (varian === 'ringkas') return <Ringkas butir={butir} sx={sx} />;
 
   const angka = varian === 'angka';
   const kisi = KISI[varian];
@@ -98,6 +141,6 @@ BarisKartuFakta.propTypes = {
       verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     }),
   ).isRequired,
-  varian: PropTypes.oneOf(['fakta', 'angka', 'manfaat']),
+  varian: PropTypes.oneOf(['fakta', 'angka', 'manfaat', 'ringkas']),
   sx: PropTypes.object,
 };

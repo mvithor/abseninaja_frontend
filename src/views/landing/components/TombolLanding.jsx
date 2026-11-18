@@ -6,7 +6,7 @@ import { resetTombol, resetTautan } from '../theme/sx';
 import SegeraHadir from './SegeraHadir';
 
 // Tombol landing. Varian: gradasi, garis, kuning, putih (+ garisTerang untuk
-// latar gelap). Ukuran: lg (52, seluler 48) dan md (44). Sudut 12.
+// latar gelap). Ukuran: xl (56, tombol kirim formulir), lg (52, seluler 48) dan md (44). Sudut 12.
 // Elemen yang dirender: <a> (href), RouterLink (to), atau <button>. Bila
 // `nonaktif`, tombol tautan menjadi teks nonaktif (aria-disabled) yang tidak
 // menavigasi.
@@ -45,6 +45,11 @@ const ukuranSx = {
     height: { xs: 48, md: 52 },
     px: { xs: '22px', md: '28px' },
     fontSize: { xs: '14px', md: '15px' },
+  },
+  xl: {
+    height: 56,
+    px: '28px',
+    fontSize: '16px',
   },
   md: {
     height: 44,
@@ -144,7 +149,7 @@ export default function TombolLanding({
 
 TombolLanding.propTypes = {
   varian: PropTypes.oneOf(['gradasi', 'garis', 'kuning', 'putih', 'garisTerang']),
-  ukuran: PropTypes.oneOf(['lg', 'md']),
+  ukuran: PropTypes.oneOf(['xl', 'lg', 'md']),
   to: PropTypes.string,
   href: PropTypes.string,
   external: PropTypes.bool,

@@ -1,3 +1,5 @@
+import { endpointValid } from '../lib/endpoint.js';
+
 // Satu sumber nilai gaya landing Absenin Aja.
 // Sumber kebenaran: desain kanvas (gen/common.py, gen/mobile.py, Sistem-Desain v3).
 // Nilai yang sama dengan tema aplikasi (src/theme/DefaultColors.jsx):
@@ -70,6 +72,16 @@ export const colors = {
   // Status berhasil (ikon centang). Selalu berdampingan dengan label teks.
   success: '#12B76A',
 
+  // Formulir (F3): kolom isian dan status galat. Galat selalu disertai teks
+  // pesan dan ikon; warna tidak berdiri sendiri. #B42318 di putih 6,5:1.
+  field: '#F9FAFB', // latar kolom isian
+  galat: '#B42318', // teks pesan galat
+  galatGaris: '#D92D20', // tepi kolom bergalat
+  galatBg: '#FEF3F2', // latar banner galat kirim
+  galatBgGaris: '#FECDCA', // tepi banner galat kirim
+  glassPromo: 'rgba(255,255,255,0.14)', // kotak hitung mundur kartu promo
+  garisPromo: 'rgba(255,255,255,0.3)', // tepi kotak hitung mundur
+
   // Penanda desain ([VERIFIKASI]) dan label status.
   verifyBorder: '#B57400',
   verifyInk: '#8A5800',
@@ -107,6 +119,11 @@ export const blobs = {
   banner: [{ right: -90, top: -90, size: 300, color: 'rgba(255,255,255,0.12)', blur: 6 }], // banner analitik
   panelJenis: [{ right: -90, top: -90, size: 280, color: 'rgba(255,255,255,0.12)', blur: 6 }], // kartu jenis sekolah
   stripGelap: [{ left: -60, bottom: -120, size: 320, color: 'rgba(94,92,230,0.55)', blur: 100 }], // strip Prakersa
+  // Halaman konversi (F3): hero Jadwalkan Demo (blob kanan di dasar, bukan di atas).
+  heroBawah: [
+    { left: -120, top: -80, size: 420, color: 'rgba(94,92,230,0.35)', blur: 130 },
+    { right: -100, bottom: -60, size: 380, color: 'rgba(56,161,255,0.28)', blur: 140 },
+  ],
 };
 
 export const radius = {
@@ -124,6 +141,7 @@ export const radius = {
   kartuSedang: '24px',
   kartuBesar: '28px',
   kartuXL: '32px',
+  kartuPromo: '36px', // kartu promo (halaman Promo)
   // Radius khusus peraga (mock/) dan kartu langkah Beranda.
   ikonKecil: '8px', // kotak ikon centang kecil (langkah pertama Pendampingan)
   batang: '8px 8px 4px 4px', // batang grafik peraga dasbor
@@ -148,6 +166,7 @@ export const shadows = {
   kartuAksen: '0 30px 60px -30px rgba(94,92,230,0.7)', // kartu gradasi di latar gelap/terang (Beranda)
   lembar: '0 -20px 40px -20px rgba(23,22,58,0.4)',
   tabKartu: '0 18px 36px -18px rgba(94,92,230,0.7)', // kartu tab jenis sekolah (aktif)
+  formulir: '0 30px 60px -30px rgba(47,50,125,0.35)', // kartu formulir (F3)
 };
 
 // Nilai khusus peraga (mock/ dan hiasan di Beranda). Bukan bagian sistem desain
@@ -235,6 +254,11 @@ export const huruf = {
   judulKartuBesar: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu perbandingan
   judulModul: { fontSize: { xs: '16px', md: '18px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu modul sebaris
   judulTab: { fontSize: { xs: '16px', md: '18px' }, fontWeight: 600 }, // kartu tab jenis sekolah
+  // Halaman konversi (F3).
+  judulFormulirHero: { fontSize: { xs: '26px', sm: '36px', md: '46px' } }, // h1 Jadwalkan Demo (menimpa judulUtama)
+  judulFormulir: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.3, fontWeight: 600 }, // judul kartu formulir
+  judulTerkirim: { fontSize: { xs: '20px', md: '26px' }, lineHeight: 1.3, fontWeight: 600 }, // judul panel terkirim
+  judulPromo: { fontSize: { xs: '22px', md: '34px' }, lineHeight: 1.25, fontWeight: 600 }, // judul kartu promo
   eyebrow: {
     fontSize: '12.5px',
     fontWeight: 600,
@@ -258,4 +282,13 @@ export const flags = {
   // Pratinjau di DEV: tombol ke halaman yang belum dibangun tampil aktif dan
   // menuju HalamanSegera. Di produksi tombol mengikuti `tersedia` di data/nav.js.
   pratinjauTombolAktif: import.meta.env.DEV,
+  // Formulir (Jadwalkan Demo dan Akun Guru Mandiri): satu-satunya penentu apakah
+  // formulir boleh mengirim. Aktif bila VITE_LANDING_FORM_URL berisi endpoint
+  // VALID (https; lihat lib/endpoint.js), atau di DEV (mode simulasi, lihat
+  // lib/kirimFormulir.js).
+  // Di produksi tanpa endpoint: formulir tampil nonaktif dan jujur, tidak pernah
+  // menampilkan "terkirim". GERBANG RILIS sebelum `main`: endpoint formulir
+  // harus ada dan KONTAK_RESMI (data/kontak.js) harus beres.
+  formulirAktif:
+    endpointValid(import.meta.env.VITE_LANDING_FORM_URL, { dev: import.meta.env.DEV }) !== null || import.meta.env.DEV,
 };

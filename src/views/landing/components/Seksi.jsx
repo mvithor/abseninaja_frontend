@@ -26,8 +26,20 @@ const padBawaan = {
   gelap: { atas: { xs: '38px', md: '76px' }, bawah: { xs: '42px', md: '84px' } },
 };
 
-export default function Seksi({ varian = 'terang', padAtas, padBawah, children, sx, kontainerSx, ...rest }) {
-  const blobSeksi = BLOB_UNTUK[varian];
+// Props tambahan: `blobDaftar` mengganti blob bawaan varian (daftar dari
+// tokens.blobs); `pudar={false}` mematikan pemudaran ke putih di dasar hero.
+export default function Seksi({
+  varian = 'terang',
+  padAtas,
+  padBawah,
+  blobDaftar,
+  pudar = true,
+  children,
+  sx,
+  kontainerSx,
+  ...rest
+}) {
+  const blobSeksi = blobDaftar ?? BLOB_UNTUK[varian];
   const atas = padAtas ?? padBawaan[varian].atas;
   const bawah = padBawah ?? padBawaan[varian].bawah;
   const hero = varian === 'hero';
@@ -46,7 +58,7 @@ export default function Seksi({ varian = 'terang', padAtas, padBawah, children, 
       {...rest}
     >
       {blobSeksi && <DaftarBlob daftar={blobSeksi} />}
-      {hero && (
+      {hero && pudar && (
         <Box
           aria-hidden="true"
           sx={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 120, background: gradients.heroFade }}
@@ -71,6 +83,8 @@ Seksi.propTypes = {
   varian: PropTypes.oneOf(['terang', 'tint', 'hero', 'gelap']),
   padAtas: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   padBawah: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  blobDaftar: PropTypes.arrayOf(PropTypes.object),
+  pudar: PropTypes.bool,
   children: PropTypes.node,
   sx: PropTypes.object,
   kontainerSx: PropTypes.object,

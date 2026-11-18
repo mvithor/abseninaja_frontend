@@ -17,6 +17,10 @@ function buatRute() {
   const Fitur = Loadable(lazy(() => import('./pages/Fitur')));
   const UntukSekolah = Loadable(lazy(() => import('./pages/UntukSekolah')));
   const Pendampingan = Loadable(lazy(() => import('./pages/Pendampingan')));
+  const Paket = Loadable(lazy(() => import('./pages/Paket')));
+  const Promo = Loadable(lazy(() => import('./pages/Promo')));
+  const JadwalkanDemo = Loadable(lazy(() => import('./pages/JadwalkanDemo')));
+  const GuruMandiri = Loadable(lazy(() => import('./pages/GuruMandiri')));
   // Path ditulis langsung (bukan dari REGISTRI_RUTE) supaya data/nav.js tetap
   // di luar chunk entry. Harus sama dengan REGISTRI_RUTE di data/nav.js.
   const anak = [
@@ -24,6 +28,10 @@ function buatRute() {
     { path: '/produk/fitur', element: <Fitur /> },
     { path: '/produk/untuk-sekolah', element: <UntukSekolah /> },
     { path: '/produk/pendampingan', element: <Pendampingan /> },
+    { path: '/produk/paket', element: <Paket /> },
+    { path: '/produk/promo', element: <Promo /> },
+    { path: '/jadwalkan-demo', element: <JadwalkanDemo /> },
+    { path: '/akun-guru-mandiri', element: <GuruMandiri /> },
   ];
 
   if (import.meta.env.DEV) {

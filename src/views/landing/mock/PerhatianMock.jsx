@@ -6,8 +6,9 @@ import { resetDaftar } from '../theme/sx';
 
 // Peraga "Perlu perhatian" untuk banner analitik pembelajaran (halaman Fitur).
 // Data dummy, dekoratif: aria-hidden. Bentuk data: lihat MOCK_PERHATIAN di
-// data/fitur.js.
-export default function PerhatianMock({ data }) {
+// data/fitur.js. `sx` menyesuaikan kartu (halaman Akun Guru Mandiri memakai
+// kartu putih bertepi di latar terang).
+export default function PerhatianMock({ data, sx }) {
   return (
     <Box
       aria-hidden="true"
@@ -19,6 +20,7 @@ export default function PerhatianMock({ data }) {
         background: colors.white,
         color: colors.body,
         boxShadow: peraga.bayangan.perhatian,
+        ...sx,
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
@@ -83,4 +85,5 @@ PerhatianMock.propTypes = {
     ringkasan: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string, nilai: PropTypes.string })).isRequired,
     baris: PropTypes.arrayOf(PropTypes.shape({ teks: PropTypes.string, aksi: PropTypes.string })).isRequired,
   }).isRequired,
+  sx: PropTypes.object,
 };
