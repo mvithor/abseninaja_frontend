@@ -11,7 +11,7 @@ import {
 } from '@tabler/icons-react';
 import SheetLainnya from './SheetLainnya';
 import { RUTE_LAINNYA, SLOT_BAR_TAB } from '../data/nav';
-import { colors, gerak, layout, radius, shadows, gradients } from '../theme/tokens';
+import { colors, flags, gerak, layout, radius, shadows, gradients } from '../theme/tokens';
 import { resetTautan, resetTombol } from '../theme/sx';
 import SegeraHadir from '../components/SegeraHadir';
 import { adaRuteAktif, ruteAktif } from './rute';
@@ -180,7 +180,8 @@ export default function BottomTabBar() {
             );
           }
           const aktif = !lembarTerbuka && ruteAktif(slot.to, pathname);
-          if (!slot.tersedia) {
+          // Di DEV (pratinjau) slot ber-`to` yang belum tersedia tetap aktif menuju HalamanSegera.
+          if (!(slot.tersedia || (flags.pratinjauTombolAktif && slot.to))) {
             return (
               <Box key={slot.key} component="span" role="link" aria-disabled="true" sx={sxSlot(false, true)}>
                 <IsiSlot slot={slot} aktif={false} />

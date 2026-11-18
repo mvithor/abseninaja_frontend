@@ -40,6 +40,8 @@ export const colors = {
   tint: '#EEF0FF',
   tintSoft: '#F3F3FE',
   surface: '#F8F8FF',
+  kartuTint: '#F4F5FF', // kartu langkah dan layar ponsel peraga (Beranda)
+  kartuTintGaris: '#DFE2FB', // tepi kartu tint dan kotak angka peraga
   white: '#FFFFFF',
 
   onDark: '#C9CBE6',
@@ -52,6 +54,14 @@ export const colors = {
   tabGelapHover: 'rgba(47,50,125,0.35)', // hover tab pada bar tab gradasi
   tabGelapJumlah: 'rgba(47,50,125,0.45)', // lencana jumlah tab tidak aktif
   scrim: 'rgba(23,22,58,0.5)',
+
+  // Latar kaca lebih tipis dan garis kaca (kartu Sebelum, F1) serta penanda daftar.
+  glassTipis: 'rgba(255,255,255,0.05)',
+  glassGaris: 'rgba(255,255,255,0.14)',
+  penandaDaftar: '#7B7FC9', // butir daftar di kartu Sebelum
+
+  // Status berhasil (ikon centang). Selalu berdampingan dengan label teks.
+  success: '#12B76A',
 
   // Penanda desain ([VERIFIKASI]) dan label status.
   verifyBorder: '#B57400',
@@ -101,6 +111,15 @@ export const radius = {
   kartu: '20px',
   kartuSedang: '24px',
   kartuBesar: '28px',
+  kartuXL: '32px',
+  // Radius khusus peraga (mock/) dan kartu langkah Beranda.
+  ikonKecil: '8px', // kotak ikon centang kecil (langkah pertama Pendampingan)
+  batang: '8px 8px 4px 4px', // batang grafik peraga dasbor
+  kartuStat: '14px', // kotak angka dan bar tersambung peraga dasbor
+  kartuLangkah: '18px', // kartu langkah Pendampingan dan kartu melayang peraga dasbor
+  balon: '18px 18px 18px 6px', // balon notifikasi peraga ponsel
+  layarPonsel: '34px',
+  ponsel: '44px',
   lembar: '24px 24px 0 0', // lembar bawah seluler (hanya sudut atas)
   cta: '40px',
 };
@@ -114,7 +133,34 @@ export const shadows = {
   demoTab: '0 12px 24px -12px rgba(94,92,230,0.7)',
   tabGradasi: '0 14px 30px -16px rgba(94,92,230,0.7)',
   keAtas: '0 14px 28px -12px rgba(47,50,125,0.65)',
+  kartuAksen: '0 30px 60px -30px rgba(94,92,230,0.7)', // kartu gradasi di latar gelap/terang (Beranda)
   lembar: '0 -20px 40px -20px rgba(23,22,58,0.4)',
+};
+
+// Nilai khusus peraga (mock/ dan hiasan di Beranda). Bukan bagian sistem desain
+// umum: dikumpulkan di sini supaya komponen peraga tidak menulis warna, gradasi,
+// atau bayangan sendiri.
+const KUNING_ATAS = '#FFBF3F'; // ujung atas batang sorot
+
+export const peraga = {
+  suksesBg: '#ECFDF3', // latar label status "tersambung"
+  suksesInk: '#067647', // teks label status dan tren naik
+  hariAkhir: '#B54708', // teks hari yang disorot di grafik
+  kuningAtas: KUNING_ATAS,
+  blobUngu: 'rgba(94,92,230,0.55)',
+  blobBiru: 'rgba(56,161,255,0.35)',
+  gradasi: {
+    batang: `linear-gradient(180deg,${colors.brand},${colors.brandDark})`,
+    batangSorot: `linear-gradient(180deg,${KUNING_ATAS},${colors.yellow})`,
+    garisLangkahPertama: `linear-gradient(90deg,${colors.yellow},${colors.brand})`, // kuning ke merek
+  },
+  bayangan: {
+    dasbor: '0 24px 56px -20px rgba(47,46,133,0.35)',
+    kartuScan: '0 18px 40px -16px rgba(47,46,133,0.4)',
+    kartuKabar: '0 22px 48px -18px rgba(47,46,133,0.45)',
+    ponsel: '0 36px 70px -30px rgba(16,16,51,0.7)',
+    balon: '0 1px 2px rgba(16,24,40,0.06)',
+  },
 };
 
 export const layout = {
@@ -187,4 +233,7 @@ export const gerak = {
 // dan tidak boleh menyala di produksi.
 export const flags = {
   tampilkanPenandaDesain: false,
+  // Pratinjau di DEV: tombol ke halaman yang belum dibangun tampil aktif dan
+  // menuju HalamanSegera. Di produksi tombol mengikuti `tersedia` di data/nav.js.
+  pratinjauTombolAktif: import.meta.env.DEV,
 };

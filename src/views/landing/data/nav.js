@@ -6,7 +6,7 @@
 // mengikuti otomatis.
 
 export const REGISTRI_RUTE = {
-  beranda: { to: '/', tersedia: true }, // Landing.jsx lama sampai F1
+  beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
   fitur: { to: '/produk/fitur', tersedia: false },
   untukSekolah: { to: '/produk/untuk-sekolah', tersedia: false },
   pendampingan: { to: '/produk/pendampingan', tersedia: false },
@@ -100,15 +100,20 @@ export const SLOT_BAR_TAB = [
 
 // Semua rute internal yang dikenal menu. Dipakai untuk menentukan slot
 // "Lainnya" aktif pada halaman di luar empat slot lain.
-const rutePadaSlot = SLOT_BAR_TAB.filter((s) => s.to).map((s) => s.to);
-
-const rutePadaMenu = [];
-MENU.forEach((m) => {
-  if (m.to) rutePadaMenu.push(m.to);
-  (m.anak || []).forEach((a) => {
-    if (a.to) rutePadaMenu.push(a.to);
+// Dihitung lewat fungsi yang ditandai murni (/* @__PURE__ */) supaya berkas ini
+// bebas efek samping tingkat modul: bundler boleh membuangnya dari chunk yang
+// hanya mengimpor REGISTRI_RUTE (mis. routes.jsx di chunk entry).
+function hitungRuteLainnya() {
+  const rutePadaSlot = SLOT_BAR_TAB.filter((s) => s.to).map((s) => s.to);
+  const rutePadaMenu = [];
+  MENU.forEach((m) => {
+    if (m.to) rutePadaMenu.push(m.to);
+    (m.anak || []).forEach((a) => {
+      if (a.to) rutePadaMenu.push(a.to);
+    });
   });
-});
-MENU_TAMBAHAN.forEach((m) => rutePadaMenu.push(m.to));
+  MENU_TAMBAHAN.forEach((m) => rutePadaMenu.push(m.to));
+  return rutePadaMenu.filter((to) => !rutePadaSlot.includes(to));
+}
 
-export const RUTE_LAINNYA = rutePadaMenu.filter((to) => !rutePadaSlot.includes(to));
+export const RUTE_LAINNYA = /* @__PURE__ */ hitungRuteLainnya();

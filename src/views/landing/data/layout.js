@@ -1,7 +1,7 @@
 // Teks tata letak (bar promo dan footer). Disalin apa adanya dari desain kanvas
 // (gen/common.py: PROMO dan FOOTER). Teks contoh: ganti lewat landing-copywriter.
 import { REGISTRI_RUTE as R, MODUL_SMK } from './nav';
-import { CONTACT, KONTAK_RESMI, mailLink, waLink } from './kontak';
+import { CONTACT, KONTAK_RESMI, KONTAK_TAMPIL, mailLink, waLink } from './kontak';
 
 export const PROMO = {
   web: 'Semester genap dimulai Januari. Siapkan absensi sekolah dari sekarang.',
@@ -16,7 +16,8 @@ export const FOOTER = {
     deskripsi: 'Perkenalkan Absenin Aja ke jaringan Anda lewat program afiliator.',
     aksi: { label: 'Daftar Afiliator', ...R.afiliator },
   },
-  tagline: 'Absensi dan tata kelola sekolah di satu sistem.',
+  // Versi seluler dari gen/short.py.
+  tagline: { web: 'Absensi dan tata kelola sekolah di satu sistem.', mobile: 'Tata kelola sekolah, satu sistem.' },
   kolom: [
     {
       judul: 'Produk',
@@ -39,15 +40,21 @@ export const FOOTER = {
     {
       judul: 'Hubungi kami',
       tautan: [
-        // Selama KONTAK_RESMI false: teks biasa (teks: true), tanpa tautan wa.me atau mailto.
-        KONTAK_RESMI
-          ? { label: `WhatsApp ${CONTACT.whatsappDisplay}`, href: waLink(), external: true, tersedia: true }
-          : { label: `WhatsApp ${CONTACT.whatsappDisplay}`, teks: true },
-        KONTAK_RESMI
-          ? { label: `Email ${CONTACT.email}`, href: mailLink, tersedia: true }
-          : { label: `Email ${CONTACT.email}`, teks: true },
+        // Gerbang rilis (lihat data/kontak.js): KONTAK_RESMI false berarti baris
+        // WhatsApp dan email tidak ada di produksi (null disaring di bawah) dan
+        // hanya tampil sebagai teks biasa (teks: true) di DEV. Tidak ada wa.me atau mailto.
+        KONTAK_TAMPIL
+          ? KONTAK_RESMI
+            ? { label: `WhatsApp ${CONTACT.whatsappDisplay}`, href: waLink(), external: true, tersedia: true }
+            : { label: `WhatsApp ${CONTACT.whatsappDisplay}`, teks: true }
+          : null,
+        KONTAK_TAMPIL
+          ? KONTAK_RESMI
+            ? { label: `Email ${CONTACT.email}`, href: mailLink, tersedia: true }
+            : { label: `Email ${CONTACT.email}`, teks: true }
+          : null,
         { label: 'Kebijakan privasi', ...R.kebijakanPrivasi },
-      ],
+      ].filter(Boolean),
     },
   ],
   hakCipta: '© 2026 Absenin Aja. Hak cipta dilindungi.',

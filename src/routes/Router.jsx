@@ -353,9 +353,6 @@ const DeadlinePerangkatAjarEdit = Loadable(lazy(() => import('../views/apps/waka
 // Arsip Perangkat Ajar
 const ArsipPerangkatAjarList = Loadable(lazy(() => import('../views/apps/waka-kurikulum/arsip/ArsipPerangkatAjarList')));
 
-// Landing
-const Landing = Loadable(lazy(() => import('../views/landing/Landing')));
-
 // Authentication
 const Login = Loadable(lazy(() => import('../views/authentication/auth/Login')));
 // Halaman akun: semua peran yang sudah masuk
@@ -371,7 +368,6 @@ const Router = [
         path: '/',
         element: <BlankLayout />, 
         children: [
-          { path: '/', element: <Landing /> },
           { path: '/login', element: <Login /> },
           { path: '/404', element: <Error /> },
           { path: '/privacy-policy', element: <PrivacyPolicy/> },

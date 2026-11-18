@@ -3,11 +3,14 @@ import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { IconArrowUpRight } from '@tabler/icons-react';
 import SegeraHadir from '../components/SegeraHadir';
+import { flags } from '../theme/tokens';
 import { hanyaPembaca, resetTautan } from '../theme/sx';
 import { ruteAktif } from './rute';
 
 // Satu butir menu dalam tiga keadaan:
-//  - tersedia: false  -> teks nonaktif (role=link, aria-disabled), tidak menavigasi
+//  - tersedia: false  -> teks nonaktif (role=link, aria-disabled), tidak menavigasi.
+//    Kecuali di DEV (flags.pratinjauTombolAktif): butir ber-`to` tampil sebagai
+//    tautan aktif menuju HalamanSegera, sama seperti tombol (data/aksi.js).
 //  - href/external    -> <a> biasa (tab baru bila external)
 //  - to               -> RouterLink, aria-current="page" bila rute sedang aktif
 // `sx` berlaku untuk semua keadaan, `sxAktif` untuk rute aktif, `sxNonaktif`
@@ -15,8 +18,9 @@ import { ruteAktif } from './rute';
 export default function TautanNav({ butir, onKlik, sx, sxAktif, sxNonaktif, tanpaIkonLuar = false, children, ...rest }) {
   const { pathname } = useLocation();
   const isi = children ?? butir.label;
+  const tersedia = butir.tersedia || (flags.pratinjauTombolAktif && Boolean(butir.to));
 
-  if (!butir.tersedia) {
+  if (!tersedia) {
     return (
       <Box component="span" role="link" aria-disabled="true" sx={{ ...resetTautan, cursor: 'default', ...sx, ...sxNonaktif }} {...rest}>
         {isi}

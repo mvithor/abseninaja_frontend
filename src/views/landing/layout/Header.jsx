@@ -7,7 +7,7 @@ import TautanNav from './TautanNav';
 import LogoMerek from '../components/LogoMerek';
 import TombolLanding from '../components/TombolLanding';
 import { AKSI_DEMO, AKSI_MASUK, MENU } from '../data/nav';
-import { colors, gerak, layout, radius } from '../theme/tokens';
+import { colors, flags, gerak, layout, radius } from '../theme/tokens';
 import { resetTautan, resetTombol } from '../theme/sx';
 import { adaRuteAktif } from './rute';
 
@@ -209,7 +209,7 @@ export default function Header() {
             varian="gradasi"
             ukuran="md"
             to={AKSI_DEMO.to}
-            nonaktif={!AKSI_DEMO.tersedia}
+            nonaktif={!(AKSI_DEMO.tersedia || flags.pratinjauTombolAktif)}
             sx={{ display: { xs: 'none', md: 'inline-flex' } }}
           >
             {AKSI_DEMO.label}

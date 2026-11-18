@@ -1,9 +1,15 @@
-// GANTI dengan kontak resmi Absenin Aja sebelum tayang.
+// GERBANG RILIS: GANTI dengan kontak resmi Absenin Aja sebelum tayang.
 // Nilai di bawah ini dummy, dipindahkan dari Landing.jsx (yang tetap memegang salinannya).
-// Setelah nilainya diganti, ubah KONTAK_RESMI menjadi true. Selama false, footer
-// menampilkan kontak sebagai teks biasa dan waLink() serta mailLink tidak
-// menghasilkan tautan, sehingga tidak ada tombol yang mengarah ke nomor dummy.
+// Setelah nilainya diganti, ubah KONTAK_RESMI menjadi true. Selama false:
+//  - produksi: footer TIDAK menampilkan baris WhatsApp dan email sama sekali;
+//  - DEV (import.meta.env.DEV): baris tampil sebagai teks biasa supaya tata
+//    letak bisa diperiksa;
+//  - waLink() dan mailLink tidak menghasilkan tautan, jadi tidak ada wa.me atau
+//    mailto yang mengarah ke nomor dummy.
 export const KONTAK_RESMI = false;
+
+// Baris kontak ikut dirender hanya bila kontaknya resmi, atau saat DEV (sebagai teks).
+export const KONTAK_TAMPIL = KONTAK_RESMI || import.meta.env.DEV;
 
 export const CONTACT = {
   whatsappNumber: '6281234567890', // format internasional tanpa tanda +

@@ -1,23 +1,28 @@
 import { lazy } from 'react';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
+import { REGISTRI_RUTE } from './data/nav';
 
-// Rute landing baru (di bawah LandingLayout). Rute `/` tetap ke Landing.jsx lama
-// sampai F1 dan tetap didaftarkan di src/routes/Router.jsx.
+// Rute landing (di bawah LandingLayout, sudah didaftarkan di src/routes/Router.jsx).
+// Halaman produksi ditambahkan di `anak` per fase. Landing.jsx lama tetap ada di
+// disk sebagai cadangan rollback, tetapi tidak lagi terdaftar.
 //
-// Halaman uji visual: /landing-dev/fondasi. Hanya terdaftar saat
-// import.meta.env.DEV, sehingga chunk-nya tidak ikut build produksi.
+// Hanya saat import.meta.env.DEV (chunk-nya tidak ikut build produksi):
+//  - /landing-dev/fondasi : halaman uji visual komponen fondasi
+//  - HalamanSegera untuk setiap rute di REGISTRI_RUTE yang `tersedia: false`,
+//    supaya tombol pratinjau (flags.pratinjauTombolAktif) punya tujuan.
 function buatRute() {
-  // Penjaga Fase 0: di build produksi belum ada halaman landing baru, jadi
-  // LandingLayout tidak boleh ikut menjadi chunk. HAPUS baris ini saat Fase 1
-  // menambah halaman produksi, lalu pindahkan blok DEV di bawah ke dalam `if`.
-  if (!import.meta.env.DEV) return [];
+  const Beranda = Loadable(lazy(() => import('./pages/Beranda')));
+  const anak = [{ path: '/', element: <Beranda /> }];
 
-  const anak = [];
+  if (import.meta.env.DEV) {
+    const DevFondasi = Loadable(lazy(() => import('./pages/DevFondasi')));
+    anak.push({ path: '/landing-dev/fondasi', element: <DevFondasi /> });
 
-  // Halaman produksi ditambahkan di sini per fase (F1 dan seterusnya).
-
-  const DevFondasi = Loadable(lazy(() => import('./pages/DevFondasi')));
-  anak.push({ path: '/landing-dev/fondasi', element: <DevFondasi /> });
+    const HalamanSegera = Loadable(lazy(() => import('./pages/HalamanSegera')));
+    Object.values(REGISTRI_RUTE)
+      .filter((r) => !r.tersedia)
+      .forEach((r) => anak.push({ path: r.to, element: <HalamanSegera /> }));
+  }
 
   const LandingLayout = Loadable(lazy(() => import('./layout/LandingLayout')));
   return [{ element: <LandingLayout />, children: anak }];
