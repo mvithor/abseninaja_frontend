@@ -9,7 +9,6 @@ import {
   CircularProgress,
   MenuItem,
   Paper,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -25,6 +24,7 @@ import { IconAdjustmentsHorizontal, IconCash, IconEye, IconKey } from '@tabler/i
 import Alerts from 'src/components/alerts/Alerts';
 import SearchButton from 'src/components/button-group/SearchButton';
 import PageContainer from 'src/components/container/PageContainer';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
 import ParentCard from 'src/components/shared/ParentCard';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
@@ -148,7 +148,7 @@ const DompetSiswaPage = () => {
             }}
             placeholder="Cari nama, NIS, atau kode QR..."
           />
-          <Select
+          <CustomSelect
             size="small"
             displayEmpty
             value={statusSiswa}
@@ -162,7 +162,7 @@ const DompetSiswaPage = () => {
             <MenuItem value="aktif">Siswa Aktif</MenuItem>
             <MenuItem value="nonaktif">Nonaktif</MenuItem>
             <MenuItem value="lulus">Lulus</MenuItem>
-          </Select>
+          </CustomSelect>
         </Box>
 
         <Paper variant="outlined">
@@ -170,13 +170,41 @@ const DompetSiswaPage = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>No</TableCell>
-                  <TableCell>Siswa</TableCell>
-                  <TableCell>Kode QR</TableCell>
-                  <TableCell align="right">Saldo</TableCell>
-                  <TableCell align="right">Limit Harian</TableCell>
-                  <TableCell align="center">Status Dompet</TableCell>
-                  <TableCell align="center">Aksi</TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      No
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Siswa
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Kode QR
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Saldo
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Limit Harian
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Status Dompet
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Aksi
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

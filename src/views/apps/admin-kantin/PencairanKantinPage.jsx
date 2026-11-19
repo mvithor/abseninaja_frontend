@@ -9,7 +9,6 @@ import {
   CircularProgress,
   MenuItem,
   Paper,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -24,6 +23,7 @@ import {
 import Grid from '@mui/material/Grid';
 import { IconAlertTriangle, IconCheck } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
 import ParentCard from 'src/components/shared/ParentCard';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
@@ -156,7 +156,7 @@ const PencairanKantinPage = () => {
             <Typography variant="body2" color="text.secondary">
               Pencairan saldo mengendap dicatat dan disetujui oleh Bendahara / Admin Sekolah.
             </Typography>
-            <Select
+            <CustomSelect
               size="small"
               displayEmpty
               value={statusFilter}
@@ -170,7 +170,7 @@ const PencairanKantinPage = () => {
               <MenuItem value="MENUNGGU">Menunggu</MenuItem>
               <MenuItem value="SELESAI">Selesai</MenuItem>
               <MenuItem value="DIBATALKAN">Dibatalkan</MenuItem>
-            </Select>
+            </CustomSelect>
           </Box>
 
           <Paper variant="outlined">
@@ -178,13 +178,41 @@ const PencairanKantinPage = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Waktu</TableCell>
-                    <TableCell>Kode Pencairan</TableCell>
-                    <TableCell align="center">Metode</TableCell>
-                    <TableCell align="right">Nominal</TableCell>
-                    <TableCell align="right">Saldo Sesudah</TableCell>
-                    <TableCell align="center">Status</TableCell>
-                    <TableCell>Catatan / Ref</TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Waktu
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Kode Pencairan
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Metode
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Nominal
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Saldo Sesudah
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Status
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Catatan / Ref
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>

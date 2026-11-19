@@ -9,7 +9,6 @@ import {
   DialogTitle,
   FormControlLabel,
   MenuItem,
-  Select,
   Switch,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -17,6 +16,7 @@ import CancelButton from 'src/components/button-group/CancelButton';
 import SubmitButton from 'src/components/button-group/SubmitButton';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
 import CustomOutlinedInput from 'src/components/forms/theme-elements/CustomOutlinedInput';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
 import { BATAS_KANTIN, KATEGORI_MENU, bangunPayloadMenu, validasiMenu } from '../kantin';
 
 const STATE_KOSONG = {
@@ -99,7 +99,7 @@ const MenuFormDialog = ({ buka, mode, awal, sibuk = false, errorServer = '', onS
               <CustomFormLabel htmlFor="kategori" sx={{ mt: 0 }}>
                 Kategori
               </CustomFormLabel>
-              <Select
+              <CustomSelect
                 id="kategori"
                 name="kategori"
                 value={formState.kategori}
@@ -111,7 +111,7 @@ const MenuFormDialog = ({ buka, mode, awal, sibuk = false, errorServer = '', onS
                     {kat.label}
                   </MenuItem>
                 ))}
-              </Select>
+              </CustomSelect>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomFormLabel htmlFor="harga" sx={{ mt: 0 }}>

@@ -9,7 +9,6 @@ import {
   CircularProgress,
   MenuItem,
   Paper,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -19,12 +18,13 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography,
 } from '@mui/material';
 import { IconReceipt, IconRotateClockwise } from '@tabler/icons-react';
 import Alerts from 'src/components/alerts/Alerts';
 import PageContainer from 'src/components/container/PageContainer';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
+import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
 import ParentCard from 'src/components/shared/ParentCard';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import usePesanAlert from 'src/hooks/usePesanAlert';
@@ -116,7 +116,7 @@ const TransaksiKantinPage = () => {
         <Alerts key={`${kunciSukses}-${kunciError}`} error={error} success={success} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
-          <Select
+          <CustomSelect
             size="small"
             displayEmpty
             value={jenisTransaksi}
@@ -130,9 +130,9 @@ const TransaksiKantinPage = () => {
             <MenuItem value="BELANJA">Belanja Kasir</MenuItem>
             <MenuItem value="TOPUP">Top-Up Saldo</MenuItem>
             <MenuItem value="REVERSAL">Reversal / Refund</MenuItem>
-          </Select>
+          </CustomSelect>
 
-          <TextField
+          <CustomTextField
             size="small"
             type="date"
             label="Dari Tanggal"
@@ -144,7 +144,7 @@ const TransaksiKantinPage = () => {
             }}
           />
 
-          <TextField
+          <CustomTextField
             size="small"
             type="date"
             label="Sampai Tanggal"
@@ -177,13 +177,41 @@ const TransaksiKantinPage = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Waktu</TableCell>
-                  <TableCell>Kode Transaksi</TableCell>
-                  <TableCell align="center">Jenis</TableCell>
-                  <TableCell>Siswa</TableCell>
-                  <TableCell align="right">Nominal</TableCell>
-                  <TableCell align="right">Saldo Sesudah</TableCell>
-                  <TableCell align="center">Aksi</TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Waktu
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Kode Transaksi
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Jenis
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Siswa
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Nominal
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Saldo Sesudah
+                    </Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                      Aksi
+                    </Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

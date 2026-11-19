@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Box, MenuItem, Select } from '@mui/material';
+import { Box, MenuItem } from '@mui/material';
 import { IconPlus } from '@tabler/icons-react';
 import Alerts from 'src/components/alerts/Alerts';
 import AddButton from 'src/components/button-group/AddButton';
 import SearchButton from 'src/components/button-group/SearchButton';
 import PageContainer from 'src/components/container/PageContainer';
 import DialogKonfirmasi from 'src/components/dialog/DialogKonfirmasi';
+import CustomSelect from 'src/components/forms/theme-elements/CustomSelect';
 import ParentCard from 'src/components/shared/ParentCard';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
 import usePesanAlert from 'src/hooks/usePesanAlert';
@@ -106,7 +107,7 @@ const MenuKantinPage = () => {
               }}
               placeholder="Cari nama menu..."
             />
-            <Select
+            <CustomSelect
               size="small"
               displayEmpty
               value={kategori}
@@ -122,7 +123,7 @@ const MenuKantinPage = () => {
                   {kat.label}
                 </MenuItem>
               ))}
-            </Select>
+            </CustomSelect>
           </Box>
 
           <AddButton
