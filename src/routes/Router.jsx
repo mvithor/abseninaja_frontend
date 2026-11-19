@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
 import GerbangKonteksBk from "src/components/pemetaan-siswa/GerbangKonteksBk";
+import GerbangKonteksKantin from "src/apps/admin-kantin/GerbangKonteksKantin";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
 import { PERAN_GURU_LAD } from "src/portals/registry";
 
@@ -764,7 +765,12 @@ const Router = [
                 path: 'dashboard/admin-kantin',
                 element: <ProtectedRoute allowedRoles={['admin kantin']} requirePortal="admin-kantin" />,
                 children: [
-                    { path: '', element: <DashboardAdminKantin /> },
+                  {
+                    element: <GerbangKonteksKantin />,
+                    children: [
+                      { path: '', element: <DashboardAdminKantin /> },
+                    ],
+                  },
                 ]
             },
         ]
