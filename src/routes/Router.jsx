@@ -2,6 +2,7 @@ import { lazy } from "react";
 import { Navigate } from "react-router-dom";
 import ProtectedRoute from "src/components/protected-route/ProtectedRoutes";
 import GerbangKonteksBk from "src/components/pemetaan-siswa/GerbangKonteksBk";
+import GerbangKonteksKantin from "src/apps/admin-kantin/GerbangKonteksKantin";
 import Loadable from "src/layouts/full/shared/loadable/Loadable";
 import { PERAN_GURU_LAD } from "src/portals/registry";
 
@@ -334,6 +335,11 @@ const PengaduanList = Loadable(lazy(() => import('../views/apps/guru-bk/pengadua
 const PengaduanDetail = Loadable(lazy(() => import('../views/apps/guru-bk/pengaduan/PengaduanDetail')));
 const JadwalKonselingPage = Loadable(lazy(() => import('../views/apps/guru-bk/jadwal/JadwalKonselingPage')));
 const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/AdminKantin')));
+const MenuKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/MenuKantinPage')));
+const KasirPosPage = Loadable(lazy(() => import('../views/apps/admin-kantin/KasirPosPage')));
+const DompetSiswaPage = Loadable(lazy(() => import('../views/apps/admin-kantin/DompetSiswaPage')));
+const TransaksiKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/TransaksiKantinPage')));
+const PencairanKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/PencairanKantinPage')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
@@ -764,7 +770,17 @@ const Router = [
                 path: 'dashboard/admin-kantin',
                 element: <ProtectedRoute allowedRoles={['admin kantin']} requirePortal="admin-kantin" />,
                 children: [
-                    { path: '', element: <DashboardAdminKantin /> },
+                  {
+                    element: <GerbangKonteksKantin />,
+                    children: [
+                      { path: '', element: <DashboardAdminKantin /> },
+                      { path: 'kasir', element: <KasirPosPage /> },
+                      { path: 'menu', element: <MenuKantinPage /> },
+                      { path: 'dompet', element: <DompetSiswaPage /> },
+                      { path: 'transaksi', element: <TransaksiKantinPage /> },
+                      { path: 'pencairan', element: <PencairanKantinPage /> },
+                    ],
+                  },
                 ]
             },
         ]
