@@ -7,6 +7,7 @@ import {
   Autocomplete,
   Box,
   Button,
+  CardActionArea,
   Chip,
   CircularProgress,
   Dialog,
@@ -38,6 +39,7 @@ import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel
 import CustomOutlinedInput from 'src/components/forms/theme-elements/CustomOutlinedInput';
 import PageContainer from 'src/components/container/PageContainer';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
 import {
   ambilDaftarMenu,
@@ -83,8 +85,8 @@ const KasirPosPage = () => {
   const [pinInput, setPinInput] = useState('');
   const [kunciIdem, setKunciIdem] = useState('');
   const [errorPin, setErrorPin] = useState('');
-  const [successMsg, setSuccessMsg] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg, kunciSukses] = usePesanAlert('');
+  const [errorMsg, setErrorMsg, kunciError] = usePesanAlert('');
   const [strukHasil, setStrukHasil] = useState(null);
 
   const menuQuery = useQuery({
@@ -231,7 +233,7 @@ const KasirPosPage = () => {
           />
         </Box>
 
-        <Alerts error={errorMsg} success={successMsg} />
+        <Alerts key={`${kunciSukses}-${kunciError}`} error={errorMsg} success={successMsg} />
 
         <Grid container spacing={2.5} alignItems="flex-start">
           {/* Kolom Kiri: Katalog Menu Tersedia */}
@@ -285,32 +287,39 @@ const KasirPosPage = () => {
                         <Grid key={menu.id} size={{ xs: 12, sm: 6, md: 4 }}>
                           <Paper
                             variant="outlined"
-                            onClick={() => setKeranjang((prev) => tambahItemKeranjang(prev, menu))}
                             sx={{
-                              p: 1.75,
                               height: '100%',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              justifyContent: 'space-between',
-                              cursor: 'pointer',
+                              overflow: 'hidden',
                               borderColor: qty > 0 ? 'primary.main' : 'divider',
                               bgcolor: qty > 0 ? 'primary.light' : 'background.paper',
                               transition: 'border-color .15s',
                               '&:hover': { borderColor: 'primary.main' },
                             }}
                           >
-                            <Box>
-                              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 0.75 }}>
-                                <Chip size="small" label={metaKategoriMenu(menu.kategori)} variant="outlined" />
-                                {qty > 0 && <Chip size="small" color="primary" label={`${qty}x`} />}
+                            <CardActionArea
+                              onClick={() => setKeranjang((prev) => tambahItemKeranjang(prev, menu))}
+                              sx={{
+                                p: 1.75,
+                                height: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'stretch',
+                                justifyContent: 'space-between',
+                              }}
+                            >
+                              <Box>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 1, mb: 0.75 }}>
+                                  <Chip size="small" label={metaKategoriMenu(menu.kategori)} variant="outlined" />
+                                  {qty > 0 && <Chip size="small" color="primary" label={`${qty}x`} />}
+                                </Box>
+                                <Typography variant="subtitle2" fontWeight={700}>
+                                  {menu.nama_menu}
+                                </Typography>
                               </Box>
-                              <Typography variant="subtitle2" fontWeight={700}>
-                                {menu.nama_menu}
+                              <Typography variant="h6" color="primary.main" sx={{ mt: 1.5 }}>
+                                {formatRupiah(menu.harga)}
                               </Typography>
-                            </Box>
-                            <Typography variant="h6" color="primary.main" sx={{ mt: 1.5 }}>
-                              {formatRupiah(menu.harga)}
-                            </Typography>
+                            </CardActionArea>
                           </Paper>
                         </Grid>
                       );

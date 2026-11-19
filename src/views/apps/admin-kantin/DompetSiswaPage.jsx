@@ -28,6 +28,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import {
   ambilDetailDompet,
   cariSiswaDompet,
@@ -56,8 +57,8 @@ const DompetSiswaPage = () => {
   const [statusSiswa, setStatusSiswa] = useState('aktif');
   const qDebounced = useDebouncedValue(searchQuery, 300);
 
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [success, setSuccess, kunciSukses] = usePesanAlert('');
+  const [error, setError, kunciError] = usePesanAlert('');
   const [errorDialog, setErrorDialog] = useState('');
   const [aksi, setAksi] = useState({ jenis: null, item: null });
   const [siswaDetailId, setSiswaDetailId] = useState(null);
@@ -136,7 +137,7 @@ const DompetSiswaPage = () => {
   return (
     <PageContainer title="Dompet Siswa & Top-Up" description="Kelola saldo, top-up loket, PIN, dan limit harian siswa">
       <ParentCard title="Dompet Siswa & Top-Up Loket">
-        <Alerts error={error} success={success} />
+        <Alerts key={`${kunciSukses}-${kunciError}`} error={error} success={success} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
           <SearchButton

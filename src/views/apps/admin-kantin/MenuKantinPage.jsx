@@ -11,6 +11,7 @@ import PageContainer from 'src/components/container/PageContainer';
 import DialogKonfirmasi from 'src/components/dialog/DialogKonfirmasi';
 import ParentCard from 'src/components/shared/ParentCard';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import { ambilDaftarMenu, buatMenuKantin, hapusMenuKantin, ubahMenuKantin } from 'src/apps/admin-kantin/api';
 import { KATEGORI_MENU, KUNCI_KANTIN, pesanGalatKantin } from 'src/apps/admin-kantin/kantin';
 import MenuFormDialog from 'src/apps/admin-kantin/menu/MenuFormDialog';
@@ -27,8 +28,8 @@ const MenuKantinPage = () => {
   const [kategori, setKategori] = useState('');
   const qDebounced = useDebouncedValue(searchQuery, 300);
 
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [success, setSuccess, kunciSukses] = usePesanAlert('');
+  const [error, setError, kunciError] = usePesanAlert('');
   const [errorDialog, setErrorDialog] = useState('');
   const [dialogForm, setDialogForm] = useState({ buka: false, mode: 'buat', awal: null });
   const [targetHapus, setTargetHapus] = useState(null);
@@ -84,7 +85,7 @@ const MenuKantinPage = () => {
   return (
     <PageContainer title="Katalog Menu Kantin" description="Kelola daftar menu makanan dan minuman kantin">
       <ParentCard title="Katalog Menu Kantin">
-        <Alerts error={error} success={success} />
+        <Alerts key={`${kunciSukses}-${kunciError}`} error={error} success={success} />
 
         <Box
           sx={{

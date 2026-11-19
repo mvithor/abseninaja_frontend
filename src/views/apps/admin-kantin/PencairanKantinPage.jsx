@@ -4,6 +4,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   Alert,
   Box,
+  Button,
   Chip,
   CircularProgress,
   MenuItem,
@@ -77,7 +78,16 @@ const PencairanKantinPage = () => {
               <CircularProgress />
             </Box>
           ) : rekonQuery.isError ? (
-            <Alert severity="error">{pesanGalatKantin(rekonQuery.error, 'Gagal memuat laporan rekonsiliasi.')}</Alert>
+            <Alert
+              severity="error"
+              action={
+                <Button color="inherit" size="small" onClick={() => rekonQuery.refetch()}>
+                  Coba lagi
+                </Button>
+              }
+            >
+              {pesanGalatKantin(rekonQuery.error, 'Gagal memuat laporan rekonsiliasi.')}
+            </Alert>
           ) : (
             <Stack spacing={2}>
               <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 1 }}>

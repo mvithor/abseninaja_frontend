@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Box, Skeleton, Typography } from '@mui/material';
+import { Box, CardActionArea, Paper, Skeleton, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import {
   IconReportMoney,
@@ -11,21 +11,8 @@ import { formatRupiah } from '../kantin';
 
 const TileKpi = ({ icon, label, nilai, keterangan, aksenColor = 'text.secondary', onClick, isLoading }) => {
   const Icon = icon;
-  return (
-    <Box
-      onClick={onClick}
-      sx={{
-        p: 2.5,
-        height: '100%',
-        borderRadius: 2,
-        border: 1,
-        borderColor: 'divider',
-        bgcolor: 'background.paper',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'border-color .15s',
-        '&:hover': onClick ? { borderColor: 'primary.main' } : undefined,
-      }}
-    >
+  const isi = (
+    <Box sx={{ p: 2.5, height: '100%' }}>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: aksenColor }}>
         <Icon size={18} />
         <Typography variant="subtitle2" color="text.secondary">
@@ -39,6 +26,21 @@ const TileKpi = ({ icon, label, nilai, keterangan, aksenColor = 'text.secondary'
         {keterangan}
       </Typography>
     </Box>
+  );
+
+  return (
+    <Paper
+      variant="outlined"
+      sx={{
+        height: '100%',
+        borderRadius: 2,
+        overflow: 'hidden',
+        transition: 'border-color .15s',
+        '&:hover': onClick ? { borderColor: 'primary.main' } : undefined,
+      }}
+    >
+      {onClick ? <CardActionArea onClick={onClick} sx={{ height: '100%' }}>{isi}</CardActionArea> : isi}
+    </Paper>
   );
 };
 

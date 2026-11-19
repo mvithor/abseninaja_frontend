@@ -47,7 +47,7 @@ const DashboardAdminKantin = () => {
   const navigate = useNavigate();
   const timeZone = useSchoolTimezone();
   const konteksOutlet = useOutletContext();
-  const fallbackProfilQuery = useKonteksKantin();
+  const fallbackProfilQuery = useKonteksKantin({ enabled: !konteksOutlet?.profil });
   const profil = konteksOutlet?.profil || fallbackProfilQuery.data;
   const unitAktif = konteksOutlet ? konteksOutlet.unitAktif : Boolean(profil?.kantin?.is_aktif);
   const userId = user?.userId;
@@ -134,7 +134,16 @@ const DashboardAdminKantin = () => {
 
         {/* Kartu KPI Utama */}
         {rekonQuery.isError ? (
-          <Alert severity="error">{pesanGalatKantin(rekonQuery.error, 'Gagal memuat ringkasan keuangan kantin.')}</Alert>
+          <Alert
+            severity="error"
+            action={
+              <Button color="inherit" size="small" onClick={() => rekonQuery.refetch()}>
+                Coba lagi
+              </Button>
+            }
+          >
+            {pesanGalatKantin(rekonQuery.error, 'Gagal memuat ringkasan keuangan kantin.')}
+          </Alert>
         ) : (
           <KpiKantinRow
             saldoMengendap={kantin?.saldo_mengendap ?? 0}

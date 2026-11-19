@@ -27,6 +27,7 @@ import Alerts from 'src/components/alerts/Alerts';
 import PageContainer from 'src/components/container/PageContainer';
 import ParentCard from 'src/components/shared/ParentCard';
 import TablePaginationActions from 'src/components/table-pagination-actions/TablePaginationActions';
+import usePesanAlert from 'src/hooks/usePesanAlert';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
 import {
   ambilDaftarTransaksi,
@@ -60,8 +61,8 @@ const TransaksiKantinPage = () => {
 
   const [trxDetailId, setTrxDetailId] = useState(null);
   const [targetReversal, setTargetReversal] = useState(null);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
+  const [success, setSuccess, kunciSukses] = usePesanAlert('');
+  const [error, setError, kunciError] = usePesanAlert('');
   const [errorReversal, setErrorReversal] = useState('');
 
   const paramsQuery = {
@@ -112,7 +113,7 @@ const TransaksiKantinPage = () => {
   return (
     <PageContainer title="Riwayat Transaksi Kantin" description="Daftar buku besar transaksi kantin dan reversal">
       <ParentCard title="Riwayat Transaksi Kantin">
-        <Alerts error={error} success={success} />
+        <Alerts key={`${kunciSukses}-${kunciError}`} error={error} success={success} />
 
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, mb: 2 }}>
           <Select
