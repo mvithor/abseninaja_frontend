@@ -335,6 +335,7 @@ const PengaduanList = Loadable(lazy(() => import('../views/apps/guru-bk/pengadua
 const PengaduanDetail = Loadable(lazy(() => import('../views/apps/guru-bk/pengaduan/PengaduanDetail')));
 const JadwalKonselingPage = Loadable(lazy(() => import('../views/apps/guru-bk/jadwal/JadwalKonselingPage')));
 const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/AdminKantin')));
+const MenuKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/MenuKantinPage')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
@@ -769,6 +770,7 @@ const Router = [
                     element: <GerbangKonteksKantin />,
                     children: [
                       { path: '', element: <DashboardAdminKantin /> },
+                      { path: 'menu', element: <MenuKantinPage /> },
                     ],
                   },
                 ]
