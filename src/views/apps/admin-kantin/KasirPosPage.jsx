@@ -19,7 +19,6 @@ import {
   LinearProgress,
   Paper,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material';
 import Grid from '@mui/material/Grid';
@@ -37,7 +36,9 @@ import SearchButton from 'src/components/button-group/SearchButton';
 import SubmitButton from 'src/components/button-group/SubmitButton';
 import CustomFormLabel from 'src/components/forms/theme-elements/CustomFormLabel';
 import CustomOutlinedInput from 'src/components/forms/theme-elements/CustomOutlinedInput';
+import CustomTextField from 'src/components/forms/theme-elements/CustomTextField';
 import PageContainer from 'src/components/container/PageContainer';
+import DashboardCard from 'src/components/shared/DashboardCard';
 import useDebouncedValue from 'src/hooks/useDebouncedValue';
 import usePesanAlert from 'src/hooks/usePesanAlert';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
@@ -218,7 +219,8 @@ const KasirPosPage = () => {
 
   return (
     <PageContainer title="Kasir POS Kantin" description="Point of Sale pembayaran kartu & PIN siswa">
-      <Stack spacing={2.5}>
+      <Box sx={{ pb: 5 }}>
+        <Stack spacing={2.5}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
           <Box>
             <Typography variant="h4">Kasir POS · {profil?.kantin?.nama_kantin || 'Kantin'}</Typography>
@@ -238,7 +240,7 @@ const KasirPosPage = () => {
         <Grid container spacing={2.5} alignItems="flex-start">
           {/* Kolom Kiri: Katalog Menu Tersedia */}
           <Grid size={{ xs: 12, lg: 7 }}>
-            <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
+            <DashboardCard title="Katalog Menu" subtitle="Pilih menu yang tersedia untuk ditambahkan ke keranjang">
               <Stack spacing={2}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 1.5 }}>
                   <SearchButton
@@ -327,17 +329,14 @@ const KasirPosPage = () => {
                   </Grid>
                 )}
               </Stack>
-            </Box>
+            </DashboardCard>
           </Grid>
 
           {/* Kolom Kanan: Identitas Siswa, Info Dompet, & Keranjang Checkout */}
           <Grid size={{ xs: 12, lg: 5 }}>
             <Stack spacing={2}>
               {/* Pilih Siswa */}
-              <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <Typography variant="h6" gutterBottom>
-                  1. Identifikasi Pembeli
-                </Typography>
+              <DashboardCard title="1. Identifikasi Pembeli">
 
                 <Box component="form" onSubmit={handleScanQrSubmit} sx={{ display: 'flex', gap: 1, mb: 1.5 }}>
                   <CustomOutlinedInput
@@ -365,7 +364,7 @@ const KasirPosPage = () => {
                     }
                   }}
                   renderInput={(params) => (
-                    <TextField {...params} label="Atau cari nama / NIS siswa" placeholder="Ketik minimal 1 huruf..." />
+                    <CustomTextField {...params} label="Atau cari nama / NIS siswa" placeholder="Ketik minimal 1 huruf..." />
                   )}
                 />
 
@@ -418,18 +417,19 @@ const KasirPosPage = () => {
                     </Box>
                   </Paper>
                 )}
-              </Box>
+              </DashboardCard>
 
               {/* Keranjang Belanja */}
-              <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1.5 }}>
-                  <Typography variant="h6">2. Keranjang Belanja ({ringkas.jumlahQty})</Typography>
-                  {keranjang.length > 0 && (
-                    <Button size="small" color="error" onClick={() => setKeranjang([])}>
+              <DashboardCard
+                title={`2. Keranjang Belanja (${ringkas.jumlahQty})`}
+                action={
+                  keranjang.length > 0 ? (
+                    <Button size="small" color="error" sx={{ textTransform: 'none' }} onClick={() => setKeranjang([])}>
                       Kosongkan
                     </Button>
-                  )}
-                </Box>
+                  ) : null
+                }
+              >
 
                 {keranjang.length === 0 ? (
                   <Typography variant="body2" color="text.secondary" align="center" sx={{ py: 3 }}>
@@ -511,11 +511,12 @@ const KasirPosPage = () => {
                     </Button>
                   </Stack>
                 )}
-              </Box>
+              </DashboardCard>
             </Stack>
           </Grid>
         </Grid>
-      </Stack>
+        </Stack>
+      </Box>
 
       {/* Dialog Otorisasi PIN 6 Digit */}
       <Dialog
