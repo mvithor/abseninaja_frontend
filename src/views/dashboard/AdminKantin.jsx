@@ -18,7 +18,6 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import Grid from '@mui/material/Grid';
 import {
   IconCheck,
   IconAlertTriangle,
@@ -28,6 +27,7 @@ import {
   IconWallet,
 } from '@tabler/icons-react';
 import PageContainer from 'src/components/container/PageContainer';
+import DashboardCard from 'src/components/shared/DashboardCard';
 import { useSchoolTimezone } from 'src/hooks/useSchoolTimezone';
 import KpiKantinRow from 'src/apps/admin-kantin/dashboard/KpiKantinRow';
 import StrukTransaksiDialog from 'src/apps/admin-kantin/transaksi/StrukTransaksiDialog';
@@ -79,8 +79,9 @@ const DashboardAdminKantin = () => {
 
   return (
     <PageContainer title="Dashboard Admin Kantin" description="Ringkasan operasional dan keuangan kantin cashless">
-      <Stack spacing={3}>
-        {/* Header Identitas Unit Kantin */}
+      <Box sx={{ pb: 5 }}>
+        <Stack spacing={3}>
+          {/* Header Identitas Unit Kantin */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 2 }}>
           <Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
@@ -155,37 +156,56 @@ const DashboardAdminKantin = () => {
         )}
 
         {/* Transaksi Terbaru */}
-        <Box sx={{ p: 2.5, borderRadius: 2, border: 1, borderColor: 'divider', bgcolor: 'background.paper' }}>
-          <Grid container alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
-            <Grid size="auto">
-              <Typography variant="h6">Transaksi Terbaru</Typography>
-              <Typography variant="caption" color="text.secondary">
-                5 mutasi terakhir pada unit kantin ini
-              </Typography>
-            </Grid>
-            <Grid size="auto">
-              <Button
-                size="small"
-                variant="text"
-                startIcon={<IconReceipt size={16} />}
-                onClick={() => navigate('/dashboard/admin-kantin/transaksi')}
-              >
-                Lihat Semua Transaksi
-              </Button>
-            </Grid>
-          </Grid>
-
+        <DashboardCard
+          title="Transaksi Terbaru"
+          subtitle="5 mutasi terakhir pada unit kantin ini"
+          action={
+            <Button
+              size="small"
+              variant="text"
+              startIcon={<IconReceipt size={16} />}
+              sx={{ textTransform: 'none' }}
+              onClick={() => navigate('/dashboard/admin-kantin/transaksi')}
+            >
+              Lihat semua
+            </Button>
+          }
+        >
           <Paper variant="outlined">
             <TableContainer>
-              <Table size="small">
+              <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Waktu</TableCell>
-                    <TableCell>Kode Transaksi</TableCell>
-                    <TableCell>Jenis</TableCell>
-                    <TableCell>Siswa</TableCell>
-                    <TableCell align="right">Nominal</TableCell>
-                    <TableCell align="center">Detail</TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Waktu
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Kode Transaksi
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Jenis
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Siswa
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Nominal
+                      </Typography>
+                    </TableCell>
+                    <TableCell align="center">
+                      <Typography variant="h6" sx={{ fontSize: '1rem' }}>
+                        Detail
+                      </Typography>
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -245,8 +265,9 @@ const DashboardAdminKantin = () => {
               </Table>
             </TableContainer>
           </Paper>
-        </Box>
+        </DashboardCard>
       </Stack>
+    </Box>
 
       <StrukTransaksiDialog
         buka={Boolean(trxDipilihId)}
