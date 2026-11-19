@@ -338,6 +338,8 @@ const DashboardAdminKantin = Loadable(lazy(() => import('../views/dashboard/Admi
 const MenuKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/MenuKantinPage')));
 const KasirPosPage = Loadable(lazy(() => import('../views/apps/admin-kantin/KasirPosPage')));
 const DompetSiswaPage = Loadable(lazy(() => import('../views/apps/admin-kantin/DompetSiswaPage')));
+const TransaksiKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/TransaksiKantinPage')));
+const PencairanKantinPage = Loadable(lazy(() => import('../views/apps/admin-kantin/PencairanKantinPage')));
 const LadBeranda = Loadable(lazy(() => import('../views/apps/guru-lad/LadBeranda')));
 const LadKelas = Loadable(lazy(() => import('../views/apps/guru-lad/LadKelas')));
 const LadSiswa = Loadable(lazy(() => import('../views/apps/guru-lad/LadSiswa')));
@@ -775,6 +777,8 @@ const Router = [
                       { path: 'kasir', element: <KasirPosPage /> },
                       { path: 'menu', element: <MenuKantinPage /> },
                       { path: 'dompet', element: <DompetSiswaPage /> },
+                      { path: 'transaksi', element: <TransaksiKantinPage /> },
+                      { path: 'pencairan', element: <PencairanKantinPage /> },
                     ],
                   },
                 ]

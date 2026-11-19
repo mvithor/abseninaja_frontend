@@ -58,6 +58,20 @@ export const formatWaktu = (iso, timeZone = 'Asia/Jakarta') => {
   }
 };
 
+/** Mengubah input date YYYY-MM-DD ke batas awal/akhir hari lokal dalam format ISO untuk filter API. */
+export const rentangTanggalQuery = (dariTanggal, sampaiTanggal) => {
+  const hasil = {};
+  if (dariTanggal) {
+    const awal = new Date(`${dariTanggal}T00:00:00`);
+    if (!Number.isNaN(awal.getTime())) hasil.dari_tanggal = awal.toISOString();
+  }
+  if (sampaiTanggal) {
+    const akhir = new Date(`${sampaiTanggal}T23:59:59.999`);
+    if (!Number.isNaN(akhir.getTime())) hasil.sampai_tanggal = akhir.toISOString();
+  }
+  return hasil;
+};
+
 /** Membuat kunci idempotensi baru per percobaan submit transaksi finansial. */
 export const buatKunciIdempotensi = (awalan = 'knt') => {
   const prefix = String(awalan || 'knt')

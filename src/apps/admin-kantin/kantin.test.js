@@ -21,6 +21,7 @@ import {
   metaStatusPencairan,
   metaStatusUnit,
   pesanGalatKantin,
+  rentangTanggalQuery,
   sisaLimitHarian,
   tambahItemKeranjang,
   ubahJumlahKeranjang,
@@ -47,6 +48,10 @@ test('formatRupiah dan formatWaktu menormalkan angka bulat & tanggal aman', () =
   assert.equal(formatWaktu(null), '-');
   assert.equal(formatWaktu('bukan-tanggal'), '-');
   assert.notEqual(formatWaktu('2026-11-19T05:00:00.000Z', 'Asia/Jakarta'), '-');
+
+  const rentang = rentangTanggalQuery('2026-11-19', '2026-11-19');
+  assert.ok(rentang.dari_tanggal && rentang.sampai_tanggal);
+  assert.ok(new Date(rentang.dari_tanggal).getTime() < new Date(rentang.sampai_tanggal).getTime());
 });
 
 test('buatKunciIdempotensi menghasilkan kunci unik <= 100 karakter sesuai skema backend', () => {

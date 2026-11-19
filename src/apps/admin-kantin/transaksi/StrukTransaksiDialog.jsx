@@ -43,6 +43,7 @@ const StrukTransaksiDialog = ({
   isLoading = false,
   judul = 'Detail Struk Transaksi',
   timeZone = 'Asia/Jakarta',
+  aksiTambahan = null,
   onTutup,
 }) => {
   const jenis = metaJenisTransaksi(transaksi?.jenis_transaksi);
@@ -149,7 +150,8 @@ const StrukTransaksiDialog = ({
           </Stack>
         )}
       </DialogContent>
-      <DialogActions>
+      <DialogActions sx={{ gap: 1 }}>
+        {aksiTambahan}
         <Button onClick={onTutup} variant="contained">
           Tutup
         </Button>
@@ -164,6 +166,7 @@ StrukTransaksiDialog.propTypes = {
   isLoading: PropTypes.bool,
   judul: PropTypes.string,
   timeZone: PropTypes.string,
+  aksiTambahan: PropTypes.node,
   onTutup: PropTypes.func.isRequired,
 };
 
