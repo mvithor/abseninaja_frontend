@@ -183,6 +183,11 @@ const PersonaPenugasanAdd = Loadable(lazy(() => import('../views/apps/admin-seko
 const AdminKantinList = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinList')));
 const AdminKantinAdd = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinAdd')));
 const AdminKantinEdit = Loadable(lazy(() => import('../views/apps/admin-sekolah/admin-kantin/AdminKantinEdit')));
+// Kantin Cashless (Pengelolaan & Pengawasan Admin Sekolah)
+const UnitKantinSekolahPage = Loadable(lazy(() => import('../views/apps/admin-sekolah/kantin/UnitKantinPage')));
+const DompetSekolahPage = Loadable(lazy(() => import('../views/apps/admin-sekolah/kantin/DompetSekolahPage')));
+const TransaksiSekolahPage = Loadable(lazy(() => import('../views/apps/admin-sekolah/kantin/TransaksiSekolahPage')));
+const KeuanganSekolahPage = Loadable(lazy(() => import('../views/apps/admin-sekolah/kantin/KeuanganSekolahPage')));
 // Download Data Siswa
 const DownloadDataSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-siswa/DownloadDataSiswaList')));
 const DownloadDataWaliSiswaList = Loadable(lazy(() => import('../views/apps/admin-sekolah/download-data-wali-siswa/DownloadDataWaliSiswaList')));
@@ -554,6 +559,11 @@ const Router = [
                     { path: 'admin-kantin', element: <AdminKantinList/> },
                     { path: 'admin-kantin/tambah', element: <AdminKantinAdd/> },
                     { path: 'admin-kantin/edit/:id', element: <AdminKantinEdit/> },
+                    // Kantin Cashless Sekolah
+                    { path: 'kantin', element: <UnitKantinSekolahPage/> },
+                    { path: 'kantin/dompet', element: <DompetSekolahPage/> },
+                    { path: 'kantin/transaksi', element: <TransaksiSekolahPage/> },
+                    { path: 'kantin/pencairan', element: <KeuanganSekolahPage/> },
                      // Download
                      { path: 'download/data-siswa-kelas', element: <DownloadDataSiswaList/> },
                      { path: 'download/data-wali-siswa', element: <DownloadDataWaliSiswaList/> },
