@@ -17,7 +17,7 @@ Folder ini berisi subagent dan skill Claude Code yang dipakai bersama tim. Berka
 | `frontend-developer` | Halaman dan komponen React, MUI, TanStack Query |
 | `code-reviewer` | Review PR antar pemilik modul |
 | `test-engineer` | Strategi dan penulisan tes |
-| `landing-copywriter` | Copy landing page berbahasa Indonesia (judul, CTA, seksi, FAQ), dengan tahap anti-slop dan penandaan klaim. Tidak menulis kode. Skill terhubung: `copywriting`, `anti-slop-id` |
+| `landing-copywriter` | Copy landing page berbahasa Indonesia (judul, CTA, seksi, FAQ), dengan tahap anti-slop dan penandaan klaim. Tidak menulis kode. Skill terhubung: `copywriting`, `anti-slop-id`, `suara-abseninaja` (skill pribadi di `~/.claude/skills/`, tidak ikut repo) |
 | `landing-builder` | Membangun seksi landing di `src/views/landing` sesuai stack repo (JavaScript, MUI 7, tanpa Tailwind). Skill terhubung: `frontend-design`, `react-best-practices`, `web-performance-optimization` |
 
 ## Daftar skill
