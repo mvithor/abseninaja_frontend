@@ -100,15 +100,19 @@ Linimasa.propTypes = {
   sx: PropTypes.object,
 };
 
-export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', sx }) {
+// Tambahan varian kartu: `jarak` (gap kisi, bawaan 24 seluler dan 20 web) dan
+// `sxJudul` (penyesuaian judul kartu, mis. ukuran huruf seluler halaman LAD).
+export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', jarak = { xs: '24px', md: '20px' }, sxJudul, sx }) {
   if (varian === 'linimasa') return <Linimasa langkah={langkah} sx={sx} />;
   return (
     <Box
       component="ol"
+      // role="list": Safari dan VoiceOver membuang semantik daftar bila list-style: none.
+      role="list"
       sx={{
         ...resetDaftar,
         display: 'grid',
-        gap: { xs: '24px', md: '20px' },
+        gap: jarak,
         gridTemplateColumns: {
           xs: 'minmax(0,1fr)',
           md: `repeat(${kolom}, minmax(0,1fr))`,
@@ -132,7 +136,10 @@ export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', 
               flex: 1,
             }}
           >
-            <Box component="h3" sx={{ m: 0, fontSize: { xs: '17px', md: '18px' }, fontWeight: 600, color: colors.ink }}>
+            <Box
+              component="h3"
+              sx={{ m: 0, fontSize: { xs: '17px', md: '18px' }, fontWeight: 600, color: colors.ink, ...sxJudul }}
+            >
               {l.judul}
             </Box>
             <Box component="p" sx={{ m: '6px 0 0', fontSize: '14px', lineHeight: 1.7, color: colors.muted }}>
@@ -157,5 +164,7 @@ LangkahBernomor.propTypes = {
   ).isRequired,
   kolom: PropTypes.number,
   varian: PropTypes.oneOf(['kartu', 'linimasa']),
+  jarak: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+  sxJudul: PropTypes.object,
   sx: PropTypes.object,
 };

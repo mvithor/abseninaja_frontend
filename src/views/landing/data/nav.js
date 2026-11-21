@@ -1,9 +1,15 @@
 // Struktur menu landing (persis dari desain Dropdown.dc.html dan Menu-Seluler.dc.html).
 //
+// `analitik.tersedia` mengikuti gerbang rilis LAD (lib/gerbang.js): false di
+// produksi sampai VITE_LANDING_LAD_AKTIF=true, true di DEV. Berkas gerbang
+// sengaja tanpa impor supaya nav.js tidak menyeret tokens.js.
+//
 // `tersedia: false` berarti halamannya belum dibangun. Butir seperti itu tampil
 // sebagai teks nonaktif (aria-disabled) dan tidak menavigasi. Ubah menjadi
 // `true` di REGISTRI_RUTE saat halamannya selesai; menu, bar tab, dan footer
 // mengikuti otomatis.
+
+import { LAD_DIRILIS } from '../lib/gerbang';
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
@@ -12,7 +18,7 @@ export const REGISTRI_RUTE = {
   pendampingan: { to: '/produk/pendampingan', tersedia: true }, // pages/Pendampingan.jsx, F2
   paket: { to: '/produk/paket', tersedia: true }, // pages/Paket.jsx, F3
   promo: { to: '/produk/promo', tersedia: true }, // pages/Promo.jsx, F3
-  analitik: { to: '/analitik-pembelajaran', tersedia: false },
+  analitik: { to: '/analitik-pembelajaran', tersedia: LAD_DIRILIS }, // pages/Analitik.jsx, F4 (digerbang)
   dampak: { to: '/bukti/dampak', tersedia: false },
   testimoni: { to: '/bukti/testimoni', tersedia: false },
   sekolahMitra: { to: '/bukti/sekolah-mitra', tersedia: false },

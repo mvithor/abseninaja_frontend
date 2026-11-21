@@ -1,12 +1,19 @@
 import { lazy } from 'react';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 import { REGISTRI_RUTE } from './data/nav';
+import { LAD_DIRILIS } from './lib/gerbang';
 
 // Rute landing (di bawah LandingLayout, sudah didaftarkan di src/routes/Router.jsx).
 // Halaman produksi ditambahkan di `anak` per fase; tiap halaman menjadi chunk
 // lazy sendiri. Landing.jsx lama tetap ada di disk sebagai cadangan rollback,
 // tetapi tidak lagi terdaftar. Rute di REGISTRI_RUTE (data/nav.js) dengan
 // `tersedia: true` wajib punya halaman di sini.
+//
+// Gerbang rilis LAD (lib/gerbang.js): rute /analitik-pembelajaran hanya
+// didaftarkan bila LAD_DIRILIS menyala (DEV, atau build dengan
+// VITE_LANDING_LAD_AKTIF=true). Bila mati, rute tidak ada (404 di produksi) dan
+// chunk halaman Analitik tidak ikut build. Nilainya sama dengan
+// REGISTRI_RUTE.analitik.tersedia, jadi menu mengikuti rute.
 //
 // Hanya saat import.meta.env.DEV (chunk-nya tidak ikut build produksi):
 //  - /landing-dev/fondasi : halaman uji visual komponen fondasi
@@ -33,6 +40,11 @@ function buatRute() {
     { path: '/jadwalkan-demo', element: <JadwalkanDemo /> },
     { path: '/akun-guru-mandiri', element: <GuruMandiri /> },
   ];
+
+  if (LAD_DIRILIS) {
+    const Analitik = Loadable(lazy(() => import('./pages/Analitik')));
+    anak.push({ path: '/analitik-pembelajaran', element: <Analitik /> });
+  }
 
   if (import.meta.env.DEV) {
     const DevFondasi = Loadable(lazy(() => import('./pages/DevFondasi')));

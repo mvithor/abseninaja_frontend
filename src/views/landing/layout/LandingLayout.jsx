@@ -1,5 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { Box, ThemeProvider, createTheme } from '@mui/material';
+import { Box, GlobalStyles, ThemeProvider, createTheme } from '@mui/material';
 import { baselightTheme } from 'src/theme/DefaultColors';
 import PromoBar from './PromoBar';
 import Header from './Header';
@@ -9,6 +9,18 @@ import TombolKeAtas from './TombolKeAtas';
 import { colors, font, gradients, layout } from '../theme/tokens';
 import { cincinFokus, hanyaPembaca } from '../theme/sx';
 import { footerDenganAfiliator } from './rute';
+
+// Tema global aplikasi (src/theme/Components.jsx) memberi SETIAP Box aturan
+// `.MuiBox-root { border-radius: theme.shape.borderRadius }` (7 px). Di landing
+// itu membuat bar pengumuman, header, section lebar penuh, dan footer ikut
+// membulat. Aturan di bawah dipasang hanya selama layout landing terpasang
+// (GlobalStyles dilepas saat unmount) dan meniadakannya: Box tanpa borderRadius
+// eksplisit menjadi persegi, termasuk Box di portal (lembar Lainnya).
+// Jangan diberi !important atau selektor turunan: kartu, tombol, tag, dan kotak
+// ikon yang menulis borderRadius lewat sx harus tetap membulat. Itu aman karena
+// emotion menyisipkan gaya global sebelum gaya komponen (sx), dan spesifisitas
+// keduanya sama (satu kelas), jadi sx menang.
+const gayaGlobalLanding = { '.MuiBox-root': { borderRadius: 0 } };
 
 // Tema landing: selalu terang, diturunkan dari palet terang aplikasi
 // (src/theme/DefaultColors.jsx). Dibuat sekali di tingkat modul dan tidak
@@ -40,6 +52,7 @@ export default function LandingLayout() {
   const { pathname } = useLocation();
   return (
     <ThemeProvider theme={temaLanding}>
+      <GlobalStyles styles={gayaGlobalLanding} />
       {/* React 19 mengangkat link ini ke <head> otomatis; precedence membuat render menunggu CSS font dimuat. */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />

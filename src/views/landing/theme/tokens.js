@@ -48,6 +48,7 @@ export const colors = {
 
   onDark: '#C9CBE6',
   onDarkSoft: '#D5D7F2',
+  onDarkTerang: '#E6E7FB', // langkah di kartu gradasi (jalur akun, F4)
   onDarkLine: 'rgba(255,255,255,0.18)',
   glass: 'rgba(255,255,255,0.08)',
   glassLine: 'rgba(255,255,255,0.22)',
@@ -59,6 +60,7 @@ export const colors = {
 
   // Latar kaca lebih tipis dan garis kaca (kartu Sebelum, F1) serta penanda daftar.
   glassTipis: 'rgba(255,255,255,0.05)',
+  glassIkon: 'rgba(255,255,255,0.14)', // lingkaran ikon butir "Sebelum" (F4)
   glassGaris: 'rgba(255,255,255,0.14)',
   penandaDaftar: '#7B7FC9', // butir daftar di kartu Sebelum
 
@@ -196,6 +198,37 @@ export const peraga = {
   },
 };
 
+// Peraga tampilan produk LAD (mock/lad dan halaman Analitik, F4). Nilai dari
+// desain LAD.dc.html. Semua isi peraga adalah data contoh (DUMMY), bukan data
+// nyata. Warna selalu berdampingan dengan angka atau label teks.
+export const peragaLad = {
+  perhatianBg: '#FFF1D6', // kartu Perlu perhatian, sel dan tanda penanda P1 sampai P4
+  perhatianGaris: '#F7D28A',
+  perhatianInk: '#7A4B00',
+  pengayaanBg: '#D9FBF4', // kartu Pengayaan, sel tinggi, tanda penanda P5
+  pengayaanGaris: '#8BE8D6',
+  pengayaanInk: '#0B6B5D',
+  belumCukupBg: '#F6F7FB', // kartu Data belum cukup (garis putus), kolom isian saran
+  belumCukupGaris: '#98A2B3',
+  lengkapBg: '#E8F0FF', // kartu Kelengkapan nilai TP
+  garisKartu: 'rgba(16,24,40,0.06)',
+  catatanBg: '#F8F9FC', // kartu Data belum cukup (halaman) dan catatan bukan diagnosis
+  inkSedang: '#344054', // judul kecil "Muncul bila", isi kolom saran
+  batasAbu: '#D0D5DD', // tepi tombol Abaikan saran
+  segmenBelum: '#F5A524', // belum tuntas (bergaris miring agar tidak hanya warna)
+  segmenTuntas: '#4F93FF',
+  segmenPengayaan: '#19D3B0',
+  garisMiring: 'rgba(255,255,255,0.6)',
+  kktp: '#FF7A59', // garis KKTP pada grafik tren
+  kktpInk: '#C4452A', // teks "KKTP 75" pada grafik tren
+  wajib: '#D92D20', // tanda bintang kolom wajib
+  bayangan: {
+    ringkasan: '0 40px 70px -30px rgba(47,50,125,0.45)', // kartu ringkasan hero
+    saranMini: '0 24px 50px -24px rgba(47,50,125,0.5)', // kartu "Saran tindak lanjut" melayang
+    kartuProfil: '0 30px 60px -34px rgba(47,50,125,0.4)', // kartu profil murid dan saran
+  },
+};
+
 export const layout = {
   lebarKonten: 1200,
   padX: { xs: '20px', md: '40px' },
@@ -291,4 +324,7 @@ export const flags = {
   // harus ada dan KONTAK_RESMI (data/kontak.js) harus beres.
   formulirAktif:
     endpointValid(import.meta.env.VITE_LANDING_FORM_URL, { dev: import.meta.env.DEV }) !== null || import.meta.env.DEV,
+  // Gerbang rilis halaman Analitik Pembelajaran (LAD) tidak ada di sini: sumber
+  // tunggalnya lib/gerbang.js (LAD_DIRILIS), dibaca routes.jsx dan data/nav.js
+  // langsung supaya tokens.js tidak masuk chunk entry.
 };

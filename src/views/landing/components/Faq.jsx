@@ -16,6 +16,8 @@ export default function Faq({ butir, bukaAwal = 0, sx }) {
   return (
     <Box
       component="ul"
+      // role="list": Safari dan VoiceOver membuang semantik daftar bila list-style: none.
+      role="list"
       sx={{
         ...resetDaftar,
         display: 'flex',

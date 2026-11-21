@@ -10,6 +10,20 @@ export const PROMO = {
   labelTutup: 'Tutup pengumuman',
 };
 
+// Bar pengumuman khusus halaman Analitik Pembelajaran (desain LAD.dc.html dan
+// LAD-Seluler.dc.html). Memakai bar pengumuman LandingLayout (tidak digandakan):
+// PromoBar menukar PROMO dengan ini di rute `rute`. Tautan tampil juga di
+// seluler (`aksiSeluler`), sesuai desain.
+// Teks sama dengan versi desain (butir 2 copy-lad.md: Kelas latihan ada di dalam akun).
+export const PROMO_ANALITIK = {
+  rute: R.analitik.to,
+  web: 'Dua Kelas latihan hanya-baca tersedia di dalam akun. Kelas nyata tidak terpengaruh.',
+  seluler: 'Dua Kelas latihan siap dicoba',
+  aksi: { label: 'Minta akun', ...R.akunGuruMandiri },
+  aksiSeluler: true,
+  labelTutup: PROMO.labelTutup,
+};
+
 export const FOOTER = {
   afiliator: {
     judul: 'Kenal sekolah lain yang butuh ini?',
