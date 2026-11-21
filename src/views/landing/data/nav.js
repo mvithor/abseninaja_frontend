@@ -8,12 +8,16 @@
 // mengikuti gerbang rilis F5 (lib/gerbang.js, BUKTI_DIRILIS): false di produksi
 // sampai VITE_LANDING_BUKTI_AKTIF=true, true di DEV.
 //
+// Tiga rute Perusahaan (tentangKami, kerjaSama, afiliator) mengikuti gerbang
+// rilis F6 (lib/gerbang.js, PERUSAHAAN_DIRILIS): false di produksi sampai
+// VITE_LANDING_PERUSAHAAN_AKTIF=true, true di DEV.
+//
 // `tersedia: false` berarti halamannya belum dibangun. Butir seperti itu tampil
 // sebagai teks nonaktif (aria-disabled) dan tidak menavigasi. Ubah menjadi
 // `true` di REGISTRI_RUTE saat halamannya selesai; menu, bar tab, dan footer
 // mengikuti otomatis.
 
-import { BUKTI_DIRILIS, LAD_DIRILIS } from '../lib/gerbang';
+import { BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from '../lib/gerbang';
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
@@ -28,9 +32,9 @@ export const REGISTRI_RUTE = {
   sekolahMitra: { to: '/bukti/sekolah-mitra', tersedia: BUKTI_DIRILIS }, // pages/SekolahMitra.jsx, F5 (digerbang)
   keamananData: { to: '/bukti/keamanan-data', tersedia: BUKTI_DIRILIS }, // pages/KeamananData.jsx, F5 (digerbang)
   legalitas: { to: '/bukti/legalitas', tersedia: BUKTI_DIRILIS }, // pages/Legalitas.jsx, F5 (digerbang)
-  tentangKami: { to: '/tentang-kami', tersedia: false },
-  kerjaSama: { to: '/kerja-sama', tersedia: false },
-  afiliator: { to: '/afiliator', tersedia: false },
+  tentangKami: { to: '/tentang-kami', tersedia: PERUSAHAAN_DIRILIS }, // pages/TentangKami.jsx, F6 (digerbang)
+  kerjaSama: { to: '/kerja-sama', tersedia: PERUSAHAAN_DIRILIS }, // pages/KerjaSama.jsx, F6 (digerbang)
+  afiliator: { to: '/afiliator', tersedia: PERUSAHAAN_DIRILIS }, // pages/Afiliator.jsx, F6 (digerbang)
   blog: { to: '/blog', tersedia: false },
   demo: { to: '/jadwalkan-demo', tersedia: true }, // pages/JadwalkanDemo.jsx, F3
   akunGuruMandiri: { to: '/akun-guru-mandiri', tersedia: true }, // pages/GuruMandiri.jsx, F3

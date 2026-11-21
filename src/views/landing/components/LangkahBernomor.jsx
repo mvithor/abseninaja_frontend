@@ -100,9 +100,19 @@ Linimasa.propTypes = {
   sx: PropTypes.object,
 };
 
-// Tambahan varian kartu: `jarak` (gap kisi, bawaan 24 seluler dan 20 web) dan
-// `sxJudul` (penyesuaian judul kartu, mis. ukuran huruf seluler halaman LAD).
-export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', jarak = { xs: '24px', md: '20px' }, sxJudul, sx }) {
+// Tambahan varian kartu: `jarak` (gap kisi, bawaan 24 seluler dan 20 web),
+// `sxJudul` (penyesuaian judul kartu, mis. ukuran huruf seluler halaman LAD), dan
+// `sxKartu` (penyesuaian kartu, mis. padding). Butir boleh memuat `verifikasi`
+// (penanda desain di bawah deskripsi; tidak menambah apa pun bila penanda mati).
+export default function LangkahBernomor({
+  langkah,
+  kolom = 3,
+  varian = 'kartu',
+  jarak = { xs: '24px', md: '20px' },
+  sxJudul,
+  sxKartu,
+  sx,
+}) {
   if (varian === 'linimasa') return <Linimasa langkah={langkah} sx={sx} />;
   return (
     <Box
@@ -134,6 +144,7 @@ export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', 
               border: `1px solid ${colors.border}`,
               boxShadow: 'none',
               flex: 1,
+              ...sxKartu,
             }}
           >
             <Box
@@ -145,6 +156,7 @@ export default function LangkahBernomor({ langkah, kolom = 3, varian = 'kartu', 
             <Box component="p" sx={{ m: '6px 0 0', fontSize: '14px', lineHeight: 1.7, color: colors.muted }}>
               {l.deskripsi}
             </Box>
+            <PenandaVerifikasi verifikasi={l.verifikasi} sx={{ mt: '10px' }} />
           </Box>
         </Box>
       ))}
@@ -166,5 +178,6 @@ LangkahBernomor.propTypes = {
   varian: PropTypes.oneOf(['kartu', 'linimasa']),
   jarak: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   sxJudul: PropTypes.object,
+  sxKartu: PropTypes.object,
   sx: PropTypes.object,
 };

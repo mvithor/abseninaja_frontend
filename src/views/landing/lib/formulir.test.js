@@ -77,8 +77,10 @@ const BATAS_MS = 50;
 // ---------------------------------------------------------------------------
 
 describe('skema formulir', () => {
-  it('punya dua jenis: demo dan guru', () => {
-    assert.deepEqual(Object.keys(SKEMA).sort(), ['demo', 'guru']);
+  // F6 menambah kerjaSama dan afiliator; tesnya ada di formulirPerusahaan.test.js.
+  // SEMUA_JENIS di bawah tetap dua jenis konversi awal (demo dan guru).
+  it('punya empat jenis: demo, guru, kerjaSama, dan afiliator', () => {
+    assert.deepEqual(Object.keys(SKEMA).sort(), ['afiliator', 'demo', 'guru', 'kerjaSama']);
   });
 
   it('kolom jebakan bernama netral (hp_k7x2) dan bukan bagian skema mana pun', () => {
@@ -203,7 +205,7 @@ describe('normalisasiWhatsapp: nomor tidak valid', () => {
     ['simbol tidak dikenal', '0812*3456789'],
     ['garis miring', '0812/3456789'],
     ['digit lebar penuh', '０８１２３４５６７８９'],
-    ['awalan 8 tanpa 0 atau 62', '8123456789'],
+    // '8123456789' (awalan 8 tanpa 0) diterima sejak F6: lihat formulirPengerasan.test.js.
   ];
   for (const [nama, masuk] of kasus) {
     it(`menolak: ${nama}`, () => {

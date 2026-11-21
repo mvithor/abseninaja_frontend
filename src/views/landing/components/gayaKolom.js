@@ -30,3 +30,14 @@ export function gayaKontrol(bergalat) {
     '&:disabled': { background: colors.disabledBg, color: colors.muted, cursor: 'not-allowed' },
   };
 }
+
+// Tambahan untuk textarea (kolom teksPanjang): tinggi 110, padding 12 16, tanpa
+// pegangan ubah ukuran (desain Kerja-Sama.dc.html). Dipakai menimpa gayaKontrol.
+export const gayaTeksPanjang = {
+  height: 110,
+  px: '16px',
+  py: '12px',
+  lineHeight: 1.5,
+  resize: 'none',
+  overflow: 'auto',
+};

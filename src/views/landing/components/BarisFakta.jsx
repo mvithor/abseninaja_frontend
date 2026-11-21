@@ -5,10 +5,13 @@ import { colors, gradients, huruf, radius, shadows } from '../theme/tokens';
 import { resetDaftar } from '../theme/sx';
 
 // Baris fakta. Varian:
-//  ikon  : kartu kecil berisi ikon + label (hero halaman). Seluler: 2 kolom tanpa ikon.
-//  angka : kartu kaca di latar gelap, angka besar + label (34, seluler 22).
+//  ikon      : kartu kecil berisi ikon + label (hero halaman). Seluler: 2 kolom tanpa ikon.
+//  ikonLebar : seperti `ikon`, tetapi ikon selalu tampil dan kolom 1 (seluler), 2 (sm),
+//              4 (md); kartu sudut 18, label 13, maks 900 (hero Afiliator).
+//  angka     : kartu kaca di latar gelap, angka besar + label (34, seluler 22).
 export default function BarisFakta({ butir, varian = 'ikon', sx }) {
   const angka = varian === 'angka';
+  const lebar = varian === 'ikonLebar';
   return (
     <Box
       component="ul"
@@ -25,7 +28,10 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
           xs: 'repeat(2, minmax(0,1fr))',
           md: 'repeat(4, minmax(0,1fr))',
         },
-        ...(angka ? { gridTemplateColumns: { xs: 'minmax(0,1fr)', sm: 'repeat(2, minmax(0,1fr))', md: 'repeat(4, minmax(0,1fr))' } } : null),
+        ...(angka || lebar
+          ? { gridTemplateColumns: { xs: 'minmax(0,1fr)', sm: 'repeat(2, minmax(0,1fr))', md: 'repeat(4, minmax(0,1fr))' } }
+          : null),
+        ...(lebar ? { gap: '14px', maxWidth: 900, mt: '20px' } : null),
         ...sx,
       }}
     >
@@ -59,9 +65,9 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
               display: 'flex',
               alignItems: 'center',
               gap: '12px',
-              p: { xs: '12px 14px', md: '14px 18px' },
+              p: lebar ? '14px 18px' : { xs: '12px 14px', md: '14px 18px' },
               textAlign: 'left',
-              borderRadius: radius.kartuKecil,
+              borderRadius: lebar ? radius.kartuFakta : radius.kartuKecil,
               background: colors.white,
               border: `1px solid ${colors.border}`,
               boxShadow: shadows.kartu,
@@ -70,7 +76,7 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
             <Box
               aria-hidden="true"
               sx={{
-                display: { xs: 'none', md: 'inline-flex' },
+                display: lebar ? 'inline-flex' : { xs: 'none', md: 'inline-flex' },
                 alignItems: 'center',
                 justifyContent: 'center',
                 width: 40,
@@ -83,7 +89,7 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
             >
               <b.ikon size={20} stroke={1.9} />
             </Box>
-            <Box component="span" sx={{ fontSize: '14px', fontWeight: 600, color: colors.ink, lineHeight: 1.3 }}>
+            <Box component="span" sx={{ fontSize: lebar ? '13px' : '14px', fontWeight: 600, color: colors.ink, lineHeight: lebar ? undefined : 1.3 }}>
               {b.label}
             </Box>
             <PenandaVerifikasi verifikasi={b.verifikasi} />
@@ -102,6 +108,6 @@ BarisFakta.propTypes = {
       angka: PropTypes.string,
     }),
   ).isRequired,
-  varian: PropTypes.oneOf(['ikon', 'angka']),
+  varian: PropTypes.oneOf(['ikon', 'ikonLebar', 'angka']),
   sx: PropTypes.object,
 };

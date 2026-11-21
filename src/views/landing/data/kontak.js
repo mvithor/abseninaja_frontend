@@ -17,6 +17,12 @@ export const CONTACT = {
   email: 'halo@abseninaja.com',
 };
 
+// Alamat kantor (halaman Tentang Kami). Sama seperti WhatsApp dan email: DUMMY, dan
+// hanya tampil bila KONTAK_TAMPIL (kontak resmi, atau DEV). Ganti dengan alamat
+// resmi bersama kontak di atas.
+// DUMMY wajib diganti sebelum main
+export const ALAMAT = 'Jl. Contoh No. 10, Bandar Lampung';
+
 export const WA_PESAN_AWAL = 'Halo Absenin Aja, saya ingin tahu lebih lanjut tentang platform sekolah Anda.';
 
 export const waLink = (pesan = WA_PESAN_AWAL) =>

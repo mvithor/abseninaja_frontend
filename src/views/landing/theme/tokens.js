@@ -126,6 +126,8 @@ export const blobs = {
   banner: [{ right: -90, top: -90, size: 300, color: 'rgba(255,255,255,0.12)', blur: 6 }], // banner analitik
   panelJenis: [{ right: -90, top: -90, size: 280, color: 'rgba(255,255,255,0.12)', blur: 6 }], // kartu jenis sekolah
   stripGelap: [{ left: -60, bottom: -120, size: 320, color: 'rgba(94,92,230,0.55)', blur: 100 }], // strip Prakersa
+  // Halaman Perusahaan (F6): lingkaran kilau di pojok kartu pendiri (tanpa blur).
+  kartuPendiri: [{ right: -60, top: -60, size: 220, color: 'rgba(255,255,255,0.14)', blur: 0 }],
   // Halaman konversi (F3): hero Jadwalkan Demo (blob kanan di dasar, bukan di atas).
   heroBawah: [
     { left: -120, top: -80, size: 420, color: 'rgba(94,92,230,0.35)', blur: 130 },
@@ -141,6 +143,7 @@ export const radius = {
   tombol: '12px',
   tombolAtas: '12px',
   kartuKecil: '16px',
+  kartuFakta: '18px', // kartu fakta hero Afiliator (F6)
   ikon: '16px',
   barTab: '16px', // kotak Demo terangkat di bar tab bawah dan bar tab gradasi
   panelMenu: '14px',
@@ -309,6 +312,14 @@ export const huruf = {
   angkaStudi: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 700 }, // nilai metrik studi kasus
   isiTestimoni: { fontSize: '15px', lineHeight: 1.75, fontWeight: 400 }, // kutipan testimoni
   bintang: { fontSize: { xs: '16px', md: '18px' } }, // ukuran deret bintang peringkat
+  // Halaman Perusahaan (F6).
+  inisialPendiri: { fontSize: { xs: '28px', md: '64px' }, fontWeight: 700, lineHeight: 'normal' }, // inisial di kartu pendiri
+  tandaKutip: { fontSize: { xs: '28px', md: '72px' }, lineHeight: 0.8, fontWeight: 700 }, // tanda kutip besar
+  kutipanPendiri: { fontSize: { xs: '17px', md: '20px' }, lineHeight: 1.7, fontWeight: 400 }, // kutipan pendiri
+  tahunLinimasa: { fontSize: '13px', fontWeight: 700, lineHeight: 'normal' }, // tahun pada kartu linimasa
+  judulLinimasa: { fontSize: { xs: '16px', md: '18px' }, lineHeight: 'normal', fontWeight: 600 }, // judul kartu linimasa
+  judulHubungi: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 'normal', fontWeight: 600 }, // judul blok hubungi
+  judulKeuntungan: { fontSize: { xs: '17px', md: '19px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu keuntungan afiliator
   eyebrow: {
     fontSize: '12.5px',
     fontWeight: 600,

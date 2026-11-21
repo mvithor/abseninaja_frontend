@@ -1,13 +1,26 @@
-// Skema dan teks bersama formulir konversi (Jadwalkan Demo dan Akun Guru
-// Mandiri). Disalin dari desain kanvas (Demo.dc.html, Demo-Seluler.dc.html,
-// Guru-Mandiri.dc.html, Guru-Mandiri-Seluler.dc.html).
+// Skema dan teks bersama formulir konversi (Jadwalkan Demo, Akun Guru Mandiri,
+// Kerja Sama, dan Afiliator). Disalin dari desain kanvas (Demo.dc.html,
+// Demo-Seluler.dc.html, Guru-Mandiri.dc.html, Guru-Mandiri-Seluler.dc.html,
+// Kerja-Sama.dc.html, Kerja-Sama-Seluler.dc.html, Afiliator.dc.html,
+// Afiliator-Seluler.dc.html).
+//
+// Skema ini ikut terbawa ke chunk FormulirKonversi (dipakai semua halaman
+// berformulir), termasuk saat gerbang rilis Perusahaan mati. Karena itu skema
+// kerjaSama dan afiliator HANYA berisi nama jenis, label kolom, placeholder, dan
+// opsi pilihan: tanpa klaim, janji, atau angka. Teks seperti "Data dipakai hanya
+// untuk membalas" tinggal di data/kerjaSama.js dan data/afiliator.js.
 //
 // BERKAS INI SENGAJA TANPA IMPOR: lib/formulir.js (logika murni) membacanya
 // dan diuji dengan `node --test` tanpa React, MUI, atau Vite.
 //
 // Setiap kolom: { nama, label, jenis, wajib, maks, placeholder, autoComplete,
 // lebar, awal, opsi }.
-//  jenis   : 'teks' | 'pilihan' | 'whatsapp' | 'email'
+//  jenis   : 'teks' | 'pilihan' | 'whatsapp' | 'email' | 'kontak' | 'teksPanjang'
+//            'kontak'      = satu kolom "WhatsApp atau email": isian ber-"@" dianggap
+//                            email, selain itu nomor WhatsApp (lib/formulir.js,
+//                            normalisasiKontak).
+//            'teksPanjang' = teks beberapa baris (textarea), biasanya opsional, dengan
+//                            `maks` sebagai batas karakter; baris baru dipertahankan.
 //  lebar   : 'penuh' (dua kolom di md ke atas) | 'setengah'
 //  opsi    : untuk 'pilihan' saja, [{ nilai, label }]. `placeholderPilih` = teks
 //            butir kosong (tanpa butir kosong bila tidak ada, nilai awal = awal).
@@ -31,6 +44,20 @@ const OPSI_JUMLAH_MURID = [
   { nilai: '200-500', label: '200 sampai 500' },
   { nilai: '500-1000', label: '500 sampai 1.000' },
   { nilai: 'lebih-1000', label: 'Lebih dari 1.000' },
+];
+
+const OPSI_BENTUK_KERJA_SAMA = [
+  { nilai: 'sekolah-yayasan', label: 'Sekolah dan yayasan' },
+  { nilai: 'komunitas-guru', label: 'Komunitas guru' },
+  { nilai: 'mitra-industri', label: 'Mitra industri' },
+  { nilai: 'lainnya', label: 'Lainnya' },
+];
+
+const OPSI_LATAR_BELAKANG = [
+  { nilai: 'guru', label: 'Guru' },
+  { nilai: 'kepala-sekolah', label: 'Kepala sekolah' },
+  { nilai: 'komunitas', label: 'Komunitas' },
+  { nilai: 'lainnya', label: 'Lainnya' },
 ];
 
 export const SKEMA = {
@@ -77,6 +104,42 @@ export const SKEMA = {
     { nama: 'email', label: 'Email', jenis: 'email', wajib: true, maks: 254, placeholder: 'nama@email.com', autoComplete: 'email', lebar: 'setengah' },
     { nama: 'whatsapp', label: 'WhatsApp', jenis: 'whatsapp', wajib: false, placeholder: '08xxxxxxxxxx', autoComplete: 'tel', lebar: 'setengah' },
   ],
+  // Kerja Sama (Kerja-Sama.dc.html). Pilihan "Bentuk kerja sama" tanpa butir kosong,
+  // seperti desain: nilai awal butir pertama.
+  kerjaSama: [
+    { nama: 'nama', label: 'Nama lengkap', jenis: 'teks', wajib: true, maks: 100, placeholder: 'Nama Anda', autoComplete: 'name', lebar: 'setengah' },
+    { nama: 'instansi', label: 'Instansi', jenis: 'teks', wajib: true, maks: 150, placeholder: 'Nama instansi', autoComplete: 'organization', lebar: 'setengah' },
+    {
+      nama: 'bentuk',
+      label: 'Bentuk kerja sama',
+      jenis: 'pilihan',
+      wajib: true,
+      opsi: OPSI_BENTUK_KERJA_SAMA,
+      awal: 'sekolah-yayasan',
+      autoComplete: 'off',
+      lebar: 'penuh',
+    },
+    { nama: 'kontak', label: 'WhatsApp atau email', jenis: 'kontak', wajib: true, maks: 254, placeholder: 'Kontak yang bisa dihubungi', autoComplete: 'off', lebar: 'penuh' },
+    { nama: 'pesan', label: 'Pesan', jenis: 'teksPanjang', wajib: false, maks: 1000, placeholder: 'Ceritakan singkat rencana Anda', autoComplete: 'off', lebar: 'penuh' },
+  ],
+  // Afiliator (Afiliator.dc.html). Latar belakang: pilihan tanpa butir kosong,
+  // nilai awal butir pertama.
+  afiliator: [
+    { nama: 'nama', label: 'Nama lengkap', jenis: 'teks', wajib: true, maks: 100, placeholder: 'Nama Anda', autoComplete: 'name', lebar: 'penuh' },
+    { nama: 'whatsapp', label: 'Nomor WhatsApp', jenis: 'whatsapp', wajib: true, placeholder: '08xxxxxxxxxx', autoComplete: 'tel', lebar: 'setengah' },
+    { nama: 'email', label: 'Email', jenis: 'email', wajib: true, maks: 254, placeholder: 'nama@email.com', autoComplete: 'email', lebar: 'setengah' },
+    { nama: 'kota', label: 'Kota', jenis: 'teks', wajib: true, maks: 100, placeholder: 'Kota atau kabupaten', autoComplete: 'address-level2', lebar: 'setengah' },
+    {
+      nama: 'latarBelakang',
+      label: 'Latar belakang',
+      jenis: 'pilihan',
+      wajib: true,
+      opsi: OPSI_LATAR_BELAKANG,
+      awal: 'guru',
+      autoComplete: 'off',
+      lebar: 'setengah',
+    },
+  ],
 };
 
 // Nama kolom jebakan spam (honeypot). Disembunyikan dari pengguna dan pembaca
@@ -98,6 +161,10 @@ export const PESAN_GALAT = {
   pilihanTidakDikenal: (label) => `${label} tidak valid.`,
   whatsapp: 'Nomor WhatsApp tidak valid.',
   email: 'Alamat email tidak valid.',
+  // Kolom "WhatsApp atau email" tanpa "@": belum jelas yang dimaksud nomor atau email,
+  // jadi pesannya menyebut keduanya. Dengan "@" dipakai pesan `email`. Tidak ada di
+  // desain: perlu ditinjau copywriter.
+  kontak: 'Nomor WhatsApp atau alamat email tidak valid.',
 };
 
 // Teks bersama kedua formulir. Tanda keadaan: isian, mengirim, terkirim, gagal.
@@ -122,6 +189,11 @@ export const TEKS_FORMULIR = {
   // Kalimat privasi di bawah tombol kirim, dengan tautan ke Kebijakan Privasi.
   // DUMMY wajib diganti sebelum main: bukan dari desain; perlu ditinjau copywriter
   // dan pihak hukum (tanpa klaim persetujuan sengaja).
+  // Jenis kerjaSama dan afiliator sengaja tanpa kalimat di sini (desainnya tidak
+  // punya, dan tidak ada klaim baru yang ditulis): hanya tautan Kebijakan Privasi
+  // yang tampil. Kalimat desain ("Data dipakai hanya untuk membalas" dan "... untuk
+  // pendaftaran") ada di jaminan data/kerjaSama.js dan data/afiliator.js, ditandai
+  // verifikasi (butuh tinjauan hukum UU PDP sebelum rilis).
   privasi: {
     demo: 'Data Anda dipakai untuk menghubungi Anda.',
     guru: 'Data Anda dipakai untuk membuat akun Anda.',

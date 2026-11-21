@@ -48,4 +48,7 @@ export const tanpaScrollbar = {
 
 // Subjudul bagian (h2 diikuti p) 16 px web dan 15 px seluler: skala `.sub`
 // desain halaman Bukti (F5). Bawaan JudulSeksi 17 px (F1 sampai F3).
+// Jangkar tautan dalam halaman: sisakan sedikit ruang di atas saat digulir ke sini.
+export const sxJangkar = { scrollMarginTop: '16px' };
+
 export const sxSubBukti = { '& > h2 + p': { fontSize: { xs: '15px', md: '16px' } } };

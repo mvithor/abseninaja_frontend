@@ -6,7 +6,10 @@ import { renderJudul } from './renderJudul';
 import { blobs, colors, gradients, huruf, radius } from '../theme/tokens';
 
 // Banner ajakan bertindak: panel gradasi merek, blob, judul, subjudul, dua tombol.
-export default function BannerCta({ judul, sub, aksiUtama, aksiKedua, sx }) {
+// `penanda` = penanda desain (PenandaVerifikasi) untuk klaim di subjudul; tampil
+// di bawah subjudul dan tidak menambah apa pun bila penanda mati (null). Pemanggil
+// memberinya `sx={{ position: 'relative' }}` supaya tidak tertutup blob.
+export default function BannerCta({ judul, sub, penanda, aksiUtama, aksiKedua, sx }) {
   return (
     <Box component="section" sx={{ pt: 0, pb: { xs: '48px', md: '96px' }, ...sx }}>
       <Kontainer>
@@ -58,6 +61,7 @@ export default function BannerCta({ judul, sub, aksiUtama, aksiKedua, sx }) {
               {sub}
             </Box>
           )}
+          {penanda}
           <Box
             sx={{
               position: 'relative',
@@ -77,7 +81,8 @@ export default function BannerCta({ judul, sub, aksiUtama, aksiKedua, sx }) {
               if (!aksi) return null;
               const { label, ...props } = aksi;
               return (
-                <TombolLanding key={label} varian={varian} {...props}>
+                // Kunci memakai varian (bukan label): dua tombol boleh berlabel sama.
+                <TombolLanding key={varian} varian={varian} {...props}>
                   {label}
                 </TombolLanding>
               );
@@ -97,6 +102,7 @@ const aksiShape = PropTypes.shape({
 BannerCta.propTypes = {
   judul: PropTypes.node.isRequired,
   sub: PropTypes.node,
+  penanda: PropTypes.node,
   aksiUtama: aksiShape,
   aksiKedua: aksiShape,
   sx: PropTypes.object,

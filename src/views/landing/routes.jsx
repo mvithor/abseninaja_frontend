@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 import { REGISTRI_RUTE } from './data/nav';
-import { BUKTI_DIRILIS, LAD_DIRILIS } from './lib/gerbang';
+import { BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from './lib/gerbang';
 
 // Rute landing (di bawah LandingLayout, sudah didaftarkan di src/routes/Router.jsx).
 // Halaman produksi ditambahkan di `anak` per fase; tiap halaman menjadi chunk
@@ -63,6 +63,22 @@ function buatRute() {
       { path: '/bukti/sekolah-mitra', element: <SekolahMitra /> },
       { path: '/bukti/keamanan-data', element: <KeamananData /> },
       { path: '/bukti/legalitas', element: <Legalitas /> },
+    );
+  }
+
+  // Gerbang rilis Perusahaan (lib/gerbang.js): tiga halaman berisi data DUMMY dan
+  // program afiliator belum ada, jadi hanya didaftarkan bila PERUSAHAAN_DIRILIS
+  // menyala (DEV, atau build dengan VITE_LANDING_PERUSAHAAN_AKTIF=true). Bila mati,
+  // ketiga rute tidak ada (404 di produksi) dan chunk halamannya tidak ikut build.
+  // Nilainya sama dengan REGISTRI_RUTE.tentangKami/kerjaSama/afiliator.tersedia.
+  if (PERUSAHAAN_DIRILIS) {
+    const TentangKami = Loadable(lazy(() => import('./pages/TentangKami')));
+    const KerjaSama = Loadable(lazy(() => import('./pages/KerjaSama')));
+    const Afiliator = Loadable(lazy(() => import('./pages/Afiliator')));
+    anak.push(
+      { path: '/tentang-kami', element: <TentangKami /> },
+      { path: '/kerja-sama', element: <KerjaSama /> },
+      { path: '/afiliator', element: <Afiliator /> },
     );
   }
 

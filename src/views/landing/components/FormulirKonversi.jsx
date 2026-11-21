@@ -8,6 +8,7 @@ import KolomForm from './KolomForm';
 import PilihanForm from './PilihanForm';
 import KotakIkon from './KotakIkon';
 import TombolLanding from './TombolLanding';
+import PenandaVerifikasi from './PenandaVerifikasi';
 import useFormulir from '../lib/useFormulir';
 import { KOLOM_JEBAKAN, LABEL_JEBAKAN, SKEMA, TEKS_FORMULIR as T } from '../data/formulir';
 import { REGISTRI_RUTE } from '../data/nav';
@@ -62,9 +63,11 @@ function PanelTerkirim({ judulRef, tingkatJudul = 'h2', sub, langkah = [] }) {
       >
         {T.terkirimJudul}
       </Box>
-      <Box component="p" sx={{ m: 0, maxWidth: 380, color: colors.muted, ...huruf.subjudul, fontSize: '15px' }}>
-        {sub}
-      </Box>
+      {sub && (
+        <Box component="p" sx={{ m: 0, maxWidth: 380, color: colors.muted, ...huruf.subjudul, fontSize: '15px' }}>
+          {sub}
+        </Box>
+      )}
       {langkah.length > 0 && (
         <Box
           component="ol"
@@ -124,7 +127,8 @@ PanelTerkirim.propTypes = {
   langkah: PropTypes.arrayOf(PropTypes.string),
 };
 
-// Formulir konversi bersama (Jadwalkan Demo dan Akun Guru Mandiri). Kolom
+// Formulir konversi bersama (Jadwalkan Demo, Akun Guru Mandiri, Kerja Sama, dan
+// Afiliator). Kolom
 // berasal dari SKEMA di data/formulir.js; logika di lib/. Empat keadaan:
 // isian, mengirim, terkirim, gagal, ditambah keadaan jujur "belum aktif" bila
 // flags.formulirAktif mati (produksi tanpa endpoint).
@@ -133,11 +137,12 @@ PanelTerkirim.propTypes = {
 // aria-describedby), fokus ke kolom bergalat pertama, region aria-live untuk
 // status, fokus ke panel sukses atau banner galat, tombol kirim nonaktif saat
 // mengirim.
-//  jenis      : 'demo' | 'guru' (kunci SKEMA)
+//  jenis      : 'demo' | 'guru' | 'kerjaSama' | 'afiliator' (kunci SKEMA)
 //  judul      : judul kartu (`tingkatJudul`, bawaan h2)
 //  teksKirim  : teks tombol pada keadaan isian
 //  terkirim   : { sub, langkah? }
-//  jaminan    : [{ ikon, label }] baris keterangan di bawah tombol
+//  jaminan    : [{ ikon, label, verifikasi? }] baris keterangan di bawah tombol;
+//               `verifikasi` (true atau teks label) = penanda desain di sisi label
 //  pesanWa    : pesan awal tautan WhatsApp pada keadaan "belum aktif"
 export default function FormulirKonversi({
   jenis,
@@ -287,6 +292,8 @@ export default function FormulirKonversi({
                   batasKetik={batasKetik(k)}
                   inputRef={daftarkanKolom(k.nama)}
                   terkunci={mengirim}
+                  multiBaris={k.jenis === 'teksPanjang'}
+                  tanpaKoreksi={k.jenis === 'kontak'}
                   sx={sxKolom}
                 />
               );
@@ -346,7 +353,7 @@ export default function FormulirKonversi({
           </TombolLanding>
 
           <Box component="p" sx={{ m: '14px 0 0', textAlign: 'center', fontSize: '12px', lineHeight: 1.6, color: colors.muted }}>
-            {T.privasi[jenis]}{' '}
+            {T.privasi[jenis] && `${T.privasi[jenis]} `}
             <Box
               component={RouterLink}
               to={REGISTRI_RUTE.kebijakanPrivasi.to}
@@ -384,6 +391,7 @@ export default function FormulirKonversi({
                 <Box key={j.label} component="li" sx={{ display: 'inline-flex', gap: '6px', alignItems: 'center' }}>
                   <j.ikon size={14} stroke={2} aria-hidden="true" style={{ flex: 'none' }} />
                   {j.label}
+                  <PenandaVerifikasi verifikasi={j.verifikasi} />
                 </Box>
               ))}
             </Box>
@@ -401,12 +409,18 @@ export default function FormulirKonversi({
 }
 
 FormulirKonversi.propTypes = {
-  jenis: PropTypes.oneOf(['demo', 'guru']).isRequired,
+  jenis: PropTypes.oneOf(['demo', 'guru', 'kerjaSama', 'afiliator']).isRequired,
   judul: PropTypes.string.isRequired,
   tingkatJudul: PropTypes.oneOf(['h2', 'h3']),
   teksKirim: PropTypes.string.isRequired,
   terkirim: PropTypes.shape({ sub: PropTypes.node, langkah: PropTypes.arrayOf(PropTypes.string) }).isRequired,
-  jaminan: PropTypes.arrayOf(PropTypes.shape({ ikon: PropTypes.elementType, label: PropTypes.string })),
+  jaminan: PropTypes.arrayOf(
+    PropTypes.shape({
+      ikon: PropTypes.elementType,
+      label: PropTypes.string,
+      verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+    }),
+  ),
   pesanWa: PropTypes.string,
   sx: PropTypes.object,
 };

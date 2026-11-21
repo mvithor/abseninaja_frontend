@@ -13,6 +13,9 @@ import { resetDaftar } from '../theme/sx';
 //            2 kolom di sm, 1 kolom di seluler (sesuai desain seluler).
 //  manfaat : ikon + judul + keterangan, tiga kolom maks 900 (hero Pendampingan).
 //            Satu kolom di bawah md.
+//  ikonLebar : seperti `fakta`, tetapi ikon tampil di semua lebar, kolom 1 (seluler),
+//            2 (sm), 4 (md), kartu sudut 18, label 13, maks 900 (hero Afiliator);
+//            diserahkan ke BarisFakta.
 //  ringkas : tumpukan satu kolom maks 460, kartu sudut 20 berisi ikon + judul +
 //            keterangan (hero Jadwalkan Demo, rata kiri).
 // Butir: { ikon, label, angka?, kecil?, sub?, verifikasi? }. `kecil` = angka
@@ -70,6 +73,7 @@ Ringkas.propTypes = {
 
 export default function BarisKartuFakta({ butir, varian = 'fakta', sx }) {
   if (varian === 'fakta') return <BarisFakta butir={butir} varian="ikon" sx={sx} />;
+  if (varian === 'ikonLebar') return <BarisFakta butir={butir} varian="ikonLebar" sx={sx} />;
   if (varian === 'ringkas') return <Ringkas butir={butir} sx={sx} />;
 
   const angka = varian === 'angka';
@@ -143,6 +147,6 @@ BarisKartuFakta.propTypes = {
       verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     }),
   ).isRequired,
-  varian: PropTypes.oneOf(['fakta', 'angka', 'manfaat', 'ringkas']),
+  varian: PropTypes.oneOf(['fakta', 'ikonLebar', 'angka', 'manfaat', 'ringkas']),
   sx: PropTypes.object,
 };

@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import Tag from './Tag';
-import { colors, gradients, huruf, radius, shadows } from '../theme/tokens';
+import PenandaVerifikasi from './PenandaVerifikasi';
+import { colors, flags, gradients, huruf, radius, shadows } from '../theme/tokens';
 
 // Kartu ikon. Varian (`varian`):
 //  terang : kartu putih bertepi, ikon dalam kotak gradasi merek (latar terang)
@@ -17,6 +18,10 @@ import { colors, gradients, huruf, radius, shadows } from '../theme/tokens';
 // kecil di kanan kotak ikon, mis. "Tahap 1"), `sxJudul` dan `sxDeskripsi`
 // (penyesuaian judul dan deskripsi). `labelKanan` hanya berlaku untuk
 // tata="tumpuk"; pada tata="sebaris" diabaikan.
+// Tambahan F6: `verifikasi` (true atau teks label) menampilkan penanda verifikasi di
+// baris tag, hanya bila flags.tampilkanPenandaDesain menyala (bila mati, baris tag
+// tidak ikut dibuat, jadi tinggi kartu tidak berubah). `penanda` (elemen) tetap
+// diutamakan bila diberikan.
 export default function KartuIkon({
   ikon,
   judul,
@@ -24,6 +29,7 @@ export default function KartuIkon({
   tag = [],
   status,
   penanda,
+  verifikasi,
   varian = 'terang',
   aksen = false,
   tata = 'tumpuk',
@@ -39,7 +45,9 @@ export default function KartuIkon({
   const Ikon = ikon;
   const kaca = varian === 'kaca';
   const sebaris = tata === 'sebaris';
-  const adaBarisTag = tag.length > 0 || Boolean(status) || Boolean(penanda);
+  const penandaAkhir =
+    penanda ?? (verifikasi && flags.tampilkanPenandaDesain ? <PenandaVerifikasi verifikasi={verifikasi} /> : undefined);
+  const adaBarisTag = tag.length > 0 || Boolean(status) || Boolean(penandaAkhir);
 
   const kotakIkon = (
     <Box
@@ -137,7 +145,7 @@ export default function KartuIkon({
             <Tag key={t}>{t}</Tag>
           ))}
           {status && <Tag varian="status">{status}</Tag>}
-          {penanda}
+          {penandaAkhir}
         </Box>
       )}
     </Box>
@@ -151,6 +159,7 @@ KartuIkon.propTypes = {
   tag: PropTypes.arrayOf(PropTypes.string),
   status: PropTypes.string,
   penanda: PropTypes.node,
+  verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   varian: PropTypes.oneOf(['terang', 'kaca']),
   aksen: PropTypes.bool,
   tata: PropTypes.oneOf(['tumpuk', 'sebaris']),
