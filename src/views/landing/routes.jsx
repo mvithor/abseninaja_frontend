@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 import { REGISTRI_RUTE } from './data/nav';
-import { LAD_DIRILIS } from './lib/gerbang';
+import { BUKTI_DIRILIS, LAD_DIRILIS } from './lib/gerbang';
 
 // Rute landing (di bawah LandingLayout, sudah didaftarkan di src/routes/Router.jsx).
 // Halaman produksi ditambahkan di `anak` per fase; tiap halaman menjadi chunk
@@ -44,6 +44,26 @@ function buatRute() {
   if (LAD_DIRILIS) {
     const Analitik = Loadable(lazy(() => import('./pages/Analitik')));
     anak.push({ path: '/analitik-pembelajaran', element: <Analitik /> });
+  }
+
+  // Gerbang rilis Bukti (lib/gerbang.js): lima halaman /bukti/* berisi klaim
+  // DUMMY, jadi hanya didaftarkan bila BUKTI_DIRILIS menyala (DEV, atau build
+  // dengan VITE_LANDING_BUKTI_AKTIF=true). Bila mati, kelima rute tidak ada (404
+  // di produksi) dan chunk halamannya tidak ikut build. Nilainya sama dengan
+  // REGISTRI_RUTE.dampak/testimoni/sekolahMitra/keamananData/legalitas.tersedia.
+  if (BUKTI_DIRILIS) {
+    const Dampak = Loadable(lazy(() => import('./pages/Dampak')));
+    const Testimoni = Loadable(lazy(() => import('./pages/Testimoni')));
+    const SekolahMitra = Loadable(lazy(() => import('./pages/SekolahMitra')));
+    const KeamananData = Loadable(lazy(() => import('./pages/KeamananData')));
+    const Legalitas = Loadable(lazy(() => import('./pages/Legalitas')));
+    anak.push(
+      { path: '/bukti/dampak', element: <Dampak /> },
+      { path: '/bukti/testimoni', element: <Testimoni /> },
+      { path: '/bukti/sekolah-mitra', element: <SekolahMitra /> },
+      { path: '/bukti/keamanan-data', element: <KeamananData /> },
+      { path: '/bukti/legalitas', element: <Legalitas /> },
+    );
   }
 
   if (import.meta.env.DEV) {

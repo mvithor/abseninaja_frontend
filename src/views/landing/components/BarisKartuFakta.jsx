@@ -77,6 +77,8 @@ export default function BarisKartuFakta({ butir, varian = 'fakta', sx }) {
   return (
     <Box
       component="ul"
+      // role="list": Safari dan VoiceOver membuang semantik daftar bila list-style: none.
+      role="list"
       sx={{
         ...resetDaftar,
         display: 'grid',

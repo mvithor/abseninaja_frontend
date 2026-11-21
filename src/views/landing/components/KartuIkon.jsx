@@ -12,6 +12,11 @@ import { colors, gradients, huruf, radius, shadows } from '../theme/tokens';
 //  sebaris: ikon di kiri judul, kartu sudut 24 (kartu modul halaman Fitur)
 // Tambahan: `status` = label status berteks setelah tag, `penanda` = penanda
 // desain (PenandaVerifikasi) di baris tag, `ikonSx` = penyesuaian kotak ikon.
+// Tambahan halaman Bukti (F5), semuanya opsional dan tanpa pengaruh bila tidak
+// diberikan: `ikonUkuran` (ukuran glif ikon, bawaan 26), `labelKanan` (teks
+// kecil di kanan kotak ikon, mis. "Tahap 1"), `sxJudul` dan `sxDeskripsi`
+// (penyesuaian judul dan deskripsi). `labelKanan` hanya berlaku untuk
+// tata="tumpuk"; pada tata="sebaris" diabaikan.
 export default function KartuIkon({
   ikon,
   judul,
@@ -25,6 +30,10 @@ export default function KartuIkon({
   tingkatJudul = 'h3',
   ekstra,
   ikonSx,
+  ikonUkuran = 26,
+  labelKanan,
+  sxJudul,
+  sxDeskripsi,
   sx,
 }) {
   const Ikon = ikon;
@@ -49,14 +58,19 @@ export default function KartuIkon({
         ...ikonSx,
       }}
     >
-      <Ikon size={26} stroke={1.8} />
+      <Ikon size={ikonUkuran} stroke={1.8} />
     </Box>
   );
 
   const judulEl = (
     <Box
       component={tingkatJudul}
-      sx={{ m: 0, color: kaca ? colors.white : colors.ink, ...(sebaris ? huruf.judulModul : huruf.judulKartu) }}
+      sx={{
+        m: 0,
+        color: kaca ? colors.white : colors.ink,
+        ...(sebaris ? huruf.judulModul : huruf.judulKartu),
+        ...sxJudul,
+      }}
     >
       {judul}
     </Box>
@@ -91,7 +105,16 @@ export default function KartuIkon({
         </Box>
       ) : (
         <>
-          {kotakIkon}
+          {labelKanan ? (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+              {kotakIkon}
+              <Box component="span" sx={{ fontSize: '13px', fontWeight: 600, color: kaca ? colors.onDark : colors.muted }}>
+                {labelKanan}
+              </Box>
+            </Box>
+          ) : (
+            kotakIkon
+          )}
           {judulEl}
         </>
       )}
@@ -102,6 +125,7 @@ export default function KartuIkon({
           color: kaca ? colors.onDarkSoft : colors.muted,
           ...huruf.isi,
           ...(sebaris ? { lineHeight: 1.65 } : null),
+          ...sxDeskripsi,
         }}
       >
         {deskripsi}
@@ -133,5 +157,9 @@ KartuIkon.propTypes = {
   tingkatJudul: PropTypes.oneOf(['h2', 'h3', 'h4', 'div']),
   ekstra: PropTypes.node,
   ikonSx: PropTypes.object,
+  ikonUkuran: PropTypes.number,
+  labelKanan: PropTypes.node,
+  sxJudul: PropTypes.object,
+  sxDeskripsi: PropTypes.object,
   sx: PropTypes.object,
 };

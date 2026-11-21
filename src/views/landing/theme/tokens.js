@@ -84,6 +84,11 @@ export const colors = {
   glassPromo: 'rgba(255,255,255,0.14)', // kotak hitung mundur kartu promo
   garisPromo: 'rgba(255,255,255,0.3)', // tepi kotak hitung mundur
 
+  // Halaman Bukti (F5): kartu sekolah peraga di latar gelap (garis putus tanda
+  // logo belum ada) dan kotak ikonnya.
+  garisPutusKaca: 'rgba(255,255,255,0.4)',
+  glassKotak: 'rgba(255,255,255,0.16)',
+
   // Penanda desain ([VERIFIKASI]) dan label status.
   verifyBorder: '#B57400',
   verifyInk: '#8A5800',
@@ -169,6 +174,7 @@ export const shadows = {
   lembar: '0 -20px 40px -20px rgba(23,22,58,0.4)',
   tabKartu: '0 18px 36px -18px rgba(94,92,230,0.7)', // kartu tab jenis sekolah (aktif)
   formulir: '0 30px 60px -30px rgba(47,50,125,0.35)', // kartu formulir (F3)
+  dokumenUtama: '0 24px 50px -30px rgba(47,50,125,0.35)', // kartu dokumen utama (Legalitas, F5)
 };
 
 // Nilai khusus peraga (mock/ dan hiasan di Beranda). Bukan bagian sistem desain
@@ -292,6 +298,17 @@ export const huruf = {
   judulFormulir: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.3, fontWeight: 600 }, // judul kartu formulir
   judulTerkirim: { fontSize: { xs: '20px', md: '26px' }, lineHeight: 1.3, fontWeight: 600 }, // judul panel terkirim
   judulPromo: { fontSize: { xs: '22px', md: '34px' }, lineHeight: 1.25, fontWeight: 600 }, // judul kartu promo
+  // Halaman Bukti (F5).
+  judulSorot: { fontSize: { xs: '20px', md: '26px' }, lineHeight: 1.25, fontWeight: 600 }, // banner sorot (Keamanan)
+  judulSorotBesar: { fontSize: { xs: '20px', md: '28px' }, lineHeight: 1.25, fontWeight: 600 }, // banner sorot (Testimoni)
+  judulKartuKaca: { fontSize: { xs: '17px', md: '19px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu kebijakan (Legalitas)
+  judulDokumenUtama: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu dokumen utama
+  labelDokumenUtama: { fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase', lineHeight: 1.4 },
+  angkaRingkasan: { fontSize: { xs: '26px', md: '40px' }, lineHeight: 1.1, fontWeight: 700 }, // kartu angka kaca (Dampak)
+  angkaMitra: { fontSize: { xs: '22px', md: '32px' }, lineHeight: 1.1, fontWeight: 700 }, // kartu angka terang (Sekolah Mitra)
+  angkaStudi: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 700 }, // nilai metrik studi kasus
+  isiTestimoni: { fontSize: '15px', lineHeight: 1.75, fontWeight: 400 }, // kutipan testimoni
+  bintang: { fontSize: { xs: '16px', md: '18px' } }, // ukuran deret bintang peringkat
   eyebrow: {
     fontSize: '12.5px',
     fontWeight: 600,

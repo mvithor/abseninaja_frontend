@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
+import PenandaVerifikasi from './PenandaVerifikasi';
 import { colors, gradients, huruf, radius, shadows } from '../theme/tokens';
 import { resetDaftar } from '../theme/sx';
 
@@ -11,6 +12,8 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
   return (
     <Box
       component="ul"
+      // role="list": Safari dan VoiceOver membuang semantik daftar bila list-style: none.
+      role="list"
       sx={{
         ...resetDaftar,
         display: 'grid',
@@ -83,6 +86,7 @@ export default function BarisFakta({ butir, varian = 'ikon', sx }) {
             <Box component="span" sx={{ fontSize: '14px', fontWeight: 600, color: colors.ink, lineHeight: 1.3 }}>
               {b.label}
             </Box>
+            <PenandaVerifikasi verifikasi={b.verifikasi} />
           </Box>
         ),
       )}

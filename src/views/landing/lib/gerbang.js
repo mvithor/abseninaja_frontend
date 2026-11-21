@@ -18,3 +18,21 @@
 // Nilai dibaca statis oleh Vite: bila tidak menyala, cabang kode terkait dibuang
 // dari bundel produksi.
 export const LAD_DIRILIS = import.meta.env.DEV || import.meta.env.VITE_LANDING_LAD_AKTIF === 'true';
+
+// Gerbang rilis lima halaman Bukti (F5): Dampak, Testimoni, Sekolah Mitra,
+// Keamanan Data, dan Legalitas (/bukti/*). Seluruh isinya masih DUMMY dari
+// desain (angka, nama sekolah, nama orang, penghargaan, nomor dokumen), jadi
+// halaman ini TIDAK boleh tampil di produksi sebelum data nyata dan izin
+// tertulis (sekolah, narasumber, dokumen) ada.
+//  - Bendera mati (bawaan di produksi): kelima rute tidak didaftarkan (404),
+//    kode halaman dan datanya tidak ikut build, dan
+//    REGISTRI_RUTE.dampak/testimoni/sekolahMitra/keamananData/legalitas
+//    `tersedia` bernilai false sehingga menu Bukti (header dan lembar Lainnya),
+//    footer, dan tombol "Lihat ..." tampil nonaktif.
+//  - Bendera menyala: kelima rute terdaftar dan `tersedia` bernilai true.
+//
+// Cara menyalakan: setelah data dan izin lengkap (dan semua penanda
+// `// DUMMY wajib diganti sebelum main` di data/*.js beres), setel
+// VITE_LANDING_BUKTI_AKTIF=true di lingkungan build (Netlify). Di DEV bendera
+// selalu menyala untuk pratinjau.
+export const BUKTI_DIRILIS = import.meta.env.DEV || import.meta.env.VITE_LANDING_BUKTI_AKTIF === 'true';

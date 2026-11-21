@@ -4,12 +4,16 @@
 // produksi sampai VITE_LANDING_LAD_AKTIF=true, true di DEV. Berkas gerbang
 // sengaja tanpa impor supaya nav.js tidak menyeret tokens.js.
 //
+// Lima rute Bukti (dampak, testimoni, sekolahMitra, keamananData, legalitas)
+// mengikuti gerbang rilis F5 (lib/gerbang.js, BUKTI_DIRILIS): false di produksi
+// sampai VITE_LANDING_BUKTI_AKTIF=true, true di DEV.
+//
 // `tersedia: false` berarti halamannya belum dibangun. Butir seperti itu tampil
 // sebagai teks nonaktif (aria-disabled) dan tidak menavigasi. Ubah menjadi
 // `true` di REGISTRI_RUTE saat halamannya selesai; menu, bar tab, dan footer
 // mengikuti otomatis.
 
-import { LAD_DIRILIS } from '../lib/gerbang';
+import { BUKTI_DIRILIS, LAD_DIRILIS } from '../lib/gerbang';
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
@@ -19,11 +23,11 @@ export const REGISTRI_RUTE = {
   paket: { to: '/produk/paket', tersedia: true }, // pages/Paket.jsx, F3
   promo: { to: '/produk/promo', tersedia: true }, // pages/Promo.jsx, F3
   analitik: { to: '/analitik-pembelajaran', tersedia: LAD_DIRILIS }, // pages/Analitik.jsx, F4 (digerbang)
-  dampak: { to: '/bukti/dampak', tersedia: false },
-  testimoni: { to: '/bukti/testimoni', tersedia: false },
-  sekolahMitra: { to: '/bukti/sekolah-mitra', tersedia: false },
-  keamananData: { to: '/bukti/keamanan-data', tersedia: false },
-  legalitas: { to: '/bukti/legalitas', tersedia: false },
+  dampak: { to: '/bukti/dampak', tersedia: BUKTI_DIRILIS }, // pages/Dampak.jsx, F5 (digerbang)
+  testimoni: { to: '/bukti/testimoni', tersedia: BUKTI_DIRILIS }, // pages/Testimoni.jsx, F5 (digerbang)
+  sekolahMitra: { to: '/bukti/sekolah-mitra', tersedia: BUKTI_DIRILIS }, // pages/SekolahMitra.jsx, F5 (digerbang)
+  keamananData: { to: '/bukti/keamanan-data', tersedia: BUKTI_DIRILIS }, // pages/KeamananData.jsx, F5 (digerbang)
+  legalitas: { to: '/bukti/legalitas', tersedia: BUKTI_DIRILIS }, // pages/Legalitas.jsx, F5 (digerbang)
   tentangKami: { to: '/tentang-kami', tersedia: false },
   kerjaSama: { to: '/kerja-sama', tersedia: false },
   afiliator: { to: '/afiliator', tersedia: false },
