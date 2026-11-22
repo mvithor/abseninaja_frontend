@@ -9,8 +9,12 @@
 // `verifikasi` (true atau teks label) = klaim yang belum diverifikasi. Penandanya
 // tampil hanya bila flags.tampilkanPenandaDesain menyala.
 //
+// Koreksi klaim F8 (naskah Fitur Lengkap v2, bagian G3): angka contoh (12 modul,
+// 13 peran), "semua modul", kartu Keuangan dan SPP, ujian, dan kanal WhatsApp ke
+// wali dihapus; LAKSANA diberi chip Segera (ChipStatus). Apakah fitur Segera
+// masuk paket lengkap tanpa biaya tambahan belum diputuskan (H-24).
+//
 // DUMMY wajib diganti sebelum main (klaim contoh dari desain, belum terbukti):
-//  - "12 modul", "13 peran pengguna", "Web + HP" (sama dengan data/fitur.js)
 //  - "Semua paket sudah termasuk pelatihan dan pendampingan", "Termasuk di setiap paket"
 //  - "Demo gratis", "Dukungan WhatsApp", "jam kerja sekolah"
 //  - label "Rekomendasi" dan nama paket (Paket lengkap, Paket modular); "Harga dibahas saat demo"
@@ -19,13 +23,13 @@ import {
   IconBell,
   IconCalendar,
   IconChartLine,
+  IconFileCheck,
   IconHeadset,
   IconPlayerPlay,
   IconQrcode,
   IconSchool,
   IconStack2,
   IconUsers,
-  IconWallet,
 } from '@tabler/icons-react';
 
 export const META = {
@@ -44,36 +48,30 @@ export const HERO = {
   aksiUtama: { label: 'Konsultasikan Kebutuhan', rute: 'demo' },
   aksiKedua: { label: 'Jadwalkan Demo', rute: 'demo' },
   fakta: [
-    { ikon: IconPlayerPlay, label: 'Demo gratis' },
+    { ikon: IconPlayerPlay, label: 'Demo gratis', verifikasi: 'Verifikasi H-20' },
     { ikon: IconSchool, label: 'Pelatihan per peran' },
-    { ikon: IconHeadset, label: 'Dukungan WhatsApp' },
-    { ikon: IconStack2, label: '12 modul sekolah' },
+    { ikon: IconHeadset, label: 'Dukungan WhatsApp', verifikasi: 'Verifikasi H-20' },
+    { ikon: IconStack2, label: 'Fitur per peran' },
   ],
 };
 
 export const LENGKAP = {
   id: 'paket-lengkap',
   eyebrow: 'Paket lengkap',
-  judul: 'Semua modul *dalam satu paket*',
-  sub: {
-    web: 'Mulai dari satu paket, sekolah memakai modul yang dibutuhkan.',
-    mobile: 'Pakai modul yang dibutuhkan.',
-  },
-  statistik: [
-    { angka: '12', label: 'Modul' },
-    { angka: '13', label: 'Peran pengguna' },
-    { angka: 'Web + HP', label: 'Satu data' },
-  ],
+  // Naskah G3 memberi satu kalimat pengganti untuk judul dan sub; ditempel sebagai
+  // judul, subjudul dihapus. Eyebrow "Paket lengkap" mengulang dua kata pertamanya.
+  judul: 'Paket lengkap: fitur yang sudah berjalan, dengan fitur Segera menyusul.',
+  statistik: [{ angka: 'Web + HP', label: 'Satu data' }],
   modul: [
     { ikon: IconQrcode, judul: 'Absensi QR', deskripsi: 'Datang dan pulang tercatat otomatis.' },
-    { ikon: IconCalendar, judul: 'Jadwal sekolah', deskripsi: 'Kelas, mapel, ekskul, ujian.' },
-    { ikon: IconWallet, judul: 'Keuangan dan SPP', deskripsi: 'Tagihan dan riwayat bayar.' },
-    { ikon: IconBell, judul: 'Kabar wali murid', deskripsi: 'Aplikasi dan WhatsApp.' },
-    { ikon: IconUsers, judul: 'Data murid dan pegawai', deskripsi: 'Satu data untuk semua modul.' },
-    { ikon: IconChartLine, judul: 'Analitik pembelajaran', deskripsi: 'Murid yang perlu perhatian.' },
+    { ikon: IconCalendar, judul: 'Jadwal sekolah', deskripsi: 'Kelas, mapel, ekskul.' },
+    { ikon: IconFileCheck, judul: 'Perizinan', deskripsi: 'Izin tercatat, rekap bisa diunduh.' },
+    { ikon: IconBell, judul: 'Kabar wali murid', deskripsi: 'Notifikasi di aplikasi wali.' },
+    { ikon: IconUsers, judul: 'Data murid dan pegawai', deskripsi: 'Satu data untuk semua fitur.' },
+    { ikon: IconChartLine, judul: 'Analitik pembelajaran', deskripsi: 'Segera dipakai guru.', chip: 'segera', verifikasi: 'Verifikasi H-5' },
   ],
   aksi: { label: 'Tanya Harga Paket Ini', rute: 'demo' },
-  verifikasi: true, // DUMMY wajib diganti sebelum main (angka 12, 13)
+  verifikasi: 'Verifikasi H-24', // apakah fitur Segera masuk paket lengkap tanpa biaya tambahan
 };
 
 export const JALUR = {
@@ -87,19 +85,19 @@ export const JALUR = {
   lengkap: {
     judul: 'Paket lengkap',
     status: 'Rekomendasi',
-    deskripsi: {
-      web: 'Semua modul sekolah, pelatihan, dan pendampingan.',
-      mobile: 'Semua modul, pelatihan, pendampingan.',
-    },
+    // Naskah G3 hanya memberi satu teks (web); dipakai di semua lebar karena pendek.
+    deskripsi: 'Fitur yang berjalan, pelatihan, dan pendampingan.',
+    verifikasi: 'Verifikasi H-20, H-24',
     harga: 'Hubungi kami',
     aksi: { label: 'Jadwalkan Demo', rute: 'demo' },
   },
   modular: {
     judul: 'Paket modular',
     deskripsi: {
-      web: 'Mulai dari satu modul, tambah kapan saja. Modul tambahan diaktifkan per sekolah.',
-      mobile: 'Mulai satu modul, tambah kapan saja.',
+      web: 'Fitur inti ada di setiap paket. Jurusan, PKL, dan analitik pembelajaran ditambahkan sesuai kebutuhan sekolah.',
+      mobile: 'Jurusan, PKL, dan analitik ditambah sesuai kebutuhan.',
     },
+    verifikasi: 'Verifikasi H-24',
     tag: ['Analitik pembelajaran', 'Jurusan dan kompetensi (SMK)', 'PKL (SMK)'],
     harga: 'Hubungi kami',
     aksi: { label: 'Konsultasikan Kebutuhan', rute: 'demo' },
@@ -109,19 +107,21 @@ export const JALUR = {
 export const TERMASUK = {
   id: 'termasuk-di-setiap-paket',
   eyebrow: 'Termasuk di setiap paket',
-  judul: 'Bukan hanya aplikasi',
+  judul: 'Aplikasi, pelatihan, dan pendampingan',
+  verifikasi: 'Verifikasi H-20',
   kartu: [
     {
       ikon: IconPlayerPlay,
       judul: 'Demo gratis',
-      deskripsi: { web: 'Kebutuhan dipetakan sebelum Anda memutuskan.', mobile: 'Kebutuhan dipetakan sebelum memutuskan.' },
+      deskripsi: { web: 'Kebutuhan dipetakan sebelum sekolah memutuskan.', mobile: 'Kebutuhan dipetakan sebelum memutuskan.' },
+      verifikasi: 'Verifikasi H-20', // "Demo gratis" sendiri belum terverifikasi
     },
     {
       ikon: IconSchool,
       judul: 'Pelatihan per peran',
       deskripsi: { web: 'Admin, guru, dan wali kelas dilatih sesuai tugas.', mobile: 'Admin, guru, dan wali kelas dilatih.' },
     },
-    { ikon: IconHeadset, judul: 'Dukungan WhatsApp', deskripsi: 'Kendala dibantu pada jam kerja sekolah.' },
+    { ikon: IconHeadset, judul: 'Dukungan WhatsApp', deskripsi: 'Kendala dibantu pada jam kerja sekolah.', verifikasi: 'Verifikasi H-20' },
   ],
 };
 

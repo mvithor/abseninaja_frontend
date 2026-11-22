@@ -13,7 +13,7 @@ import { adaRuteAktif } from './rute';
 
 // Header: logo, menu (Beranda, Produk, Bukti, Tentang Kami, Blog) dan aksi
 // Masuk + Demo Gratis. Menu desktop hanya dari md ke atas. Di bawah md header
-// hanya memuat logo; Demo ada di slot tengah bar tab bawah dan Masuk di lembar Lainnya.
+// memuat logo dan tombol Masuk di kanannya; Demo ada di slot tengah bar tab bawah.
 const sxItemNav = {
   display: 'inline-flex',
   alignItems: 'center',
@@ -201,7 +201,6 @@ export default function Header() {
             ukuran="md"
             to={AKSI_MASUK.to}
             nonaktif={!AKSI_MASUK.tersedia}
-            sx={{ display: { xs: 'none', md: 'inline-flex' } }}
           >
             {AKSI_MASUK.label}
           </TombolLanding>

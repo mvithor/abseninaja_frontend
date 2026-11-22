@@ -2,6 +2,7 @@ import { Box } from '@mui/material';
 import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
 import KartuIkon from '../../components/KartuIkon';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import { renderTeks } from '../../components/renderTeks';
 import { TERMASUK as D } from '../../data/paket';
 import { resetDaftar } from '../../theme/sx';
@@ -10,7 +11,13 @@ import { resetDaftar } from '../../theme/sx';
 export default function TermasukPaket() {
   return (
     <Seksi varian="terang" id={D.id} padAtas={{ xs: '36px', md: '72px' }} padBawah={{ xs: '48px', md: '96px' }} aria-labelledby="judul-termasuk">
-      <JudulSeksi eyebrow={D.eyebrow} judul={D.judul} id="judul-termasuk" maxJudul={720} />
+      <JudulSeksi
+        eyebrow={D.eyebrow}
+        judul={D.judul}
+        id="judul-termasuk"
+        maxJudul={720}
+        penanda={<PenandaVerifikasi verifikasi={D.verifikasi} />}
+      />
       <Box
         component="ul"
         role="list"
@@ -28,6 +35,7 @@ export default function TermasukPaket() {
               ikon={k.ikon}
               judul={k.judul}
               deskripsi={renderTeks(k.deskripsi)}
+              verifikasi={k.verifikasi}
               ikonSx={{ width: 56, height: 56 }}
               sx={{ flex: 1, minWidth: 0 }}
             />

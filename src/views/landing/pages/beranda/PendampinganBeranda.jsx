@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { IconCheck, IconUsers } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import Teks from '../../components/Teks';
 import { PENDAMPINGAN as D } from '../../data/beranda';
 import { colors, gradients, huruf, peraga, radius } from '../../theme/tokens';
@@ -47,6 +48,7 @@ function Langkah({ nomor, langkah, pertama }) {
           <Box component="p" sx={{ m: '2px 0 0', fontSize: '12px', color: pertama ? colors.white : colors.muted }}>
             {langkah.deskripsi}
           </Box>
+          <PenandaVerifikasi verifikasi={langkah.verifikasi} sx={{ mt: '6px' }} />
         </Box>
       </Box>
     </Box>
@@ -55,7 +57,11 @@ function Langkah({ nomor, langkah, pertama }) {
 
 Langkah.propTypes = {
   nomor: PropTypes.number.isRequired,
-  langkah: PropTypes.shape({ judul: PropTypes.string, deskripsi: PropTypes.string }).isRequired,
+  langkah: PropTypes.shape({
+    judul: PropTypes.string,
+    deskripsi: PropTypes.string,
+    verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  }).isRequired,
   pertama: PropTypes.bool,
 };
 

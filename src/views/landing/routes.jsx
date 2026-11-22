@@ -1,7 +1,7 @@
 import { lazy } from 'react';
 import Loadable from 'src/layouts/full/shared/loadable/Loadable';
 import { REGISTRI_RUTE } from './data/nav';
-import { BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from './lib/gerbang';
+import { ALAT_DIRILIS, BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from './lib/gerbang';
 
 // Rute landing (di bawah LandingLayout, sudah didaftarkan di src/routes/Router.jsx).
 // Halaman produksi ditambahkan di `anak` per fase; tiap halaman menjadi chunk
@@ -79,6 +79,24 @@ function buatRute() {
       { path: '/tentang-kami', element: <TentangKami /> },
       { path: '/kerja-sama', element: <KerjaSama /> },
       { path: '/afiliator', element: <Afiliator /> },
+    );
+  }
+
+  // Gerbang rilis alat (lib/gerbang.js): Blog dan Kalkulator berisi konten CONTOH
+  // (artikel dummy, pertanyaan dan rumus skor contoh), jadi hanya didaftarkan bila
+  // ALAT_DIRILIS menyala (DEV, atau build dengan VITE_LANDING_ALAT_AKTIF=true).
+  // Bila mati, ketiga rute tidak ada (404 di produksi) dan chunk halamannya tidak
+  // ikut build. Nilainya sama dengan REGISTRI_RUTE.blog/kalkulator.tersedia.
+  // /blog/:slug tidak ada di REGISTRI_RUTE (anak dari /blog), jadi penjaga DEV di
+  // bawah tidak memeriksanya; ia dijaga oleh bendera yang sama dengan /blog.
+  if (ALAT_DIRILIS) {
+    const Blog = Loadable(lazy(() => import('./pages/Blog')));
+    const BlogArtikel = Loadable(lazy(() => import('./pages/BlogArtikel')));
+    const Kalkulator = Loadable(lazy(() => import('./pages/Kalkulator')));
+    anak.push(
+      { path: '/blog', element: <Blog /> },
+      { path: '/blog/:slug', element: <BlogArtikel /> },
+      { path: '/kalkulator', element: <Kalkulator /> },
     );
   }
 

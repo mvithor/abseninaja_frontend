@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { IconArrowUpRight, IconCheck, IconUser } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
+import ChipStatus from '../../components/ChipStatus';
 import KotakIkon from '../../components/KotakIkon';
 import Tag from '../../components/Tag';
 import TombolLanding from '../../components/TombolLanding';
@@ -83,6 +84,7 @@ function KartuJenis({ jenis }) {
               <IconCheck size={14} stroke={3} />
             </Box>
             {b.teks}
+            {b.chip && <ChipStatus status={b.chip} />}
             <PenandaVerifikasi verifikasi={b.verifikasi} />
           </Box>
         ))}
@@ -125,6 +127,7 @@ function KartuPeran({ peran }) {
             {peran.tag}
           </Tag>
         )}
+        {peran.chip && <ChipStatus status={peran.chip} sx={{ mt: '8px' }} />}
         <PenandaVerifikasi verifikasi={peran.verifikasi} sx={{ mt: '8px' }} />
       </Box>
     </Box>
@@ -159,6 +162,7 @@ function StripJenis({ strip }) {
             sx={{ m: 0, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px', fontSize: { xs: '16px', md: '17px' }, fontWeight: 600, color: colors.ink }}
           >
             {strip.judul}
+            {strip.chip && <ChipStatus status={strip.chip} />}
             <PenandaVerifikasi verifikasi={strip.verifikasi} />
           </Box>
           <Box component="p" sx={{ m: '2px 0 0', fontSize: '14px', color: colors.muted }}>

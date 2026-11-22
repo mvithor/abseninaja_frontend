@@ -1,14 +1,16 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { IconCheck, IconMinus } from '@tabler/icons-react';
+import ChipStatus from '../../components/ChipStatus';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import PerbandinganGelap from '../../components/PerbandinganGelap';
 import { PERBANDINGAN as D } from '../../data/untukSekolah';
 import { colors, radius } from '../../theme/tokens';
 import { hanyaPembaca } from '../../theme/sx';
 
 // Perbandingan dua jalur: tabel sungguhan (caption, th scope) di kartu kaca.
-// Status selalu berupa teks (Tersedia, Tidak ada, Di Prakersa); ikon hanya
-// pendamping. Di seluler lajur dipersempit (huruf dan jarak lebih kecil) dan
+// Status selalu berupa teks (Tersedia, Tidak ada, Di Prakersa, Segera); ikon hanya
+// pendamping. "Segera" dirender sebagai chip Segera (ChipStatus, F8). Di seluler lajur dipersempit (huruf dan jarak lebih kecil) dan
 // teks boleh turun baris supaya terbaca di 360 px tanpa gulir mendatar.
 const LEBAR_KOLOM = ['37.5%', '31.25%', '31.25%'];
 
@@ -20,6 +22,7 @@ const sxSel = {
 };
 
 function Status({ nilai }) {
+  if (nilai === 'segera') return <ChipStatus status="segera" />;
   const tidak = nilai === 'tidak';
   const Ikon = tidak ? IconMinus : IconCheck;
   return (
@@ -42,7 +45,7 @@ function Status({ nilai }) {
   );
 }
 
-Status.propTypes = { nilai: PropTypes.oneOf(['ada', 'tidak', 'prakersa']).isRequired };
+Status.propTypes = { nilai: PropTypes.oneOf(['ada', 'tidak', 'prakersa', 'segera']).isRequired };
 
 export default function Perbandingan() {
   return (
@@ -101,6 +104,7 @@ export default function Perbandingan() {
               <tr key={b.modul}>
                 <Box component="th" scope="row" sx={{ ...sxSel, fontSize: { xs: '14px', md: '15px' }, fontWeight: 500, lineHeight: 1.3, color: colors.white }}>
                   {b.modul}
+                  <PenandaVerifikasi verifikasi={b.verifikasi} sx={{ display: 'flex', width: 'fit-content', mt: '6px' }} />
                 </Box>
                 <Box component="td" sx={sxSel}>
                   <Status nilai={b.umum} />

@@ -3,19 +3,23 @@ import { Box } from '@mui/material';
 import { IconArrowRight } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
+import ChipStatus from '../../components/ChipStatus';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import Tag from '../../components/Tag';
 import Teks from '../../components/Teks';
 import TombolLanding from '../../components/TombolLanding';
 import { propsAksi } from '../../data/aksi';
 import { FITUR as D } from '../../data/beranda';
+import { DAFTAR_CHIP } from '../../lib/fitur.js';
 import { colors, gradients, huruf, radius, shadows } from '../../theme/tokens';
 import { resetDaftar } from '../../theme/sx';
 import { JARAK, PAD_SEKSI, sxJudulBeranda } from './gaya';
 
 // Bagian Fitur (id "fitur"): delapan kartu modul dan banner analitik
 // pembelajaran. Kartu: 4 kolom di md ke atas, 2 kolom di bawahnya (seperti
-// desain seluler). Kantin memakai label status "Segera".
-function KartuModul({ ikon, judul, deskripsi, status }) {
+// desain seluler). Keuangan dan SPP, Murid baru, dan Kantin memakai chip "Segera"
+// (ChipStatus, F8).
+function KartuModul({ ikon, judul, deskripsi, chip }) {
   const Ikon = ikon;
   return (
     <Box
@@ -51,7 +55,7 @@ function KartuModul({ ikon, judul, deskripsi, status }) {
       <Box>
         <Box component="h3" sx={{ m: 0, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', fontSize: { xs: '16px', md: '17px' }, fontWeight: 600, color: colors.ink, lineHeight: 1.3 }}>
           {judul}
-          {status && <Tag varian="status" sx={{ height: 'auto', py: '2px' }}>{status}</Tag>}
+          {chip && <ChipStatus status={chip} />}
         </Box>
         <Box component="p" sx={{ m: '4px 0 0', fontSize: '14px', lineHeight: 1.6, color: colors.muted }}>
           {deskripsi}
@@ -65,7 +69,7 @@ KartuModul.propTypes = {
   ikon: PropTypes.elementType.isRequired,
   judul: PropTypes.string.isRequired,
   deskripsi: PropTypes.string.isRequired,
-  status: PropTypes.string,
+  chip: PropTypes.oneOf(DAFTAR_CHIP),
 };
 
 export default function FiturBeranda() {
@@ -104,8 +108,12 @@ export default function FiturBeranda() {
         }}
       >
         <Box sx={{ maxWidth: 640 }}>
-          <Box component="h3" sx={{ m: 0, fontSize: { xs: '18px', md: '24px' }, fontWeight: 600, color: colors.white }}>
-            {analitik.judul}
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px 12px' }}>
+            <Box component="h3" sx={{ m: 0, fontSize: { xs: '18px', md: '24px' }, fontWeight: 600, color: colors.white }}>
+              {analitik.judul}
+            </Box>
+            {analitik.chip && <ChipStatus status={analitik.chip} />}
+            <PenandaVerifikasi verifikasi={analitik.verifikasi} />
           </Box>
           <Box component="p" sx={{ m: '8px 0 0', ...huruf.isi, color: colors.onDark }}>
             <Teks web={analitik.deskripsi.web} seluler={analitik.deskripsi.mobile} />

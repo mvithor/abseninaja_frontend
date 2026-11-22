@@ -8,6 +8,7 @@ import { resetDaftar } from '../../theme/sx';
 
 // Pita angka di dasar hero: empat butir, angka 42 px (seluler 26 px) dengan
 // bagian aksen, pemisah garis tipis di kiri tiap butir (dua kolom di seluler).
+// Bila hanya satu butir (F8: tiga angka contoh dihapus), butir itu ditengahkan.
 const garis = `1px solid ${colors.borderSoft}`;
 
 export default function Fakta() {
@@ -20,7 +21,8 @@ export default function Fakta() {
           sx={{
             ...resetDaftar,
             display: 'grid',
-            gridTemplateColumns: { xs: 'repeat(2, minmax(0,1fr))', md: `repeat(${n}, minmax(0,1fr))` },
+            gridTemplateColumns: { xs: `repeat(${Math.min(n, 2)}, minmax(0,1fr))`, md: `repeat(${n}, minmax(0,1fr))` },
+            textAlign: n === 1 ? 'center' : undefined,
             rowGap: { xs: '20px', md: 0 },
           }}
         >
@@ -34,7 +36,7 @@ export default function Fakta() {
                   py: '4px',
                   borderLeft: { xs: kanan ? garis : 'none', md: i > 0 ? garis : 'none' },
                   pl: { xs: kanan ? '20px' : 0, md: i > 0 ? '20px' : 0 },
-                  pr: { xs: kanan ? 0 : '12px', md: i < n - 1 ? '20px' : 0 },
+                  pr: { xs: kanan || n === 1 ? 0 : '12px', md: i < n - 1 ? '20px' : 0 },
                 }}
               >
                 <Box sx={{ fontSize: { xs: '26px', md: '42px' }, fontWeight: 700, lineHeight: 1.1, color: colors.ink }}>

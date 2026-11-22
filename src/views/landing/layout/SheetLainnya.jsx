@@ -3,8 +3,7 @@ import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import { IconChevronDown, IconX } from '@tabler/icons-react';
 import TautanNav from './TautanNav';
-import TombolLanding from '../components/TombolLanding';
-import { AKSI_MASUK, MENU, MENU_TAMBAHAN } from '../data/nav';
+import { MENU, MENU_TAMBAHAN } from '../data/nav';
 import { colors, gerak, layout, radius, shadows } from '../theme/tokens';
 import { resetDaftar, resetTombol } from '../theme/sx';
 
@@ -240,17 +239,6 @@ export default function SheetLainnya({ id, terbuka, onTutup }) {
                 <TautanNav butir={b} onKlik={tutupTanpaFokus} sx={sxBaris} sxAktif={sxBarisAktif} sxNonaktif={sxNonaktif} />
               </Box>
             ))}
-          </Box>
-          <Box sx={{ pt: '16px' }}>
-            <TombolLanding
-              varian="garis"
-              to={AKSI_MASUK.to}
-              nonaktif={!AKSI_MASUK.tersedia}
-              penuh
-              onClick={tutupTanpaFokus}
-            >
-              {AKSI_MASUK.label}
-            </TombolLanding>
           </Box>
         </Box>
       </Box>
