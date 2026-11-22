@@ -5,7 +5,7 @@ import {
     IconChartBar, IconUser, IconBuildingArch, IconBooks, IconCategory2, IconCalendar, 
     IconBell, IconCoin, IconCreditCard, IconPoint, IconClipboardText, IconMessage,IconKey, 
     IconTemplate, IconBroadcast, IconClock2, IconTrophy, IconBrandWhatsapp, IconPhone, 
-    IconLicense, IconUsersGroup, IconDatabase, IconActivity, IconFileDownload, IconCalendarClock, IconUserOff
+    IconLicense, IconUsersGroup, IconDatabase, IconActivity, IconFileDownload, IconCalendarClock, IconUserOff, IconToolsKitchen2
   } from '@tabler/icons-react';
   
   import { uniqueId } from 'lodash';
@@ -496,6 +496,38 @@ import {
                         title: 'Transaksi Belanja',
                         icon: IconPoint,
                         href: '#',
+                    },
+                ],
+            },
+            {
+                id: uniqueId(),
+                title: 'Kantin Cashless',
+                icon: IconToolsKitchen2,
+                href: '#',
+                children: [
+                    {
+                        id: uniqueId(),
+                        title: 'Unit Kantin',
+                        icon: IconPoint,
+                        href: '/dashboard/admin-sekolah/kantin',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Dompet & Reset PIN',
+                        icon: IconPoint,
+                        href: '/dashboard/admin-sekolah/kantin/dompet',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Transaksi Kantin',
+                        icon: IconPoint,
+                        href: '/dashboard/admin-sekolah/kantin/transaksi',
+                    },
+                    {
+                        id: uniqueId(),
+                        title: 'Pencairan & Rekon',
+                        icon: IconPoint,
+                        href: '/dashboard/admin-sekolah/kantin/pencairan',
                     },
                 ],
             },
