@@ -1,5 +1,10 @@
+// Font dashboard dan seluruh aplikasi: sans-serif bawaan sistem.
+// Jangan menyebut Poppins di sini. Poppins hanya milik landing (src/views/landing,
+// dimuat oleh LandingLayout dengan tema sendiri). Tautan font itu bertahan di <head>
+// selama sesi SPA, jadi bila tema aplikasi menyebut Poppins, dashboard ikut berganti
+// font setelah pengguna membuka landing. Uji: src/theme/typography.test.js.
 const typography = {
-    fontFamily: "'Poppins', sans-serif;",
+    fontFamily: "sans-serif",
     h1: {
       fontWeight: 600,
       fontSize: '2.25rem',
