@@ -72,3 +72,50 @@ export const BUKTI_DIRILIS = import.meta.env.DEV || import.meta.env.VITE_LANDING
 // VITE_LANDING_PERUSAHAAN_AKTIF=true di lingkungan build (Netlify). Di DEV bendera
 // selalu menyala untuk pratinjau.
 export const PERUSAHAAN_DIRILIS = import.meta.env.DEV || import.meta.env.VITE_LANDING_PERUSAHAAN_AKTIF === 'true';
+
+// Gerbang rilis dua alat konten (F7): Blog (/blog dan /blog/:slug) dan Kalkulator
+// Digitalisasi (/kalkulator). Keduanya satu bendera karena sama-sama masih berisi
+// konten CONTOH dari desain: tujuh artikel dummy (judul, isi, penulis) dan
+// kalkulator dengan pertanyaan, rumus skor, ambang, dan teks saran contoh.
+//  - Bendera mati (bawaan di produksi): ketiga rute tidak didaftarkan (404),
+//    kode halaman dan datanya tidak ikut build, dan REGISTRI_RUTE.blog dan
+//    REGISTRI_RUTE.kalkulator `tersedia` bernilai false sehingga menu Blog
+//    (header dan lembar Lainnya), kolom Perusahaan footer, dan butir "Kalkulator
+//    Digitalisasi" di lembar Lainnya tampil nonaktif. Tidak ada tautan hidup ke
+//    rute yang 404.
+//  - Bendera menyala: ketiga rute terdaftar dan `tersedia` bernilai true.
+//
+// Daftar periksa sebelum menyalakan (semua wajib beres):
+//  1. Artikel nyata menggantikan dummy di data/blog.js (judul, ringkasan, isi,
+//     tanggal, menit baca, kategori, daftar isi). Jumlah artikel dan hitungan
+//     kategori sudah diturunkan dari data, tidak ada angka yang perlu diganti.
+//  2. Nama penulis ("Tim Absenin Aja") dan inisial avatar ("SR") adalah dummy;
+//     ganti dengan penulis sebenarnya atau hapus avatar.
+//  3. Pertanyaan, pilihan jawaban, rumus skor (jumlah nilai dibagi dua kali
+//     jumlah soal), ambang tingkat (35 dan 70), dan tiga teks saran di
+//     data/kalkulator.js masih CONTOH. Tim menetapkan versi sebenarnya, lalu
+//     perbarui lib/kalkulator.test.js bila rumus berubah.
+//  4. Klaim "Skor menunjukkan tahap digitalisasi sekolah" dan "Saran modul yang
+//     paling relevan" ditinjau: hasilnya bukan penilaian resmi.
+//  5. Semua penanda `// DUMMY wajib diganti sebelum main` di data/blog.js dan
+//     data/kalkulator.js beres (lib/blog.test.js menjaga penanda itu masih ada
+//     selama datanya dummy; hapus tes itu bersama penandanya).
+//  6. Empat kartu kategori di hero Blog ("Panduan", "Tips sekolah", "Kabar
+//     produk", "Cerita mitra") tidak sama dengan kategori artikel (Absensi,
+//     Keuangan, Pembelajaran, Fitur, Panduan): samakan atau ubah.
+//  7. Klaim "Gratis" (kartu di bawah kalkulator) dan "Waktu pengisian sekitar
+//     2 menit" (pengantar kalkulator) diverifikasi; waktu belum pernah diukur.
+//  8. Tanggal artikel adalah fakta yang tampil ke publik: pastikan tanggal terbit
+//     nyata, bukan tanggal contoh desain.
+//  9. Klaim privasi kalkulator "Tanpa daftar" dan jawaban tidak disimpan atau
+//     dikirim masih benar saat bendera dinyalakan (kode kalkulator tidak punya
+//     akses jaringan atau penyimpanan; jangan menambahkannya tanpa memperbarui
+//     klaim itu). Pertimbangkan tautan ke Kebijakan Privasi di dekat kartu.
+// 10. SEO belum ada: entri sitemap dan robots untuk /blog dan /blog/*, Open Graph,
+//     dan `noindex` selama konten masih dummy (Open Graph menyentuh index.html,
+//     dibicarakan di F8). Halaman belum noindex.
+//
+// Cara menyalakan: setelah daftar di atas beres, setel
+// VITE_LANDING_ALAT_AKTIF=true di lingkungan build (Netlify). Di DEV bendera
+// selalu menyala untuk pratinjau.
+export const ALAT_DIRILIS = import.meta.env.DEV || import.meta.env.VITE_LANDING_ALAT_AKTIF === 'true';

@@ -12,12 +12,17 @@
 // rilis F6 (lib/gerbang.js, PERUSAHAAN_DIRILIS): false di produksi sampai
 // VITE_LANDING_PERUSAHAAN_AKTIF=true, true di DEV.
 //
+// Dua rute alat (blog, kalkulator) mengikuti gerbang rilis F7 (lib/gerbang.js,
+// ALAT_DIRILIS): false di produksi sampai VITE_LANDING_ALAT_AKTIF=true, true di
+// DEV. Rute /blog/:slug tidak ada di sini (hanya anak dari /blog) dan ikut
+// bendera yang sama di routes.jsx.
+//
 // `tersedia: false` berarti halamannya belum dibangun. Butir seperti itu tampil
 // sebagai teks nonaktif (aria-disabled) dan tidak menavigasi. Ubah menjadi
 // `true` di REGISTRI_RUTE saat halamannya selesai; menu, bar tab, dan footer
 // mengikuti otomatis.
 
-import { BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from '../lib/gerbang';
+import { ALAT_DIRILIS, BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from '../lib/gerbang';
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
@@ -35,10 +40,10 @@ export const REGISTRI_RUTE = {
   tentangKami: { to: '/tentang-kami', tersedia: PERUSAHAAN_DIRILIS }, // pages/TentangKami.jsx, F6 (digerbang)
   kerjaSama: { to: '/kerja-sama', tersedia: PERUSAHAAN_DIRILIS }, // pages/KerjaSama.jsx, F6 (digerbang)
   afiliator: { to: '/afiliator', tersedia: PERUSAHAAN_DIRILIS }, // pages/Afiliator.jsx, F6 (digerbang)
-  blog: { to: '/blog', tersedia: false },
+  blog: { to: '/blog', tersedia: ALAT_DIRILIS }, // pages/Blog.jsx dan BlogArtikel.jsx, F7 (digerbang)
   demo: { to: '/jadwalkan-demo', tersedia: true }, // pages/JadwalkanDemo.jsx, F3
   akunGuruMandiri: { to: '/akun-guru-mandiri', tersedia: true }, // pages/GuruMandiri.jsx, F3
-  kalkulator: { to: '/kalkulator', tersedia: false },
+  kalkulator: { to: '/kalkulator', tersedia: ALAT_DIRILIS }, // pages/Kalkulator.jsx, F7 (digerbang)
   masuk: { to: '/login', tersedia: true },
   kebijakanPrivasi: { to: '/privacy-policy', tersedia: true },
 };

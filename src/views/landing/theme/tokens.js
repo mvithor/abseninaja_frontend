@@ -89,6 +89,10 @@ export const colors = {
   garisPutusKaca: 'rgba(255,255,255,0.4)',
   glassKotak: 'rgba(255,255,255,0.16)',
 
+  // Halaman Blog (F7): kotak gambar kaca di kartu artikel utama (latar gelap).
+  kacaGambar: 'rgba(255,255,255,0.1)',
+  kacaGambarGaris: 'rgba(255,255,255,0.25)',
+
   // Penanda desain ([VERIFIKASI]) dan label status.
   verifyBorder: '#B57400',
   verifyInk: '#8A5800',
@@ -133,6 +137,8 @@ export const blobs = {
     { left: -120, top: -80, size: 420, color: 'rgba(94,92,230,0.35)', blur: 130 },
     { right: -100, bottom: -60, size: 380, color: 'rgba(56,161,255,0.28)', blur: 140 },
   ],
+  // Halaman Blog (F7): kilau di pojok kiri atas kartu artikel utama.
+  artikelUtama: [{ left: -120, top: -120, size: 360, color: 'rgba(94,92,230,0.55)', blur: 100 }],
 };
 
 export const radius = {
@@ -162,6 +168,11 @@ export const radius = {
   ponsel: '44px',
   lembar: '24px 24px 0 0', // lembar bawah seluler (hanya sudut atas)
   cta: '40px',
+  // Halaman Blog dan Kalkulator (F7).
+  kutipan: '0 20px 20px 0', // kutipan bergaris kiri di isi artikel
+  opsi: '18px', // opsi jawaban kalkulator
+  nomorKecil: '10px', // kotak nomor baris pengantar kalkulator
+  lingkaran: '50%', // avatar penulis, cincin skor, dan penanda radio
 };
 
 export const shadows = {
@@ -320,6 +331,20 @@ export const huruf = {
   judulLinimasa: { fontSize: { xs: '16px', md: '18px' }, lineHeight: 'normal', fontWeight: 600 }, // judul kartu linimasa
   judulHubungi: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 'normal', fontWeight: 600 }, // judul blok hubungi
   judulKeuntungan: { fontSize: { xs: '17px', md: '19px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu keuntungan afiliator
+  // Halaman Blog (F7).
+  judulUtamaBlog: { fontSize: { xs: '22px', md: '32px' }, lineHeight: 1.3, fontWeight: 600 }, // kartu artikel utama
+  judulDaftarBlog: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.3, fontWeight: 600 }, // "Artikel terbaru"
+  judulKartuArtikel: { fontSize: { xs: '16px', md: '17px' }, lineHeight: 1.4, fontWeight: 600 }, // judul kartu artikel
+  judulHeroArtikel: { fontSize: { xs: '26px', sm: '34px', md: '42px' } }, // h1 artikel (menimpa judulUtama)
+  judulIsiArtikel: { fontSize: { xs: '20px', md: '26px' }, lineHeight: 1.3, fontWeight: 600 }, // h2 di isi artikel
+  isiArtikel: { fontSize: { xs: '16px', md: '17px' }, lineHeight: { xs: 1.6, md: 1.75 }, fontWeight: 400 }, // paragraf artikel
+  kutipanArtikel: { fontSize: { xs: '17px', md: '19px' }, lineHeight: 1.7, fontWeight: 400 }, // kutipan di isi artikel
+  judulBilah: { fontSize: '16px', lineHeight: 1.4, fontWeight: 600 }, // judul kartu putih bilah samping
+  judulAjakanBilah: { fontSize: { xs: '17px', md: '20px' }, lineHeight: 1.4, fontWeight: 600 }, // kartu gradasi bilah samping
+  // Halaman Kalkulator (F7).
+  judulSoal: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.4, fontWeight: 600 }, // pertanyaan
+  angkaSkor: { fontSize: { xs: '22px', md: '36px' }, lineHeight: 1, fontWeight: 700 }, // angka di cincin skor
+  judulTingkat: { fontSize: { xs: '18px', md: '24px' }, lineHeight: 1.3, fontWeight: 600 }, // nama tingkat hasil
   eyebrow: {
     fontSize: '12.5px',
     fontWeight: 600,

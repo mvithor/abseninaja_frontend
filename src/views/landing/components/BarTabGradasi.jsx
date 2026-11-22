@@ -14,7 +14,9 @@ import { idTab } from './idTab';
 // (roving tabindex, pilihan mengikuti fokus). Id tab = `${idDasar}-tab-${id}`;
 // bila panel perlu aria-labelledby, berikan idDasar dari luar (useId) dan pakai
 // idTab(). Berikan `idPanel` hanya bila elemen panelnya ada di halaman.
-export default function BarTabGradasi({ tab, aktif, onUbah, label, idPanel, idDasar, varian = 'bar', sx }) {
+// `ringkas` (F7, hanya varian bar): tab selebar isinya (tidak dibagi rata) dan
+// tinggi 44, sesuai bar kategori Blog. Bawaan tetap bagi rata, tinggi 48.
+export default function BarTabGradasi({ tab, aktif, onUbah, label, idPanel, idDasar, varian = 'bar', ringkas = false, sx }) {
   const refs = useRef([]);
   const idSendiri = useId();
   const dasar = idDasar ?? idSendiri;
@@ -76,8 +78,8 @@ export default function BarTabGradasi({ tab, aktif, onUbah, label, idPanel, idDa
           alignItems: 'center',
           justifyContent: 'center',
           gap: '10px',
-          flex: { xs: 'none', md: 1 },
-          height: 48,
+          flex: ringkas ? 'none' : { xs: 'none', md: 1 },
+          height: ringkas ? 44 : 48,
           px: '20px',
           borderRadius: radius.tombol,
           background: on ? colors.white : 'transparent',
@@ -188,5 +190,6 @@ BarTabGradasi.propTypes = {
   idPanel: PropTypes.string,
   idDasar: PropTypes.string,
   varian: PropTypes.oneOf(['bar', 'kartu']),
+  ringkas: PropTypes.bool,
   sx: PropTypes.object,
 };
