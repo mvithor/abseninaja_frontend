@@ -23,6 +23,7 @@
 // mengikuti otomatis.
 
 import { ALAT_DIRILIS, BUKTI_DIRILIS, LAD_DIRILIS, PERUSAHAAN_DIRILIS } from '../lib/gerbang';
+import { URL_MODUL_SMK } from './urlModul.js';
 
 export const REGISTRI_RUTE = {
   beranda: { to: '/', tersedia: true }, // Beranda (pages/Beranda.jsx), F1
@@ -48,7 +49,8 @@ export const REGISTRI_RUTE = {
   kebijakanPrivasi: { to: '/privacy-policy', tersedia: true },
 };
 
-export const URL_MODUL_SMK = 'https://prakersa.abseninaja.com/';
+// Nilainya di data/urlModul.js (tanpa impor, agar data halaman bisa diuji di node).
+export { URL_MODUL_SMK };
 
 const R = REGISTRI_RUTE;
 

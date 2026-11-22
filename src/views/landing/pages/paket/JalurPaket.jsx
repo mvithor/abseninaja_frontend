@@ -3,6 +3,7 @@ import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
 import Tag from '../../components/Tag';
 import TombolLanding from '../../components/TombolLanding';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import { renderTeks } from '../../components/renderTeks';
 import { propsAksi } from '../../data/aksi';
 import { JALUR as D } from '../../data/paket';
@@ -51,6 +52,7 @@ export default function JalurPaket() {
           <Box component="p" sx={sxIsiKartu}>
             {renderTeks(lengkap.deskripsi)}
           </Box>
+          <PenandaVerifikasi verifikasi={lengkap.verifikasi} sx={{ alignSelf: 'flex-start' }} />
           <Box component="p" sx={sxHarga}>
             {lengkap.harga}
           </Box>
@@ -78,6 +80,7 @@ export default function JalurPaket() {
           <Box component="p" sx={{ ...sxIsiKartu, color: colors.muted }}>
             {renderTeks(modular.deskripsi)}
           </Box>
+          <PenandaVerifikasi verifikasi={modular.verifikasi} sx={{ alignSelf: 'flex-start' }} />
           <Box sx={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
             {modular.tag.map((t) => (
               <Tag key={t} sx={{ height: 30, fontSize: '13px' }}>

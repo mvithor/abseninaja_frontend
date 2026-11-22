@@ -5,7 +5,10 @@ import { colors, layout, radius, shadows } from '../theme/tokens';
 import { resetDaftar } from '../theme/sx';
 
 // Panel dropdown menu desktop (Dropdown.dc.html): lebar 250, sudut 14, bayangan
-// menu, butir sudut 8, butir sorot #F3F3FE dengan teks #3C3AAB.
+// menu, padding wadah 10, jarak antar butir 4, butir tinggi minimal 44 dengan
+// sudut 10 dan padding samping 14, butir sorot #F3F3FE dengan teks #3C3AAB. Jarak
+// dan padding itu menjaga sorotan hover atau aktif tidak saling menempel dan tidak
+// menempel tepi wadah (F8).
 // `statis` menampilkan panel di alur dokumen (untuk halaman uji).
 const sorot = { background: colors.tintSoft, color: colors.brand700 };
 
@@ -16,9 +19,9 @@ const sxButir = {
   gap: '8px',
   minHeight: layout.targetSentuh,
   boxSizing: 'border-box',
-  px: '12px',
-  py: '11px',
-  borderRadius: radius.menuItem,
+  px: '14px',
+  py: 0,
+  borderRadius: radius.navItem,
   fontSize: '15px',
   lineHeight: 1.3,
   color: colors.ink,
@@ -44,7 +47,7 @@ export default function DropdownPanel({ id, label, butir, onPilih, statis = fals
         width: 250,
         maxWidth: 'calc(100vw - 40px)',
         boxSizing: 'border-box',
-        p: '8px',
+        p: '10px',
         background: colors.white,
         border: `1px solid ${colors.border}`,
         borderRadius: radius.panelMenu,
@@ -52,7 +55,7 @@ export default function DropdownPanel({ id, label, butir, onPilih, statis = fals
         ...sx,
       }}
     >
-      <Box component="ul" role="list" sx={resetDaftar}>
+      <Box component="ul" role="list" sx={{ ...resetDaftar, display: 'flex', flexDirection: 'column', gap: '4px' }}>
         {butir.map((b, i) => (
           <Box component="li" key={b.label}>
             <TautanNav

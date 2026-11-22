@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import Tag from './Tag';
+import ChipStatus from './ChipStatus';
 import PenandaVerifikasi from './PenandaVerifikasi';
+import { DAFTAR_CHIP } from '../lib/fitur.js';
 import { colors, flags, gradients, huruf, radius, shadows } from '../theme/tokens';
 
 // Kartu ikon. Varian (`varian`):
@@ -22,12 +24,15 @@ import { colors, flags, gradients, huruf, radius, shadows } from '../theme/token
 // baris tag, hanya bila flags.tampilkanPenandaDesain menyala (bila mati, baris tag
 // tidak ikut dibuat, jadi tinggi kartu tidak berubah). `penanda` (elemen) tetap
 // diutamakan bila diberikan.
+// Tambahan F8: `chip` ('uji-terbatas' atau 'segera') menampilkan ChipStatus di baris
+// tag, setelah tag dan label `status`. Tanpa `chip`, kartu tidak berubah.
 export default function KartuIkon({
   ikon,
   judul,
   deskripsi,
   tag = [],
   status,
+  chip,
   penanda,
   verifikasi,
   varian = 'terang',
@@ -47,7 +52,7 @@ export default function KartuIkon({
   const sebaris = tata === 'sebaris';
   const penandaAkhir =
     penanda ?? (verifikasi && flags.tampilkanPenandaDesain ? <PenandaVerifikasi verifikasi={verifikasi} /> : undefined);
-  const adaBarisTag = tag.length > 0 || Boolean(status) || Boolean(penandaAkhir);
+  const adaBarisTag = tag.length > 0 || Boolean(status) || Boolean(chip) || Boolean(penandaAkhir);
 
   const kotakIkon = (
     <Box
@@ -145,6 +150,7 @@ export default function KartuIkon({
             <Tag key={t}>{t}</Tag>
           ))}
           {status && <Tag varian="status">{status}</Tag>}
+          {chip && <ChipStatus status={chip} varian={kaca ? 'gelap' : 'terang'} />}
           {penandaAkhir}
         </Box>
       )}
@@ -158,6 +164,7 @@ KartuIkon.propTypes = {
   deskripsi: PropTypes.node,
   tag: PropTypes.arrayOf(PropTypes.string),
   status: PropTypes.string,
+  chip: PropTypes.oneOf(DAFTAR_CHIP),
   penanda: PropTypes.node,
   verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
   varian: PropTypes.oneOf(['terang', 'kaca']),

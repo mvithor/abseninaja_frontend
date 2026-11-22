@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import { IconArrowRight, IconSparkles } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
+import ChipStatus from '../../components/ChipStatus';
 import Tag from '../../components/Tag';
 import TombolLanding from '../../components/TombolLanding';
 import PenandaVerifikasi from '../../components/PenandaVerifikasi';
@@ -12,20 +13,25 @@ import { ANALITIK as D, MOCK_PERHATIAN } from '../../data/fitur';
 import { blobs, colors, gradients, huruf, radius, shadows } from '../../theme/tokens';
 import { resetDaftar } from '../../theme/sx';
 
-// Banner analitik pembelajaran: kartu gradasi dua kolom (teks di kiri, peraga
-// "Perlu perhatian" di kanan), satu kolom di bawah md. Tombol menuju halaman
-// Analitik, nonaktif sampai halamannya tersedia (data/nav.js).
+// Banner analitik pembelajaran (naskah E0): tampil di bawah panel tab pada semua tab.
+// Kartu gradasi dua kolom (teks di kiri, peraga "Perlu perhatian" berlabel "Data contoh"
+// di kanan), satu kolom di bawah md. Label "Untuk guru" dan chip Segera di atas judul;
+// teks memakai bentuk rencana. Tombol menuju halaman Analitik, nonaktif sampai halaman
+// itu tersedia (gerbang LAD, data/nav.js).
+// Banner dan kartu LAKSANA (tab Guru) menyebut hal yang sama: status keduanya (H-5)
+// harus berubah bersamaan.
 const sxTagKaca = {
   height: 'auto',
   py: '6px',
   px: '12px',
+  borderRadius: radius.tombol, // desain: tag di banner bersudut 12
   background: colors.tabGelapJumlah,
   color: colors.white,
 };
 
 export default function BannerAnalitik() {
   return (
-    <Seksi varian="terang" id={D.id} padAtas="0px" padBawah="56px" aria-labelledby="judul-analitik">
+    <Seksi varian="terang" id={D.id} padAtas="0px" padBawah={{ xs: '24px', md: '32px' }} aria-labelledby="judul-analitik">
       <Box
         sx={{
           position: 'relative',
@@ -43,23 +49,26 @@ export default function BannerAnalitik() {
       >
         <DaftarBlob daftar={blobs.banner} />
         <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '16px' }}>
-          <Box
-            component="p"
-            sx={{
-              m: 0,
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              height: 28,
-              px: '12px',
-              borderRadius: radius.tag,
-              background: colors.tabGelapJumlah,
-              fontSize: '12px',
-              fontWeight: 600,
-            }}
-          >
-            <IconSparkles size={14} stroke={2} aria-hidden="true" />
-            {D.label}
+          <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <Box
+              component="p"
+              sx={{
+                m: 0,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                height: 28,
+                px: '12px',
+                borderRadius: radius.tombol,
+                background: colors.tabGelapJumlah,
+                fontSize: '12px',
+                fontWeight: 600,
+              }}
+            >
+              <IconSparkles size={14} stroke={2} aria-hidden="true" />
+              {D.label}
+            </Box>
+            <ChipStatus status={D.chip} />
           </Box>
           <Box
             component="h2"

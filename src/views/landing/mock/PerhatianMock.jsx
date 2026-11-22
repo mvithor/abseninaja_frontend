@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 import { Box } from '@mui/material';
 import PenandaVerifikasi from '../components/PenandaVerifikasi';
+import Tag from '../components/Tag';
 import { colors, huruf, peraga, radius } from '../theme/tokens';
 import { resetDaftar } from '../theme/sx';
 
 // Peraga "Perlu perhatian" untuk banner analitik pembelajaran (halaman Fitur).
 // Data dummy, dekoratif: aria-hidden. Bentuk data: lihat MOCK_PERHATIAN di
 // data/fitur.js. `sx` menyesuaikan kartu (halaman Akun Guru Mandiri memakai
-// kartu putih bertepi di latar terang).
+// kartu putih bertepi di latar terang). Tambahan F8: `data.label` (opsional) menampilkan
+// label permanen (mis. "Data contoh") di kanan judul; tanpa label, tampilan tidak berubah.
 export default function PerhatianMock({ data, sx }) {
   return (
     <Box
@@ -27,6 +29,7 @@ export default function PerhatianMock({ data, sx }) {
         <Box component="span" sx={{ fontSize: '15px', fontWeight: 600, color: colors.ink }}>
           {data.judul}
         </Box>
+        {data.label && <Tag>{data.label}</Tag>}
         <PenandaVerifikasi verifikasi={data.verifikasi} />
       </Box>
       <Box
@@ -81,6 +84,7 @@ export default function PerhatianMock({ data, sx }) {
 PerhatianMock.propTypes = {
   data: PropTypes.shape({
     judul: PropTypes.string.isRequired,
+    label: PropTypes.string,
     verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
     ringkasan: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string, nilai: PropTypes.string })).isRequired,
     baris: PropTypes.arrayOf(PropTypes.shape({ teks: PropTypes.string, aksi: PropTypes.string })).isRequired,

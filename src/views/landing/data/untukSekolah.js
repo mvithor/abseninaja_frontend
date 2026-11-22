@@ -6,8 +6,12 @@
 // `verifikasi` (true atau teks label) = klaim yang belum diverifikasi. Ganti
 // dengan data produksi sebelum tayang. Penandanya tampil hanya bila
 // flags.tampilkanPenandaDesain menyala.
+//
+// Koreksi klaim F8 (naskah Fitur Lengkap v2, bagian G2): keuangan, tagihan, dan
+// "dasbor" yang belum ada dihapus atau diberi `chip: 'segera'` (ChipStatus).
+// `chip` pada peran dan strip, dan status 'segera' pada PERBANDINGAN.
 import { IconBriefcase, IconChartLine, IconSchool } from '@tabler/icons-react';
-import { URL_MODUL_SMK } from './nav';
+import { URL_MODUL_SMK } from './urlModul.js';
 
 export const META = {
   title: 'Untuk Sekolah | Absenin Aja',
@@ -37,24 +41,25 @@ export const JENIS = [
     butir: [
       { teks: 'Absensi QR dan rekap otomatis' },
       { teks: 'Kabar kehadiran ke wali murid' },
-      { teks: 'Analitik pembelajaran untuk guru' },
+      // Analitik belum dipakai guru (LAKSANA mulai Januari): chip Segera, bukan butir biasa.
+      { teks: 'Analitik pembelajaran untuk guru', chip: 'segera', verifikasi: 'Verifikasi H-5' },
     ],
     peran: [
-      { nama: 'Admin dan tata usaha', deskripsi: 'Kelola data, jadwal, dan keuangan.' },
-      { nama: 'Kepala sekolah', deskripsi: 'Pantau kondisi sekolah di satu dasbor.' },
-      { nama: 'Waka kurikulum', deskripsi: 'Pantau perangkat ajar guru.' },
-      { nama: 'Guru', deskripsi: 'Absensi mapel dan analitik pembelajaran.' },
-      { nama: 'Guru BK', deskripsi: 'Jurnal dan pemetaan konseling.' },
-      // DUMMY: ganti dengan data produksi
-      { nama: 'Wali murid', deskripsi: 'Kabar kehadiran dan tagihan.', verifikasi: 'Verifikasi aplikasi' },
+      { nama: 'Admin dan tata usaha', deskripsi: 'Kelola data, kehadiran, dan jadwal.' },
+      { nama: 'Kepala sekolah', deskripsi: 'Dasbor dijadwalkan rilis Januari 2027.', chip: 'segera' },
+      { nama: 'Waka kurikulum', deskripsi: 'Pantau perangkat ajar guru.', chip: 'segera', verifikasi: 'Verifikasi H-13' },
+      { nama: 'Guru', deskripsi: 'Absensi mapel, jurnal, dan nilai.' },
+      { nama: 'Guru BK', deskripsi: 'Jurnal dan pemetaan konseling.', chip: 'segera', verifikasi: 'Verifikasi H-13' },
+      { nama: 'Wali murid', deskripsi: 'Kabar kehadiran lewat notifikasi aplikasi.', verifikasi: 'Verifikasi H-6' },
     ],
     aksi: { label: 'Lihat Fitur Lengkap', rute: 'fitur' },
     strip: {
       ikon: IconChartLine,
       judul: 'Analitik pembelajaran untuk guru',
-      teks: 'Tersedia untuk semua jenis sekolah, juga lewat akun guru mandiri.',
+      teks: 'LAKSANA, analitik pembelajaran untuk guru, segera dipakai guru, juga lewat akun guru mandiri.',
+      chip: 'segera',
       aksi: { label: 'Lihat fitur', rute: 'fitur' },
-      verifikasi: 'Status rilis diverifikasi', // DUMMY: ganti dengan data produksi
+      verifikasi: 'Verifikasi H-5, H-23',
     },
   },
   {
@@ -64,18 +69,17 @@ export const JENIS = [
     nama: 'SMK dan MAK',
     sub: 'Jurusan, kompetensi, dan PKL',
     butir: [
-      { teks: 'Semua fitur sekolah umum' },
+      { teks: 'Fitur sekolah umum, ditambah jurusan dan PKL.' },
       { teks: 'Jurusan dan kompetensi SKKNI', verifikasi: true }, // DUMMY: ganti dengan data produksi
       { teks: 'Penempatan dan logbook PKL' },
     ],
     peran: [
-      { nama: 'Admin dan tata usaha', deskripsi: 'Kelola data, jadwal, dan keuangan.' },
-      { nama: 'Kepala sekolah', deskripsi: 'Pantau kondisi sekolah di satu dasbor.' },
-      { nama: 'Guru', deskripsi: 'Absensi mapel dan analitik pembelajaran.' },
+      { nama: 'Admin dan tata usaha', deskripsi: 'Kelola data, kehadiran, dan jadwal.' },
+      { nama: 'Kepala sekolah', deskripsi: 'Dasbor dijadwalkan rilis Januari 2027.', chip: 'segera' },
+      { nama: 'Guru', deskripsi: 'Absensi mapel, jurnal, dan nilai.' },
       { nama: 'Kepala jurusan', deskripsi: 'Kompetensi murid dan penempatan PKL.', tag: 'Di Prakersa' },
       { nama: 'Mitra industri', deskripsi: 'Memantau murid PKL dan memberi evaluasi.', tag: 'Di Prakersa' },
-      // DUMMY: ganti dengan data produksi
-      { nama: 'Wali murid', deskripsi: 'Kabar kehadiran dan tagihan.', verifikasi: 'Verifikasi aplikasi' },
+      { nama: 'Wali murid', deskripsi: 'Kabar kehadiran lewat notifikasi aplikasi.', verifikasi: 'Verifikasi H-6' },
     ],
     aksi: { label: 'Buka Prakersa', href: URL_MODUL_SMK },
     strip: {
@@ -96,19 +100,20 @@ export const PERBANDINGAN = {
   caption: 'Perbandingan modul antara sekolah umum dan SMK dan MAK',
   kolom: { modul: 'Modul', umum: 'Sekolah umum', smk: 'SMK dan MAK' },
   // Status ditulis sebagai teks (ikon hanya pendamping): ada, tidak, prakersa.
+  // `segera` dirender sebagai chip Segera (ChipStatus), jadi tidak ada teksnya di sini.
   status: { ada: 'Tersedia', tidak: 'Tidak ada', prakersa: 'Di Prakersa' },
   baris: [
     { modul: 'Absensi QR', umum: 'ada', smk: 'ada' },
     { modul: 'Jadwal sekolah', umum: 'ada', smk: 'ada' },
-    { modul: 'Keuangan dan SPP', umum: 'ada', smk: 'ada' },
-    { modul: 'Analitik pembelajaran', umum: 'ada', smk: 'ada' },
+    { modul: 'Keuangan dan SPP', umum: 'segera', smk: 'segera' },
+    { modul: 'Analitik pembelajaran', umum: 'segera', smk: 'segera', verifikasi: 'Verifikasi H-5' },
     { modul: 'Jurusan dan kompetensi', umum: 'tidak', smk: 'prakersa' },
     { modul: 'PKL dan mitra industri', umum: 'tidak', smk: 'prakersa' },
   ],
 };
 
 export const CTA = {
-  judul: 'Mulai dari jenis sekolah Anda',
+  judul: 'Mulai dari jenis sekolahnya',
   sub: {
     web: 'Jadwalkan demo. Kita tunjukkan modul yang relevan.',
     mobile: 'Jadwalkan demo, lihat modul relevan.',

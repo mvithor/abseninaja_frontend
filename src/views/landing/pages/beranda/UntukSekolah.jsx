@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { IconArrowUpRight, IconCheck } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
+import ChipStatus from '../../components/ChipStatus';
 import Tag from '../../components/Tag';
 import TombolLanding from '../../components/TombolLanding';
 import { propsAksi } from '../../data/aksi';
@@ -50,18 +51,23 @@ function KartuJenis({ data }) {
         {data.sub}
       </Box>
       <Box component="ul" role="list" sx={{ ...resetDaftar, mt: '24px', display: 'flex', flexDirection: 'column', gap: '14px', fontSize: '15px' }}>
-        {data.butir.map((b) => (
-          <Box key={b} component="li" sx={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-            <Box
-              component="span"
-              aria-hidden="true"
-              sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', flex: 'none', ...g.centang }}
-            >
-              <IconCheck size={13} stroke={3} />
+        {data.butir.map((butir) => {
+          // Butir berupa teks, atau { teks, chip } untuk fitur yang belum dipakai (chip Segera).
+          const b = typeof butir === 'string' ? { teks: butir } : butir;
+          return (
+            <Box key={b.teks} component="li" sx={{ display: 'flex', flexWrap: 'wrap', gap: '8px 12px', alignItems: 'center' }}>
+              <Box
+                component="span"
+                aria-hidden="true"
+                sx={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', flex: 'none', ...g.centang }}
+              >
+                <IconCheck size={13} stroke={3} />
+              </Box>
+              {b.teks}
+              {b.chip && <ChipStatus status={b.chip} />}
             </Box>
-            {b}
-          </Box>
-        ))}
+          );
+        })}
       </Box>
       <Box component="ul" role="list" aria-label="Peran pengguna" sx={{ ...resetDaftar, display: 'flex', flexWrap: 'wrap', gap: '8px', mt: '24px' }}>
         {data.peran.map((p) => (
@@ -93,7 +99,9 @@ KartuJenis.propTypes = {
     id: PropTypes.oneOf(['umum', 'smk']).isRequired,
     judul: PropTypes.string,
     sub: PropTypes.string,
-    butir: PropTypes.arrayOf(PropTypes.string),
+    butir: PropTypes.arrayOf(
+      PropTypes.oneOfType([PropTypes.string, PropTypes.shape({ teks: PropTypes.string.isRequired, chip: PropTypes.string })]),
+    ),
     peran: PropTypes.arrayOf(PropTypes.string),
     aksi: PropTypes.object,
   }).isRequired,

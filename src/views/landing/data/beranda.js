@@ -6,6 +6,11 @@
 // `verifikasi: true` = angka atau klaim contoh yang belum diverifikasi.
 // Ganti dengan data produksi sebelum tayang. Penandanya tampil hanya bila
 // flags.tampilkanPenandaDesain menyala.
+//
+// Koreksi klaim F8 (naskah Fitur Lengkap v2, bagian G4): keuangan, tagihan SPP,
+// ujian, WhatsApp sebagai kanal kabar wali, angka contoh (2.000+, Jan 2026, 10
+// peran), dan klaim dampak ("0 jam", "di hari yang sama", "tanpa menelepon")
+// dihapus atau diganti. `chip: 'segera'` = kartu berchip Segera (ChipStatus).
 import {
   IconBell,
   IconCalendar,
@@ -16,47 +21,46 @@ import {
   IconUsers,
   IconWallet,
 } from '@tabler/icons-react';
-import { URL_MODUL_SMK } from './nav';
+import { URL_MODUL_SMK } from './urlModul.js';
 
 export const META = {
   // Sama dengan Landing.jsx lama.
   title: 'Absenin Aja | Tata Kelola & Absensi Sekolah',
-  description: 'Solusi terintegrasi untuk absensi digital dan manajemen akademik sekolah.',
+  description: 'Absensi QR, jadwal, jurnal guru, dan kabar kehadiran untuk wali murid dalam satu sistem sekolah.',
 };
 
 export const HERO = {
   eyebrow: 'Absensi dan tata kelola sekolah',
   judul: 'Dari gerbang sampai ruang kelas, *semua tercatat di satu sistem.*',
   sub: {
-    web: 'Absensi QR, jadwal, keuangan, dan kabar wali murid dalam satu tempat.',
-    mobile: 'Absensi, jadwal, dan keuangan di satu tempat.',
+    web: 'Absensi QR, jadwal, jurnal guru, dan kabar kehadiran untuk wali murid dalam satu sistem.',
+    mobile: 'Absensi, jadwal, dan jurnal di satu sistem.',
   },
   aksiUtama: { label: 'Jadwalkan Demo', rute: 'demo' },
   aksiKedua: { label: 'Lihat Fitur Lengkap', rute: 'fitur' },
-  catatan: 'Demo gratis, tanpa komitmen',
+  // Naskah G4: "tahan sampai terverifikasi" (H-20). Klaim layanan belum terbukti, jadi
+  // catatan di bawah tombol tidak ditampilkan. Isi lagi hanya setelah diverifikasi.
+  catatan: null,
 };
 
-// DUMMY: ganti dengan data produksi (angka pada tiga butir pertama adalah contoh).
-export const FAKTA = [
-  { nilai: '2.000*+*', label: 'Pengguna aktif', verifikasi: true }, // DUMMY: ganti dengan data produksi
-  { nilai: 'Jan *2026*', label: 'Mulai dipakai sekolah', verifikasi: true }, // DUMMY: ganti dengan data produksi
-  { nilai: '10 *peran*', label: 'Tampilan sendiri', verifikasi: true }, // DUMMY: ganti dengan data produksi
-  { nilai: 'Web *+ HP*', label: 'Admin di web, guru dan wali di aplikasi' },
-];
+// Naskah G4: tiga butir angka contoh (2.000+ pengguna, Jan 2026, 10 peran) dihapus,
+// tersisa "Web + HP". Isi ulang hanya dari kueri produksi bertanggal (H-18).
+export const FAKTA = [{ nilai: 'Web *+ HP*', label: 'Admin di web, guru dan wali di aplikasi' }];
 
 export const SEBELUM_SESUDAH = {
   eyebrow: 'Dari manual ke tersambung',
   judul: 'Pekerjaan yang dulu diulang, kini *cukup dicatat sekali*',
   sub: {
     web: 'Data dicatat di tempat asalnya, lalu dipakai ulang oleh rekap dan notifikasi.',
-    mobile: 'Dicatat sekali, dipakai di semua modul.',
+    mobile: 'Dicatat sekali, dipakai di semua fitur.',
   },
   sebelum: {
     tag: 'Sebelum',
     judul: 'Administrasi manual',
+    verifikasi: 'Verifikasi H-25', // praktik "jurnal ditulis di buku" di sekolah sasaran
     butir: [
       'Rekap absensi dikerjakan manual',
-      'SPP dicatat di buku kas',
+      'Jurnal mengajar ditulis di buku',
       'Jadwal tersebar di banyak berkas',
       'Wali menelepon sekolah untuk bertanya',
     ],
@@ -66,7 +70,7 @@ export const SEBELUM_SESUDAH = {
     judul: 'Dengan Absenin Aja',
     butir: [
       'Absensi QR langsung masuk rekap',
-      'Tagihan SPP tercatat digital',
+      'Jurnal mengajar dicatat di sistem',
       'Jadwal sekolah di satu tempat',
       'Wali menerima kabar otomatis',
     ],
@@ -76,22 +80,25 @@ export const SEBELUM_SESUDAH = {
 export const FITUR = {
   id: 'fitur',
   eyebrow: 'Fitur',
-  judul: 'Semua modul membaca *data yang sama*',
+  judul: 'Fitur yang berjalan membaca *data yang sama*',
   modul: [
     { ikon: IconQrcode, judul: 'Absensi QR', deskripsi: 'Kartu QR saat datang dan pulang.' },
-    { ikon: IconCalendar, judul: 'Jadwal sekolah', deskripsi: 'Kelas, mapel, ekskul, dan ujian.' },
+    { ikon: IconCalendar, judul: 'Jadwal sekolah', deskripsi: 'Kelas, mapel, dan ekskul.' },
     { ikon: IconFileCheck, judul: 'Izin dan rekap', deskripsi: 'Izin tercatat, rekap siap diunduh.' },
     { ikon: IconUsers, judul: 'Data murid dan pegawai', deskripsi: 'Murid, wali, guru, staf, dan kelas.' },
-    { ikon: IconWallet, judul: 'Keuangan dan SPP', deskripsi: 'Tagihan dan riwayat pembayaran.' },
-    { ikon: IconUserPlus, judul: 'Murid baru', deskripsi: 'Pendaftaran sampai penempatan kelas.' },
-    { ikon: IconBell, judul: 'Kabar wali murid', deskripsi: 'Lewat aplikasi dan WhatsApp.' },
-    { ikon: IconShoppingBag, judul: 'Kantin', status: 'Segera', deskripsi: 'Saldo digital dan transaksi.' },
+    { ikon: IconWallet, judul: 'Keuangan dan SPP', chip: 'segera', deskripsi: 'Tagihan dan riwayat pembayaran.' },
+    { ikon: IconUserPlus, judul: 'Murid baru', chip: 'segera', deskripsi: 'Pendaftaran lewat web.' },
+    { ikon: IconBell, judul: 'Kabar wali murid', deskripsi: 'Lewat notifikasi di aplikasi wali.' },
+    { ikon: IconShoppingBag, judul: 'Kantin', chip: 'segera', deskripsi: 'Saldo digital dan transaksi.' },
   ],
   analitik: {
     judul: 'Analitik pembelajaran untuk guru',
+    // Bentuk rencana seperti naskah D2 (LAKSANA berchip Segera, guru mulai Januari).
+    chip: 'segera',
+    verifikasi: 'Verifikasi H-5',
     deskripsi: {
-      web: 'Guru melihat murid yang perlu perhatian, dari nilai dan kehadiran kelas.',
-      mobile: 'Lihat murid yang perlu perhatian.',
+      web: 'Guru akan melihat penanda dari nilai dan kehadiran.',
+      mobile: 'Guru akan dapat penanda, keputusan tetap di guru.',
     },
     tag: ['Impor dari Excel', 'Nilai per tujuan', 'Saran tindak lanjut'],
     aksi: { label: 'Lihat Analitik', rute: 'analitik' },
@@ -107,7 +114,11 @@ export const UNTUK_SEKOLAH = {
       id: 'umum',
       judul: 'Sekolah umum',
       sub: 'SD, MI, SMP, MTs, SMA, MA',
-      butir: ['Absensi QR dan rekap otomatis', 'Kabar kehadiran ke wali murid', 'Analitik pembelajaran untuk guru'],
+      butir: [
+        'Absensi QR dan rekap otomatis',
+        'Kabar kehadiran ke wali murid',
+        { teks: 'Analitik pembelajaran untuk guru', chip: 'segera' },
+      ],
       peran: ['Admin', 'Kepala sekolah', 'Guru', 'Guru BK', 'Wali murid'],
       aksi: { label: 'Lihat Fitur', rute: 'fitur' },
     },
@@ -124,12 +135,12 @@ export const UNTUK_SEKOLAH = {
 
 export const KOMUNIKASI = {
   eyebrow: 'Komunikasi',
-  judul: 'Wali murid tahu *di hari yang sama*',
+  judul: 'Wali murid menerima *kabar kehadiran di aplikasi*',
   sub: {
-    web: 'Kabar kehadiran dan tagihan sampai lewat aplikasi atau WhatsApp, tanpa menelepon satu per satu.',
-    mobile: 'Kabar sampai lewat aplikasi dan WhatsApp.',
+    web: 'Kabar kehadiran sampai ke wali lewat notifikasi di aplikasi.',
+    mobile: 'Kabar kehadiran lewat notifikasi aplikasi.',
   },
-  kanal: ['Aplikasi wali', 'WhatsApp', 'Templat pesan'],
+  kanal: ['Aplikasi wali', 'Notifikasi otomatis'],
 };
 
 export const PENDAMPINGAN = {
@@ -151,7 +162,7 @@ export const PENDAMPINGAN = {
     { judul: 'Demo', deskripsi: 'Kebutuhan dipetakan' },
     { judul: 'Penyiapan data', deskripsi: 'Murid, pegawai, jadwal' },
     { judul: 'Pelatihan', deskripsi: 'Per peran' },
-    { judul: 'Dukungan WhatsApp', deskripsi: 'Jam kerja sekolah' },
+    { judul: 'Dukungan WhatsApp', deskripsi: 'Jam kerja sekolah', verifikasi: 'Verifikasi H-20' },
   ],
 };
 
@@ -167,9 +178,13 @@ export const FAQ = {
       butir: [
         {
           q: 'Apa itu Absenin Aja?',
-          a: 'Platform sekolah untuk absensi QR, jadwal, keuangan, dan kabar wali murid dalam satu sistem.',
+          a: 'Sistem sekolah untuk absensi QR, jadwal, jurnal guru, dan kabar kehadiran wali murid.',
         },
-        { q: 'Bisakah dipilih per modul?', a: 'Bisa. Sekolah mulai dari satu modul lalu menambah yang lain.' },
+        {
+          q: 'Bisakah dipilih per modul?',
+          a: 'Fitur inti ada di setiap paket. Jurusan, PKL, dan analitik pembelajaran ditambahkan sesuai kebutuhan.',
+          verifikasi: 'Verifikasi H-24',
+        },
       ],
     },
     {
@@ -187,7 +202,8 @@ export const FAQ = {
         { q: 'Berapa biayanya?', a: 'Disesuaikan dengan jumlah murid dan modul. Dibahas saat demo.' },
         {
           q: 'Bisakah guru memakai tanpa sekolah berlangganan?',
-          a: 'Bisa, untuk analitik pembelajaran lewat akun guru mandiri.',
+          a: 'Bisa. LAKSANA, analitik pembelajaran untuk guru, segera dipakai guru, juga lewat akun guru mandiri.',
+          verifikasi: 'Verifikasi H-5, H-23',
         },
       ],
     },
@@ -212,7 +228,7 @@ export const MOCK_DASBOR = {
   statistik: [
     { angka: '642', label: 'Hadir' },
     { angka: '97%', label: 'Tingkat hadir' },
-    { angka: '0 jam', label: 'Rekap manual' },
+    { angka: 'Rekap', label: 'otomatis' },
   ],
   grafik: {
     judul: 'Kehadiran per hari',
@@ -228,7 +244,7 @@ export const MOCK_DASBOR = {
       { hari: 'Min', tinggi: 22, jenis: 'pudar' },
     ],
   },
-  tersambung: { teks: 'Data murid dan SPP terhubung otomatis', status: 'Aktif' },
+  tersambung: { teks: 'Data murid dan kehadiran terhubung otomatis', status: 'Aktif' },
   kartuScan: { judul: 'Scan QR masuk', sub: 'XI RPL 1, 06.52' },
   kartuKabar: { judul: 'Kabar untuk wali murid', teks: 'Ananda Rizky tercatat hadir pukul 06.52.' },
 };
@@ -237,7 +253,6 @@ export const MOCK_PONSEL = {
   judul: 'Absenin Aja',
   pesan: [
     { waktu: '06.52', teks: 'Ananda Rizky tercatat hadir pukul 06.52.' },
-    { waktu: '12.10', teks: 'Tagihan SPP Januari jatuh tempo tanggal 10.' },
     { waktu: '15.30', teks: 'Ananda Rizky tercatat pulang pukul 15.30.' },
   ],
 };

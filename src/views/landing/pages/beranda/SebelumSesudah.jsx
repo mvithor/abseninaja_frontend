@@ -3,6 +3,7 @@ import { Box } from '@mui/material';
 import { IconCheck, IconCircleCheck, IconFile } from '@tabler/icons-react';
 import Seksi from '../../components/Seksi';
 import JudulSeksi from '../../components/JudulSeksi';
+import PenandaVerifikasi from '../../components/PenandaVerifikasi';
 import Tag from '../../components/Tag';
 import Teks from '../../components/Teks';
 import { SEBELUM_SESUDAH as D } from '../../data/beranda';
@@ -57,6 +58,7 @@ function Kartu({ sesudah = false, data, ikonSudut }) {
       <Box component="h3" sx={{ m: '14px 0 0', fontSize: { xs: '20px', md: '26px' }, fontWeight: 600, color: colors.white }}>
         {data.judul}
       </Box>
+      <PenandaVerifikasi verifikasi={data.verifikasi} sx={{ mt: '10px' }} />
       <Box
         component="ul"
         sx={{
@@ -92,7 +94,12 @@ function Kartu({ sesudah = false, data, ikonSudut }) {
 
 Kartu.propTypes = {
   sesudah: PropTypes.bool,
-  data: PropTypes.shape({ tag: PropTypes.string, judul: PropTypes.string, butir: PropTypes.arrayOf(PropTypes.string) }).isRequired,
+  data: PropTypes.shape({
+    tag: PropTypes.string,
+    judul: PropTypes.string,
+    butir: PropTypes.arrayOf(PropTypes.string),
+    verifikasi: PropTypes.oneOfType([PropTypes.bool, PropTypes.string]),
+  }).isRequired,
   ikonSudut: PropTypes.elementType.isRequired,
 };
 

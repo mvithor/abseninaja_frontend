@@ -54,12 +54,15 @@ export default function Hero() {
                 {HERO.aksiKedua.label}
               </TombolLanding>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: colors.muted }}>
-              <Box component="span" aria-hidden="true" sx={{ display: 'inline-flex', color: colors.success }}>
-                <IconCircleCheck size={18} stroke={2.4} />
+            {/* Catatan di bawah tombol ditahan sampai klaimnya terverifikasi (HERO.catatan: null). */}
+            {HERO.catatan && (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', color: colors.muted }}>
+                <Box component="span" aria-hidden="true" sx={{ display: 'inline-flex', color: colors.success }}>
+                  <IconCircleCheck size={18} stroke={2.4} />
+                </Box>
+                {HERO.catatan}
               </Box>
-              {HERO.catatan}
-            </Box>
+            )}
           </Box>
           <DasborMock data={MOCK_DASBOR} />
         </Box>

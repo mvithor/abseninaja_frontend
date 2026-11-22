@@ -57,6 +57,11 @@ export const colors = {
   tabGelapHover: 'rgba(47,50,125,0.35)', // hover tab pada bar tab gradasi
   tabGelapJumlah: 'rgba(47,50,125,0.45)', // lencana jumlah tab tidak aktif
   scrim: 'rgba(23,22,58,0.5)',
+  // Tombol geser bar tab (F8): kaca di atas gradasi merek.
+  panahBg: 'rgba(255,255,255,0.16)',
+  panahBgHover: 'rgba(255,255,255,0.26)',
+  panahBgOff: 'rgba(255,255,255,0.06)',
+  panahGaris: 'rgba(255,255,255,0.4)',
 
   // Latar kaca lebih tipis dan garis kaca (kartu Sebelum, F1) serta penanda daftar.
   glassTipis: 'rgba(255,255,255,0.05)',
@@ -99,6 +104,23 @@ export const colors = {
   verifyBg: '#FFF8E6',
   statusBg: '#FFF3D0',
   statusInk: '#6B4A00',
+
+  // Chip status fitur (F8, ChipStatus): dua status saja, Uji terbatas dan Segera.
+  // Dibedakan lewat kecerahan, ikon, dan teks (bukan warna saja).
+  statusGaris: '#F0C95C', // tepi chip Segera (amber)
+  chipUjiGelap: 'rgba(255,255,255,0.12)', // isi chip Uji terbatas di blok gelap
+  chipUjiGelapGaris: 'rgba(255,255,255,0.75)', // tepi chip Uji terbatas di blok gelap
+};
+
+// Gaya chip status fitur. Kunci = nilai status di lib/fitur.js (STATUS_CHIP),
+// ditambah varian blok gelap untuk Uji terbatas. Kontras teks terhadap isi:
+// putih di #2F327D ~11:1, #6B4A00 di #FFF3D0 ~7:1, putih di isi transparan di
+// atas gradasi gelap > 7:1.
+export const chipStatus = {
+  tinggi: 26,
+  'uji-terbatas': { bg: colors.brandDark, ink: colors.white, garis: colors.brandDark },
+  segera: { bg: colors.statusBg, ink: colors.statusInk, garis: colors.statusGaris },
+  'uji-terbatas-gelap': { bg: colors.chipUjiGelap, ink: colors.white, garis: colors.chipUjiGelapGaris },
 };
 
 export const gradients = {
@@ -341,6 +363,18 @@ export const huruf = {
   kutipanArtikel: { fontSize: { xs: '17px', md: '19px' }, lineHeight: 1.7, fontWeight: 400 }, // kutipan di isi artikel
   judulBilah: { fontSize: '16px', lineHeight: 1.4, fontWeight: 600 }, // judul kartu putih bilah samping
   judulAjakanBilah: { fontSize: { xs: '17px', md: '20px' }, lineHeight: 1.4, fontWeight: 600 }, // kartu gradasi bilah samping
+  // Halaman Fitur Lengkap per peran (F8).
+  judulSub: { fontSize: { xs: '20px', md: '26px' }, lineHeight: 1.3, fontWeight: 600 }, // subjudul tab (Waka kurikulum, Guru BK)
+  judulGrupBesar: { fontSize: { xs: '18px', md: '20px' }, lineHeight: 1.3, fontWeight: 600 }, // nama grup di kartu grup besar
+  judulButirGrup: { fontSize: '16px', lineHeight: 1.4, fontWeight: 600 }, // judul fitur di kartu grup besar
+  judulKartuRingkas: { fontSize: '16px', lineHeight: 1.35, fontWeight: 600 }, // judul kartu ringkas
+  labelGrup: {
+    fontSize: { xs: '12.5px', md: '13px' },
+    fontWeight: 600,
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    lineHeight: 1.4,
+  }, // label grup kartu (Presensi, Kesiswaan, ...)
   // Halaman Kalkulator (F7).
   judulSoal: { fontSize: { xs: '18px', md: '22px' }, lineHeight: 1.4, fontWeight: 600 }, // pertanyaan
   angkaSkor: { fontSize: { xs: '22px', md: '36px' }, lineHeight: 1, fontWeight: 700 }, // angka di cincin skor
